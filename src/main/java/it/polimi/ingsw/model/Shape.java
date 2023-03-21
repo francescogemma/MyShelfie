@@ -50,6 +50,13 @@ public class Shape {
         return new ArrayList<>(offsets);
     }
 
+    public Shape verticalFlip() {
+        return new Shape(
+            new ArrayList<>(offsets.stream().map(offset -> Offset.getInstance(offset.getRowOffset(),
+                    width - 1 - offset.getColumnOffset())).collect(Collectors.toList()))
+        );
+    }
+
     public static final ArrayList<Shape> DOMINOES = new ArrayList<>(Arrays.asList(
         /* #
          * #

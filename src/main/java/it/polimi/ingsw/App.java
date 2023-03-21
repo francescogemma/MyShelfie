@@ -51,11 +51,11 @@ public class App {
         library.insertTiles(new ArrayList<>(Collections.nCopies(3, Tile.GREEN)), 0);
         library.insertTiles(new ArrayList<>(Collections.nCopies(2, Tile.GREEN)), 1);
 
-        Shape shape = new Shape(new ArrayList<>(Arrays.asList(Offset.getInstance(0, 1),
+        Shape fork = new Shape(new ArrayList<>(Arrays.asList(Offset.getInstance(0, 1),
             Offset.getInstance(1, 0), Offset.getInstance(1, 1), Offset.getInstance(1, 2),
             Offset.getInstance(2, 0), Offset.getInstance(2, 2))));
 
-        Fetcher fetcher = new ShapeFetcher(shape);
+        Fetcher fetcher = new ShapeFetcher(fork);
         Filter filter = new NumDifferentColorFilter(1, 1);
 
         calculatePoints(library, fetcher, filter);
@@ -75,5 +75,15 @@ public class App {
         UnionFetcher tetrominoesFetcher = new UnionFetcher(tetrominoFetchers);
 
         calculatePoints(library, tetrominoesFetcher, filter);
+
+        Shape l = new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0),
+            Offset.getInstance(1, 0),
+            Offset.getInstance(2, 0),
+            Offset.getInstance(3, 0), Offset.getInstance(3, 1), Offset.getInstance(3, 2)
+        )));
+
+        System.out.println(l.verticalFlip());
+        System.out.println(l);
     }
 }
