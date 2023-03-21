@@ -72,6 +72,11 @@ public class Shape {
         )))
     ));
 
+    public static final Shape CORNERS = new Shape(new ArrayList<>(Arrays.asList(
+        Offset.getInstance(0, 0), Offset.getInstance(0, 4),
+        Offset.getInstance(5, 0), Offset.getInstance(5, 4)
+    )));
+
     // https://en.wikipedia.org/wiki/Tetromino
     public static final ArrayList<Shape> TETROMINOES = new ArrayList<>(Arrays.asList(
         /*  #
@@ -226,6 +231,45 @@ public class Shape {
             Offset.getInstance(3, 0)
         )))
     ));
+
+    public static final Shape SQUARE = new Shape(new ArrayList<>(Arrays.asList(
+        Offset.getInstance(0, 0), Offset.getInstance(0, 1),
+        Offset.getInstance(1, 0), Offset.getInstance(1, 1)
+    )));
+
+    public static Shape getColumn(int height) {
+        ArrayList<Offset> columnOffsets = new ArrayList<>();
+
+        for (int i = 0; i < height; i++) {
+            columnOffsets.add(Offset.down(i));
+        }
+
+        return new Shape(columnOffsets);
+    }
+
+    public static Shape getMainDiagonal(int size) {
+        ArrayList<Offset> diagonalOffsets = new ArrayList<>();
+
+        for (int i = 0; i < size; i++) {
+            diagonalOffsets.add(Offset.getInstance(i, i));
+        }
+
+        return new Shape(diagonalOffsets);
+    }
+
+    public static Shape getRow(int width) {
+        ArrayList<Offset> rowOffsets = new ArrayList<>();
+
+        for (int i = 0; i < width; i++) {
+            rowOffsets.add(Offset.right(i));
+        }
+
+        return new Shape(rowOffsets);
+    }
+
+    // TODO: Add X shape
+
+    // TODO: Add stair shape
 
     @Override
     public String toString() {
