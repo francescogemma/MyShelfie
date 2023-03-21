@@ -1,13 +1,60 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.model.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
 /**
  * Hello world!
  *
  */
 public class App 
 {
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
+    public static void main( String[] args ) {
+        Library library = new Library();
+        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.BLUE)), 0);
+        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.YELLOW, Tile.YELLOW, Tile.BLUE)), 1);
+        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.YELLOW)), 2);
+        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.YELLOW, Tile.YELLOW, Tile.BLUE)), 3);
+        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.BLUE)), 4);
+        library.insertTiles(new ArrayList<>(Collections.nCopies(3, Tile.GREEN)), 0);
+        library.insertTiles(new ArrayList<>(Collections.nCopies(2, Tile.GREEN)), 1);
+
+        Shape shape = new Shape(new ArrayList<>(Arrays.asList(Offset.getInstance(0, 1),
+            Offset.getInstance(1, 0), Offset.getInstance(1, 1), Offset.getInstance(1, 2),
+            Offset.getInstance(2, 0), Offset.getInstance(2, 2))));
+
+        Fetcher fetcher = new ShapeFetcher(shape);
+        Filter filter = new NumDifferentColorFilter(1, 1);
+
+        LibraryMask mask = new LibraryMask(library);
+
+        do {
+            Shelf next = fetcher.next();
+            if (filter.add(library.get(next))) {
+                if (fetcher.canFix()) {
+                    filter.forgetLastTile();
+                    continue;
+                }
+
+                filter.clear();
+                mask.clear();
+                continue;
+            }
+
+            mask.add(next);
+
+            if (fetcher.lastShelf()) {
+                if (filter.isSatisfied()) {
+                    System.out.println(mask);
+                }
+                filter.clear();
+                mask.clear();
+            }
+        } while (!fetcher.hasFinished());
     }
 }
