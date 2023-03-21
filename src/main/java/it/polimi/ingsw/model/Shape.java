@@ -50,90 +50,175 @@ public class Shape {
         return new ArrayList<>(offsets);
     }
 
-    public static ArrayList<Shape> getAllConnectedShapesOfSizeN(int n) {
-        if (n <= 0) {
-            throw new IllegalArgumentException("There is no shape of size 0");
-        }
+    public static final ArrayList<Shape> DOMINOES = new ArrayList<>(Arrays.asList(
+        /* #
+         * #
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0),
+            Offset.getInstance(1, 0)
+        ))),
+        /* ##
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0),   Offset.getInstance(0, 1)
+        )))
+    ));
 
-        ArrayList<Shape> shapes = new ArrayList<>();
-        ArrayList<Offset> offsets = new ArrayList<>();
-
-        if (n == 1) {
-            offsets.add(Offset.getInstance(0, 0));
-            shapes.add(new Shape(offsets));
-
-            return shapes;
-        }
-
-        ArrayList<Shape> subShapes = getAllConnectedShapesOfSizeN(n - 1);
-
-        boolean[][] contains = new boolean[Library.ROWS][Library.COLUMNS];
-
-        for (Shape subShape : subShapes) {
-            for (int row = 0; row < subShape.height; row++) {
-                for (int column = 0; column < subShape.width; column++) {
-                    contains[row][column] = false;
-                }
-            }
-
-            Shelf currentShelf;
-            for (Offset offset : subShape.offsets) {
-                currentShelf = Shelf.origin().move(offset);
-                contains[currentShelf.getRow()][currentShelf.getColumn()] = true;
-            }
-
-            // Zone 1:
-            if (subShape.width < Library.COLUMNS) {
-                if (contains[0][0]) {
-                    offsets.clear();
-
-                    offsets.add(Offset.getInstance(0, 0));
-                    for (Offset offset : subShape.offsets) {
-                        offsets.add(offset.add(Offset.right()));
-                    }
-
-                    shapes.add(new Shape(offsets));
-                }
-            }
-
-            // Zone 2:
-            if (subShape.height < Library.ROWS) {
-                for (int column = 0; column < subShape.width; column++) {
-                    if (contains[0][column]) {
-                        offsets.clear();
-
-                        offsets.add(Offset.right(column));
-                        for (Offset offset : subShape.offsets) {
-                            offsets.add(offset.add(Offset.down()));
-                        }
-
-                        shapes.add(new Shape(offsets));
-                    }
-                }
-            }
-
-            // Zone 3:
-            for (int column = 0; column < subShape.width - 1; column++) {
-                if (contains[0][column]) {
-                    break;
-                }
-
-                if ((subShape.height > 1 && contains[1][column])
-                        || contains[0][column + 1]) {
-                    offsets.clear();
-
-                    offsets.add(Offset.right(column));
-                    for (Offset offset : subShape.offsets) {
-                        offsets.add(offset);
-                    }
-
-                    shapes.add(new Shape(offsets));
-                }
-            }
-        }
-
-        return shapes;
-    }
+    // https://en.wikipedia.org/wiki/Tetromino
+    public static final ArrayList<Shape> TETROMINOES = new ArrayList<>(Arrays.asList(
+        /*  #
+         *  #
+         * ##
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+                                                            Offset.getInstance(0, 1),
+                                                            Offset.getInstance(1, 1),
+            Offset.getInstance(2, 0),   Offset.getInstance(2, 1)
+        ))),
+        /* ###
+         *   #
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0),   Offset.getInstance(0, 1),   Offset.getInstance(0, 2),
+                                                                                                            Offset.getInstance(1, 2)
+        ))),
+        /* ##
+         * #
+         * #
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0),   Offset.getInstance(0, 1),
+            Offset.getInstance(1, 0),
+            Offset.getInstance(2, 0)
+        ))),
+        /* #
+         * ###
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0),
+            Offset.getInstance(1, 0),   Offset.getInstance(1, 1),   Offset.getInstance(1, 2)
+        ))),
+        /*  ##
+         * ##
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+                                                            Offset.getInstance(0, 1), Offset.getInstance(0, 2),
+            Offset.getInstance(1, 0), Offset.getInstance(1, 1)
+        ))),
+        /* #
+         * ##
+         *  #
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0),
+            Offset.getInstance(1, 0),   Offset.getInstance(1, 1),
+                                                            Offset.getInstance(2, 1)
+        ))),
+        /* ###
+         *  #
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0),   Offset.getInstance(0, 1),   Offset.getInstance(0, 2),
+                                                            Offset.getInstance(1, 1)
+        ))),
+        /* #
+         * ##
+         * #
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0),
+            Offset.getInstance(1, 0),   Offset.getInstance(1, 1),
+            Offset.getInstance(2, 0)
+        ))),
+        /* ####
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0), Offset.getInstance(0, 1), Offset.getInstance(0, 2), Offset.getInstance(0, 3)
+        ))),
+        /* ##
+         * ##
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0),   Offset.getInstance(0, 1),
+            Offset.getInstance(1, 0),   Offset.getInstance(1, 1)
+        ))),
+        /* ##
+         *  #
+         *  #
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0),   Offset.getInstance(0, 1),
+                                                            Offset.getInstance(1, 1),
+                                                            Offset.getInstance(2, 1)
+        ))),
+        /*   #
+         * ###
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+                                                                                                        Offset.getInstance(0, 2),
+            Offset.getInstance(1, 0),   Offset.getInstance(1, 1), Offset.getInstance(1, 2)
+        ))),
+        /* #
+         * #
+         * ##
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0),
+            Offset.getInstance(1, 0),
+            Offset.getInstance(2, 0),   Offset.getInstance(2, 1)
+        ))),
+        /* ###
+         * #
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0),   Offset.getInstance(0, 1),   Offset.getInstance(0, 2),
+            Offset.getInstance(1, 0)
+        ))),
+        /* ##
+         *  ##
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0),   Offset.getInstance(0, 1),
+                                                            Offset.getInstance(1, 1),   Offset.getInstance(1, 2)
+        ))),
+        /*  #
+         * ##
+         * #
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+                                                            Offset.getInstance(0, 1),
+            Offset.getInstance(1, 0),   Offset.getInstance(1, 1),
+            Offset.getInstance(2, 0)
+        ))),
+        /*  #
+         * ###
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+                                                            Offset.getInstance(0, 1),
+            Offset.getInstance(1, 0),   Offset.getInstance(1, 1),   Offset.getInstance(1, 2)
+        ))),
+        /*  #
+         * ##
+         *  #
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+                                                            Offset.getInstance(0, 1),
+            Offset.getInstance(1, 0),   Offset.getInstance(1, 1),
+                                                            Offset.getInstance(2, 1)
+        ))),
+        /* #
+         * #
+         * #
+         * #
+         */
+        new Shape(new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, 0),
+            Offset.getInstance(1, 0),
+            Offset.getInstance(2, 0),
+            Offset.getInstance(3, 0)
+        )))
+    ));
 
     @Override
     public String toString() {
