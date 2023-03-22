@@ -6,12 +6,14 @@ public class NonIntersectingColorEvaluator implements Evaluator {
     private ArrayList<LibraryMaskSet> group;
     private final int points;
     private final int targetSetSize;
+    private boolean targetMet;
 
     public NonIntersectingColorEvaluator(int points, int targetGroupSize) {
         group = new ArrayList<>();
 
         this.points = points;
         this.targetSetSize = targetGroupSize;
+        this.targetMet = targetSetSize <= 1;
     }
 
     // returns true if a single sampled color from both the set and the LibraryMask is the same
@@ -25,8 +27,6 @@ public class NonIntersectingColorEvaluator implements Evaluator {
         return maskTile.equals(setTile);
     }
     public boolean add(LibraryMask libraryMask) {
-        boolean result = targetSetSize <= 1;
-
         for (LibraryMaskSet libraryMaskSet : group) {
             boolean intersectionFound = false;
 
@@ -38,7 +38,7 @@ public class NonIntersectingColorEvaluator implements Evaluator {
                 libraryMaskSet.addLibraryMask(libraryMask);
 
                 // note down if this addition meets out target size
-                result = libraryMaskSet.getSize() >= targetSetSize;
+                targetMet = libraryMaskSet.getSize() >= targetSetSize;
             }
         }
         // create and add one more set with a single LibraryMask
@@ -46,23 +46,11 @@ public class NonIntersectingColorEvaluator implements Evaluator {
         libraryMaskSetLast.addLibraryMask(libraryMask);
         group.add(libraryMaskSetLast);
 
-        return result;
-    }
-    public int getPoints() {
-        return points;
+        return targetMet;
     }
 
-    // quick and dirty way to get the biggest LibraryMaskSet
-    // may want to make this more efficient eventually
-    public LibraryMaskSet getBiggestSet() {
-        int cardinality = 0;
-        LibraryMaskSet biggest = null;
-        for (LibraryMaskSet libraryMaskSet : group) {
-            if (libraryMaskSet.getSize() > cardinality) {
-                cardinality = libraryMaskSet.getSize();
-                biggest = libraryMaskSet;
-            }
-        }
-        return biggest;
+    public int getPoints() {
+        if (targetMet) { return points; }
+        return 0;
     }
 }

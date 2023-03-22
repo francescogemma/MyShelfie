@@ -6,16 +6,16 @@ public class NonIntersectingEvaluator implements Evaluator {
     private ArrayList<LibraryMaskSet> group;
     private final int points;
     private final int targetSetSize;
+    private boolean targetMet;
 
     public NonIntersectingEvaluator(int points, int targetGroupSize) {
         group = new ArrayList<>();
 
         this.points = points;
         this.targetSetSize = targetGroupSize;
+        this.targetMet = targetSetSize <= 1;
     }
     public boolean add(LibraryMask libraryMask) {
-        boolean result = targetSetSize <= 1;
-
         for (LibraryMaskSet libraryMaskSet : group) {
             boolean intersectionFound = false;
 
@@ -26,7 +26,7 @@ public class NonIntersectingEvaluator implements Evaluator {
                 libraryMaskSet.addLibraryMask(libraryMask);
 
                 // note down if this addition meets out target size
-                result = libraryMaskSet.getSize() >= targetSetSize;
+                targetMet = libraryMaskSet.getSize() >= targetSetSize;
             }
         }
         // create and add one more set with a single LibraryMask
@@ -34,9 +34,10 @@ public class NonIntersectingEvaluator implements Evaluator {
         libraryMaskSetLast.addLibraryMask(libraryMask);
         group.add(libraryMaskSetLast);
 
-        return result;
+        return targetMet;
     }
     public int getPoints() {
-        return points;
+        if (targetMet) { return points; }
+        return 0;
     }
 }
