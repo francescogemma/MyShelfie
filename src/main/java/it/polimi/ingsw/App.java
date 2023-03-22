@@ -16,30 +16,17 @@ public class App {
     private static void calculatePoints(Library library, Fetcher fetcher, Filter filter) {
         LibraryMask mask = new LibraryMask(library);
 
-        // TODO: refactor this piece of code
         do {
             Shelf next = fetcher.next();
-            // System.out.println(next);
             if (filter.add(library.get(next))) {
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
-                    if (fetcher.lastShelf()) {
-                        if (filter.isSatisfied()) {
-                            System.out.println(mask);
-                        }
-                        filter.clear();
-                        mask.clear();
-                    }
+                } else {
+                    filter.clear();
+                    mask.clear();
                     continue;
                 }
-
-                filter.clear();
-                mask.clear();
-                continue;
-            }
-
-            mask.add(next);
-            // System.out.println(mask);
+            } else mask.add(next);
 
             if (fetcher.lastShelf()) {
                 if (filter.isSatisfied()) {
@@ -70,7 +57,7 @@ public class App {
 
         calculatePoints(library, fetcher, filter);
 
-        /*ArrayList<Fetcher> dominoFetchers = new ArrayList<>();
+        /* ArrayList<Fetcher> dominoFetchers = new ArrayList<>();
         for (Shape domino : Shape.DOMINOES) {
             dominoFetchers.add(new ShapeFetcher(domino));
         }
@@ -94,6 +81,6 @@ public class App {
         )));
 
         System.out.println(l.verticalFlip());
-        System.out.println(l);*/
+        System.out.println(l); */
     }
 }
