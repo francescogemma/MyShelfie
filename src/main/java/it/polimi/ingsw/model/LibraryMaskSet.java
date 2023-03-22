@@ -9,6 +9,18 @@ public class LibraryMaskSet {
         libraryMasks = new ArrayList<>();
     }
 
+    public LibraryMaskSet(LibraryMaskSet libraryMaskSet) {
+        libraryMasks = libraryMaskSet.getLibraryMasks();
+    }
+
+    public int getSize() {
+        return libraryMasks.size();
+    }
+
+    public ArrayList<LibraryMask> getLibraryMasks() {
+        return new ArrayList<>(libraryMasks);
+    }
+
     public void addLibraryMask(LibraryMask libraryMask) {
         libraryMasks.add(libraryMask);
     }

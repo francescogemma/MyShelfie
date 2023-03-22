@@ -3,45 +3,40 @@ package it.polimi.ingsw.model;
 import java.util.ArrayList;
 
 public class NonIntersectingEvaluator implements Evaluator {
-    private ArrayList<ArrayList<LibraryMask>> groups;
+    private ArrayList<LibraryMaskSet> group;
+    private final int points;
+    private final int targetSetSize;
 
-    public NonIntersectingEvaluator() {
-        groups = new ArrayList<>();
+    public NonIntersectingEvaluator(int points, int targetGroupSize) {
+        group = new ArrayList<>();
+
+        this.points = points;
+        this.targetSetSize = targetGroupSize;
     }
     public boolean add(LibraryMask libraryMask) {
-        // TODO: delete all of this and start fresh using LibraryMaskSet
+        boolean result = targetSetSize <= 1;
 
-        for (ArrayList<LibraryMask> group : groups) {
+        for (LibraryMaskSet libraryMaskSet : group) {
             boolean intersectionFound = false;
-            for (LibraryMask libraryMaskSample : group) {
-                if (areIntersecting(libraryMask, libraryMaskSample)) {
-                    intersectionFound = true;
-                    break;
-                }
-            }
-            if (!intersectionFound) {
-                group.add(libraryMask);
+
+            if (!libraryMaskSet.intersects(libraryMask)) {
+                // duplicate current LibraryMaskSet in group
+                // then, add non-intersecting mask to one of them
+                group.add(new LibraryMaskSet(libraryMaskSet));
+                libraryMaskSet.addLibraryMask(libraryMask);
+
+                // not down if this addition meets out target size
+                result = libraryMaskSet.getSize() >= targetSetSize;
             }
         }
-        ArrayList<LibraryMask> newGroup = new ArrayList<>();
-        newGroup.add(libraryMask);
-        groups.add(newGroup);
+        // create and add one more set with a single LibraryMask
+        LibraryMaskSet libraryMaskSetLast = new LibraryMaskSet();
+        libraryMaskSetLast.addLibraryMask(libraryMask);
+        group.add(libraryMaskSetLast);
 
-        return false;
+        return result;
     }
     public int getPoints() {
-        return 0;
-    }
-
-    private boolean areIntersecting(LibraryMask a, LibraryMask b) {
-        // TODO: delete all of this and start fresh using LibraryMaskSet
-        for (Shelf shelfA : a.getShelves()) {
-            for (Shelf shelfB : b.getShelves()) {
-                if (shelfA.getRow() == shelfB.getRow() && shelfA.getColumn() == shelfB.getColumn()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return points;
     }
 }

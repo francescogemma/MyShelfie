@@ -34,7 +34,7 @@ public class LibraryMask {
     public boolean intersects(LibraryMask libraryMask) {
         for (Shelf A : shelves) {
             for (Shelf B : libraryMask.getShelves()) {
-                if (A.getRow() == B.getRow() && A.getColumn() == B.getColumn()) {
+                if (A.equals(B)) {
                     return true;
                 }
             }
