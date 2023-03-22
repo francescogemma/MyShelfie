@@ -28,7 +28,19 @@ public class LibraryMask {
 
         shelves.add(shelf);
     }
-
+    public ArrayList<Shelf> getShelves() {
+        return new ArrayList<>(shelves);
+    }
+    public boolean intersects(LibraryMask libraryMask) {
+        for (Shelf A : shelves) {
+            for (Shelf B : libraryMask.getShelves()) {
+                if (A.getRow() == B.getRow() && A.getColumn() == B.getColumn()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder("---------------\n");
