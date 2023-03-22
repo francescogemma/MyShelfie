@@ -31,6 +31,10 @@ public class LibraryMask {
     public ArrayList<Shelf> getShelves() {
         return new ArrayList<>(shelves);
     }
+    // gets the first tile in the mask
+    public Tile getSampleTile() {
+        return library.get(shelves.get(0));
+    }
     public boolean intersects(LibraryMask libraryMask) {
         for (Shelf A : shelves) {
             for (Shelf B : libraryMask.getShelves()) {

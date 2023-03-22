@@ -25,7 +25,7 @@ public class NonIntersectingEvaluator implements Evaluator {
                 group.add(new LibraryMaskSet(libraryMaskSet));
                 libraryMaskSet.addLibraryMask(libraryMask);
 
-                // not down if this addition meets out target size
+                // note down if this addition meets out target size
                 result = libraryMaskSet.getSize() >= targetSetSize;
             }
         }
