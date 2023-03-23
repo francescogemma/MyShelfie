@@ -54,11 +54,10 @@ public class Game {
     }
 
     public boolean disconnected(final Player player) {
-        return this.players.get(indexOf(player)).getValue();
+        return !this.players.get(indexOf(player)).getValue();
     }
 
     public void connect(Player player) {
-
         final int index = this.indexOf(player);
         this.players.get(index).setValue(true);
     }
