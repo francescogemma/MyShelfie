@@ -1,13 +1,10 @@
 package it.polimi.ingsw.model;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.abs;
@@ -101,8 +98,7 @@ public class Board {
                                                             {2, 6},
                                                                             {3, 8},
             {5, 0},
-                            {6, 2},
-                                                    {6, 5},
+                            {6, 2},                 {6, 6},
                                                     {8, 5}
     };
 
@@ -111,7 +107,7 @@ public class Board {
                                                     {1, 5},
                                                                             {4, 8},
                                                                     {5, 7},
-                                                    {8, 5}
+                                                    {8, 4}
     };
 
     /**
@@ -148,7 +144,7 @@ public class Board {
     }
 
     /**
-     * @return  it return true if tiles[row + deltaRow, col + deltaCol] is outside of the board or 
+     * @return  it returns true if tiles[row + deltaRow, col + deltaCol] is outside of the board or
      *          tiles[row + deltaRow, col + deltaCol] is empty
      * */
     private boolean isSideFree(int row, int col, int deltaRow, int deltaCol) {
@@ -164,15 +160,11 @@ public class Board {
     }
 
     /**
-     * @return return the numer of sides touching the edge
+     * @return return true if tiles[row][col] is on border
      * */
-    private int numberOfEdgesOnBorder(int row, int col) {
-        int f = 0;
-        f += (row == 0) ? 1 : 0;
-        f += (row + 1 == Board.rowBoard) ? 1 : 0;
-        f += (col == 0) ? 1 : 0;
-        f += (col + 1 == Board.columnBoard) ? 1 : 0;
-        return f;
+    private boolean hasEdgeOnBorder(int row, int col) {
+        return row == tiles.length || col == tiles.length ||
+                row == 0 || col == 0;
     }
 
     /**
@@ -201,10 +193,11 @@ public class Board {
         List<Tile> res = new ArrayList<>();
 
         Consumer<int[][]> action = (int[][] board) -> {
-            for (int r = 0; r < board.length; r++) {
-                for (int c = 0; c < board[r].length; c++) {
-                    if (this.freeSide(r, c) > 0)
-                        res.add(typeAt(c, r));
+            for (int[] ints : board) {
+                final int row = ints[0];
+                final int col = ints[1];
+                if (freeSide(row, col) > 0) {
+                    res.add(typeAt(row, col));
                 }
             }
         };
@@ -255,6 +248,28 @@ public class Board {
         return res;
     }
 
+    private int edgesOccupied (int row, int col) {
+        int free = 0;
+        final boolean onBorder = this.hasEdgeOnBorder(row, col);
+        if (onBorder)
+            free ++;
+
+        if (col + 1< Board.columnBoard && this.isEmpty(row, col+1))
+                free ++;
+
+        if (row + 1< Board.rowBoard && this.isEmpty(row+1, col))
+                free ++;
+
+
+        if (row != 0 && this.isEmpty(row - 1, col))
+                free ++;
+
+        if (col != 0 && this.isEmpty(row, col - 1))
+                free++;
+
+        return free;
+    }
+
     private List<Coordinates> getAvailablePositionInsert(int numPlayer) {
         List<Coordinates> res = new ArrayList<>();
 
@@ -274,13 +289,17 @@ public class Board {
         }
 
         Consumer<int[][]> action = (int [][] position) -> {
-            int r, c;
-            for (r = 0; r < position.length; r++) {
-                for (c = 0; c < position[r].length; c++) {
-                    if (this.isEmpty(r, c)) {
-                        if (freeSide(r, c) - numberOfEdgesOnBorder(r, c) > 0)
-                            res.add(new Coordinates(r, c));
-                    }
+            for (int[] ints : position) {
+                final int row = ints[0];
+                final int col = ints[1];
+
+                if (this.isEmpty(row, col)) {
+                    final int edge = edgesOccupied(row, col);
+
+                    if (edge < 4)
+                        res.add(new Coordinates(
+                                row, col
+                        ));
                 }
             }
         };
@@ -303,7 +322,8 @@ public class Board {
             throw new IllegalArgumentException("Board is full");
 
         final List<Coordinates> possible = this.getAvailablePositionInsert(numPlayer);
-        final int index = new Random().nextInt(0, possible.size());
+        final int index = new Random().nextInt(possible.size());
+
         this.insert(tile,
                 possible.get(index).getY(),
                 possible.get(index).getX()
@@ -317,7 +337,6 @@ public class Board {
 
     public boolean needsRefill() {
         int r, c;
-        boolean allNull = false;
 
         for (r = 0; r < rowBoard; r++) {
             for (c = 0; c < columnBoard; c++) {
@@ -325,12 +344,11 @@ public class Board {
                     if (freeSide(r, c) == 4) {
                         return true;
                     }
-                    allNull = true;
                 }
             }
         }
 
-        return allNull;
+        return occupied == 0;
     }
 
     private Tile remove (int row, int col) {
@@ -340,5 +358,21 @@ public class Board {
         this.occupied --;
         this.tiles[row][col] = null;
         return t;
+    }
+
+    @Override
+    public String toString() {
+        int i, k;
+        StringBuilder result = new StringBuilder("---------------\n");
+        for (i = 0; i < this.tiles.length; i++) {
+            for (k = 0; k < this.tiles[i].length; k++) {
+                if (isEmpty(i, k))
+                    result.append("[ ]");
+                else
+                    result.append("[").append(this.tiles[i][k].color("#")).append("]");
+            }
+            result.append("\n");
+        }
+        return result.toString();
     }
 }
