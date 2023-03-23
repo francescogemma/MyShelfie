@@ -8,10 +8,6 @@ import java.util.Collections;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-/**
- * Hello world!
- *
- */
 public class App {
     private static void calculatePoints(Library library, Fetcher fetcher, Filter filter) {
         LibraryMask mask = new LibraryMask(library);
