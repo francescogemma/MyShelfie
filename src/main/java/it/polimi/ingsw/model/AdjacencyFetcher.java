@@ -3,28 +3,27 @@ package it.polimi.ingsw.model;
 import java.util.Stack;
 
 /**
- * Fetches all the groups of adjacent shelves with the same color.
- * It implements the Fetcher interface.
- * It uses a stack to implement a DFS.
+ * Fetches all the groups of adjacent {@link Shelf shelves} with the same color.
+ * It implements the {@link Fetcher} interface.
+ * It uses a {@link Stack} to implement a DFS.
  * @author Francesco Gemma
  */
 public class AdjacencyFetcher implements Fetcher {
     /**
-     * Represents the status of a shelf.
-     * A status can be NOT_VISITED, VISITED or NOT_THE_SAME_COLOR.
-     * @author Francesco Gemma
+     * Represents the status of a {@link Shelf shelf}.
+     * A status can be {@link ShelfStatus#NOT_VISITED}, {@link ShelfStatus#VISITED} or {@link ShelfStatus#NOT_THE_SAME_COLOR}.
      */
     public enum ShelfStatus {
         /**
-         * NOT_VISITED indicates that the shelf has not been visited yet.
+         * It indicates that the shelf has not been visited yet.
          */
         NOT_VISITED,
         /**
-         * VISITED indicates that the shelf has been visited.
+         * It indicates that the shelf has been visited.
          */
         VISITED,
         /**
-         * NOT_THE_SAME_COLOR indicates that the shelf has been visited,
+         * It indicates that the shelf has been visited,
          * but it is not the same color as the first shelf of the group.
          */
         NOT_THE_SAME_COLOR
@@ -39,9 +38,8 @@ public class AdjacencyFetcher implements Fetcher {
 
     /**
      * Constructor of the class.
-     * It initializes the stack,
-     * and it sets all the shelves to NOT_VISITED.
-     * @author Francesco Gemma
+     * It initializes the {@link Stack},
+     * and it sets all the {@link Shelf shelves} to {@link ShelfStatus#NOT_VISITED}.
      */
     public AdjacencyFetcher() {
         stack = new Stack<>();
@@ -170,10 +168,9 @@ public class AdjacencyFetcher implements Fetcher {
     }
 
     /**
-     * This method checks if at least one of the shelves adjacent to the shelf passed as parameter is not visited.
+     * This method checks if at least one of the {@link Shelf shelves} adjacent to the shelf passed as parameter is {@link ShelfStatus#NOT_VISITED}.
      * @param shelf the shelf from which we want to check if its adjacent shelves are not visited.
      * @return true if at least one of the adjacent shelves is not visited, false otherwise.
-     * @author Francesco Gemma
      */
     private boolean canMove(Shelf shelf) {
         return canMoveInThisDirection(shelf, Offset.up()) ||
@@ -183,14 +180,13 @@ public class AdjacencyFetcher implements Fetcher {
     }
 
     /**
-     * This method checks if the shelf adjacent to the shelf passed as parameter in the direction specified by the offset
-     * is not visited.
+     * This method checks if the {@link Shelf shelf} adjacent to the shelf passed as parameter in the direction specified by the {@link Offset offset}
+     * is {@link ShelfStatus#NOT_VISITED}.
      * First it check if the shelf specified by the offset is not out of bounds, then it checks if the shelf is not visited.
      * @param shelf the shelf from which we want to check if one of its adjacent shelf is not visited.
      * @param offset the direction in which we want to check the adjacent shelf.
      * @return true if the adjacent shelf is not visited, false otherwise.
      * @throws IllegalArgumentException if the offset is not a valid offset, we can only check an adjacent shelf.
-     * @author Francesco Gemma
      */
     private boolean canMoveInThisDirection(Shelf shelf, Offset offset) {
         if(offset.getRowOffset() < -1 ||
@@ -216,8 +212,7 @@ public class AdjacencyFetcher implements Fetcher {
     }
 
     /**
-     * @return true if all shelves are visited, false otherwise.
-     * @author Francesco Gemma
+     * @return true if the {@link ShelfStatus status} of all the {@link Shelf shelves} is {@link ShelfStatus#VISITED}, false otherwise.
      */
     private boolean areAllShelvesVisited() {
         for(int i = 0; i < Library.ROWS; i++) {
@@ -231,8 +226,7 @@ public class AdjacencyFetcher implements Fetcher {
     }
 
     /**
-     * @return true if all shelves are not visited, false otherwise.
-     * @author Francesco Gemma
+     * @return true if the {@link ShelfStatus status} of all the {@link Shelf shelves} is {@link ShelfStatus#NOT_VISITED}, false otherwise.
      */
     private boolean areAllShelvesNotVisited() {
         for(int i = 0; i < Library.ROWS; i++) {
@@ -246,9 +240,8 @@ public class AdjacencyFetcher implements Fetcher {
     }
 
     /**
-     * This method is called when a new group is started, so it checks for a not visited shelf for the next group.
+     * This method is called when a new group is started, so it checks for a {@link ShelfStatus#NOT_VISITED} {@link Shelf shelf} for the next group.
      * @return the next shelf to visit so the next shelf not visited, null otherwise.
-     * @author Francesco Gemma
      */
     private Shelf findAnotherShelf() {
         for(int i = 0; i < Library.ROWS; i++) {
@@ -262,9 +255,8 @@ public class AdjacencyFetcher implements Fetcher {
     }
 
     /**
-     * This method sets all the shelves statuses from "NOT_THE_SAME_COLOR" to NOT_VISITED.
+     * This method sets all the {@link Shelf shelves} statuses from {@link ShelfStatus#NOT_THE_SAME_COLOR} to {@link ShelfStatus#NOT_VISITED}.
      * It is called when a new group is started.
-     * @author Francesco Gemma
      */
     private void setupNewGroup() {
         for(int i = 0; i < Library.ROWS; i++) {
@@ -277,8 +269,7 @@ public class AdjacencyFetcher implements Fetcher {
     }
 
     /**
-     * This method sets all the shelves statuses to NOT_VISITED.
-     * @author Francesco Gemma
+     * This method sets all the {@link Shelf shelves} statuses to {@link ShelfStatus#NOT_VISITED}.
      */
     private void setAllShelvesToNotVisited() {
         for(int i = 0; i < Library.ROWS; i++) {
@@ -289,28 +280,25 @@ public class AdjacencyFetcher implements Fetcher {
     }
 
     /**
-     * This method sets the status of the shelf passed as parameter to NOT_THE_SAME_COLOR.
+     * This method sets the {@link ShelfStatus status} of the {@link Shelf shelf} passed as parameter to {@link ShelfStatus#NOT_THE_SAME_COLOR}.
      * @param shelf the shelf to set to NOT_THE_SAME_COLOR.
-     * @author Francesco Gemma
      */
     private void setShelfToNotTheSameColor(Shelf shelf) {
         statuses[shelf.getRow()][shelf.getColumn()] = ShelfStatus.NOT_THE_SAME_COLOR;
     }
 
     /**
-     * This method sets the status of the shelf passed as parameter to VISITED.
+     * This method sets the {@link ShelfStatus status} of the {@link Shelf shelf} passed as parameter to {@link ShelfStatus#VISITED}.
      * @param shelf the shelf to set to VISITED.
-     * @author Francesco Gemma
      */
     private void setShelfToVisited(Shelf shelf) {
         statuses[shelf.getRow()][shelf.getColumn()] = ShelfStatus.VISITED;
     }
 
     /**
-     * This method gets the status of the shelf passed as parameter.
+     * This method gets the {@link ShelfStatus status} of the {@link Shelf shelf} passed as parameter.
      * @param shelf the shelf to get the status from.
      * @return the status of the shelf passed as parameter.
-     * @author Francesco Gemma
      */
     private ShelfStatus getShelfStatus(Shelf shelf) {
         return statuses[shelf.getRow()][shelf.getColumn()];

@@ -1,8 +1,8 @@
 package it.polimi.ingsw.model;
 
 /**
- * This class represents a player of the game.
- * It contains the name of the player, the points, the library and the personal objective of that player.
+ * This class represents a player of the {@link Game game}.
+ * It contains the name of the player, his {@link Player#points}, his {@link Library library} and his personal objective of that player.
  * @author Francesco Gemma
  */
 public class Player {
@@ -13,10 +13,9 @@ public class Player {
     private int points;
 
     /**
-     * Constructor of the class Player.
-     * Sets the name of the player, his points to 0 and creates a new library.
-     * @param name the name of the player
-     * @author Francesco Gemma
+     * Constructor of the class.
+     * Sets the name of the player, his points to 0 and creates a new {@link Library library}.
+     * @param name the name of the player.
      */
     public Player(String name) {
         this.name = name;
@@ -25,26 +24,23 @@ public class Player {
     }
 
     /**
-     * @return the name of the player
-     * @author Francesco Gemma
+     * @return {@link Player#name}
      */
     public String getName() {
         return name;
     }
 
     /**
-     * @return the points of the player
-     * @author Francesco Gemma
+     * @return {@link Player#points}
      */
     public int getPoints() {
         return points;
     }
 
     /**
-     * This method adds points to the player
-     * @param points number of points to add to the player
-     * @throws IllegalArgumentException if the points to add are negative
-     * @author Francesco Gemma
+     * This method adds {@link Player#points} to the player.
+     * @param points number of points to add to the player.
+     * @throws IllegalArgumentException if the points to add are negative.
      */
     public void addPoints(int points) {
         if(points < 0) {
@@ -55,16 +51,15 @@ public class Player {
     }
 
     /**
-     * @return the library of the player
-     * @author Francesco Gemma
+     * @return {@link Player#library}
      */
     public Library getLibrary() {
         return library;
     }
 
     /**
-     * @param library the library to set
-     * @author Francesco Gemma
+     * This method sets the {@link Player#library} of the player.
+     * @param library the new {@link Library}.
      */
     public void setLibrary(Library library) {
         this.library = library;
