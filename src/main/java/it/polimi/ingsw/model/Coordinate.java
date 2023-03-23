@@ -1,12 +1,10 @@
 package it.polimi.ingsw.model;
 
-import java.io.StreamCorruptedException;
-
-public class Coordinates {
+public class Coordinate {
     private final int x;
     private final int y;
 
-    public Coordinates(int y, int x) {
+    public Coordinate(int y, int x) {
         this.x = x;
         this.y = y;
     }
@@ -23,7 +21,7 @@ public class Coordinates {
     public boolean equals(Object obj) {
         if (obj == this)
             return true;
-        if (obj instanceof Coordinates o) {
+        if (obj instanceof Coordinate o) {
             return this.x == o.x && this.y == o.y;
         }
         return false;

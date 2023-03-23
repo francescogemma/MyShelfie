@@ -1,16 +1,25 @@
 package it.polimi.ingsw.model;
 
+import jdk.jshell.spi.ExecutionControl;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.max;
 
+/**
+ * Manager for Tile selection
+ * @author Giacomo Groppi
+ */
 class BoardSelector {
-    private final List<Coordinates> selected;
+    private final List<Coordinate> selected;
 
     BoardSelector () {
         selected = new ArrayList<>();
@@ -20,25 +29,42 @@ class BoardSelector {
         return this.selected.size();
     }
 
-    private boolean isVerticalExtraction () {
+    /**
+     * @exception RuntimeException if sizeSelection() != 2
+     * @return true if the extraction is Vertical
+     */
+    protected boolean isVerticalExtraction () {
         if (this.sizeSelection() != 2)
             throw new RuntimeException();
 
-        return this.selected.get(0).getY() == this.selected.get(1).getY();
+        final int x0 = selected.get(0).getX();
+        final int x1 = selected.get(1).getX();
+
+        return x0 == x1;
     }
 
+    protected boolean contains(Coordinate c) {
+        return this.selected.contains(c);
+    }
+
+    /**
+     * @exception IllegalExtractionException if the position of the Tile is along the diagonal
+     * @exception IllegalArgumentException if we are trying to extract more than 3 tiles
+     * @exception IllegalArgumentException if [r, c] is already in the list
+     */
     public void select (int r, int c) throws IllegalExtractionException {
         if (sizeSelection() > 2) {
             throw new IllegalArgumentException("More than 3 tiles have already been selected");
         }
 
-        if (selected.contains(new Coordinates(r, c))) {
+        if (contains(new Coordinate(r, c))) {
             throw new IllegalArgumentException("The specified coordinate already exists");
         }
 
         switch (selected.size()) {
+            case 0 -> {}
             case 1 -> {
-                Coordinates alreadySelected = this.selected.get(0);
+                Coordinate alreadySelected = this.selected.get(0);
                 final int alreadySelectedRow = alreadySelected.getY();
                 final int alreadySelectedCol = alreadySelected.getX();
 
@@ -47,17 +73,19 @@ class BoardSelector {
             }
             case 2 -> {
                 if (this.isVerticalExtraction()) {
-                    if (this.selected.get(0).getX() == c && (
+                    if (!(this.selected.get(0).getX() == c && (
                             abs(selected.get(0).getY() - r) == 1 ||
                             abs(selected.get(1).getY() - r) == 1)
-                    ) {
+                    )) {
                         throw new IllegalExtractionException();
                     }
                 } else {
-                    if (this.selected.get(0).getY() == r && (
-                            abs(selected.get(0).getX() - c) == 1 ||
-                            abs(selected.get(1).getX() - c) == 1)
-                    ){
+                    Coordinate c0 = selected.get(0);
+                    Coordinate c1 = selected.get(1);
+                    if (!(c0.getY() == r && (
+                            abs(c0.getX() - c) == 1 ||
+                            abs(c1.getX() - c) == 1)
+                    )) {
                         throw new IllegalExtractionException();
                     }
                 }
@@ -65,10 +93,13 @@ class BoardSelector {
             default -> throw new RuntimeException();
         }
 
-        this.selected.add(new Coordinates(r, c));
+        this.selected.add(new Coordinate(r, c));
     }
 
-    public final List<Coordinates> getSelected() {
+    /**
+     * @return it returns a new List with all the selected tiles
+     */
+    public final List<Coordinate> getSelected() {
         return new ArrayList<>(this.selected);
     }
 }
@@ -82,6 +113,7 @@ public class Board {
     public static final int columnBoard = 9;
     private BoardSelector boardSelector;
     private int occupied;
+
 
     static final int [][] twoPlayerPosition = {
                                     {1, 3}, {1, 4},
@@ -111,8 +143,9 @@ public class Board {
     };
 
     /**
-     * tiles[i][j] will be null if and only if the cell is empty
+     * tiles[i][j] will be null if the cell is empty
      */
+    // TODO: replace Tile with Optional<Tile>
     private final Tile [][]tiles;
 
     public Board() {
@@ -121,19 +154,29 @@ public class Board {
         occupied = 0;
     }
 
+    /**
+     * @return the Tile in position [row, col]
+     */
     public Tile typeAt(int row, int col) {
         return this.tiles[row][col];
     }
 
+    /**
+     * 
+    * */
     public Tile selectTile(int row, int col) throws IllegalExtractionException {
-        if (this.isEmpty(row, col) || this.freeSide(row, col) == 0) {
-            throw new IllegalExtractionException();
+        if (this.isEmpty(row, col) || numberOfFreeSides(row, col, this::isEmptyExtraction) == 0) {
+            System.out.println(this);
+            throw new IllegalExtractionException("Can't extract tile at: [" + row + ", " + col + "]");
         }
 
         this.boardSelector.select(row, col);
         return this.typeAt(row, col);
     }
 
+    /**
+     * @return All Tiles selected so far.
+     */
     public List<Tile> getSelectedTiles() {
         return this
                 .boardSelector
@@ -144,22 +187,6 @@ public class Board {
     }
 
     /**
-     * @return  it returns true if tiles[row + deltaRow, col + deltaCol] is outside of the board or
-     *          tiles[row + deltaRow, col + deltaCol] is empty
-     * */
-    private boolean isSideFree(int row, int col, int deltaRow, int deltaCol) {
-        if (abs(deltaRow) == 1 ^ abs(deltaCol) == 1)
-            throw new IllegalArgumentException();
-
-        if (deltaCol + col >= columnBoard || deltaCol + col < 0)
-            return true;
-        if (deltaRow + row >= rowBoard || deltaRow + row < 0)
-            return true;
-
-        return isEmpty(row + deltaRow, col + deltaCol);
-    }
-
-    /**
      * @return return true if tiles[row][col] is on border
      * */
     private boolean hasEdgeOnBorder(int row, int col) {
@@ -167,28 +194,15 @@ public class Board {
                 row == 0 || col == 0;
     }
 
-    /**
-     * @return the number of free side in position (row, col)
-     *          if the cell is on the edge of the board the function will always return > 0
-     * */
-    private int freeSide(int row, int col) {
-        final Coordinates[] pos = new Coordinates[]{
-                new Coordinates(0, -1),
-                new Coordinates(-1, 0),
-                new Coordinates(1, 0),
-                new Coordinates(0, 1)
-        };
-
-        int free = 0;
-
-        for (Coordinates coordinates: pos) {
-            if (isSideFree(row, col, coordinates.getY(), coordinates.getY()))
-                free ++;
-        }
-
-        return free;
+    private boolean isEmptyExtraction(int row, int col) {
+        if (this.boardSelector.contains(new Coordinate(row, col)))
+            return true;
+        return this.isEmpty(row, col);
     }
 
+    /**
+     * @return All the Tiles on the board.
+     */
     public List<Tile> getSelectableTiles() {
         List<Tile> res = new ArrayList<>();
 
@@ -196,32 +210,80 @@ public class Board {
             for (int[] ints : board) {
                 final int row = ints[0];
                 final int col = ints[1];
-                if (freeSide(row, col) > 0) {
+                if (row < 0 || row > Board.rowBoard)
+                    continue;
+                if (col < 0 || col > Board.columnBoard)
+                    continue;
+                if (this.numberOfFreeSides(row, col, this::isEmptyExtraction) > 0 && typeAt(row, col) != null){
                     res.add(typeAt(row, col));
                 }
             }
         };
 
-        action.accept(Board.twoPlayerPosition);
-        action.accept(Board.threePlayerPosition);
-        action.accept(Board.fourPlayerPosition);
+        if (this.boardSelector.sizeSelection() == 0) {
+            action.accept(Board.twoPlayerPosition);
+            action.accept(Board.threePlayerPosition);
+            action.accept(Board.fourPlayerPosition);
+        } else if (this.boardSelector.sizeSelection() == 1) {
+            final List<Coordinate> s = boardSelector.getSelected();
+            final int sy = s.get(0).getY();
+            final int sx = s.get(0).getX();
+
+            final int[][] selectable = {
+                    {sy + 1, sx},
+                    {sy - 1, sx},
+                    {sy, sx + 1},
+                    {sy, sx - 1}
+            };
+            action.accept(selectable);
+        } else if (boardSelector.sizeSelection() == 2) {
+            final List<Coordinate> s = boardSelector.getSelected();
+            final int x0 = s.get(0).getX();
+            final int y0 = s.get(0).getY();
+
+            if (boardSelector.isVerticalExtraction()) {
+                final int sy1 = s.get(1).getY();
+
+                final int [][] selectable = {
+                        {
+                            Math.max(y0, sy1) + 1,
+                            x0
+                        },
+                        {
+                            Math.min(y0, sy1) - 1,
+                            x0
+                        }
+                };
+                action.accept(selectable);
+            }
+            else{
+                final int sx1 = s.get(1).getX();
+
+                final int[][] selectable = {
+                        {
+                            y0,
+                            Math.max(x0, sx1) + 1
+                        },
+                        {
+                            y0,
+                            Math.min(x0, sx1) - 1
+                        }
+                };
+                action.accept(selectable);
+            }
+        }
+
 
         return res;
     }
 
+    /**
+     * @param row cell row
+     * @param col cell column
+     * @return true if there is no tile in position [row, column]
+     */
     private boolean isEmpty(int row, int col) {
         return this.typeAt(row, col) == null;
-    }
-
-    private boolean isFullCoordinates(final int [][] coordinates) {
-        return Arrays
-                .stream(coordinates)
-                .anyMatch(
-                        (coordinate) -> isEmpty(
-                                coordinate[0],
-                                coordinate[1]
-                        )
-                );
     }
 
     public boolean isFull(final int numPlayer) {
@@ -236,6 +298,10 @@ public class Board {
         return s == this.occupied;
     }
 
+    /**
+     * The function removes the tiles from the board
+     * @return The list of all Tiles selected.
+     */
     public List<Tile> draw() {
         List<Tile> res = new ArrayList<>();
 
@@ -248,41 +314,47 @@ public class Board {
         return res;
     }
 
-    private int edgesOccupied (int row, int col) {
+    private int numberOfFreeSides(int row, int col, BiFunction<Integer, Integer, Boolean> isEmptyFunc) {
+        if (row < 0 || row > Board.rowBoard || col < 0 || col > Board.columnBoard)
+            throw new IllegalArgumentException("row or col out of bound: row: " + row + " col: " + col);
+
         int free = 0;
         final boolean onBorder = this.hasEdgeOnBorder(row, col);
         if (onBorder)
             free ++;
 
-        if (col + 1< Board.columnBoard && this.isEmpty(row, col+1))
+        if (col + 1 < Board.columnBoard && isEmptyFunc.apply(row, col+1))
                 free ++;
 
-        if (row + 1< Board.rowBoard && this.isEmpty(row+1, col))
+        if (row + 1 < Board.rowBoard && isEmptyFunc.apply(row + 1, col))
                 free ++;
 
-
-        if (row != 0 && this.isEmpty(row - 1, col))
+        if (row != 0 && isEmptyFunc.apply(row - 1, col))
                 free ++;
 
-        if (col != 0 && this.isEmpty(row, col - 1))
+        if (col != 0 && isEmptyFunc.apply(row, col - 1))
                 free++;
 
         return free;
     }
 
-    private List<Coordinates> getAvailablePositionInsert(int numPlayer) {
-        List<Coordinates> res = new ArrayList<>();
+    private int numberOfFreeSides(int row, int col) {
+        return numberOfFreeSides(row, col, this::isEmpty);
+    }
+
+    private List<Coordinate> getAvailablePositionInsert(int numPlayer) {
+        List<Coordinate> res = new ArrayList<>();
 
         if (this.occupied == 0) {
             Arrays.stream(Board.twoPlayerPosition)
-                    .forEach((t) -> res.add(new Coordinates(t[0], t[1])));
+                    .forEach((t) -> res.add(new Coordinate(t[0], t[1])));
             if (numPlayer > 2) {
                 Arrays.stream(Board.threePlayerPosition)
-                        .forEach((t) -> res.add(new Coordinates(t[0], t[1])));
+                        .forEach((t) -> res.add(new Coordinate(t[0], t[1])));
             }
             if (numPlayer == 4) {
                 Arrays.stream(Board.fourPlayerPosition)
-                        .forEach((t) -> res.add(new Coordinates(t[0], t[1])));
+                        .forEach((t) -> res.add(new Coordinate(t[0], t[1])));
             }
 
             return res;
@@ -294,10 +366,10 @@ public class Board {
                 final int col = ints[1];
 
                 if (this.isEmpty(row, col)) {
-                    final int edge = edgesOccupied(row, col);
+                    final int edge = numberOfFreeSides(row, col);
 
                     if (edge < 4)
-                        res.add(new Coordinates(
+                        res.add(new Coordinate(
                                 row, col
                         ));
                 }
@@ -321,7 +393,7 @@ public class Board {
         if (this.isFull(numPlayer))
             throw new IllegalArgumentException("Board is full");
 
-        final List<Coordinates> possible = this.getAvailablePositionInsert(numPlayer);
+        final List<Coordinate> possible = this.getAvailablePositionInsert(numPlayer);
         final int index = new Random().nextInt(possible.size());
 
         this.insert(tile,
@@ -335,13 +407,17 @@ public class Board {
         this.occupied ++;
     }
 
+    /**
+     * 
+     * @return true if it is necessary to fill the board
+     */
     public boolean needsRefill() {
         int r, c;
 
         for (r = 0; r < rowBoard; r++) {
             for (c = 0; c < columnBoard; c++) {
                 if (this.typeAt(r, c) != null) {
-                    if (freeSide(r, c) == 4) {
+                    if (numberOfFreeSides(r, c) == 4) {
                         return true;
                     }
                 }
