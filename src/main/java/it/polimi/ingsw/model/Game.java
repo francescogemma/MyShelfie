@@ -53,17 +53,14 @@ public class Game {
         return this.players.get(index).getValue();
     }
 
-    private void setConnected(Player player, boolean connected) {
-        final int index = this.indexOf(player);
-        this.players.get(index).setValue(connected);
-    }
-
-    public void disconnected(final Player player) {
-        setConnected(player, false);
+    public boolean disconnected(final Player player) {
+        return this.players.get(indexOf(player)).getValue();
     }
 
     public void connect(Player player) {
-        setConnected(player, true);
+
+        final int index = this.indexOf(player);
+        this.players.get(index).setValue(true);
     }
 
     public Optional<Player> getCurrentPlayer() {
