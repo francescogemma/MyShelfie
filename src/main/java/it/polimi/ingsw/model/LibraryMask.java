@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model;
 
 import java.util.ArrayList;
+import java.util.function.BiFunction;
 
 public class LibraryMask {
     private final Library library;
@@ -35,16 +36,20 @@ public class LibraryMask {
     public Tile getSampleTile() {
         return library.get(shelves.get(0));
     }
-    public boolean intersects(LibraryMask libraryMask) {
-        for (Shelf A : shelves) {
-            for (Shelf B : libraryMask.getShelves()) {
+    public static final BiFunction<LibraryMask, LibraryMask, Boolean> DO_NOT_INTERSECT = (first, second) -> {
+        for (Shelf A : first.shelves) {
+            for (Shelf B : second.shelves) {
                 if (A.equals(B)) {
-                    return true;
+                    return false;
                 }
             }
         }
-        return false;
-    }
+        return true;
+    };
+
+    public static final BiFunction<LibraryMask, LibraryMask, Boolean> DO_NOT_INTERSECT_AND_SAME_COLOR = (first, second) ->
+        first.getSampleTile() == second.getSampleTile() && DO_NOT_INTERSECT.apply(first, second);
+
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder("---------------\n");

@@ -1,12 +1,16 @@
 package it.polimi.ingsw.model;
 
 import java.util.ArrayList;
+import java.util.function.BiFunction;
 
 public class LibraryMaskSet {
     private ArrayList<LibraryMask> libraryMasks;
+    private BiFunction<LibraryMask, LibraryMask, Boolean> compatible;
 
-    public LibraryMaskSet() {
+
+    public LibraryMaskSet(BiFunction<LibraryMask, LibraryMask, Boolean> compatible) {
         libraryMasks = new ArrayList<>();
+        this.compatible = compatible;
     }
 
     public LibraryMaskSet(LibraryMaskSet libraryMaskSet) {
@@ -25,12 +29,12 @@ public class LibraryMaskSet {
         libraryMasks.add(libraryMask);
     }
 
-    public boolean intersects(LibraryMask libraryMask) {
+    public boolean isCompatible(LibraryMask libraryMask) {
         for (LibraryMask libraryMaskSample : libraryMasks) {
-            if (libraryMaskSample.intersects(libraryMask)) {
-                return true;
+            if (!compatible.apply(libraryMaskSample, libraryMask)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 }

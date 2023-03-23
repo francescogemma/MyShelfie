@@ -1,16 +1,20 @@
 package it.polimi.ingsw.model;
 
 import java.util.ArrayList;
+import java.util.function.BiFunction;
 
-public class NonIntersectingEvaluator implements Evaluator {
-    private ArrayList<LibraryMaskSet> group;
+public class CompatibleEvaluator implements Evaluator {
+    private final ArrayList<LibraryMaskSet> group;
     private final int points;
     private final int targetSetSize;
+    private final BiFunction<LibraryMask, LibraryMask, Boolean> compatible;
     private boolean targetMet;
 
-    public NonIntersectingEvaluator(int points, int targetGroupSize) {
+
+    public CompatibleEvaluator(int points, int targetGroupSize, BiFunction<LibraryMask, LibraryMask, Boolean> compatible) {
         group = new ArrayList<>();
 
+        this.compatible = compatible;
         this.points = points;
         this.targetSetSize = targetGroupSize;
         this.targetMet = targetSetSize <= 1;
@@ -19,7 +23,7 @@ public class NonIntersectingEvaluator implements Evaluator {
         for (LibraryMaskSet libraryMaskSet : group) {
             boolean intersectionFound = false;
 
-            if (!libraryMaskSet.intersects(libraryMask)) {
+            if (!libraryMaskSet.isCompatible(libraryMask)) {
                 // duplicate current LibraryMaskSet in group
                 // then, add non-intersecting mask to one of them
                 group.add(new LibraryMaskSet(libraryMaskSet));
@@ -30,7 +34,7 @@ public class NonIntersectingEvaluator implements Evaluator {
             }
         }
         // create and add one more set with a single LibraryMask
-        LibraryMaskSet libraryMaskSetLast = new LibraryMaskSet();
+        LibraryMaskSet libraryMaskSetLast = new LibraryMaskSet(compatible);
         libraryMaskSetLast.addLibraryMask(libraryMask);
         group.add(libraryMaskSetLast);
 
