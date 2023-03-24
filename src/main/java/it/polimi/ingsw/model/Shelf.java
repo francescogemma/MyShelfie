@@ -1,10 +1,12 @@
 package it.polimi.ingsw.model;
 
 /**
- * Represents the location of a single cell inside a {@link Library};
+ * Represents the location of a single cell inside a {@link Library library};
  * that is a couple of integers (row, column) where row is an integer between 0 and the number of rows
  * in a library ({@value Library#ROWS}) minus 1 and column is an integer between 0 and the number
  * of columns in a library ({@value Library#COLUMNS}) minus 1.
+ * Rows are enumerated starting from 0 which corresponds to the first row from the top of the library.
+ * Columns are enumerated starting from 0 too, which corresponds to the first column to the left in the library.
  * Shelf objects are immutable.
  *
  * @see Library
@@ -15,14 +17,12 @@ package it.polimi.ingsw.model;
  */
 public class Shelf {
     /**
-     * The library row in which the shelf is located (rows are enumerated starting from 0 which corresponds
-     * to the first row from the top).
+     * The library row in which the shelf is located.
      */
     private final int row;
 
     /**
-     * The library column in which the shelf is located (columns are enumerated starting from 0 which corresponds
-     * to the first column from the left).
+     * The library column in which the shelf is located.
      */
     private final int column;
 
@@ -53,15 +53,15 @@ public class Shelf {
 
 
     /**
-     * Retrieves an instance of a Shelf in the specified location. This is the only way of doing so: this class implements
+     * Retrieves a shelf in the specified location. This is the only way of doing so: this class implements
      * a singleton pattern. For this reason Shelf objects in the same location (row, column) of the library are actually
      * the same object in memory.
      *
-     * @param row is the library row where the returned Shelf instance is located. It must be between 0 and
+     * @param row is the library row where the returned shelf is located. It must be between 0 and
      *            {@value Library#ROWS} - 1.
-     * @param column is the library column where the returned Shelf instance is located. It must be between 0 and
+     * @param column is the library column where the returned shelf is located. It must be between 0 and
      *               {@value Library#COLUMNS} - 1.
-     * @return an instance of a Shelf in location (row, column).
+     * @return a shelf in location (row, column).
      * @throws IllegalArgumentException if arguments are outside the domain {0, ..., {@value Library#ROWS} - 1}
      * x {0, ..., {@value Library#COLUMNS} - 1}.
      */
@@ -90,7 +90,8 @@ public class Shelf {
      *               the shelf down and the number of columns we are going to shift the shelf right
      *               (negative values of offset components allow moving up and left respectively).
      * @return a shelf in location (row + offset.getRowOffset(), column + offset.getColumnOffset()) where (row, column)
-     * is the location of the shelf on which this method is invoked.
+     * is the location of the shelf on which this method is invoked. The original shelf is not affected since it's
+     * immutable.
      * @throws RuntimeException if we try to move a shelf to a location which is outside the library.
      */
     public Shelf move(Offset offset) {
@@ -104,14 +105,14 @@ public class Shelf {
 
 
     /**
-     * @return {@link Shelf#row}.
+     * @return the library row in which the shelf is located.
      */
     public int getRow() {
         return row;
     }
 
     /**
-     * @return {@link Shelf#column}.
+     * @return the library column in which the shelf is located.
      */
     public int getColumn() {
         return column;
