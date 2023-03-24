@@ -1,18 +1,14 @@
 package it.polimi.ingsw.model;
 
-import jdk.jshell.spi.ExecutionControl;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.function.BiConsumer;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 /**
  * Manager for Tile selection
@@ -37,17 +33,69 @@ class BoardSelector {
         if (this.sizeSelection() != 2)
             throw new RuntimeException();
 
-        final int x0 = selected.get(0).getX();
-        final int x1 = selected.get(1).getX();
+        final int x0 = selected.get(0).getCol();
+        final int x1 = selected.get(1).getCol();
 
         return x0 == x1;
     }
 
+    /**
+     * The function checks in all the possible previous selections
+     * and returns whether the coordinate has already been selected.
+     * @param c the point for check
+     * @return true iff c is already selected
+     * */
     protected boolean contains(Coordinate c) {
         return this.selected.contains(c);
     }
 
     /**
+     * The function returns the set of coordinates that can be selected for extraction,
+     * taking into account the previous extractions.
+     * @return List of legal Coordinates for selection.
+     * */
+    protected List<Coordinate> getAvailableSelection() {
+        List<Coordinate> res = new ArrayList<>();
+        switch (sizeSelection()) {
+            case 0 -> {
+                throw new RuntimeException("Can't call this function if sizeSelection() is equals to 0");
+            }
+            case 1 -> {
+                final int r = this.selected.get(0).getRow();
+                final int c = this.selected.get(0).getCol();
+                res.addAll(Arrays.asList(
+                        new Coordinate(r, c + 1),
+                        new Coordinate(r ,c - 1),
+                        new Coordinate(r + 1, c),
+                        new Coordinate(r - 1, c)
+                        ));
+            }
+            case 2 -> {
+                if (isVerticalExtraction()) {
+                    final int col = this.selected.get(0).getCol();
+                    final int biggerRow =   max(selected.get(0).getRow(), selected.get(1).getRow());
+                    final int smallerRow =  min(selected.get(0).getRow(), selected.get(1).getRow());
+                    res.addAll(Arrays.asList(
+                            new Coordinate(smallerRow - 1, col),
+                            new Coordinate(biggerRow + 1, col)
+                    ));
+                } else {
+                    final int row = this.selected.get(0).getRow();
+                    final int biggerCol =   max(selected.get(0).getCol(), selected.get(1).getCol());
+                    final int smallerCol =  min(selected.get(0).getCol(), selected.get(1).getCol());
+                    res.addAll(Arrays.asList(
+                            new Coordinate(row, smallerCol - 1),
+                            new Coordinate(row, biggerCol + 1)
+                    ));
+                }
+            }
+            default -> res = new ArrayList<>();
+        }
+        return res;
+    }
+
+    /**
+     * The function checks that wrong positions are not selected, but it does not check whether the cell can actually be selected, i.e., whether it has a free side.
      * @exception IllegalExtractionException if the position of the Tile is along the diagonal
      * @exception IllegalArgumentException if we are trying to extract more than 3 tiles
      * @exception IllegalArgumentException if [r, c] is already in the list
@@ -61,42 +109,21 @@ class BoardSelector {
             throw new IllegalArgumentException("The specified coordinate already exists");
         }
 
-        switch (selected.size()) {
+        switch (sizeSelection()) {
             case 0 -> {}
-            case 1 -> {
-                Coordinate alreadySelected = this.selected.get(0);
-                final int alreadySelectedRow = alreadySelected.getY();
-                final int alreadySelectedCol = alreadySelected.getX();
-
-                if (abs(alreadySelectedRow - r) + abs(alreadySelectedCol - c) != 1)
+            case 1, 2 -> {
+                if (!getAvailableSelection().contains(new Coordinate(r, c))) {
                     throw new IllegalExtractionException();
-            }
-            case 2 -> {
-                if (this.isVerticalExtraction()) {
-                    if (!(this.selected.get(0).getX() == c && (
-                            abs(selected.get(0).getY() - r) == 1 ||
-                            abs(selected.get(1).getY() - r) == 1)
-                    )) {
-                        throw new IllegalExtractionException();
-                    }
-                } else {
-                    Coordinate c0 = selected.get(0);
-                    Coordinate c1 = selected.get(1);
-                    if (!(c0.getY() == r && (
-                            abs(c0.getX() - c) == 1 ||
-                            abs(c1.getX() - c) == 1)
-                    )) {
-                        throw new IllegalExtractionException();
-                    }
                 }
             }
-            default -> throw new RuntimeException();
         }
 
         this.selected.add(new Coordinate(r, c));
     }
 
     /**
+     * The function returns the set of Tiles selected up to this point.
+     * The function does not remove the Tiles from the Board.
      * @return it returns a new List with all the selected tiles
      */
     public final List<Coordinate> getSelected() {
@@ -114,7 +141,9 @@ public class Board {
     private BoardSelector boardSelector;
     private int occupied;
 
-
+    /**
+     * All the possible cell positions if the players were two.
+     * */
     static final int [][] twoPlayerPosition = {
                                     {1, 3}, {1, 4},
                             {2, 2}, {2, 3}, {2, 4}, {2, 5},
@@ -125,6 +154,9 @@ public class Board {
                                     {7, 3}, {7, 4}, {7, 5}
     };
 
+    /**
+     * All the possible cell positions if the players were three.
+     * */
     static final int [][] threePlayerPosition = {
                                     {0, 3},
                                                             {2, 6},
@@ -134,6 +166,9 @@ public class Board {
                                                     {8, 5}
     };
 
+    /**
+     * All the possible cell positions if the players were four.
+     * */
     static final int [][] fourPlayerPosition = {
                                             {0, 4},
                                                     {1, 5},
@@ -157,12 +192,15 @@ public class Board {
     /**
      * @return the Tile in position [row, col]
      */
-    public Tile typeAt(int row, int col) {
+    public Tile tileAt(int row, int col) {
         return this.tiles[row][col];
     }
 
     /**
-     * 
+     * The function selects the Tile for extraction, it handles both the case where a Tile without
+     * a free side is selected, and if a Tile is selected that cannot be extracted together with
+     * the Tiles previously selected.
+     * @return The {@link Tile Tile} selected.
     * */
     public Tile selectTile(int row, int col) throws IllegalExtractionException {
         if (this.isEmpty(row, col) || numberOfFreeSides(row, col, this::isEmptyExtraction) == 0) {
@@ -171,10 +209,12 @@ public class Board {
         }
 
         this.boardSelector.select(row, col);
-        return this.typeAt(row, col);
+        return this.tileAt(row, col);
     }
 
     /**
+     * The function returns the set of tiles selected up to this point.
+     * The function does not remove the objects from the board.
      * @return All Tiles selected so far.
      */
     public List<Tile> getSelectedTiles() {
@@ -182,7 +222,7 @@ public class Board {
                 .boardSelector
                 .getSelected()
                 .stream()
-                .map((t) -> this.typeAt(t.getX(), t.getY()))
+                .map((t) -> this.tileAt(t.getCol(), t.getRow()))
                 .collect(Collectors.toList());
     }
 
@@ -200,79 +240,51 @@ public class Board {
         return this.isEmpty(row, col);
     }
 
+    private boolean isOutOfBoard (int row, int col) {
+        return row < 0 || col < 0 || row >= Board.rowBoard || col >= Board.columnBoard;
+    }
+
     /**
-     * @return All the Tiles on the board.
-     */
+     * The function returns a {@link List List} of {@link Tile Tile} containing
+     * all the {@link Tile tiles} that can be extracted in a single extraction.
+     * In case there were multiple extractions before the call, the function will only return the legal extractions
+     * from that point onwards.
+     * @return All the {@link Tile tiles} available for extraction.
+    * */
     public List<Tile> getSelectableTiles() {
         List<Tile> res = new ArrayList<>();
+
+        if (this.boardSelector.sizeSelection() > 2) {
+            return res;
+        }
 
         Consumer<int[][]> action = (int[][] board) -> {
             for (int[] ints : board) {
                 final int row = ints[0];
                 final int col = ints[1];
-                if (row < 0 || row > Board.rowBoard)
-                    continue;
-                if (col < 0 || col > Board.columnBoard)
-                    continue;
-                if (this.numberOfFreeSides(row, col, this::isEmptyExtraction) > 0 && typeAt(row, col) != null){
-                    res.add(typeAt(row, col));
+
+
+
+                if (this.numberOfFreeSides(row, col, this::isEmptyExtraction) > 0 && tileAt(row, col) != null){
+                    res.add(tileAt(row, col));
                 }
             }
         };
 
-        if (this.boardSelector.sizeSelection() == 0) {
-            action.accept(Board.twoPlayerPosition);
-            action.accept(Board.threePlayerPosition);
-            action.accept(Board.fourPlayerPosition);
-        } else if (this.boardSelector.sizeSelection() == 1) {
-            final List<Coordinate> s = boardSelector.getSelected();
-            final int sy = s.get(0).getY();
-            final int sx = s.get(0).getX();
-
-            final int[][] selectable = {
-                    {sy + 1, sx},
-                    {sy - 1, sx},
-                    {sy, sx + 1},
-                    {sy, sx - 1}
-            };
-            action.accept(selectable);
-        } else if (boardSelector.sizeSelection() == 2) {
-            final List<Coordinate> s = boardSelector.getSelected();
-            final int x0 = s.get(0).getX();
-            final int y0 = s.get(0).getY();
-
-            if (boardSelector.isVerticalExtraction()) {
-                final int sy1 = s.get(1).getY();
-
-                final int [][] selectable = {
-                        {
-                            Math.max(y0, sy1) + 1,
-                            x0
-                        },
-                        {
-                            Math.min(y0, sy1) - 1,
-                            x0
-                        }
-                };
-                action.accept(selectable);
+        switch (boardSelector.sizeSelection()) {
+            case 0 -> {
+                action.accept(Board.twoPlayerPosition);
+                action.accept(Board.threePlayerPosition);
+                action.accept(Board.fourPlayerPosition);
             }
-            else{
-                final int sx1 = s.get(1).getX();
-
-                final int[][] selectable = {
-                        {
-                            y0,
-                            Math.max(x0, sx1) + 1
-                        },
-                        {
-                            y0,
-                            Math.min(x0, sx1) - 1
-                        }
-                };
-                action.accept(selectable);
+            case 1, 2 -> {
+                boardSelector.getAvailableSelection()
+                        .forEach((t) -> {
+                            if (!isOutOfBoard(t.getRow(), t.getCol()) && !isEmpty(t.getRow(), t.getCol()))
+                                res.add(tileAt(t.getRow(), t.getCol()));
+                        });
             }
         }
-
 
         return res;
     }
@@ -283,9 +295,15 @@ public class Board {
      * @return true if there is no tile in position [row, column]
      */
     private boolean isEmpty(int row, int col) {
-        return this.typeAt(row, col) == null;
+        return this.tileAt(row, col) == null;
     }
 
+    /**
+     * The function checks that the board is full for the number of players passed.
+     * @return Return true iff the board is full for numPlayer players.
+     * @param numPlayer number of players
+     * @throws IllegalArgumentException if numPlayer is bigger than 4 or numPlayer is lower then 2
+     * */
     public boolean isFull(final int numPlayer) {
         if (numPlayer < 2 || numPlayer > 4) {
             throw new IllegalArgumentException("The number of players must be between 2 and 4");
@@ -299,15 +317,15 @@ public class Board {
     }
 
     /**
-     * The function removes the tiles from the board
-     * @return The list of all Tiles selected.
+     * The function removes the tiles from the board and return a List of {@link Tile tile} selected.
+     * @return The list of all {@link Tile tile} selected.
      */
     public List<Tile> draw() {
         List<Tile> res = new ArrayList<>();
 
         this.boardSelector
                 .getSelected()
-                .forEach((t) -> res.add(this.remove(t.getY(), t.getX())));
+                .forEach((t) -> res.add(this.remove(t.getRow(), t.getCol())));
 
         this.boardSelector = new BoardSelector();
 
@@ -315,7 +333,7 @@ public class Board {
     }
 
     private int numberOfFreeSides(int row, int col, BiFunction<Integer, Integer, Boolean> isEmptyFunc) {
-        if (row < 0 || row > Board.rowBoard || col < 0 || col > Board.columnBoard)
+        if (this.isOutOfBoard(row, col))
             throw new IllegalArgumentException("row or col out of bound: row: " + row + " col: " + col);
 
         int free = 0;
@@ -389,6 +407,12 @@ public class Board {
         return res;
     }
 
+    /**
+     * The function places the {@link Tile tile} in a random position within the
+     * board.
+     * The function places the {@link Tile tile} in a legal position, therefore it is guaranteed that the
+     * {@link Tile tile} inserted will have at least one occupied side, if such position exists.
+    */
     public void fillRandomly(final Tile tile, final int numPlayer) {
         if (this.isFull(numPlayer))
             throw new IllegalArgumentException("Board is full");
@@ -397,8 +421,8 @@ public class Board {
         final int index = new Random().nextInt(possible.size());
 
         this.insert(tile,
-                possible.get(index).getY(),
-                possible.get(index).getX()
+                possible.get(index).getRow(),
+                possible.get(index).getCol()
         );
     }
 
@@ -408,23 +432,29 @@ public class Board {
     }
 
     /**
-     * 
+     * The function checks that there are no Tiles within the board
+     * that have 4 sides not touching any other Tile.
      * @return true if it is necessary to fill the board
      */
     public boolean needsRefill() {
-        int r, c;
 
-        for (r = 0; r < rowBoard; r++) {
-            for (c = 0; c < columnBoard; c++) {
-                if (this.typeAt(r, c) != null) {
-                    if (numberOfFreeSides(r, c) == 4) {
-                        return true;
-                    }
-                }
-            }
-        }
+        Function<int [][], Boolean> checkerEdges =
+                (int [][] data) -> Arrays.stream(data)
+                    .anyMatch((coor -> {
+                        final int r = coor[0];
+                        final int c = coor[1];
+                        if (tileAt(r, c) != null) {
+                            return numberOfFreeSides(r, c) == 4;
+                        }
+                        return false;
+                    }));
 
-        return occupied == 0;
+        if (this.occupied == 0)
+            return true;
+
+        return  checkerEdges.apply(Board.twoPlayerPosition) ||
+                checkerEdges.apply(Board.threePlayerPosition) ||
+                checkerEdges.apply(Board.fourPlayerPosition);
     }
 
     private Tile remove (int row, int col) {

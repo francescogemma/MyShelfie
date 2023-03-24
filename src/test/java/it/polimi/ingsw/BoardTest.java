@@ -79,7 +79,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testWrongeSelectAfterOne() throws IllegalExtractionException {
+    public void testWrongeSelectAfterOne() {
         fillBoard(this.board);
 
         Assertions.assertThrows(IllegalExtractionException.class, () -> {

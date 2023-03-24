@@ -1,20 +1,28 @@
 package it.polimi.ingsw.model;
 
 public class Coordinate {
-    private final int x;
-    private final int y;
+    private final int col;
+    private final int row;
 
-    public Coordinate(int y, int x) {
-        this.x = x;
-        this.y = y;
+    public Coordinate(int row, int col) {
+        this.col = col;
+        this.row = row;
     }
 
-    public int getX() {
-        return this.x;
+    public int getCol() {
+        return this.col;
     }
 
-    public int getY() {
-        return this.y;
+    public int getRow() {
+        return this.row;
+    }
+
+    public int getX () {
+        return getCol();
+    }
+
+    public int getY () {
+        return this.getRow();
     }
 
     @Override
@@ -22,7 +30,7 @@ public class Coordinate {
         if (obj == this)
             return true;
         if (obj instanceof Coordinate o) {
-            return this.x == o.x && this.y == o.y;
+            return this.col == o.col && this.row == o.row;
         }
         return false;
     }

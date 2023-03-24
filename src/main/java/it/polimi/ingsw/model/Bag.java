@@ -16,10 +16,18 @@ class BagData {
         this.remaining = tilePerTyle * typeTile;
     }
 
+    /**
+     * @return return the number of tiles left in the class.
+     * */
     protected int getRemaining() {
         return this.remaining;
     }
 
+    /**
+     * The function removes the Tile at position index
+     * @param index index of extraction
+     * @throws IllegalArgumentException If there is no Tile left at index i
+     * */
     protected void pop(int index) {
         if (this.remainingTile[index] < 1) {
             throw new IllegalArgumentException("Index not valid");
@@ -29,7 +37,11 @@ class BagData {
         this.remainingTile[index] --;
     }
 
-    protected int getAvailable(final int index) {
+    /**
+     * @param index index of interrogation
+     * @return The number of remaining Tiles at index i.
+     * */
+    protected int getAvailable(int index) {
         return this.remainingTile[index];
     }
 
@@ -38,21 +50,34 @@ class BagData {
     }
 }
 
+/**
+ * This represents the bag for a game, which contains all 6 types of {@link Tile tile} (22 tiles per type).
+ * It's not possible to refill the bag
+ * @author Giacomo Groppi
+*/
 public class Bag extends BagData {
 
+    /**
+     * Constructor of the class.
+     * It initializes all 22*6 {@link Tile tile}
+     * */
     public Bag() {
         super();
     }
 
+    /**
+     * The function selects a random {@link Tile tile} from the bag and removes it.
+     * @return a random {@link Tile tile}
+     * @see Tile
+     * */
     public Tile getRandomTile() {
-        int i;
-        if (this.getRemaining() == 0) {
+        if (this.isEmpty()) {
             throw new IllegalStateException("Bag is empty");
         }
 
-        int index = new Random().nextInt(typeTile);
+        final int index = new Random().nextInt(typeTile);
 
-        for (i = 0; i < typeTile; i++) {
+        for (int i = 0; i < typeTile; i++) {
             final int realIndex = (index + i) % typeTile;
             if (getAvailable(realIndex) != 0) {
                 return this.removeAndReturn(realIndex);
