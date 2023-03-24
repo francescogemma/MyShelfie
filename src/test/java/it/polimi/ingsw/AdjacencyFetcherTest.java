@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions;
 public class AdjacencyFetcherTest {
     Fetcher fetcher;
     int groupValue;
+    int numGroups;
     boolean anotherGroup;
     final int NUM_SHELVES_IN_LIBRARY = 30;
 
@@ -18,6 +19,7 @@ public class AdjacencyFetcherTest {
     public void setUp() {
         fetcher = new AdjacencyFetcher();
         anotherGroup = true;
+        numGroups = 0;
     }
 
     @Test
@@ -33,7 +35,7 @@ public class AdjacencyFetcherTest {
         };
 
         fetchGroups(matrix);
-        checkAssertions(matrix);
+        checkAssertions(matrix, 1);
     }
 
     @Test
@@ -49,7 +51,7 @@ public class AdjacencyFetcherTest {
         };
 
         fetchGroups(matrix);
-        checkAssertions(matrix);
+        checkAssertions(matrix, 30);
     }
 
     @Test
@@ -65,7 +67,7 @@ public class AdjacencyFetcherTest {
         };
 
         fetchGroups(matrix);
-        checkAssertions(matrix);
+        checkAssertions(matrix, 3);
     }
 
     @Test
@@ -81,7 +83,7 @@ public class AdjacencyFetcherTest {
         };
 
         fetchGroups(matrix);
-        checkAssertions(matrix);
+        checkAssertions(matrix, 5);
     }
 
     @Test
@@ -97,7 +99,7 @@ public class AdjacencyFetcherTest {
         };
 
         fetchGroups(matrix);
-        checkAssertions(matrix);
+        checkAssertions(matrix, 6);
     }
 
     @Test
@@ -113,11 +115,11 @@ public class AdjacencyFetcherTest {
         };
 
         fetchGroups(matrix);
-        checkAssertions(matrix);
+        checkAssertions(matrix, 30);
     }
 
     @Test
-    @DisplayName("Pseudo-random groups")
+    @DisplayName("Pseudo-random groups, 9 groups")
     public void findGroups_randomGroups_correctOutput() {
         int[][] matrix = {
                 {7, 1, 1, 5, 5},
@@ -129,7 +131,7 @@ public class AdjacencyFetcherTest {
         };
 
         fetchGroups(matrix);
-        checkAssertions(matrix);
+        checkAssertions(matrix, 9);
     }
 
     @Test
@@ -145,7 +147,7 @@ public class AdjacencyFetcherTest {
         };
 
         fetchGroups(matrix);
-        checkAssertions(matrix);
+        checkAssertions(matrix, 2);
     }
 
     @Test
@@ -161,11 +163,11 @@ public class AdjacencyFetcherTest {
         };
 
         fetchGroups(matrix);
-        checkAssertions(matrix);
+        checkAssertions(matrix, 5);
     }
 
     @Test
-    @DisplayName("Snake style group")
+    @DisplayName("Snake style group, 4 groups")
     public void findGroups_snakeStyleGroup_correctOutput() {
         int[][] matrix = {
                 {1, 1, 1, 1, 1},
@@ -177,22 +179,39 @@ public class AdjacencyFetcherTest {
         };
 
         fetchGroups(matrix);
-        checkAssertions(matrix);
+        checkAssertions(matrix, 4);
     }
 
     @Test
     @DisplayName("Call canFix() with empty stack -> throws IllegalStateException")
-    public void findGroups_canFixWithEmptyStack_throwsIllegalStateException() {
+    public void canFixMethod_canFixWithEmptyStack_throwsIllegalStateException() {
         Assertions.assertThrows(IllegalStateException.class, () -> fetcher.canFix());
     }
 
     @Test
     @DisplayName("Call next() with all surrounding cells visited -> throws IllegalStateException")
-    public void findGroups_nextCalledWithAllVisitedShelves_throwsIllegalStateException() {
+    public void nextMethod_nextCalledWithAllVisitedShelves_throwsIllegalStateException() {
         for(int i = 0; i < NUM_SHELVES_IN_LIBRARY; i++) {
             fetcher.next();
         }
         Assertions.assertThrows(IllegalStateException.class, () -> fetcher.next());
+    }
+
+    @Test
+    @DisplayName("next() cannot return a shelf 'diagonally adjacent' to the previous one")
+    public void nextMethod_severalNextCalls_noDiagonallyAdjacentShelvesReturned() {
+        Shelf next = fetcher.next();
+        int row = next.getRow();
+        int column = next.getColumn();
+        for(int i = 0; i < NUM_SHELVES_IN_LIBRARY - 1; i++) {
+            next = fetcher.next();
+            Assertions.assertFalse(next.getRow() == row + 1 && next.getColumn() == column + 1);
+            Assertions.assertFalse(next.getRow() == row - 1 && next.getColumn() == column - 1);
+            Assertions.assertFalse(next.getRow() == row - 1 && next.getColumn() == column + 1);
+            Assertions.assertFalse(next.getRow() == row + 1 && next.getColumn() == column - 1);
+            row = next.getRow();
+            column = next.getColumn();
+        }
     }
 
     private void fetchGroups(int[][] matrix) {
@@ -208,19 +227,22 @@ public class AdjacencyFetcherTest {
                 Assertions.assertTrue(flag, "canFix() returned false when it should have returned true");
             } else {
                 matrix[next.getRow()][next.getColumn()] -= groupValue;
+                Assertions.assertEquals(0, matrix[next.getRow()][next.getColumn()], "The value of the cell at position (" + next.getRow() + ", " + next.getColumn() + ") is not 0");
             }
 
             if (fetcher.lastShelf()) {
+                numGroups++;
                 anotherGroup = true;
             }
         } while (!fetcher.hasFinished());
     }
 
-    private void checkAssertions(int[][] matrix) {
+    private void checkAssertions(int[][] matrix, int expectedNumGroups) {
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 5; j++) {
                 Assertions.assertEquals(0, matrix[i][j], "The value of the cell at position (" + i + ", " + j + ") is not 0");
             }
         }
+        Assertions.assertEquals(expectedNumGroups, numGroups, "The number of groups is not correct");
     }
 }
