@@ -1,175 +1,168 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.model.*;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import it.polimi.ingsw.model.Fetcher;
+import it.polimi.ingsw.model.AdjacencyFetcher;
+import it.polimi.ingsw.model.Shelf;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 
 public class AdjacencyFetcherTest {
-    Library library = null;
-    Fetcher fetcher = null;
-    Filter filter = null;
+    Fetcher fetcher;
+    int groupValue;
+    boolean anotherGroup;
+    final int NUM_SHELVES_IN_LIBRARY = 30;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        library = new Library();
         fetcher = new AdjacencyFetcher();
-        filter = new NumDifferentColorFilter(1, 1);
+        anotherGroup = true;
     }
 
     @Test
-    public void findGroups_fullLibraryOneColor_correctOutput() {
-        System.out.println("findGroups_fullLibraryOneColor_correctOutput");
+    public void findGroups_oneGroup_correctOutput() {
+        int[][] matrix = {
+                {1, 1, 1, 1, 1},
+                {1, 1, 1, 1, 1},
+                {1, 1, 1, 1, 1},
+                {1, 1, 1, 1, 1},
+                {1, 1, 1, 1, 1},
+                {1, 1, 1, 1, 1}
+        };
 
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 1);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 2);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 3);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 1);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 2);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 3);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
+        fetchGroups(matrix);
+        checkAssertions(matrix);
+    }
 
-        LibraryMask mask = new LibraryMask(library);
+    @Test
+    public void findGroups_allGroupsOfOne_correctOutput() {
+        int[][] matrix = {
+                {1, 2, 3, 4, 5},
+                {6, 7, 8, 9, 10},
+                {11, 12, 13, 14, 15},
+                {16, 17, 18, 19, 20},
+                {21, 22, 23, 24, 25},
+                {26, 27, 28, 29, 30}
+        };
 
+        fetchGroups(matrix);
+        checkAssertions(matrix);
+    }
+
+    @Test
+    public void findGroups_circularGroups_correctOutput() {
+        int[][] matrix = {
+                {1, 1, 1, 1, 1},
+                {1, 2, 2, 2, 1},
+                {1, 2, 3, 2, 1},
+                {1, 2, 3, 2, 1},
+                {1, 2, 2, 2, 1},
+                {1, 1, 1, 1, 1}
+        };
+
+        fetchGroups(matrix);
+        checkAssertions(matrix);
+    }
+
+    @Test
+    public void findGroups_allColumns_correctOutput() {
+        int[][] matrix = {
+                {1, 2, 3, 4, 5},
+                {1, 2, 3, 4, 5},
+                {1, 2, 3, 4, 5},
+                {1, 2, 3, 4, 5},
+                {1, 2, 3, 4, 5},
+                {1, 2, 3, 4, 5}
+        };
+
+        fetchGroups(matrix);
+        checkAssertions(matrix);
+    }
+
+    @Test
+    public void findGroups_allRows_correctOutput() {
+        int[][] matrix = {
+                {1, 1, 1, 1, 1},
+                {2, 2, 2, 2, 2},
+                {3, 3, 3, 3, 3},
+                {4, 4, 4, 4, 4},
+                {5, 5, 5, 5, 5},
+                {6, 6, 6, 6, 6}
+        };
+
+        fetchGroups(matrix);
+        checkAssertions(matrix);
+    }
+
+    @Test
+    public void findGroups_randomGroups_correctOutput() {
+        int[][] matrix = {
+                {7, 1, 1, 5, 5},
+                {1, 1, 1, 3, 2},
+                {1, 1, 3, 3, 3},
+                {1, 3, 3, 3, 3},
+                {4, 4, 4, 4, 4},
+                {5, 6, 6, 7, 4}
+        };
+
+        fetchGroups(matrix);
+        checkAssertions(matrix);
+    }
+
+    @Test
+    public void findGroups_rectangle_correctOutput() {
+        int[][] matrix = {
+                {1, 1, 1, 1, 1},
+                {1, 3, 3, 3, 1},
+                {1, 3, 3, 3, 1},
+                {1, 3, 3, 3, 1},
+                {1, 3, 3, 3, 1},
+                {1, 1, 1, 1, 1}
+        };
+
+        fetchGroups(matrix);
+        checkAssertions(matrix);
+    }
+
+    @Test
+    public void findGroups_canFixWithEmptyStack_throwsIllegalStateException() {
+        Assertions.assertThrows(IllegalStateException.class, () -> fetcher.canFix());
+    }
+
+    @Test
+    public void findGroups_nextCalledWithAllVisitedShelves_throwsIllegalStateException() {
+        for(int i = 0; i < NUM_SHELVES_IN_LIBRARY; i++) {
+            fetcher.next();
+        }
+        Assertions.assertThrows(IllegalStateException.class, () -> fetcher.next());
+    }
+
+    private void fetchGroups(int[][] matrix) {
         do {
             Shelf next = fetcher.next();
-            if (filter.add(library.get(next))) {
-                if (fetcher.canFix()) {
-                    filter.forgetLastTile();
-                } else {
-                    filter.clear();
-                    mask.clear();
-                    continue;
-                }
-            } else mask.add(next);
+            if(anotherGroup) {
+                groupValue = matrix[next.getRow()][next.getColumn()];
+                anotherGroup = false;
+            }
+
+            if(matrix[next.getRow()][next.getColumn()] != groupValue) {
+                boolean flag = fetcher.canFix();
+                Assertions.assertTrue(flag, "canFix() returned false when it should have returned true");
+            } else {
+                matrix[next.getRow()][next.getColumn()] -= groupValue;
+            }
 
             if (fetcher.lastShelf()) {
-                if (filter.isSatisfied()) {
-                    System.out.println(mask);
-                }
-                filter.clear();
-                mask.clear();
+                anotherGroup = true;
             }
         } while (!fetcher.hasFinished());
     }
 
-    @Test
-    public void findGroups_fullLibraryCircularGroups_correctOutput() {
-        System.out.println("findGroups_fullLibraryCircularGroups_correctOutput");
-
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.WHITE, Tile.WHITE)), 1);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.WHITE, Tile.BLUE)), 2);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.WHITE, Tile.WHITE)), 3);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.WHITE, Tile.CYAN)), 1);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.BLUE, Tile.WHITE, Tile.CYAN)), 2);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.WHITE, Tile.CYAN)), 3);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
-
-        LibraryMask mask = new LibraryMask(library);
-
-        do {
-            Shelf next = fetcher.next();
-            if (filter.add(library.get(next))) {
-                if (fetcher.canFix()) {
-                    filter.forgetLastTile();
-                } else {
-                    filter.clear();
-                    mask.clear();
-                    continue;
-                }
-            } else mask.add(next);
-
-            if (fetcher.lastShelf()) {
-                if (filter.isSatisfied()) {
-                    System.out.println(mask);
-                }
-                filter.clear();
-                mask.clear();
+    private void checkAssertions(int[][] matrix) {
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 5; j++) {
+                Assertions.assertEquals(0, matrix[i][j], "The value of the shelf at position (" + i + ", " + j + ") is not 0");
             }
-        } while (!fetcher.hasFinished());
-    }
-
-    @Test
-    public void findGroups_normalLibrary_correctOutput() {
-        System.out.println("findGroups_normalLibrary_correctOutput");
-
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.BLUE)), 0);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.YELLOW, Tile.YELLOW, Tile.BLUE)), 1);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.YELLOW)), 2);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.YELLOW, Tile.YELLOW, Tile.BLUE)), 3);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.BLUE)), 4);
-        library.insertTiles(new ArrayList<>(Collections.nCopies(3, Tile.GREEN)), 0);
-        library.insertTiles(new ArrayList<>(Collections.nCopies(2, Tile.GREEN)), 1);
-
-        LibraryMask mask = new LibraryMask(library);
-
-        do {
-            Shelf next = fetcher.next();
-            if (filter.add(library.get(next))) {
-                if (fetcher.canFix()) {
-                    filter.forgetLastTile();
-                } else {
-                    filter.clear();
-                    mask.clear();
-                    continue;
-                }
-            } else mask.add(next);
-
-            if (fetcher.lastShelf()) {
-                if (filter.isSatisfied()) {
-                    System.out.println(mask);
-                }
-                filter.clear();
-                mask.clear();
-            }
-        } while (!fetcher.hasFinished());
-    }
-
-    @Test
-    public void findGroups_fullLibraryAllGroupsOfOneShelf_correctOutput() {
-        System.out.println("findGroups_fullLibraryAllGroupsOfOneShelf_correctOutput");
-
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.MAGENTA, Tile.CYAN, Tile.MAGENTA)), 0);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.GREEN, Tile.WHITE, Tile.GREEN)), 1);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.MAGENTA, Tile.CYAN, Tile.MAGENTA)), 2);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.GREEN, Tile.WHITE, Tile.GREEN)), 3);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.MAGENTA, Tile.BLUE, Tile.MAGENTA)), 4);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.MAGENTA, Tile.CYAN)), 0);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.GREEN, Tile.WHITE)), 1);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.MAGENTA, Tile.CYAN)), 2);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.GREEN, Tile.WHITE)), 3);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.BLUE, Tile.MAGENTA, Tile.BLUE)), 4);
-
-        LibraryMask mask = new LibraryMask(library);
-
-        do {
-            Shelf next = fetcher.next();
-            if (filter.add(library.get(next))) {
-                if (fetcher.canFix()) {
-                    filter.forgetLastTile();
-                } else {
-                    filter.clear();
-                    mask.clear();
-                    continue;
-                }
-            } else mask.add(next);
-
-            if (fetcher.lastShelf()) {
-                if (filter.isSatisfied()) {
-                    System.out.println(mask);
-                }
-                filter.clear();
-                mask.clear();
-            }
-        } while (!fetcher.hasFinished());
+        }
     }
 }
