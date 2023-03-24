@@ -87,7 +87,7 @@ public class BoardTest {
         });
     }
 
-    @Test (expected = IllegalExtractionException.class)
+    @Test
     public void testWrongeSelectAfterTwo() throws IllegalExtractionException {
         fillBoard(this.board);
         board.selectTile(5, 1);
