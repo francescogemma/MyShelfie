@@ -3,6 +3,7 @@ package it.polimi.ingsw;
 import it.polimi.ingsw.model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class SearchGroupsInALibraryTest {
     }
 
     @Test
+    @DisplayName("One single group of 30 shelves with one color")
     public void findGroups_fullLibraryOneColor_correctOutput() {
         int count = 0;
 
@@ -85,7 +87,8 @@ public class SearchGroupsInALibraryTest {
     }
 
     @Test
-    public void findGroups_fullLibraryCircularGroups_correctOutput() {
+    @DisplayName("3 concentric rectangles like groups")
+    public void findGroups_fullLibraryConcentricRectanglesGroups_correctOutput() {
         library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
         library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.WHITE, Tile.WHITE)), 1);
         library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.WHITE, Tile.BLUE)), 2);
@@ -145,6 +148,7 @@ public class SearchGroupsInALibraryTest {
     }
 
     @Test
+    @DisplayName("Normal library")
     public void findGroups_normalLibrary_correctOutput() {
         library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.BLUE)), 0);
         library.insertTiles(new ArrayList<>(Arrays.asList(Tile.YELLOW, Tile.YELLOW, Tile.BLUE)), 1);
@@ -181,6 +185,7 @@ public class SearchGroupsInALibraryTest {
     }
 
     @Test
+    @DisplayName("30 groups of one shelf")
     public void findGroups_fullLibraryAllGroupsOfOneShelf_correctOutput() {
         library.insertTiles(new ArrayList<>(Arrays.asList(Tile.MAGENTA, Tile.CYAN, Tile.MAGENTA)), 0);
         library.insertTiles(new ArrayList<>(Arrays.asList(Tile.GREEN, Tile.WHITE, Tile.GREEN)), 1);

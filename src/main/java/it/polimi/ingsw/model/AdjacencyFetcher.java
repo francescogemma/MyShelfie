@@ -6,6 +6,10 @@ import java.util.Stack;
  * Fetches all the groups of adjacent {@link Shelf shelves} with the same color.
  * It implements the {@link Fetcher} interface.
  * It uses a {@link Stack} to implement a DFS.
+ *
+ * @see Fetcher
+ * @see Shelf
+ *
  * @author Francesco Gemma
  */
 public class AdjacencyFetcher implements Fetcher {
