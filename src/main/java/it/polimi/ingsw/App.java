@@ -5,8 +5,6 @@ import it.polimi.ingsw.model.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 public class App {
     private static void calculatePoints(Library library, Fetcher fetcher, Filter filter) {
@@ -44,16 +42,17 @@ public class App {
         library.insertTiles(new ArrayList<>(Collections.nCopies(3, Tile.GREEN)), 0);
         library.insertTiles(new ArrayList<>(Collections.nCopies(2, Tile.GREEN)), 1);
 
-        Shape fork = new Shape(new ArrayList<>(Arrays.asList(Offset.getInstance(0, 1),
+        Filter filter = new NumDifferentColorFilter(1, 1);
+
+        /* Shape fork = new Shape(new ArrayList<>(Arrays.asList(Offset.getInstance(0, 1),
             Offset.getInstance(1, 0), Offset.getInstance(1, 1), Offset.getInstance(1, 2),
             Offset.getInstance(2, 0), Offset.getInstance(2, 2))));
 
-        Fetcher fetcher = new /*ShapeFetcher(fork)*/ AdjacencyFetcher();
-        Filter filter = new NumDifferentColorFilter(1, 1);
+        Fetcher fetcher = new /*ShapeFetcher(fork)*/ /*AdjacencyFetcher();
 
-        calculatePoints(library, fetcher, filter);
+        calculatePoints(library, fetcher, filter);*/
 
-        /* ArrayList<Fetcher> dominoFetchers = new ArrayList<>();
+        ArrayList<Fetcher> dominoFetchers = new ArrayList<>();
         for (Shape domino : Shape.DOMINOES) {
             dominoFetchers.add(new ShapeFetcher(domino));
         }
@@ -76,8 +75,8 @@ public class App {
             Offset.getInstance(3, 0), Offset.getInstance(3, 1), Offset.getInstance(3, 2)
         )));
 
-        System.out.println(l.verticalFlip());
-        System.out.println(l); */
+        /* System.out.println(l.verticalFlip());
+        System.out.println(l);
 
         System.out.println(Shape.X);
 
@@ -85,6 +84,6 @@ public class App {
 
         System.out.println(Shape.CORNERS);
 
-        System.out.println(Shape.WHOLE_LIBRARY);
+        System.out.println(Shape.WHOLE_LIBRARY); */
     }
 }

@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 /**
  * Allows to filter a sequence of tiles by the number of different colors in it.
+ * The sequence must not contain empty tiles in order to satisfy the criteria.
  *
  * @author Cristiano Migali
  */
@@ -72,6 +73,10 @@ public class NumDifferentColorFilter implements Filter {
 
         yetAdded[tile.ordinal()] = true;
 
+        if (tile == Tile.EMPTY) {
+            return true;
+        }
+
         /*
          * Since the number of different colors inside the sequence can only grow by adding new tiles,
          * if we don't remove the last added tile, the criteria can't be satisfied.
@@ -89,7 +94,8 @@ public class NumDifferentColorFilter implements Filter {
 
     @Override
     public boolean isSatisfied() {
-        return minColors <= count && count <= maxColors;
+        return minColors <= count && count <= maxColors &&
+            !yetAdded[Tile.EMPTY.ordinal()];
     }
 
     @Override

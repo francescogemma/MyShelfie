@@ -2,9 +2,7 @@ package it.polimi.ingsw.model;
 
 /**
  * Allows the extraction of {@link LibraryMask library masks} from a library, according to a certain
- * criteria. The extraction happens one {@link Shelf shelf} at the time. We must check if the extracted
- * shelf is the last one of the library mask we are constructing after each extraction
- * (by calling {@link Fetcher#lastShelf()}).
+ * criteria. The extraction happens one {@link Shelf shelf} at the time.
  * A fetcher is cyclic, that is, after it has extracted all the library masks following the criteria, it starts again
  * from the first. The library masks get extracted always in the same order.
  *
@@ -15,9 +13,9 @@ package it.polimi.ingsw.model;
  *     </li>
  *     <li>
  *         the fetcher has extracted the last shelf of the last library mask that it had to extract
- *         following the criteria, after that extraction {@link Fetcher#lastShelf()} has been invoked (in order
- *         to know that the last extracted is also the last shelf) and {@link Fetcher#next()} hasn't been invoked another
- *         time yet.
+ *         following the criteria and, after that extraction, {@link Fetcher#lastShelf()} has been invoked
+ *         (in order to check that the extracted shelf was the last) or a call to {@link Fetcher#canFix()}
+ *         returned false after the extraction of a shelf belonging to the last extractable library mask.
  *     </li>
  * </ul>
  * </p>
@@ -26,7 +24,8 @@ package it.polimi.ingsw.model;
  */
 public interface Fetcher {
     /**
-     * Extracts the next {@link Shelf shelf}. Remember to invoke {@link Fetcher#lastShelf()} after each call to next.
+     * Extracts the next {@link Shelf shelf}. Remember to invoke {@link Fetcher#lastShelf()} or
+     * {@link Fetcher#canFix()} after each call to next.
      *
      * @return the next {@link Shelf shelf} which belongs to the {@link LibraryMask library mask} that the
      * fetcher is extracting.
