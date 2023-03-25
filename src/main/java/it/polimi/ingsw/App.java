@@ -78,5 +78,13 @@ public class App {
 
         System.out.println(l.verticalFlip());
         System.out.println(l); */
+
+        System.out.println(Shape.X);
+
+        System.out.println(Shape.ENLARGED_STAIR);
+
+        System.out.println(Shape.CORNERS);
+
+        System.out.println(Shape.WHOLE_LIBRARY);
     }
 }
