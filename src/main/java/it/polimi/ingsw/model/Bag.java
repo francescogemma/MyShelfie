@@ -1,18 +1,21 @@
 package it.polimi.ingsw.model;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 
-class BagData {
+class BagData{
     protected static final int typeTile = 6;
     protected static final int tilePerTyle = 22;
     private int remaining;
     private final int []remainingTile;
+    private int lastExtraction;
 
     public BagData() {
         remainingTile = new int[typeTile];
 
         Arrays.fill(remainingTile, tilePerTyle);
+        lastExtraction = -1;
         this.remaining = tilePerTyle * typeTile;
     }
 
@@ -35,6 +38,7 @@ class BagData {
 
         this.remaining --;
         this.remainingTile[index] --;
+        lastExtraction = index;
     }
 
     /**
@@ -47,6 +51,31 @@ class BagData {
 
     public boolean isEmpty() {
         return this.getRemaining() == 0;
+    }
+
+    /**
+     * This function reintroduces the last drawn Tile back into the bag.
+     * @throws RuntimeException If there has been no draw or the last draw has already been restored.
+     * */
+    public void forgetLastExtraction () {
+        if (lastExtraction == -1) {
+            throw new RuntimeException("There has been no draw, or the last draw has already been restored.");
+        }
+
+        this.remaining ++;
+        this.remainingTile[this.lastExtraction] ++;
+        this.lastExtraction = -1;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BagData bagData = (BagData) o;
+
+        if (remaining != bagData.remaining) return false;
+        return Arrays.equals(remainingTile, bagData.remainingTile);
     }
 }
 
@@ -96,5 +125,13 @@ public class Bag extends BagData {
             throw new IllegalArgumentException("Index out of bounds [index: " + index + "]");
 
         return Tile.values()[index];
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        return super.equals(o);
     }
 }

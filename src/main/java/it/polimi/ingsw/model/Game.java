@@ -2,11 +2,11 @@ package it.polimi.ingsw.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
-
 public class Game {
-    private String name;
+    private final String name;
     private List<Pair<Player, Boolean>> players;
     private final Board board;
     private SharedObjective []sharedObjective;
@@ -15,6 +15,13 @@ public class Game {
     private Optional<Player> currentPlayer;
 
     public Game(String name) {
+        if (name == null)
+            throw new NullPointerException();
+
+        if (name.length() == 0)
+            throw new IllegalArgumentException("String is empty");
+
+        this.name = name;
         board = new Board();
         sharedObjective = new SharedObjective[2];
         players = new ArrayList<>();
@@ -36,7 +43,7 @@ public class Game {
         if (this.players.size() >= 4)
             throw new RuntimeException("Player are already 4");
 
-        this.players.add(new Pair<>(player, false));
+        this.players.add(new Pair<>(player, true));
     }
 
     private int indexOf(final Player player) {
@@ -62,7 +69,26 @@ public class Game {
         this.players.get(index).setValue(true);
     }
 
+    public String getName() {
+        return this.name;
+    }
+
     public Optional<Player> getCurrentPlayer() {
         return this.currentPlayer;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Game game = (Game) o;
+
+        return Objects.equals(name, game.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
     }
 }
