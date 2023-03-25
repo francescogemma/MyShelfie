@@ -60,6 +60,23 @@ public class Offset {
         this.columnOffset = columnOffset;
     }
 
+    /*
+     * It is necessary to create all instances of Offset before the main is executed, because if two
+     * threads were to request the same instance of Offset, and it does not exist, creating it could
+     * generate concurrency problems, and thus issues in the code.
+     * @author Giacomo Groppi
+     * */
+    static {
+        for(int i = 0; i < Offset.instances.length; i++) {
+            for (int j = 0; j < Offset.instances[i].length; j++) {
+                instances[i][j] = new Offset(
+                        i - Library.ROWS + 1,
+                        j - Library.COLUMNS + 1
+                );
+            }
+        }
+    }
+
     /**
      * Retrieves an offset with the specified components. This the only way of doing so: this class implements a singleton
      * pattern. For this reason Offset objects with the same components (rowOffset, columnOffset) are actually the same
