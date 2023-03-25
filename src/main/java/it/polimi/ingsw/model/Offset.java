@@ -103,11 +103,6 @@ public class Offset {
             + (Library.COLUMNS - 1));
         }
 
-        if (instances[Library.ROWS - 1 + rowOffset][Library.COLUMNS - 1 + columnOffset] == null) {
-            instances[Library.ROWS - 1 + rowOffset][Library.COLUMNS - 1 + columnOffset] =
-                new Offset(rowOffset, columnOffset);
-        }
-
         return instances[Library.ROWS - 1 + rowOffset][Library.COLUMNS - 1 + columnOffset];
     }
 
