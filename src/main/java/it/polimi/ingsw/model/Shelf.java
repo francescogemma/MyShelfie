@@ -51,6 +51,19 @@ public class Shelf {
         this.column = column;
     }
 
+    /*
+     * It is necessary to create all instances of Shelf before the main is executed, because if two
+     * threads were to request the same instance of Shelf, and it does not exist, creating it could
+     * generate concurrency problems, and thus issues in the code.
+     * @author Giacomo Groppi
+     * */
+    static {
+        for (int i = 0; i < instances.length; i++) {
+            for (int j = 0; j < instances[i].length; j++) {
+                instances[i][j] = new Shelf(i, j);
+            }
+        }
+    }
 
     /**
      * Retrieves a shelf in the specified location. This is the only way of doing so: this class implements
@@ -68,10 +81,6 @@ public class Shelf {
     public static Shelf getInstance(int row, int column) {
         if (!Library.isRowInsideTheLibrary(row) || !Library.isColumnInsideTheLibrary(column)) {
             throw new IllegalArgumentException("shelf at (" + row + ", " + column + ") is not inside the library");
-        }
-
-        if (instances[row][column] == null) {
-            instances[row][column] = new Shelf(row, column);
         }
 
         return instances[row][column];
