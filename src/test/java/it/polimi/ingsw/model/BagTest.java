@@ -47,19 +47,52 @@ class BagTest {
         });
     }
 
-    @Test
-    @Description("Test restore")
-    public void testRestore () {
+    private void removeRandom() {
         final int r = new Random().nextInt(bag.getRemaining());
         for (int i = 0; i < r; i++)
             bag.getRandomTile();
+    }
+
+    @Test
+    @Description("Test restore")
+    public void testRestore () {
+        removeRandom();
         final int s = bag.getRemaining();
         bag.forgetLastExtraction();
-        Assertions.assertEquals(s + 1, bag.getRemaining());
+        assertEquals(s + 1, bag.getRemaining());
 
-        Assertions.assertThrows(RuntimeException.class, () -> {
+        assertThrows(RuntimeException.class, () -> {
             bag.forgetLastExtraction();
         });
+    }
+
+    @Test
+    @Description("Testing clone")
+    public void testingClone() {
+        removeRandom();
+        Bag newBag = new Bag(this.bag);
+        assertEquals(newBag, this.bag);
+    }
+
+    @Test
+    @Description("Testing clone with restore")
+    public void testingCloneAndRestore() {
+        removeRandom();
+        Bag newBag = new Bag(this.bag);
+        assertEquals(newBag, this.bag);
+        newBag.getRandomTile();
+        newBag.forgetLastExtraction();
+        assertEquals(newBag, this.bag);
+    }
+
+    @Test
+    @Description("Testing clone and equals")
+    public void testingCloneAndEquals() {
+        removeRandom();
+        Bag newBag = new Bag(this.bag);
+        assertEquals(newBag, this.bag);
+        newBag.getRandomTile();
+        assertNotEquals(newBag, this.bag);
     }
 
     @AfterEach

@@ -19,6 +19,14 @@ class BagData{
         this.remaining = tilePerTyle * typeTile;
     }
 
+    public BagData(final BagData data) {
+        this();
+
+        this.lastExtraction = data.lastExtraction;
+        System.arraycopy(data.remainingTile, 0, this.remainingTile, 0, remainingTile.length);
+        this.remaining = data.remaining;
+    }
+
     /**
      * @return return the number of tiles left in the class.
      * */
@@ -92,6 +100,10 @@ public class Bag extends BagData {
      * */
     public Bag() {
         super();
+    }
+
+    public Bag(final Bag bag) {
+        super((BagData) bag);
     }
 
     /**

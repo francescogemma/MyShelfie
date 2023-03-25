@@ -204,7 +204,6 @@ public class Board {
     * */
     public Tile selectTile(int row, int col) throws IllegalExtractionException {
         if (this.isEmpty(row, col) || numberOfFreeSides(row, col, this::isEmptyExtraction) == 0) {
-            System.out.println(this);
             throw new IllegalExtractionException("Can't extract tile at: [" + row + ", " + col + "]");
         }
 
