@@ -9,11 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
 public class AdjacencyFetcherTest {
-    Fetcher fetcher;
-    int groupValue;
-    int numGroups;
-    boolean anotherGroup;
-    final int NUM_SHELVES_IN_LIBRARY = 30;
+    private Fetcher fetcher;
+    private int groupValue;
+    private int numGroups;
+    private boolean anotherGroup;
+    private final int NUM_SHELVES_IN_LIBRARY = 30;
 
     @BeforeEach
     public void setUp() {
@@ -198,17 +198,23 @@ public class AdjacencyFetcherTest {
     }
 
     @Test
-    @DisplayName("next() cannot return a shelf 'diagonally adjacent' to the previous one")
-    public void nextMethod_severalNextCalls_noDiagonallyAdjacentShelvesReturned() {
+    @DisplayName("next() must return a valid cell")
+    public void nextMethod_severalNextCalls_validCellsReturned() {
         Shelf next = fetcher.next();
         int row = next.getRow();
         int column = next.getColumn();
         for(int i = 0; i < NUM_SHELVES_IN_LIBRARY - 1; i++) {
             next = fetcher.next();
+
             Assertions.assertFalse(next.getRow() == row + 1 && next.getColumn() == column + 1);
             Assertions.assertFalse(next.getRow() == row - 1 && next.getColumn() == column - 1);
             Assertions.assertFalse(next.getRow() == row - 1 && next.getColumn() == column + 1);
             Assertions.assertFalse(next.getRow() == row + 1 && next.getColumn() == column - 1);
+
+            Assertions.assertFalse(next.getRow() == row && next.getColumn() == column);
+
+            Assertions.assertTrue(Math.abs(next.getRow() - row) <= 1 && Math.abs(next.getColumn() - column) <= 1);
+
             row = next.getRow();
             column = next.getColumn();
         }

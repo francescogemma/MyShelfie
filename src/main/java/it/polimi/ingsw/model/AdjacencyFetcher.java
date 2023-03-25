@@ -17,7 +17,7 @@ public class AdjacencyFetcher implements Fetcher {
      * Represents the status of a {@link Shelf shelf}.
      * A status can be {@link ShelfStatus#NOT_VISITED}, {@link ShelfStatus#VISITED} or {@link ShelfStatus#NOT_THE_SAME_COLOR}.
      */
-    public enum ShelfStatus {
+    private enum ShelfStatus {
         /**
          * It indicates that the shelf has not been visited yet.
          */
@@ -34,10 +34,10 @@ public class AdjacencyFetcher implements Fetcher {
     }
 
     // stack used to implement the DFS
-    Stack<Shelf> stack;
+    private final Stack<Shelf> stack;
 
     // matrix of the statuses of the shelves
-    ShelfStatus[][] statuses = new ShelfStatus[Library.ROWS][Library.COLUMNS];
+    private final ShelfStatus[][] statuses = new ShelfStatus[Library.ROWS][Library.COLUMNS];
 
 
     /**

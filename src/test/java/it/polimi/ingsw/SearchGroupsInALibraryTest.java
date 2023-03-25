@@ -11,10 +11,10 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class SearchGroupsInALibraryTest {
-    Library library = null;
-    Fetcher fetcher = null;
-    Filter filter = null;
-    int numGroups;
+    private Library library;
+    private Fetcher fetcher;
+    private Filter filter;
+    private int numGroups;
 
     @BeforeEach
     public void setUp() {
