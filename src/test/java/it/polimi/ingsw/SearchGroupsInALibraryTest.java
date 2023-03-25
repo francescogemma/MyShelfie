@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class SearchGroupsInALibraryTest {
     private Library library;
@@ -181,7 +182,100 @@ public class SearchGroupsInALibraryTest {
             }
         } while (!fetcher.hasFinished());
 
-        Assertions.assertEquals(8, numGroups);
+        Assertions.assertEquals(7, numGroups);
+    }
+
+    @Test
+    @DisplayName("Library with only one tile")
+    public void findGroups_oneTileLibrary_correctOutput() {
+        library.insertTiles(new ArrayList<>(List.of(Tile.BLUE)), 3);
+
+        LibraryMask mask = new LibraryMask(library);
+
+        do {
+            Shelf next = fetcher.next();
+            if (filter.add(library.get(next))) {
+                if (fetcher.canFix()) {
+                    filter.forgetLastTile();
+                } else {
+                    filter.clear();
+                    mask.clear();
+                    continue;
+                }
+            } else mask.add(next);
+
+            if (fetcher.lastShelf()) {
+                if (filter.isSatisfied()) {
+                    numGroups++;
+
+                    StringBuilder result = new StringBuilder("---------------\n");
+
+                    for (int row = 0; row < Library.ROWS; row++) {
+                        for (int column = 0; column < Library.COLUMNS; column++) {
+                            Shelf currentShelf = Shelf.getInstance(row, column);
+                            String toColor = " ";
+                            if(numGroups == 1 && row == 5 && column == 3) {
+                                toColor = "#";
+                            }
+
+                            result.append("[").append(library.get(currentShelf).color(toColor)).append("]");
+                        }
+
+                        result.append("\n---------------\n");
+                    }
+
+                    Assertions.assertEquals(result.toString(), mask.toString());
+                }
+                filter.clear();
+                mask.clear();
+            }
+        } while (!fetcher.hasFinished());
+
+        Assertions.assertEquals(1, numGroups);
+    }
+
+    @Test
+    @DisplayName("Empty library")
+    public void findGroups_emptyLibrary_correctOutput() {
+        LibraryMask mask = new LibraryMask(library);
+
+        do {
+            Shelf next = fetcher.next();
+            if (filter.add(library.get(next))) {
+                if (fetcher.canFix()) {
+                    filter.forgetLastTile();
+                } else {
+                    filter.clear();
+                    mask.clear();
+                    continue;
+                }
+            } else mask.add(next);
+
+            if (fetcher.lastShelf()) {
+                if (filter.isSatisfied()) {
+                    numGroups++;
+
+                    StringBuilder result = new StringBuilder("---------------\n");
+
+                    for (int row = 0; row < Library.ROWS; row++) {
+                        for (int column = 0; column < Library.COLUMNS; column++) {
+                            Shelf currentShelf = Shelf.getInstance(row, column);
+                            String toColor = " ";
+
+                            result.append("[").append(library.get(currentShelf).color(toColor)).append("]");
+                        }
+
+                        result.append("\n---------------\n");
+                    }
+
+                    Assertions.assertEquals(result.toString(), mask.toString());
+                }
+                filter.clear();
+                mask.clear();
+            }
+        } while (!fetcher.hasFinished());
+
+        Assertions.assertEquals(0, numGroups);
     }
 
     @Test

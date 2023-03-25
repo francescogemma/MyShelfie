@@ -37,7 +37,10 @@ public class AdjacencyFetcher implements Fetcher {
     private final Stack<Shelf> stack;
 
     // matrix of the statuses of the shelves
-    private final ShelfStatus[][] statuses = new ShelfStatus[Library.ROWS][Library.COLUMNS];
+    private final ShelfStatus[][] statuses;
+
+    // boolean used to know if we are visiting the first shelf of the group
+    private boolean firstShelfOfTheGroup;
 
 
     /**
@@ -47,6 +50,8 @@ public class AdjacencyFetcher implements Fetcher {
      */
     public AdjacencyFetcher() {
         stack = new Stack<>();
+        statuses = new ShelfStatus[Library.ROWS][Library.COLUMNS];
+        firstShelfOfTheGroup = true;
 
         setAllShelvesToNotVisited();
     }
@@ -64,19 +69,23 @@ public class AdjacencyFetcher implements Fetcher {
         /*
          * if the stack is empty, it means that we are starting a new group,
          * so we find another not visited shelf and we push it on the stack
-         * finally we set the shelf to VISITED and return it
+         * finally we set the shelf to VISITED and return it.
          */
         if(stack.isEmpty()) {
             stack.push(findAnotherShelf());
             setShelfToVisited(stack.peek());
+            firstShelfOfTheGroup = true;
+
             return stack.peek();
         }
+
+        firstShelfOfTheGroup = false;
 
         /*
          * if the stack is not empty, we try to move in one of the four directions
          * using the method canMoveInThisDirection.
          * If we can move, we set the shelf to VISITED, we push it on the stack
-         * and finally we return the shelf
+         * and finally we return the shelf.
          */
         Shelf current = stack.peek();
 
@@ -149,7 +158,7 @@ public class AdjacencyFetcher implements Fetcher {
     public boolean hasFinished() {
         /*
          * the process is finished if all shelves are not visited and if the stack is empty,
-         * it checks if we are in the initial state
+         * it checks if we are in the initial state.
          */
         return areAllShelvesNotVisited() && stack.isEmpty();
     }
@@ -157,7 +166,9 @@ public class AdjacencyFetcher implements Fetcher {
     /*
      * This method is called when the last shelf returned by next() was not with the same color of the group,
      * so it sets the last shelf to NOT_THE_SAME_COLOR and it pops it from the stack.
-     * Return always true
+     * If we find that the shelf we are trying to pop is the first shelf of the group,
+     * we set it to VISITED instead, to avoid loops because of empty tiles.
+     * Return always true.
      * Throws IllegalStateException if the stack is empty when calling this method, because it must mark the last shelf as NOT_THE_SAME_COLOR and pop it from the stack.
      */
     @Override
@@ -166,7 +177,11 @@ public class AdjacencyFetcher implements Fetcher {
             throw new IllegalStateException("The stack must not be empty when calling canFix");
         } else {
             Shelf toDelete = stack.pop();
-            setShelfToNotTheSameColor(toDelete);
+            if(firstShelfOfTheGroup) {
+                setShelfToVisited(toDelete);
+            } else {
+                setShelfToNotTheSameColor(toDelete);
+            }
         }
         return true;
     }
