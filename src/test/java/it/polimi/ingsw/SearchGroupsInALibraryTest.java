@@ -75,7 +75,7 @@ public class SearchGroupsInALibraryTest {
                         result.append("\n---------------\n");
                     }
 
-                    Assertions.assertEquals(mask.toString(), result.toString());
+                    Assertions.assertEquals(result.toString(), mask.toString());
                 }
                 filter.clear();
                 mask.clear();
@@ -137,7 +137,7 @@ public class SearchGroupsInALibraryTest {
                         result.append("\n---------------\n");
                     }
 
-                    Assertions.assertEquals(mask.toString(), result.toString());
+                    Assertions.assertEquals(result.toString(), mask.toString());
                 }
                 filter.clear();
                 mask.clear();
@@ -237,7 +237,7 @@ public class SearchGroupsInALibraryTest {
                         result.append("\n---------------\n");
                     }
 
-                    Assertions.assertEquals(mask.toString(), result.toString());
+                    Assertions.assertEquals(result.toString(), mask.toString());
                 }
                 filter.clear();
                 mask.clear();

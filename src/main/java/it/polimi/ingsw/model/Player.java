@@ -43,7 +43,7 @@ public class Player {
      * @throws IllegalArgumentException if the points to add are negative.
      */
     public void addPoints(int points) {
-        if(points < 0) {
+        if(points <= 0) {
             throw new IllegalArgumentException("Points to add must be positive");
         } else {
             this.points += points;
