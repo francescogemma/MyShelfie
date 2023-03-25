@@ -5,6 +5,8 @@ import java.util.function.BiFunction;
 
 /**
  * Represents a mutable set of {@link Shelf shelves} inside a {@link Library library}.
+ *
+ * @author Cristiano Migali
  */
 public class LibraryMask {
     /**
