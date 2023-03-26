@@ -112,12 +112,17 @@ public class Library {
      *
      * @param tiles is the list of the tiles that we are going to insert.
      * @param column is the index of the column where we want to do the insertion.
+     * @throws IllegalArgumentException if column isn't the index of a column inside the library.
      * @throws IllegalArgumentException if the number of tiles in tiles is bigger than the maximum insertion size:
      * {@value MAX_INSERTION_SIZE}.
      * @throws IllegalArgumentException if there is an empty tile inside tiles.
      * @throws RuntimeException if there isn't enough space inside the specified column to put all the tiles.
      */
     public void insertTiles(ArrayList<Tile> tiles, int column) {
+        if (!isColumnInsideTheLibrary(column)) {
+            throw new IllegalArgumentException("Given column index outside the library when performing an insertion");
+        }
+
         if (tiles.size() > MAX_INSERTION_SIZE) {
             throw new IllegalArgumentException("It is not allowed to insert more than " + MAX_INSERTION_SIZE
                 + " tiles");
