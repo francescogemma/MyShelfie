@@ -46,6 +46,7 @@ public class ShelfTest {
     public void getInstance_correctRowColumn_correctOutput(int row, int column) {
         Shelf shelf = Shelf.getInstance(row, column);
 
+        // This test case also exerts the code in getRow and getColumn
         Assertions.assertEquals(shelf.getRow(), row);
         Assertions.assertEquals(shelf.getColumn(), column);
     }
@@ -109,20 +110,6 @@ public class ShelfTest {
         Assertions.assertThrows(RuntimeException.class, () -> {
             Shelf.origin().move(Offset.left());
         });
-    }
-
-    @ParameterizedTest(name = "row {0}, column {1}")
-    @DisplayName("Getting shelf row from shelf at ")
-    @MethodSource("rowColumnProvider")
-    public void getRow_correctOutput(int row, int colum) {
-        Assertions.assertEquals(Shelf.getInstance(row, colum).getRow(), row);
-    }
-
-    @ParameterizedTest(name = "row {0}, column {1}")
-    @DisplayName("Getting shelf column for shelf at ")
-    @MethodSource("rowColumnProvider")
-    public void getColumn_correctOutput(int row, int column) {
-        Assertions.assertEquals(Shelf.getInstance(row, column).getColumn(), column);
     }
 
     @ParameterizedTest(name = "row {0}, column {1} is equal to its translated by {2} or not")
