@@ -81,7 +81,7 @@ public class ShapeFetcher implements Fetcher {
                 // We move the shape origin right while the library mask bounding box still fits inside the library.
                 shapeOrigin = shapeOrigin.move(Offset.right());
             } else {
-                // Otherwise we move the shape origin at the the beginning of the next row.
+                // Otherwise we move the shape origin at the beginning of the next row.
                 shapeOrigin = Shelf.origin().move(Offset.down(shapeOrigin.getRow() + 1));
             }
         }

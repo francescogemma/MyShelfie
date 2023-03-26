@@ -12,9 +12,9 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class ShapeTest {
-    private final static int NUM_OF_SHAPES_TO_GENERATE = 1000;
+    private final static int NUM_OF_SHAPES_TO_GENERATE = 10000;
 
-    private static ArrayList<Arguments> offsetsHeightWidthProvider() {
+    public static ArrayList<Arguments> offsetsHeightWidthProvider() {
         Random random = new Random(315346);
 
         ArrayList<Arguments> offsetsListsHeightsWidths = new ArrayList<>();
