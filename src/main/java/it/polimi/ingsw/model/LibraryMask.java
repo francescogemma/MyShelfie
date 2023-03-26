@@ -100,6 +100,17 @@ public class LibraryMask {
     public static final BiFunction<LibraryMask, LibraryMask, Boolean> DO_NOT_INTERSECT_AND_SAME_COLOR = (first, second) ->
         first.getSampleTile() == second.getSampleTile() && DO_NOT_INTERSECT.apply(first, second);
 
+    /**
+     * Gets a specific shelf's content.
+     * @param shelf is where we're sampling for color
+     * @return the {@link Tile tile} at that location.
+     *
+     * @author Michele Miotti
+     */
+    public Tile tileAt(Shelf shelf) {
+        return library.get(shelf);
+    }
+
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder("---------------\n");
