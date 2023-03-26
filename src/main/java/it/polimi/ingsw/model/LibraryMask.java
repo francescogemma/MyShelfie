@@ -49,7 +49,7 @@ public class LibraryMask {
 
             if (shelf.before(shelves.get(i))) {
                 shelves.add(i, shelf);
-                break;
+                return;
             }
         }
 
