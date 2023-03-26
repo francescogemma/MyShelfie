@@ -47,8 +47,8 @@ public class ShelfTest {
         Shelf shelf = Shelf.getInstance(row, column);
 
         // This test case also exerts the code in getRow and getColumn
-        Assertions.assertEquals(shelf.getRow(), row);
-        Assertions.assertEquals(shelf.getColumn(), column);
+        Assertions.assertEquals(row, shelf.getRow());
+        Assertions.assertEquals(column, shelf.getColumn());
     }
 
     @Test
@@ -90,8 +90,8 @@ public class ShelfTest {
     public void getOrigin_correctOutput() {
         Shelf shelf = Shelf.origin();
 
-        Assertions.assertEquals(shelf.getRow(), 0);
-        Assertions.assertEquals(shelf.getColumn(), 0);
+        Assertions.assertEquals(0, shelf.getRow());
+        Assertions.assertEquals(0, shelf.getColumn());
     }
 
     @ParameterizedTest(name = "row {0}, column {1} by {2}")
@@ -100,8 +100,8 @@ public class ShelfTest {
     public void move_correctOffset_correctOutput(int row, int column, Offset offset) {
         Shelf shelf = Shelf.getInstance(row, column).move(offset);
 
-        Assertions.assertEquals(shelf.getRow(), row + offset.getRowOffset());
-        Assertions.assertEquals(shelf.getColumn(), column + offset.getColumnOffset());
+        Assertions.assertEquals(row + offset.getRowOffset(), shelf.getRow());
+        Assertions.assertEquals(column + offset.getColumnOffset(), shelf.getColumn());
     }
 
     @Test
@@ -116,17 +116,17 @@ public class ShelfTest {
     @DisplayName("Checking if shelf at ")
     @MethodSource("rowColumnOffsetProvider")
     public void equals_sameShelf_correctOutput(int row, int column, Offset offset) {
-        Assertions.assertEquals(Shelf.getInstance(row, column)
-            .equals(Shelf.getInstance(row, column).move(offset)),
-            offset.equals(Offset.getInstance(0, 0)));
+        Assertions.assertEquals(offset.equals(Offset.getInstance(0, 0)),
+            Shelf.getInstance(row, column)
+            .equals(Shelf.getInstance(row, column).move(offset)));
     }
 
     @ParameterizedTest(name = "row {0}, column {1} is before its translated by {2} or not")
     @DisplayName("Checking if shelf at ")
     @MethodSource("rowColumnOffsetProvider")
     public void before_otherShelf_correctOutput(int row, int column, Offset offset) {
-        Assertions.assertEquals(Shelf.getInstance(row, column)
-            .before(Shelf.getInstance(row, column).move(offset)),
-            offset.getRowOffset() > 0 || (offset.getRowOffset() == 0 && offset.getColumnOffset() > 0));
+        Assertions.assertEquals(offset.getRowOffset() > 0 || (offset.getRowOffset() == 0 && offset.getColumnOffset() > 0),
+            Shelf.getInstance(row, column)
+            .before(Shelf.getInstance(row, column).move(offset)));
     }
 }

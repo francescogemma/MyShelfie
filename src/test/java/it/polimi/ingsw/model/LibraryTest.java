@@ -80,18 +80,18 @@ public class LibraryTest {
         library.insertTiles(thirdInsertion, 0);
 
         // This test case also exerts get code
-        Assertions.assertEquals(library.get(Shelf.getInstance(Library.ROWS - 1, 0)),
-            Tile.GREEN);
-        Assertions.assertEquals(library.get(Shelf.getInstance(Library.ROWS - 2, 0)),
-            Tile.BLUE);
-        Assertions.assertEquals(library.get(Shelf.getInstance(Library.ROWS - 3, 0)),
-            Tile.CYAN);
-        Assertions.assertEquals(library.get(Shelf.getInstance(Library.ROWS - 1, 1)),
-            Tile.YELLOW);
-        Assertions.assertEquals(library.get(Shelf.getInstance(Library.ROWS - 2, 1)),
-            Tile.MAGENTA);
-        Assertions.assertEquals(library.get(Shelf.getInstance(Library.ROWS - 4, 0)),
-            Tile.BLUE);
+        Assertions.assertEquals(Tile.GREEN,
+            library.get(Shelf.getInstance(Library.ROWS - 1, 0)));
+        Assertions.assertEquals(Tile.BLUE,
+            library.get(Shelf.getInstance(Library.ROWS - 2, 0)));
+        Assertions.assertEquals(Tile.CYAN,
+            library.get(Shelf.getInstance(Library.ROWS - 3, 0)));
+        Assertions.assertEquals(Tile.YELLOW,
+            library.get(Shelf.getInstance(Library.ROWS - 1, 1)));
+        Assertions.assertEquals(Tile.MAGENTA,
+            library.get(Shelf.getInstance(Library.ROWS - 2, 1)));
+        Assertions.assertEquals(Tile.BLUE,
+            library.get(Shelf.getInstance(Library.ROWS - 4, 0)));
     }
 
     @Test

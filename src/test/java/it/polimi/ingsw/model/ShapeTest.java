@@ -101,7 +101,7 @@ public class ShapeTest {
         Shape shape = new Shape(offsets);
 
         // This test case also exerts getOffsets code
-        Assertions.assertEquals(shape.getOffsets(), offsets);
+        Assertions.assertEquals(offsets, shape.getOffsets());
     }
 
     @Test
@@ -180,14 +180,14 @@ public class ShapeTest {
     @DisplayName("Get width of random generated shape")
     @MethodSource("offsetsHeightWidthProvider")
     public void getHeight_correctOutput(ArrayList<Offset> offsets, int height, int width) {
-        Assertions.assertEquals(new Shape(offsets).getHeight(), height);
+        Assertions.assertEquals(height, new Shape(offsets).getHeight());
     }
 
     @ParameterizedTest
     @DisplayName("Get width of random generated shape")
     @MethodSource("offsetsHeightWidthProvider")
     public void getWidth_correctOutput(ArrayList<Offset> offsets, int height, int width) {
-        Assertions.assertEquals(new Shape(offsets).getWidth(), width);
+        Assertions.assertEquals(width, new Shape(offsets).getWidth());
     }
 
     @ParameterizedTest
@@ -197,11 +197,11 @@ public class ShapeTest {
         Shape originalShape = new Shape(offsets);
         Shape flippedShape = originalShape.verticalFlip();
 
-        Assertions.assertEquals(flippedShape.getHeight(), height);
-        Assertions.assertEquals(flippedShape.getWidth(), width);
+        Assertions.assertEquals(height, flippedShape.getHeight());
+        Assertions.assertEquals(width, flippedShape.getWidth());
 
         // This test case also exerts equals code
-        Assertions.assertEquals(flippedShape.verticalFlip(), originalShape);
+        Assertions.assertEquals(originalShape, flippedShape.verticalFlip());
 
         int[] originalShapeTakenShelves = new int[height * width];
         Arrays.fill(originalShapeTakenShelves, 0);
@@ -222,7 +222,7 @@ public class ShapeTest {
         }
 
         for (int taken : originalShapeTakenShelves) {
-            Assertions.assertEquals(taken, 0);
+            Assertions.assertEquals(0, taken);
         }
     }
 
@@ -232,8 +232,8 @@ public class ShapeTest {
     public void getColumn_correctHeight_correctOutput(int height) {
         Shape column = Shape.getColumn(height);
 
-        Assertions.assertEquals(column.getHeight(), height);
-        Assertions.assertEquals(column.getWidth(), 1);
+        Assertions.assertEquals(height, column.getHeight());
+        Assertions.assertEquals(1, column.getWidth());
 
         boolean[] takenShelf = new boolean[height];
         Arrays.fill(takenShelf, false);
@@ -269,8 +269,8 @@ public class ShapeTest {
     public void getMainDiagonal_correctSize_correctSize(int size) {
         Shape mainDiagonal = Shape.getMainDiagonal(size);
 
-        Assertions.assertEquals(mainDiagonal.getHeight(), size);
-        Assertions.assertEquals(mainDiagonal.getWidth(), size);
+        Assertions.assertEquals(size, mainDiagonal.getHeight());
+        Assertions.assertEquals(size, mainDiagonal.getWidth());
 
         boolean[] takenShelf = new boolean[size];
         Arrays.fill(takenShelf, false);
@@ -278,7 +278,7 @@ public class ShapeTest {
         for (Offset offset : mainDiagonal.getOffsets()) {
             Shelf currentShelf = Shelf.origin().move(offset);
 
-            Assertions.assertEquals(currentShelf.getRow(), currentShelf.getColumn());
+            Assertions.assertEquals(currentShelf.getColumn(), currentShelf.getRow());
 
             takenShelf[currentShelf.getRow()] = true;
         }
@@ -310,8 +310,8 @@ public class ShapeTest {
     public void getRow_correctWidth_correctOutput(int width) {
         Shape row = Shape.getRow(width);
 
-        Assertions.assertEquals(row.getHeight(), 1);
-        Assertions.assertEquals(row.getWidth(), width);
+        Assertions.assertEquals(1, row.getHeight());
+        Assertions.assertEquals(width, row.getWidth());
 
         boolean[] takenShelf = new boolean[width];
         Arrays.fill(takenShelf, false);

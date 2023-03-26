@@ -76,8 +76,8 @@ public class OffsetTest {
         Offset offset = Offset.getInstance(rowOffset, columnOffset);
 
         // This test case also exerts the code in getRowOffset and getColumnOffset
-        Assertions.assertEquals(offset.getRowOffset(), rowOffset);
-        Assertions.assertEquals(offset.getColumnOffset(), columnOffset);
+        Assertions.assertEquals(rowOffset, offset.getRowOffset());
+        Assertions.assertEquals(columnOffset, offset.getColumnOffset());
     }
 
     @Test
@@ -99,14 +99,14 @@ public class OffsetTest {
     @Test
     @DisplayName("Getting up offset")
     public void up_correctOutput() {
-        Assertions.assertEquals(Offset.up(), Offset.getInstance(-1, 0));
+        Assertions.assertEquals(Offset.getInstance(-1, 0), Offset.up());
     }
 
     @ParameterizedTest(name = "vertical amount = {0}")
     @DisplayName("Getting up offset with ")
     @MethodSource("verticalAmountProvider")
     public void up_correctVerticalAmount_correctOutput(int verticalAmount) {
-        Assertions.assertEquals(Offset.up(verticalAmount), Offset.getInstance(-verticalAmount, 0));
+        Assertions.assertEquals(Offset.getInstance(-verticalAmount, 0), Offset.up(verticalAmount));
     }
 
     @Test
@@ -120,14 +120,14 @@ public class OffsetTest {
     @Test
     @DisplayName("Getting down offset")
     public void down_correctOutput() {
-        Assertions.assertEquals(Offset.down(), Offset.getInstance(1, 0));
+        Assertions.assertEquals(Offset.getInstance(1, 0), Offset.down());
     }
 
     @ParameterizedTest(name = "vertical amount = {0}")
     @DisplayName("Getting down offset with ")
     @MethodSource("verticalAmountProvider")
     public void down_correctVerticalAmount_correctOutput(int verticalAmount) {
-        Assertions.assertEquals(Offset.down(verticalAmount), Offset.getInstance(verticalAmount, 0));
+        Assertions.assertEquals(Offset.getInstance(verticalAmount, 0), Offset.down(verticalAmount));
     }
 
     @Test
@@ -141,14 +141,14 @@ public class OffsetTest {
     @Test
     @DisplayName("Getting left offset")
     public void left_correctOutput() {
-        Assertions.assertEquals(Offset.left(), Offset.getInstance(0, -1));
+        Assertions.assertEquals(Offset.getInstance(0, -1), Offset.left());
     }
 
     @ParameterizedTest(name = "horizontal amount = {0}")
     @DisplayName("Getting left offset with ")
     @MethodSource("horizontalAmountProvider")
     public void left_correctHorizontalAmount_correctOutput(int horizontalAmount) {
-        Assertions.assertEquals(Offset.left(horizontalAmount), Offset.getInstance(0, -horizontalAmount));
+        Assertions.assertEquals(Offset.getInstance(0, -horizontalAmount), Offset.left(horizontalAmount));
     }
 
     @Test
@@ -162,14 +162,14 @@ public class OffsetTest {
     @Test
     @DisplayName("Getting right offset")
     public void right_correctOutput() {
-        Assertions.assertEquals(Offset.right(), Offset.getInstance(0, 1));
+        Assertions.assertEquals(Offset.getInstance(0, 1), Offset.right());
     }
 
     @ParameterizedTest(name = "horizontal amount = {0}")
     @DisplayName("Getting right offset with ")
     @MethodSource("horizontalAmountProvider")
     public void right_correctHorizontalAmount_correctOutput(int horizontalAmount) {
-        Assertions.assertEquals(Offset.right(horizontalAmount), Offset.getInstance(0, horizontalAmount));
+        Assertions.assertEquals(Offset.getInstance(0, horizontalAmount), Offset.right(horizontalAmount));
     }
 
     @Test
@@ -189,8 +189,8 @@ public class OffsetTest {
         Offset offset = Offset.getInstance(firstRowOffset, firstColumnOffset)
             .add(Offset.getInstance(secondRowOffset, secondColumnOffset));
 
-        Assertions.assertEquals(offset.getRowOffset(), firstRowOffset + secondRowOffset);
-        Assertions.assertEquals(offset.getColumnOffset(), firstColumnOffset + secondColumnOffset);
+        Assertions.assertEquals(firstRowOffset + secondRowOffset, offset.getRowOffset());
+        Assertions.assertEquals(firstColumnOffset + secondColumnOffset, offset.getColumnOffset());
     }
 
     @Test
