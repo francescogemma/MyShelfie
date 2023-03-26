@@ -43,6 +43,8 @@ public class Pair<T, F> {
 
             if (pair.value != null && !this.value.equals(pair.value))
                 return false;
+
+            return true;
         }
 
         return false;

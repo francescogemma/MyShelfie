@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.model;
 
 import it.polimi.ingsw.model.Bag;
 import it.polimi.ingsw.model.Board;
@@ -164,5 +164,16 @@ public class BoardTest {
         Assertions.assertEquals(2, board.draw().size());
 
         Assertions.assertTrue(board.needsRefill());
+    }
+
+    @Test
+    public void testRemoveSameTile() throws IllegalExtractionException {
+        fillBoard(this.board);
+        board.selectTile(4, 0);
+        board.selectTile(4, 1);
+        Assertions.assertThrows(IllegalExtractionException.class, () ->  {
+            board.selectTile(4, 0);
+        });
+        board.selectTile(4, 2);
     }
 }

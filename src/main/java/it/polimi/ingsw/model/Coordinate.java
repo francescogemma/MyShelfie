@@ -1,12 +1,24 @@
 package it.polimi.ingsw.model;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 public class Coordinate {
     private final int col;
     private final int row;
 
     public Coordinate(int row, int col) {
-        this.col = col;
         this.row = row;
+        this.col = col;
+    }
+
+    public static List<Coordinate> toList(Collection<int []> data) {
+        return data
+                .stream()
+                .map((p) -> new Coordinate(p[0], p[1]))
+                .toList();
     }
 
     public int getCol() {
@@ -15,14 +27,6 @@ public class Coordinate {
 
     public int getRow() {
         return this.row;
-    }
-
-    public int getX () {
-        return getCol();
-    }
-
-    public int getY () {
-        return this.getRow();
     }
 
     @Override
