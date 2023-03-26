@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -118,6 +120,7 @@ public class SearchGroupsInALibraryTest {
             if (fetcher.lastShelf()) {
                 if (filter.isSatisfied()) {
                     numGroups++;
+
                     StringBuilder result = new StringBuilder("---------------\n");
 
                     for (int row = 0; row < Library.ROWS; row++) {
@@ -185,10 +188,11 @@ public class SearchGroupsInALibraryTest {
         Assertions.assertEquals(7, numGroups);
     }
 
-    @Test
+    @ParameterizedTest(name = "in column {0}")
     @DisplayName("Library with only one tile")
-    public void findGroups_oneTileLibrary_correctOutput() {
-        library.insertTiles(new ArrayList<>(List.of(Tile.BLUE)), 3);
+    @ValueSource(ints = {0, 1, 2, 3, 4})
+    public void findGroups_oneTileLibrary_correctOutput(int col) {
+        library.insertTiles(new ArrayList<>(List.of(Tile.BLUE)), col);
 
         LibraryMask mask = new LibraryMask(library);
 
@@ -214,7 +218,7 @@ public class SearchGroupsInALibraryTest {
                         for (int column = 0; column < Library.COLUMNS; column++) {
                             Shelf currentShelf = Shelf.getInstance(row, column);
                             String toColor = " ";
-                            if(numGroups == 1 && row == 5 && column == 3) {
+                            if(numGroups == 1 && row == 5 && column == col) {
                                 toColor = "#";
                             }
 
