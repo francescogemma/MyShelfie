@@ -188,10 +188,28 @@ public class Shape {
      * The original shape is not affected since it's immutable.
      */
     public Shape verticalFlip() {
-        return new Shape(
-            new ArrayList<>(offsets.stream().map(offset -> Offset.getInstance(offset.getRowOffset(),
-                    width - 1 - offset.getColumnOffset())).collect(Collectors.toList()))
-        );
+        ArrayList<Offset> flippedOffsets = new ArrayList<>();
+
+        /*
+         * In order to vertically flip the shape while keeping the offsets list
+         * invariant property (the one about the order) satisfied, we must invert the order
+         * of offsets relative to the same row when we flip and add them to the final list.
+         * For doing so, we can keep track of the index in the final list of the first offset
+         * in the row that we are flipping and add new offsets relative to that same row
+         * before that index.
+         */
+        int currentRowInsertionIndex = 0;
+        for (int i = 0; i < offsets.size(); i++) {
+            if (i == 0 || (offsets.get(i).getRowOffset() > offsets.get(i - 1).getRowOffset())) {
+                currentRowInsertionIndex = flippedOffsets.size();
+            }
+
+            flippedOffsets.add(currentRowInsertionIndex,
+                Offset.getInstance(offsets.get(i).getRowOffset(),
+                    width - 1 - offsets.get(i).getColumnOffset()));
+        }
+
+        return new Shape(flippedOffsets);
     }
 
     /**
@@ -387,9 +405,14 @@ public class Shape {
     /**
      * @param height is the height of the column.
      * @return the shape of a column with the specified height.
+     * @throws IllegalArgumentException if height is not positive.
      * @throws IllegalArgumentException if the column doesn't fit inside a {@link Library library}.
      */
     public static Shape getColumn(int height) {
+        if (height <= 0) {
+            throw new IllegalArgumentException("Height of a column must be positive");
+        }
+
         ArrayList<Offset> columnOffsets = new ArrayList<>();
 
         for (int i = 0; i < height; i++) {
@@ -406,9 +429,14 @@ public class Shape {
     /**
      * @param size is the number of shelves in the diagonal.
      * @return the shape of a main (directed down-right) diagonal with the specified size.
+     * @throws IllegalArgumentException if size is not positive.
      * @throws IllegalArgumentException if the diagonal doesn't fit inside a {@link Library library}.
      */
     public static Shape getMainDiagonal(int size) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("Size of a diagonal must be positive");
+        }
+
         ArrayList<Offset> diagonalOffsets = new ArrayList<>();
 
         for (int i = 0; i < size; i++) {
@@ -425,9 +453,14 @@ public class Shape {
     /**
      * @param width is the width of the row.
      * @return the shape of a row with the specified width.
+     * @throws IllegalArgumentException if width is not positive
      * @throws IllegalArgumentException if the row doesn't fit inside a {@link Library library}.
      */
     public static Shape getRow(int width) {
+        if (width <= 0) {
+            throw new IllegalArgumentException("Width of a row must be positive");
+        }
+
         ArrayList<Offset> rowOffsets = new ArrayList<>();
 
         for (int i = 0; i < width; i++) {
@@ -497,6 +530,21 @@ public class Shape {
         }
 
         WHOLE_LIBRARY = new Shape(offsets);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+
+        if (!(other instanceof Shape)) {
+            return false;
+        }
+
+        Shape otherShape = (Shape) other;
+
+        return offsets.equals(otherShape.offsets);
     }
 
     @Override
