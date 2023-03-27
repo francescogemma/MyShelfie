@@ -185,6 +185,13 @@ public class Board {
      */
     private final Tile[][]tiles = new Tile[rowBoard][columnBoard];
 
+    /**
+     * Constructor of the Board class.
+     * Initially, it represents an empty Board, so it will be necessary
+     * to call the fillRandomly function to fill it.
+     *
+     * @see #fillRandomly(Tile, int)
+     * */
     public Board() {
         boardSelector = new BoardSelector();
         occupied = 0;
@@ -262,7 +269,7 @@ public class Board {
             return res;
         }
 
-        Consumer<Coordinate> a = (p) -> {
+        Consumer<Coordinate> a = p -> {
             if (numberOfFreeSides(p, this::isEmptyExtraction) > 0 && !isEmpty(p))
                 res.add(tileAt(p));
         };
@@ -275,7 +282,7 @@ public class Board {
             }
             case 1, 2 -> {
                 boardSelector.getAvailableSelection()
-                        .forEach((t) -> {
+                        .forEach(t -> {
                             if (!isOutOfBoard(t) && !isEmpty(t))
                                 res.add(tileAt(t));
                         });
@@ -358,36 +365,22 @@ public class Board {
     private List<Coordinate> getAvailablePositionInsert(int numPlayer) {
         List<Coordinate> res = new ArrayList<>();
 
-        if (this.occupied == 0) {
-            Consumer<Coordinate> coordinateConsumer = res::add;
-            res.addAll(Board.twoPlayerPosition);
-            if (numPlayer > 2)
-                res.addAll(Board.threePlayerPosition);
+        Board.twoPlayerPosition
+                .stream()
+                .filter(this::isEmpty)
+                .forEach(res::add);
 
-            if (numPlayer == 4)
-                res.addAll(Board.fourPlayerPosition);
+        if (numPlayer > 2)
+            Board.threePlayerPosition
+                    .stream()
+                    .filter(this::isEmpty)
+                    .forEach(res::add);
 
-            return res;
-        }
-
-        Consumer<Coordinate> coordinateConsumer = (c) -> {
-            if (isEmpty(c)) {
-                final int edge = numberOfFreeSides(c);
-                if (edge < 4) {
-                    res.add(c);
-                }
-            }
-        };
-
-        Board.twoPlayerPosition.forEach(coordinateConsumer);
-
-        if (numPlayer > 2) {
-            Board.threePlayerPosition.forEach(coordinateConsumer);
-        }
-
-        if (numPlayer == 4) {
-            Board.fourPlayerPosition.forEach(coordinateConsumer);
-        }
+        if (numPlayer == 4)
+            Board.fourPlayerPosition
+                    .stream()
+                    .filter(this::isEmpty)
+                    .forEach(res::add);
 
         return res;
     }
@@ -402,8 +395,8 @@ public class Board {
         if (this.isFull(numPlayer))
             throw new IllegalArgumentException("Board is full");
 
-        final List<Coordinate> possible = this.getAvailablePositionInsert(numPlayer);
-        final int index = new Random().nextInt(possible.size());
+        final List<Coordinate> possible = getAvailablePositionInsert(numPlayer);
+        int index = new Random().nextInt(possible.size());
 
         this.insert(tile,
                 possible.get(index)
@@ -444,10 +437,9 @@ public class Board {
 
     @Override
     public String toString() {
-        int i, k;
         StringBuilder result = new StringBuilder("---------------\n");
-        for (i = 0; i < this.tiles.length; i++) {
-            for (k = 0; k < this.tiles[i].length; k++) {
+        for (int i = 0; i < this.tiles.length; i++) {
+            for (int k = 0; k < this.tiles[i].length; k++) {
                 if (isEmpty(new Coordinate(i, k)))
                     result.append("[ ]");
                 else
