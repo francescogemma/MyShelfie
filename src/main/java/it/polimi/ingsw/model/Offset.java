@@ -2,7 +2,7 @@ package it.polimi.ingsw.model;
 
 /**
  * Represents a translation vector that describes the movement from a {@link Shelf shelf} to another, inside
- * a {@link Library library}. That is a couple of integers (rowOffset, columnOffset) such that
+ * a {@link Bookshelf bookshelf}. That is a couple of integers (rowOffset, columnOffset) such that
  * (rowSecond, columnSecond) = (rowFirst, columnFirst) + (rowOffset, columnOffset) where (rowFirst, columnFirst)
  * is the location of the first shelf, (rowSecond, columnSecond) is the location of the second shelf
  * and the translation goes from the first shelf to the second.
@@ -29,19 +29,19 @@ public class Offset {
     /**
      * Matrix where all Offset instances are stored. It is used to implement a singleton pattern,
      * indeed the number of different Offset instances is finite. The minimum value for {@link Offset#rowOffset}
-     * is -({@value Library#ROWS} - 1) (when we translate a shelf from the last row to the first),
-     * its maximum value is {@value Library#ROWS} - 1 (when we translate a shelf from the first row to the last),
-     * for a total of 2*{@value Library#ROWS} - 1 values.
-     * Analogously the minimum value for {@link Offset#columnOffset} is -({@value Library#COLUMNS} - 1) and its
-     * maximum value is {@value Library#COLUMNS} - 1, for a total of 2*{@value Library#COLUMNS} - 1.
+     * is -({@value Bookshelf#ROWS} - 1) (when we translate a shelf from the last row to the first),
+     * its maximum value is {@value Bookshelf#ROWS} - 1 (when we translate a shelf from the first row to the last),
+     * for a total of 2*{@value Bookshelf#ROWS} - 1 values.
+     * Analogously the minimum value for {@link Offset#columnOffset} is -({@value Bookshelf#COLUMNS} - 1) and its
+     * maximum value is {@value Bookshelf#COLUMNS} - 1, for a total of 2*{@value Bookshelf#COLUMNS} - 1.
      * Hence the total number of different Offset instances is
-     * (2*{@value Library#ROWS} - 1)*(2*{@value Library#COLUMNS} - 1). An offset with rowOffset = i and columnOffset = j
-     * is stored in instances[i + ({@value Library#ROWS} - 1)][j + ({@value Library#COLUMNS} - 1)] (such that when
+     * (2*{@value Bookshelf#ROWS} - 1)*(2*{@value Bookshelf#COLUMNS} - 1). An offset with rowOffset = i and columnOffset = j
+     * is stored in instances[i + ({@value Bookshelf#ROWS} - 1)][j + ({@value Bookshelf#COLUMNS} - 1)] (such that when
      * the value of a component of the vector is minimum, the corresponding index where it is stored is 0).
      *
      * @see Shelf Rows and columns enumeration convetions
      */
-    private static final Offset[][] instances = new Offset[2*Library.ROWS - 1][2*Library.COLUMNS - 1];
+    private static final Offset[][] instances = new Offset[2*Bookshelf.ROWS - 1][2*Bookshelf.COLUMNS - 1];
 
     /**
      * Constructor of the class.
@@ -49,7 +49,6 @@ public class Offset {
      * The constructor is private since we are implementing a singleton pattern, hence we don't need to check that the
      * arguments belong to the right domain: the check is already done in {@link Offset#getInstance(int, int)}.
      *
-     * @see Offset#instances
      * @see Offset#getInstance(int, int)
      *
      * @param rowOffset is the amount of rows by which the shelf is going to be shifted in the translation.
@@ -70,8 +69,8 @@ public class Offset {
         for(int i = 0; i < Offset.instances.length; i++) {
             for (int j = 0; j < Offset.instances[i].length; j++) {
                 instances[i][j] = new Offset(
-                        i - Library.ROWS + 1,
-                        j - Library.COLUMNS + 1
+                        i - Bookshelf.ROWS + 1,
+                        j - Bookshelf.COLUMNS + 1
                 );
             }
         }
@@ -83,27 +82,27 @@ public class Offset {
      * object in memory.
      *
      * @param rowOffset is the amount of rows by which the shelf is going to be shifted in the translation. It must be
-     *                  between -({@value Library#ROWS} - 1) and {@value Library#ROWS} - 1. Negative values result in
+     *                  between -({@value Bookshelf#ROWS} - 1) and {@value Bookshelf#ROWS} - 1. Negative values result in
      *                  upward translations, positive values result in downward translations.
      * @param columnOffset is the amount of columns by which the shelf is going to be shifted in the translation. It
-     *                     must be between -({@value Library#COLUMNS} - 1) and {@value Library#COLUMNS} - 1. Negative
+     *                     must be between -({@value Bookshelf#COLUMNS} - 1) and {@value Bookshelf#COLUMNS} - 1. Negative
      *                     values result in translations to the left, positive values result in translations to the right.
      * @return an offset with components (rowOffset, columnOffset).
-     * @throws IllegalArgumentException if arguments are outside the domain {-({@value Library#ROWS} - 1), ...,
-     * {@value Library#ROWS} - 1} x {-({@value Library#COLUMNS} - 1), ..., {@value Library#COLUMNS} - 1}.
+     * @throws IllegalArgumentException if arguments are outside the domain {-({@value Bookshelf#ROWS} - 1), ...,
+     * {@value Bookshelf#ROWS} - 1} x {-({@value Bookshelf#COLUMNS} - 1), ..., {@value Bookshelf#COLUMNS} - 1}.
      */
     public static Offset getInstance(int rowOffset, int columnOffset) {
-        if (rowOffset <= - Library.ROWS || rowOffset >= Library.ROWS) {
-            throw new IllegalArgumentException("row offset must be between " + (-Library.ROWS + 1) + " and "
-            + (Library.ROWS - 1));
+        if (rowOffset <= - Bookshelf.ROWS || rowOffset >= Bookshelf.ROWS) {
+            throw new IllegalArgumentException("row offset must be between " + (-Bookshelf.ROWS + 1) + " and "
+            + (Bookshelf.ROWS - 1));
         }
 
-        if (columnOffset <= -Library.COLUMNS || columnOffset >= Library.COLUMNS) {
-            throw new IllegalArgumentException("column offset must be between " + (-Library.COLUMNS + 1) + " and "
-            + (Library.COLUMNS - 1));
+        if (columnOffset <= -Bookshelf.COLUMNS || columnOffset >= Bookshelf.COLUMNS) {
+            throw new IllegalArgumentException("column offset must be between " + (-Bookshelf.COLUMNS + 1) + " and "
+            + (Bookshelf.COLUMNS - 1));
         }
 
-        return instances[Library.ROWS - 1 + rowOffset][Library.COLUMNS - 1 + columnOffset];
+        return instances[Bookshelf.ROWS - 1 + rowOffset][Bookshelf.COLUMNS - 1 + columnOffset];
     }
 
     /**
@@ -187,11 +186,11 @@ public class Offset {
     /**
      * @param other offset that we are adding to the offset on which this method is invoked.
      * @return the sum of the offset on which this method is invoked plus other, that is
-     * an offset with components (rowOffset + otherRowOffset, columnOffset, otherColumnsOffset)
+     * an offset with components (rowOffset + otherRowOffset, columnOffset + otherColumnsOffset)
      * where (otherRowOffset, otherColumnOffset) are the components of other. The original offset
      * is not affected since it's immutable.
-     * @throws IllegalArgumentException if the offset resulting from the sum would move each shelf outside the library.
-     * That is if the offset components are bigger than library dimensions.
+     * @throws IllegalArgumentException if the offset resulting from the sum would move each shelf outside the bookshelf.
+     * That is if the offset components are bigger than bookshelf dimensions.
      */
     public Offset add(Offset other) {
         return getInstance(rowOffset + other.rowOffset, columnOffset + other.columnOffset);

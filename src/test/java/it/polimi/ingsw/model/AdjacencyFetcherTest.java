@@ -5,12 +5,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class AdjacencyFetcherTest {
+class AdjacencyFetcherTest {
     private Fetcher fetcher;
     private int groupValue;
     private int numGroups;
     private boolean anotherGroup;
-    private final int NUM_SHELVES_IN_LIBRARY = 30;
+    private final int NUM_SHELVES_IN_BOOKSHELF = 30;
 
     @BeforeEach
     public void setUp() {
@@ -21,7 +21,7 @@ public class AdjacencyFetcherTest {
 
     @Test
     @DisplayName("One single group of 30 cells")
-    public void findGroups_oneGroup_correctOutput() {
+    void findGroups_oneGroup_correctOutput() {
         int[][] matrix = {
                 {1, 1, 1, 1, 1},
                 {1, 1, 1, 1, 1},
@@ -37,7 +37,7 @@ public class AdjacencyFetcherTest {
 
     @Test
     @DisplayName("30 groups, each with one cell")
-    public void findGroups_allGroupsOfOne_correctOutput() {
+    void findGroups_allGroupsOfOne_correctOutput() {
         int[][] matrix = {
                 {1, 2, 3, 4, 5},
                 {6, 7, 8, 9, 10},
@@ -53,7 +53,7 @@ public class AdjacencyFetcherTest {
 
     @Test
     @DisplayName("3 concentric rectangles like groups")
-    public void findGroups_concentricRectanglesGroups_correctOutput() {
+    void findGroups_concentricRectanglesGroups_correctOutput() {
         int[][] matrix = {
                 {1, 1, 1, 1, 1},
                 {1, 2, 2, 2, 1},
@@ -69,7 +69,7 @@ public class AdjacencyFetcherTest {
 
     @Test
     @DisplayName("5 groups, each formed by a full column")
-    public void findGroups_allColumns_correctOutput() {
+    void findGroups_allColumns_correctOutput() {
         int[][] matrix = {
                 {1, 2, 3, 4, 5},
                 {1, 2, 3, 4, 5},
@@ -85,7 +85,7 @@ public class AdjacencyFetcherTest {
 
     @Test
     @DisplayName("6 groups, each formed by a full row")
-    public void findGroups_allRows_correctOutput() {
+    void findGroups_allRows_correctOutput() {
         int[][] matrix = {
                 {1, 1, 1, 1, 1},
                 {2, 2, 2, 2, 2},
@@ -101,7 +101,7 @@ public class AdjacencyFetcherTest {
 
     @Test
     @DisplayName("matrix with diagonal lines, 30 groups each with one cell")
-    public void findGroups_diagonalLines_correctOutput() {
+    void findGroups_diagonalLines_correctOutput() {
         int[][] matrix = {
                 {1, 2, 3, 4, 5},
                 {2, 1, 2, 3, 4},
@@ -117,7 +117,7 @@ public class AdjacencyFetcherTest {
 
     @Test
     @DisplayName("Pseudo-random groups, 9 groups")
-    public void findGroups_randomGroups_correctOutput() {
+    void findGroups_randomGroups_correctOutput() {
         int[][] matrix = {
                 {7, 1, 1, 5, 5},
                 {1, 1, 1, 3, 2},
@@ -133,7 +133,7 @@ public class AdjacencyFetcherTest {
 
     @Test
     @DisplayName("2 groups, one of which is a rectangle")
-    public void findGroups_rectangle_correctOutput() {
+    void findGroups_rectangle_correctOutput() {
         int[][] matrix = {
                 {1, 1, 1, 1, 1},
                 {1, 3, 3, 3, 1},
@@ -149,7 +149,7 @@ public class AdjacencyFetcherTest {
 
     @Test
     @DisplayName("5 groups, one of which is a circle")
-    public void findGroups_circle_correctOutput() {
+    void findGroups_circle_correctOutput() {
         int[][] matrix = {
                 {1, 1, 3, 1, 1},
                 {1, 3, 3, 3, 1},
@@ -165,7 +165,7 @@ public class AdjacencyFetcherTest {
 
     @Test
     @DisplayName("Snake style group, 4 groups")
-    public void findGroups_snakeStyleGroup_correctOutput() {
+    void findGroups_snakeStyleGroup_correctOutput() {
         int[][] matrix = {
                 {1, 1, 1, 1, 1},
                 {1, 1, 1, 1, 1},
@@ -181,14 +181,14 @@ public class AdjacencyFetcherTest {
 
     @Test
     @DisplayName("Call canFix() with empty stack -> throws IllegalStateException")
-    public void canFixMethod_canFixWithEmptyStack_throwsIllegalStateException() {
+    void canFixMethod_canFixWithEmptyStack_throwsIllegalStateException() {
         Assertions.assertThrows(IllegalStateException.class, () -> fetcher.canFix());
     }
 
     @Test
     @DisplayName("Call next() with all surrounding cells visited -> throws IllegalStateException")
-    public void nextMethod_nextCalledWithAllVisitedShelves_throwsIllegalStateException() {
-        for(int i = 0; i < NUM_SHELVES_IN_LIBRARY; i++) {
+    void nextMethod_nextCalledWithAllVisitedShelves_throwsIllegalStateException() {
+        for(int i = 0; i < NUM_SHELVES_IN_BOOKSHELF; i++) {
             fetcher.next();
         }
         Assertions.assertThrows(IllegalStateException.class, () -> fetcher.next());
@@ -196,11 +196,11 @@ public class AdjacencyFetcherTest {
 
     @Test
     @DisplayName("next() must return a valid cell")
-    public void nextMethod_severalNextCalls_validCellsReturned() {
+    void nextMethod_severalNextCalls_validCellsReturned() {
         Shelf next = fetcher.next();
         int row = next.getRow();
         int column = next.getColumn();
-        for(int i = 0; i < NUM_SHELVES_IN_LIBRARY - 1; i++) {
+        for(int i = 0; i < NUM_SHELVES_IN_BOOKSHELF - 1; i++) {
             next = fetcher.next();
 
             Assertions.assertFalse(next.getRow() == row + 1 && next.getColumn() == column + 1);

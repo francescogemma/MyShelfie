@@ -2,24 +2,23 @@ package it.polimi.ingsw.model;
 
 /**
  * This class represents a player of the {@link Game game}.
- * It contains the name of the player, his {@link Player#points}, his {@link Library library} and his personal objective of that player.
+ * It contains the name of the player, his {@link Player#points}, his {@link Bookshelf bookshelf} and his personal goal.
  * @author Francesco Gemma
  */
 public class Player {
     private String name;
-    // private String hashedPassword;
-    private Library library;
-    // PersonalObjective personalObjective;
+    private Bookshelf bookshelf;
+    // PersonalGoal personalGoal;
     private int points;
 
     /**
      * Constructor of the class.
-     * Sets the name of the player, his points to 0 and creates a new {@link Library library}.
+     * Sets the name of the player, his points to 0 and creates a new {@link Bookshelf bookshelf}.
      * @param name the name of the player.
      */
     public Player(String name) {
         this.name = name;
-        this.library = new Library();
+        this.bookshelf = new Bookshelf();
         this.points = 0;
     }
 
@@ -51,17 +50,17 @@ public class Player {
     }
 
     /**
-     * @return {@link Player#library}
+     * @return {@link Player#bookshelf}
      */
-    public Library getLibrary() {
-        return library;
+    public Bookshelf getBookshelf() {
+        return bookshelf;
     }
 
     /**
-     * This method sets the {@link Player#library} of the player.
-     * @param library the new {@link Library}.
+     * This method sets the {@link Player#bookshelf} of the player.
+     * @param bookshelf the new {@link Bookshelf}.
      */
-    public void setLibrary(Library library) {
-        this.library = library;
+    public void setBookshelf(Bookshelf bookshelf) {
+        this.bookshelf = bookshelf;
     }
 }

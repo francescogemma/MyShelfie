@@ -1,21 +1,21 @@
 package it.polimi.ingsw.model;
 
 import java.util.ArrayList;
-import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
 /**
- * This class reads and stores information about {@link LibraryMask LibraryMasks} that
- * are fed into its {@link CompatibleEvaluator#add(LibraryMask) add} method, providing
+ * This class reads and stores information about {@link BookshelfMask BookshelfMasks} that
+ * are fed into its {@link CompatibleEvaluator#add(BookshelfMask) add} method, providing
  * useful information regarding mask compatibility. Compatibility definitions can be customized
- * by defining the necessary {@link CompatibleEvaluator#compatible compatible} BiFunction.
+ * by defining the necessary {@link CompatibleEvaluator#compatible compatible} BiPredicate.
  *
  * @author Michele Miotti
  */
 public class CompatibleEvaluator implements Evaluator {
-    private final ArrayList<LibraryMaskSet> group;
+    private final ArrayList<BookshelfMaskSet> group;
     private final int points;
     private final int targetSetSize;
-    private final BiFunction<LibraryMask, LibraryMask, Boolean> compatible;
+    private final BiPredicate<BookshelfMask, BookshelfMask> compatible;
     private boolean targetMet;
 
     /**
@@ -24,10 +24,10 @@ public class CompatibleEvaluator implements Evaluator {
      *               method if the {@link CompatibleEvaluator#targetSetSize target} has been met.
      * @param targetGroupSize is the cluster size to reach in order to allow the
      *                        {@link CompatibleEvaluator#getPoints() getPoints} method to return a non-zero result.
-     * @param compatible is a BiFunction that defines the meaning of "compatibility" within elements of a set.
-     *                   Said {@link LibraryMaskSet sets} are stored in the {@link CompatibleEvaluator#group} variable.
+     * @param compatible is a BiPredicate that defines the meaning of "compatibility" within elements of a set.
+     *                   Said {@link BookshelfMaskSet sets} are stored in the {@link CompatibleEvaluator#group} variable.
      */
-    public CompatibleEvaluator(int points, int targetGroupSize, BiFunction<LibraryMask, LibraryMask, Boolean> compatible) {
+    public CompatibleEvaluator(int points, int targetGroupSize, BiPredicate<BookshelfMask, BookshelfMask> compatible) {
         group = new ArrayList<>();
 
         this.compatible = compatible;
@@ -36,38 +36,42 @@ public class CompatibleEvaluator implements Evaluator {
         this.targetMet = targetSetSize <= 1;
     }
 
-    /**
-     * Adds a {@link LibraryMask mask} to the object.
-     * @param libraryMask is a mask that will be added to the object.
-     * @return true iif there's a set of added masks that is big enough.
+    /*
+     * Adds a {@link BookshelfMask mask} to the object.
+     * @param bookshelfMask is a mask that will be added to the object.
+     * @return true iff there's a set of added masks that is big enough.
      */
     @Override
-    public boolean add(LibraryMask libraryMask) {
-        for (LibraryMaskSet libraryMaskSet : group) {
+    public boolean add(BookshelfMask bookshelfMask) {
+        for (BookshelfMaskSet bookshelfMaskSet : group) {
             boolean intersectionFound = false;
 
-            if (!libraryMaskSet.isCompatible(libraryMask)) {
-                // duplicate current LibraryMaskSet in group
+            if (bookshelfMaskSet.isCompatible(bookshelfMask)) {
+                // duplicate current BookshelfMaskSet in group
                 // then, add non-intersecting mask to one of them
-                group.add(new LibraryMaskSet(libraryMaskSet));
-                libraryMaskSet.addLibraryMask(libraryMask);
+                group.add(new BookshelfMaskSet(bookshelfMaskSet));
+                bookshelfMaskSet.addBookshelfMask(bookshelfMask);
 
                 // note down if this addition meets out target size
-                targetMet = libraryMaskSet.getSize() >= targetSetSize;
+                targetMet |= bookshelfMaskSet.getSize() >= targetSetSize;
+                if (targetMet) {
+                    return true;
+                }
             }
         }
-        // create and add one more set with a single LibraryMask
-        LibraryMaskSet libraryMaskSetLast = new LibraryMaskSet(compatible);
-        libraryMaskSetLast.addLibraryMask(libraryMask);
-        group.add(libraryMaskSetLast);
+        // create and add one more set with a single BookshelfMask
+        BookshelfMaskSet bookshelfMaskSetLast = new BookshelfMaskSet(compatible);
+        bookshelfMaskSetLast.addBookshelfMask(bookshelfMask);
+        group.add(bookshelfMaskSetLast);
 
         return targetMet;
     }
-    @Override
-    /**
+
+    /*
      * Getter method for earned points;
      * Returns 0 if target has not been met.
      */
+    @Override
     public int getPoints() {
         if (targetMet) { return points; }
         return 0;

@@ -1,4 +1,4 @@
 package it.polimi.ingsw.model;
 
-public class SharedObjective {
+public class CommonGoal {
 }

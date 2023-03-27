@@ -132,7 +132,7 @@ public class Bag extends BagData {
         this.pop(index);
         return getTileByIndex(index);
     }
-    static private Tile getTileByIndex(int index) {
+    private static Tile getTileByIndex(int index) {
         if (index < 0 || index > Tile.values().length)
             throw new IllegalArgumentException("Index out of bounds [index: " + index + "]");
 

@@ -20,8 +20,8 @@ public class ShapeTest {
         ArrayList<Arguments> offsetsListsHeightsWidths = new ArrayList<>();
 
         for (int i = 0; i < NUM_OF_SHAPES_TO_GENERATE; i++) {
-            int height = random.nextInt(Library.ROWS) + 1;
-            int width = random.nextInt(Library.COLUMNS) + 1;
+            int height = random.nextInt(Bookshelf.ROWS) + 1;
+            int width = random.nextInt(Bookshelf.COLUMNS) + 1;
 
             /*
              * We need at least 2 shelves to "force" height and width of the shape by placing
@@ -70,7 +70,7 @@ public class ShapeTest {
     private static ArrayList<Integer> heightProvider() {
         ArrayList<Integer> heights = new ArrayList<>();
 
-        for (int i = 1; i <= Library.ROWS; i++) {
+        for (int i = 1; i <= Bookshelf.ROWS; i++) {
             heights.add(i);
         }
 
@@ -80,7 +80,7 @@ public class ShapeTest {
     private static ArrayList<Integer> widthProvider() {
         ArrayList<Integer> widths = new ArrayList<>();
 
-        for (int i = 1; i <= Library.COLUMNS; i++) {
+        for (int i = 1; i <= Bookshelf.COLUMNS; i++) {
             widths.add(i);
         }
 
@@ -93,7 +93,7 @@ public class ShapeTest {
 
     @Test
     @DisplayName("Construct a shape with a correct list of offsets")
-    public void constructor_correctOffsets_correctOutput() {
+    void constructor_correctOffsets_correctOutput() {
         ArrayList<Offset> offsets = new ArrayList<>(Arrays.asList(Offset.getInstance(0, 1),
             Offset.getInstance(1, 0), Offset.getInstance(1, 1), Offset.getInstance(1, 2),
             Offset.getInstance(2, 0), Offset.getInstance(2, 2)));
@@ -106,7 +106,7 @@ public class ShapeTest {
 
     @Test
     @DisplayName("Try to construct a shape with a null offsets list, should throw exception")
-    public void constructor_nullOffsets_throwsNullPointerException() {
+    void constructor_nullOffsets_throwsNullPointerException() {
         Assertions.assertThrows(NullPointerException.class, () -> {
             new Shape(null);
         });
@@ -114,7 +114,7 @@ public class ShapeTest {
 
     @Test
     @DisplayName("Try to construct a shape with an empty offsets list, should throw exception")
-    public void constructor_emptyOffsets_throwsIllegalArgumentException() {
+    void constructor_emptyOffsets_throwsIllegalArgumentException() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             new Shape(new ArrayList<>());
         });
@@ -123,7 +123,7 @@ public class ShapeTest {
     @Test
     @DisplayName("Try to construct a shape with an offsets list that has non-monotonic row offsets, " +
         "should throw exception")
-    public void constructor_nonMonotonicRowOffsets_throwsIllegalArgumentException() {
+    void constructor_nonMonotonicRowOffsets_throwsIllegalArgumentException() {
         ArrayList<Offset> offsets = new ArrayList<>(Arrays.asList(
             Offset.getInstance(0, 0), Offset.getInstance(1, 0),
             Offset.getInstance(0, 1)
@@ -137,7 +137,7 @@ public class ShapeTest {
     @Test
     @DisplayName("Try to construct a shape with an offsets list that has non-monotonic column offsets " +
         "in the same row, should throw exception")
-    public void constructor_nonMonotonicColumnInSameRowOffsets_throwsIllegalArgumentException() {
+    void constructor_nonMonotonicColumnInSameRowOffsets_throwsIllegalArgumentException() {
         ArrayList<Offset> offsets = new ArrayList<>(Arrays.asList(
             Offset.getInstance(0, 0), Offset.getInstance(1, 0),
             Offset.getInstance(1, 2), Offset.getInstance(1, 1)
@@ -151,7 +151,7 @@ public class ShapeTest {
     @Test
     @DisplayName("Try to construct a shape with an offsets list that has duplicated offsets in adjacent positions, " +
         "should throw exception")
-    public void constructor_duplicatedOffsets_throwsIllegalArgumentException() {
+    void constructor_duplicatedOffsets_throwsIllegalArgumentException() {
         ArrayList<Offset> offsets = new ArrayList<>(Arrays.asList(
             Offset.getInstance(0, 0), Offset.getInstance(1, 0),
             Offset.getInstance(1, 1), Offset.getInstance(1, 1)
@@ -165,7 +165,7 @@ public class ShapeTest {
     @Test
     @DisplayName("Try to construct a shape with an offsets list that is not relative to the top-left shelf of the " +
         "bounding box instance, should throw exception")
-    public void construct_nonTopLeftDefinedOffsets_throwsIllegalArgumentException() {
+    void construct_nonTopLeftDefinedOffsets_throwsIllegalArgumentException() {
         ArrayList<Offset> offsets = new ArrayList<>(Arrays.asList(
             Offset.getInstance(0, 1), Offset.getInstance(1, 1),
             Offset.getInstance(1, 2)
@@ -179,21 +179,21 @@ public class ShapeTest {
     @ParameterizedTest
     @DisplayName("Get width of random generated shape")
     @MethodSource("offsetsHeightWidthProvider")
-    public void getHeight_correctOutput(ArrayList<Offset> offsets, int height, int width) {
+    void getHeight_correctOutput(ArrayList<Offset> offsets, int height, int width) {
         Assertions.assertEquals(height, new Shape(offsets).getHeight());
     }
 
     @ParameterizedTest
     @DisplayName("Get width of random generated shape")
     @MethodSource("offsetsHeightWidthProvider")
-    public void getWidth_correctOutput(ArrayList<Offset> offsets, int height, int width) {
+    void getWidth_correctOutput(ArrayList<Offset> offsets, int height, int width) {
         Assertions.assertEquals(width, new Shape(offsets).getWidth());
     }
 
     @ParameterizedTest
     @DisplayName("Vertical flip of random generated shape")
     @MethodSource("offsetsHeightWidthProvider")
-    public void verticalFlip_correctOutput(ArrayList<Offset> offsets, int height, int width) {
+    void verticalFlip_correctOutput(ArrayList<Offset> offsets, int height, int width) {
         Shape originalShape = new Shape(offsets);
         Shape flippedShape = originalShape.verticalFlip();
 
@@ -229,7 +229,7 @@ public class ShapeTest {
     @ParameterizedTest(name = "height = {0}")
     @DisplayName("Get column with ")
     @MethodSource("heightProvider")
-    public void getColumn_correctHeight_correctOutput(int height) {
+    void getColumn_correctHeight_correctOutput(int height) {
         Shape column = Shape.getColumn(height);
 
         Assertions.assertEquals(height, column.getHeight());
@@ -249,24 +249,24 @@ public class ShapeTest {
 
     @Test
     @DisplayName("Try to get column with negative height, should throw exception")
-    public void getColumn_negativeHeight_throwsIllegalArgumentException() {
+    void getColumn_negativeHeight_throwsIllegalArgumentException() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             Shape.getColumn(-1);
         });
     }
 
     @Test
-    @DisplayName("Try to get column which doesn't fit inside the library, should throw exception")
-    public void getColumn_tooBigHeight_throwsIllegalArgumentException() {
+    @DisplayName("Try to get column which doesn't fit inside the bookshelf, should throw exception")
+    void getColumn_tooBigHeight_throwsIllegalArgumentException() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            Shape.getColumn(Library.ROWS + 1);
+            Shape.getColumn(Bookshelf.ROWS + 1);
         });
     }
 
     @ParameterizedTest(name = "size = {0}")
     @DisplayName("Get main diagonal with ")
     @MethodSource("sizeProvider")
-    public void getMainDiagonal_correctSize_correctSize(int size) {
+    void getMainDiagonal_correctSize_correctSize(int size) {
         Shape mainDiagonal = Shape.getMainDiagonal(size);
 
         Assertions.assertEquals(size, mainDiagonal.getHeight());
@@ -290,7 +290,7 @@ public class ShapeTest {
 
     @Test
     @DisplayName("Try to get main diagonal with negative size, should throw exception")
-    public void getMainDiagonal_negativeSize_throwsIllegalArgumentException() {
+    void getMainDiagonal_negativeSize_throwsIllegalArgumentException() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
            Shape.getMainDiagonal(-1);
         });
@@ -298,16 +298,16 @@ public class ShapeTest {
 
     @Test
     @DisplayName("Try to get main diagonal with too big size, should throw exception")
-    public void getMainDiagonal_tooBigSize_throwsIllegalArgumentException() {
+    void getMainDiagonal_tooBigSize_throwsIllegalArgumentException() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            Shape.getMainDiagonal(Math.max(Library.COLUMNS, Library.ROWS) + 1);
+            Shape.getMainDiagonal(Math.max(Bookshelf.COLUMNS, Bookshelf.ROWS) + 1);
         });
     }
 
     @ParameterizedTest(name = "width = {0}")
     @DisplayName("Get row with ")
     @MethodSource("widthProvider")
-    public void getRow_correctWidth_correctOutput(int width) {
+    void getRow_correctWidth_correctOutput(int width) {
         Shape row = Shape.getRow(width);
 
         Assertions.assertEquals(1, row.getHeight());
@@ -327,7 +327,7 @@ public class ShapeTest {
 
     @Test
     @DisplayName("Try to get row with negative width, should throw exception")
-    public void getRow_negativeWidth_throwsIllegalArgumentException() {
+    void getRow_negativeWidth_throwsIllegalArgumentException() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             Shape.getRow(-1);
         });
@@ -335,9 +335,9 @@ public class ShapeTest {
 
     @Test
     @DisplayName("Try to get row with too big width, should throw exception")
-    public void getRow_tooBigWidth_throwsIllegalArgumentException() {
+    void getRow_tooBigWidth_throwsIllegalArgumentException() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            Shape.getRow(Library.COLUMNS + 1);
+            Shape.getRow(Bookshelf.COLUMNS + 1);
         });
     }
 }

@@ -2,34 +2,32 @@ package it.polimi.ingsw.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 /**
- * Represents a free shape inside a {@link Library library}, that is a set of {@link Shelf shelves} with
+ * Represents a free shape inside a {@link Bookshelf bookshelf}, that is a set of {@link Shelf shelves} with
  * a certain topology. With the term "free" we mean that we care only about the relative locations between
- * the shelves that compose the shape, ignoring the absolute position of them inside the library.
- * For example a set of shelves that forms a 2x2 square in the top-left corner of the library has the same
+ * the shelves that compose the shape, ignoring the absolute position of them inside the bookshelf.
+ * For example a set of shelves that forms a 2x2 square in the top-left corner of the bookshelf has the same
  * shape of another set which forms a 2x2 square in the down-right corner. Note that the shelves do not need to form
  * a connected group.
  * Shape objects are immutable.
  *
  * <p>
- *     Let's introduce some definitions that we are going to use further on:
- *     <ul>
- *         <li>
- *             <b>Shape vs shape instance</b>: when we use the term shape we refer to the topology of a certain set of shelves
- *             (for example a 2x2 square), instead, when we use the term shape instance we refer to a set of shelves with
- *             a certain topology in a certain location of the library (for example a 2x2 square in the top-left corner
- *             of the library).
- *         </li>
- *         <li>
- *             <b>Bounding box</b>: imagine an instance of a certain shape inside the library. The bounding box is the
- *             <u>shape</u> of the smallest set of shelves forming a rectangle which contains all the shelves in the
- *             instance. It is clear that all the instances of the same shape have the same bounding box (remember
- *             that the bounding box is a shape and not a shape instance).
- *         </li>
- *     </ul>
- * </p>
+ * Let's introduce some definitions that we are going to use further on:
+ * <ul>
+ *     <li>
+ *         <b>Shape vs shape instance</b>: when we use the term shape we refer to the topology of a certain set of shelves
+ *         (for example a 2x2 square), instead, when we use the term shape instance we refer to a set of shelves with
+ *         a certain topology in a certain location of the bookshelf (for example a 2x2 square in the top-left corner
+ *         of the bookshelf).
+ *     </li>
+ *     <li>
+ *         <b>Bounding box</b>: imagine an instance of a certain shape inside the bookshelf. The bounding box is the
+ *         <u>shape</u> of the smallest set of shelves forming a rectangle which contains all the shelves in the
+ *         instance. It is clear that all the instances of the same shape have the same bounding box (remember
+ *         that the bounding box is a shape and not a shape instance).
+ *     </li>
+ * </ul>
  *
  * @author Cristiano Migali
  */
@@ -76,7 +74,7 @@ public class Shape {
      *                the first offset is the one relative to the shelf in the first row (from the top) of your instance
      *                which has no other shelf to its left on that same row. The next offset refers to the first shelf
      *                to the right of the previous one, on the same row. We keep going right until
-     *                there are no shelf in that row to the right of the last one anymore.
+     *                there are no shelves in that row to the right of the last one anymore.
      *                Then we go down to the next row with some shelves and start again from the left-most.
      *                We continue this process until we have covered all the shelves.
      * @throws NullPointerException if offsets is null.
@@ -231,7 +229,7 @@ public class Shape {
     ));
 
     /**
-     * The shape with all 4 corners of a {@link Library library}.
+     * The shape with all 4 corners of a {@link Bookshelf bookshelf}.
      */
     public static final Shape CORNERS = new Shape(new ArrayList<>(Arrays.asList(
         Offset.getInstance(0, 0), Offset.getInstance(0, 4),
@@ -406,7 +404,7 @@ public class Shape {
      * @param height is the height of the column.
      * @return the shape of a column with the specified height.
      * @throws IllegalArgumentException if height is not positive.
-     * @throws IllegalArgumentException if the column doesn't fit inside a {@link Library library}.
+     * @throws IllegalArgumentException if the column doesn't fit inside a {@link Bookshelf bookshelf}.
      */
     public static Shape getColumn(int height) {
         if (height <= 0) {
@@ -419,7 +417,7 @@ public class Shape {
             try {
                 columnOffsets.add(Offset.down(i));
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("The column doesn't fit inside the library");
+                throw new IllegalArgumentException("The column doesn't fit inside the bookshelf");
             }
         }
 
@@ -430,7 +428,7 @@ public class Shape {
      * @param size is the number of shelves in the diagonal.
      * @return the shape of a main (directed down-right) diagonal with the specified size.
      * @throws IllegalArgumentException if size is not positive.
-     * @throws IllegalArgumentException if the diagonal doesn't fit inside a {@link Library library}.
+     * @throws IllegalArgumentException if the diagonal doesn't fit inside a {@link Bookshelf bookshelf}.
      */
     public static Shape getMainDiagonal(int size) {
         if (size <= 0) {
@@ -443,7 +441,7 @@ public class Shape {
             try {
                 diagonalOffsets.add(Offset.getInstance(i, i));
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("The diagonal doesn't fit inside the library");
+                throw new IllegalArgumentException("The diagonal doesn't fit inside the bookshelf");
             }
         }
 
@@ -454,7 +452,7 @@ public class Shape {
      * @param width is the width of the row.
      * @return the shape of a row with the specified width.
      * @throws IllegalArgumentException if width is not positive
-     * @throws IllegalArgumentException if the row doesn't fit inside a {@link Library library}.
+     * @throws IllegalArgumentException if the row doesn't fit inside a {@link Bookshelf bookshelf}.
      */
     public static Shape getRow(int width) {
         if (width <= 0) {
@@ -467,7 +465,7 @@ public class Shape {
             try {
                 rowOffsets.add(Offset.right(i));
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("The row doesn't fit inside the library");
+                throw new IllegalArgumentException("The row doesn't fit inside the bookshelf");
             }
         }
 
@@ -515,11 +513,11 @@ public class Shape {
     }
 
     /**
-     * The shape of the set of all shelves inside a {@link Library library}.
+     * The shape of the set of all shelves inside a {@link Bookshelf bookshelf}.
      */
-    public static final Shape WHOLE_LIBRARY;
+    public static final Shape WHOLE_BOOKSHELF;
 
-    // Builds the WHOLE_LIBRARY
+    // Builds the WHOLE_BOOKSHELF
     static {
         ArrayList<Offset> offsets = new ArrayList<>();
 
@@ -529,7 +527,7 @@ public class Shape {
             }
         }
 
-        WHOLE_LIBRARY = new Shape(offsets);
+        WHOLE_BOOKSHELF = new Shape(offsets);
     }
 
     @Override

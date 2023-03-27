@@ -1,7 +1,7 @@
 package it.polimi.ingsw.model;
 
 /**
- * Represents the type of the game tiles. They can be inserted inside a {@link Library library},
+ * Represents the type of the game tiles. They can be inserted inside a {@link Bookshelf bookshelf},
  * placed on the {@link Board board} or remain inside the {@link Bag bag}.
  *
  * @author Giacomo Groppi, Cristiano Migali

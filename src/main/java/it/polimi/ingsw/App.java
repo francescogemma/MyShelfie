@@ -7,12 +7,12 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class App {
-    private static void calculatePoints(Library library, Fetcher fetcher, Filter filter) {
-        LibraryMask mask = new LibraryMask(library);
+    private static void calculatePoints(Bookshelf bookshelf, Fetcher fetcher, Filter filter) {
+        BookshelfMask mask = new BookshelfMask(bookshelf);
 
         do {
             Shelf next = fetcher.next();
-            if (filter.add(library.get(next))) {
+            if (filter.add(bookshelf.get(next))) {
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
                 } else {
@@ -33,14 +33,14 @@ public class App {
     }
 
     public static void main( String[] args ) {
-        Library library = new Library();
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.BLUE)), 0);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.YELLOW, Tile.YELLOW, Tile.BLUE)), 1);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.YELLOW)), 2);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.YELLOW, Tile.YELLOW, Tile.BLUE)), 3);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.BLUE)), 4);
-        library.insertTiles(new ArrayList<>(Collections.nCopies(3, Tile.GREEN)), 0);
-        library.insertTiles(new ArrayList<>(Collections.nCopies(2, Tile.GREEN)), 1);
+        Bookshelf bookshelf = new Bookshelf();
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.BLUE)), 0);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.YELLOW, Tile.YELLOW, Tile.BLUE)), 1);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.YELLOW)), 2);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.YELLOW, Tile.YELLOW, Tile.BLUE)), 3);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.BLUE)), 4);
+        bookshelf.insertTiles(new ArrayList<>(Collections.nCopies(3, Tile.GREEN)), 0);
+        bookshelf.insertTiles(new ArrayList<>(Collections.nCopies(2, Tile.GREEN)), 1);
 
         Filter filter = new NumDifferentColorFilter(1, 1);
 
@@ -50,7 +50,7 @@ public class App {
 
         Fetcher fetcher = new /*ShapeFetcher(fork)*/ /*AdjacencyFetcher();
 
-        calculatePoints(library, fetcher, filter);*/
+        calculatePoints(bookshelf, fetcher, filter);*/
 
         ArrayList<Fetcher> dominoFetchers = new ArrayList<>();
         for (Shape domino : Shape.DOMINOES) {
@@ -58,7 +58,7 @@ public class App {
         }
         UnionFetcher dominoesFetcher = new UnionFetcher(dominoFetchers);
 
-        calculatePoints(library, dominoesFetcher, filter);
+        calculatePoints(bookshelf, dominoesFetcher, filter);
 
         ArrayList<Fetcher> tetrominoFetchers = new ArrayList<>();
         for (Shape tetromino : Shape.TETROMINOES) {
@@ -66,7 +66,7 @@ public class App {
         }
         UnionFetcher tetrominoesFetcher = new UnionFetcher(tetrominoFetchers);
 
-        calculatePoints(library, tetrominoesFetcher, filter);
+        calculatePoints(bookshelf, tetrominoesFetcher, filter);
 
         Shape l = new Shape(new ArrayList<>(Arrays.asList(
             Offset.getInstance(0, 0),
@@ -84,6 +84,6 @@ public class App {
 
         System.out.println(Shape.CORNERS);
 
-        System.out.println(Shape.WHOLE_LIBRARY); */
+        System.out.println(Shape.WHOLE_BOOKSHELF); */
     }
 }

@@ -20,13 +20,13 @@ class BagTest {
 
     @Test
     @Description("The function checks the initial size of the Bag")
-    public void checkSize() {
+    void checkSize() {
         Assertions.assertEquals(22 * 6, bag.getRemaining());
     }
 
     @Test
     @Description("The function tests that the getRandomTile function removes the object from the board.")
-    public void testGetRandomTile () {
+    void testGetRandomTile () {
         for (int i = 0; i < 22 * 6; i++) {
             final int oSize = bag.getRemaining();
             bag.getRandomTile();
@@ -36,7 +36,7 @@ class BagTest {
 
     @Test
     @Description("Tests that an exception is thrown when attempting to remove a Tile but the bag is empty.")
-    public void testExtractionEmpty() {
+    void testExtractionEmpty() {
         for (int i = 0; i < 22 * 6; i++) {
             bag.getRandomTile();
         }
@@ -55,7 +55,7 @@ class BagTest {
 
     @Test
     @Description("Test restore")
-    public void testRestore () {
+    void testRestore () {
         removeRandom();
         final int s = bag.getRemaining();
         bag.forgetLastExtraction();
@@ -68,7 +68,7 @@ class BagTest {
 
     @Test
     @Description("Testing clone")
-    public void testingClone() {
+    void testingClone() {
         removeRandom();
         Bag newBag = new Bag(this.bag);
         assertEquals(newBag, this.bag);
@@ -76,7 +76,7 @@ class BagTest {
 
     @Test
     @Description("Testing clone with restore")
-    public void testingCloneAndRestore() {
+    void testingCloneAndRestore() {
         removeRandom();
         Bag newBag = new Bag(this.bag);
         assertEquals(newBag, this.bag);
@@ -87,7 +87,7 @@ class BagTest {
 
     @Test
     @Description("Testing clone and equals")
-    public void testingCloneAndEquals() {
+    void testingCloneAndEquals() {
         removeRandom();
         Bag newBag = new Bag(this.bag);
         assertEquals(newBag, this.bag);

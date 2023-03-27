@@ -1,18 +1,18 @@
 package it.polimi.ingsw.model;
 
 import java.util.ArrayList;
-import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
 /**
- * Represents a mutable set of {@link Shelf shelves} inside a {@link Library library}.
+ * Represents a mutable set of {@link Shelf shelves} inside a {@link Bookshelf bookshelf}.
  *
  * @author Cristiano Migali
  */
-public class LibraryMask {
+public class BookshelfMask {
     /**
-     * The library this mask is referred to.
+     * The bookshelf this mask is referred to.
      */
-    private final Library library;
+    private final Bookshelf bookshelf;
 
     /**
      * The {@link Shelf shelves} in the set.
@@ -22,10 +22,10 @@ public class LibraryMask {
     /**
      * Constructor of the class.
      *
-     * @param library is the library the created mask is referred to.
+     * @param bookshelf is the bookshelf the created mask is referred to.
      */
-    public LibraryMask(Library library) {
-        this.library = library;
+    public BookshelfMask(Bookshelf bookshelf) {
+        this.bookshelf = bookshelf;
     }
 
     /**
@@ -69,16 +69,14 @@ public class LibraryMask {
      * @author Michele Miotti
      */
     public Tile getSampleTile() {
-        return library.get(shelves.get(0));
+        return bookshelf.get(shelves.get(0));
     }
 
     /**
-     * Lambda function which returns true iff the two library masks in input do not intersect, that is the intersection
+     * Lambda function which returns true iff the two bookshelf masks in input do not intersect, that is the intersection
      * of their sets is empty.
-     *
-     * @author Michele Miotti
      */
-    public static final BiFunction<LibraryMask, LibraryMask, Boolean> DO_NOT_INTERSECT = (first, second) -> {
+    public static final BiPredicate<BookshelfMask, BookshelfMask> DO_NOT_INTERSECT = (first, second) -> {
         for (Shelf A : first.shelves) {
             for (Shelf B : second.shelves) {
                 if (A.equals(B)) {
@@ -90,15 +88,13 @@ public class LibraryMask {
     };
 
     /**
-     * Lambda function which returns true iff the two library masks in input do not intersect, that is the intersection
+     * Lambda function which returns true iff the two bookshelf masks in input do not intersect, that is the intersection
      * of their sets is empty, and all the tiles contained in shelves inside a mask or the other are of the same color.
      * A precondition of this function is that all the tiles contained in shelves inside the same mask must be of the
      * same color.
-     *
-     * @author Michele Miotti
      */
-    public static final BiFunction<LibraryMask, LibraryMask, Boolean> DO_NOT_INTERSECT_AND_SAME_COLOR = (first, second) ->
-        first.getSampleTile() == second.getSampleTile() && DO_NOT_INTERSECT.apply(first, second);
+    public static final BiPredicate<BookshelfMask, BookshelfMask> DO_NOT_INTERSECT_AND_SAME_COLOR = (first, second) ->
+        first.getSampleTile() == second.getSampleTile() && DO_NOT_INTERSECT.test(first, second);
 
     /**
      * Gets a specific shelf's content.
@@ -108,22 +104,22 @@ public class LibraryMask {
      * @author Michele Miotti
      */
     public Tile tileAt(Shelf shelf) {
-        return library.get(shelf);
+        return bookshelf.get(shelf);
     }
 
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder("---------------\n");
 
-        for (int row = 0; row < Library.ROWS; row++) {
-            for (int column = 0; column < Library.COLUMNS; column++) {
+        for (int row = 0; row < Bookshelf.ROWS; row++) {
+            for (int column = 0; column < Bookshelf.COLUMNS; column++) {
                 Shelf currentShelf = Shelf.getInstance(row, column);
                 String toColor = " ";
                 if (shelves.contains(currentShelf)) {
                     toColor = "#";
                 }
 
-                result.append("[").append(library.get(currentShelf).color(toColor)).append("]");
+                result.append("[").append(bookshelf.get(currentShelf).color(toColor)).append("]");
             }
 
             result.append("\n---------------\n");

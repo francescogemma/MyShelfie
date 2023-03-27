@@ -1,24 +1,23 @@
 package it.polimi.ingsw.model;
 
 /**
- * Allows the extraction of {@link LibraryMask library masks} from a library, according to a certain
+ * Allows the extraction of {@link BookshelfMask bookshelf masks} from a bookshelf, according to a certain
  * criteria. The extraction happens one {@link Shelf shelf} at the time.
- * A fetcher is cyclic, that is, after it has extracted all the library masks following the criteria, it starts again
- * from the first. The library masks get extracted always in the same order.
+ * A fetcher is cyclic, that is, after it has extracted all the bookshelf masks following the criteria, it starts again
+ * from the first. The bookshelf masks get extracted always in the same order.
  *
- * <p>We say that the fetcher is in its <b>equilibrium state</b> if:
+ * <p> We say that the fetcher is in its <b> equilibrium state </b> if:
  * <ul>
  *     <li>
  *         {@link Fetcher#next()} has never been invoked since the creation of the fetcher.
  *     </li>
  *     <li>
- *         the fetcher has extracted the last shelf of the last library mask that it had to extract
+ *         the fetcher has extracted the last shelf of the last bookshelf mask that it had to extract
  *         following the criteria and, after that extraction, {@link Fetcher#lastShelf()} has been invoked
  *         (in order to check that the extracted shelf was the last) or a call to {@link Fetcher#canFix()}
- *         returned false after the extraction of a shelf belonging to the last extractable library mask.
+ *         returned false after the extraction of a shelf belonging to the last extractable bookshelf mask.
  *     </li>
  * </ul>
- * </p>
  *
  * @author Cristiano Migali
  */
@@ -27,17 +26,17 @@ public interface Fetcher {
      * Extracts the next {@link Shelf shelf}. Remember to invoke {@link Fetcher#lastShelf()} or
      * {@link Fetcher#canFix()} after each call to next.
      *
-     * @return the next {@link Shelf shelf} which belongs to the {@link LibraryMask library mask} that the
+     * @return the next {@link Shelf shelf} which belongs to the {@link BookshelfMask bookshelf mask} that the
      * fetcher is extracting.
      */
     Shelf next();
 
     /**
-     * Checks if the last extracted {@link Shelf shelf} is the last one of the {@link LibraryMask library mask} that
+     * Checks if the last extracted {@link Shelf shelf} is the last one of the {@link BookshelfMask bookshelf mask} that
      * the fetcher is extracting. Remember to call {@link Fetcher#next} before invoking this method.
      *
      * @return true iff the last extracted {@link Shelf shelf}, returned by the method {@link Fetcher#next}, is
-     * also the last shelf of the library mask that we are constructing.
+     * also the last shelf of the bookshelf mask that we are constructing.
      */
     boolean lastShelf();
 
@@ -58,12 +57,12 @@ public interface Fetcher {
     boolean hasFinished();
 
     /**
-     * Checks if the fetcher can adjust the {@link LibraryMask library mask} that it is extracting in such a way that
+     * Checks if the fetcher can adjust the {@link BookshelfMask bookshelf mask} that it is extracting in such a way that
      * it doesn't contain the last extracted {@link Shelf shelf}. Note that, after a call to canFix that returned
      * true, we should invoke {@link Fetcher#lastShelf()} since a possible adjustment is ignoring the last extracted
-     * shelf and consider the library mask finished before that.
+     * shelf and consider the bookshelf mask finished before that.
      *
-     * @return true iff the fetcher can still extract a {@link LibraryMask library mask} which satisfies the criteria,
+     * @return true iff the fetcher can still extract a {@link BookshelfMask bookshelf mask} which satisfies the criteria,
      * contains all the {@link Shelf shelves} extracted before the last one and doesn't contain the last extracted shelf.
      */
     boolean canFix();

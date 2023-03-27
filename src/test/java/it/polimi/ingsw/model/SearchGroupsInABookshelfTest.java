@@ -12,15 +12,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class SearchGroupsInALibraryTest {
-    private Library library;
+class SearchGroupsInABookshelfTest {
+    private Bookshelf bookshelf;
     private Fetcher fetcher;
     private Filter filter;
     private int numGroups;
 
     @BeforeEach
     public void setUp() {
-        library = new Library();
+        bookshelf = new Bookshelf();
         fetcher = new AdjacencyFetcher();
         filter = new NumDifferentColorFilter(1, 1);
         numGroups = 0;
@@ -28,25 +28,25 @@ public class SearchGroupsInALibraryTest {
 
     @Test
     @DisplayName("One single group of 30 shelves with one color")
-    public void findGroups_fullLibraryOneColor_correctOutput() {
+    void findGroups_fullBookshelfOneColor_correctOutput() {
         int count = 0;
 
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 1);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 2);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 3);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 1);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 2);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 3);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 1);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 2);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 3);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 1);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 2);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 3);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
 
-        LibraryMask mask = new LibraryMask(library);
+        BookshelfMask mask = new BookshelfMask(bookshelf);
 
         do {
             Shelf next = fetcher.next();
-            if (filter.add(library.get(next))) {
+            if (filter.add(bookshelf.get(next))) {
                 count = 0;
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
@@ -66,12 +66,12 @@ public class SearchGroupsInALibraryTest {
 
                     StringBuilder result = new StringBuilder("---------------\n");
 
-                    for (int row = 0; row < Library.ROWS; row++) {
-                        for (int column = 0; column < Library.COLUMNS; column++) {
+                    for (int row = 0; row < Bookshelf.ROWS; row++) {
+                        for (int column = 0; column < Bookshelf.COLUMNS; column++) {
                             Shelf currentShelf = Shelf.getInstance(row, column);
                             String toColor = "#";
 
-                            result.append("[").append(library.get(currentShelf).color(toColor)).append("]");
+                            result.append("[").append(bookshelf.get(currentShelf).color(toColor)).append("]");
                         }
 
                         result.append("\n---------------\n");
@@ -90,23 +90,23 @@ public class SearchGroupsInALibraryTest {
 
     @Test
     @DisplayName("3 concentric rectangles like groups")
-    public void findGroups_fullLibraryConcentricRectanglesGroups_correctOutput() {
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.WHITE, Tile.WHITE)), 1);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.WHITE, Tile.BLUE)), 2);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.WHITE, Tile.WHITE)), 3);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.WHITE, Tile.CYAN)), 1);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.BLUE, Tile.WHITE, Tile.CYAN)), 2);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.WHITE, Tile.CYAN)), 3);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
+    void findGroups_fullBookshelfConcentricRectanglesGroups_correctOutput() {
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.WHITE, Tile.WHITE)), 1);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.WHITE, Tile.BLUE)), 2);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.WHITE, Tile.WHITE)), 3);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.WHITE, Tile.CYAN)), 1);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.BLUE, Tile.WHITE, Tile.CYAN)), 2);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.WHITE, Tile.CYAN)), 3);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
 
-        LibraryMask mask = new LibraryMask(library);
+        BookshelfMask mask = new BookshelfMask(bookshelf);
 
         do {
             Shelf next = fetcher.next();
-            if (filter.add(library.get(next))) {
+            if (filter.add(bookshelf.get(next))) {
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
                 } else {
@@ -122,8 +122,8 @@ public class SearchGroupsInALibraryTest {
 
                     StringBuilder result = new StringBuilder("---------------\n");
 
-                    for (int row = 0; row < Library.ROWS; row++) {
-                        for (int column = 0; column < Library.COLUMNS; column++) {
+                    for (int row = 0; row < Bookshelf.ROWS; row++) {
+                        for (int column = 0; column < Bookshelf.COLUMNS; column++) {
                             Shelf currentShelf = Shelf.getInstance(row, column);
                             String toColor = " ";
                             if(numGroups == 1 && (row == 0 || row == 5 || column == 0 || column == 4)) {
@@ -134,7 +134,7 @@ public class SearchGroupsInALibraryTest {
                                 toColor = "#";
                             }
 
-                            result.append("[").append(library.get(currentShelf).color(toColor)).append("]");
+                            result.append("[").append(bookshelf.get(currentShelf).color(toColor)).append("]");
                         }
 
                         result.append("\n---------------\n");
@@ -151,21 +151,21 @@ public class SearchGroupsInALibraryTest {
     }
 
     @Test
-    @DisplayName("Normal library")
-    public void findGroups_normalLibrary_correctOutput() {
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.BLUE)), 0);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.YELLOW, Tile.YELLOW, Tile.BLUE)), 1);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.YELLOW)), 2);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.YELLOW, Tile.YELLOW, Tile.BLUE)), 3);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.BLUE)), 4);
-        library.insertTiles(new ArrayList<>(Collections.nCopies(3, Tile.GREEN)), 0);
-        library.insertTiles(new ArrayList<>(Collections.nCopies(2, Tile.GREEN)), 1);
+    @DisplayName("Normal bookshelf")
+    void findGroups_normalBookshelf_correctOutput() {
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.BLUE)), 0);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.YELLOW, Tile.YELLOW, Tile.BLUE)), 1);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.YELLOW)), 2);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.YELLOW, Tile.YELLOW, Tile.BLUE)), 3);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.BLUE)), 4);
+        bookshelf.insertTiles(new ArrayList<>(Collections.nCopies(3, Tile.GREEN)), 0);
+        bookshelf.insertTiles(new ArrayList<>(Collections.nCopies(2, Tile.GREEN)), 1);
 
-        LibraryMask mask = new LibraryMask(library);
+        BookshelfMask mask = new BookshelfMask(bookshelf);
 
         do {
             Shelf next = fetcher.next();
-            if (filter.add(library.get(next))) {
+            if (filter.add(bookshelf.get(next))) {
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
                 } else {
@@ -188,16 +188,16 @@ public class SearchGroupsInALibraryTest {
     }
 
     @ParameterizedTest(name = "in column {0}")
-    @DisplayName("Library with only one tile")
+    @DisplayName("Bookshelf with only one tile")
     @ValueSource(ints = {0, 1, 2, 3, 4})
-    public void findGroups_oneTileLibrary_correctOutput(int col) {
-        library.insertTiles(new ArrayList<>(List.of(Tile.BLUE)), col);
+    void findGroups_oneTileBookshelf_correctOutput(int col) {
+        bookshelf.insertTiles(new ArrayList<>(List.of(Tile.BLUE)), col);
 
-        LibraryMask mask = new LibraryMask(library);
+        BookshelfMask mask = new BookshelfMask(bookshelf);
 
         do {
             Shelf next = fetcher.next();
-            if (filter.add(library.get(next))) {
+            if (filter.add(bookshelf.get(next))) {
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
                 } else {
@@ -213,15 +213,15 @@ public class SearchGroupsInALibraryTest {
 
                     StringBuilder result = new StringBuilder("---------------\n");
 
-                    for (int row = 0; row < Library.ROWS; row++) {
-                        for (int column = 0; column < Library.COLUMNS; column++) {
+                    for (int row = 0; row < Bookshelf.ROWS; row++) {
+                        for (int column = 0; column < Bookshelf.COLUMNS; column++) {
                             Shelf currentShelf = Shelf.getInstance(row, column);
                             String toColor = " ";
                             if(numGroups == 1 && row == 5 && column == col) {
                                 toColor = "#";
                             }
 
-                            result.append("[").append(library.get(currentShelf).color(toColor)).append("]");
+                            result.append("[").append(bookshelf.get(currentShelf).color(toColor)).append("]");
                         }
 
                         result.append("\n---------------\n");
@@ -238,13 +238,13 @@ public class SearchGroupsInALibraryTest {
     }
 
     @Test
-    @DisplayName("Empty library")
-    public void findGroups_emptyLibrary_correctOutput() {
-        LibraryMask mask = new LibraryMask(library);
+    @DisplayName("Empty bookshelf")
+    void findGroups_emptyBookshelf_correctOutput() {
+        BookshelfMask mask = new BookshelfMask(bookshelf);
 
         do {
             Shelf next = fetcher.next();
-            if (filter.add(library.get(next))) {
+            if (filter.add(bookshelf.get(next))) {
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
                 } else {
@@ -260,12 +260,12 @@ public class SearchGroupsInALibraryTest {
 
                     StringBuilder result = new StringBuilder("---------------\n");
 
-                    for (int row = 0; row < Library.ROWS; row++) {
-                        for (int column = 0; column < Library.COLUMNS; column++) {
+                    for (int row = 0; row < Bookshelf.ROWS; row++) {
+                        for (int column = 0; column < Bookshelf.COLUMNS; column++) {
                             Shelf currentShelf = Shelf.getInstance(row, column);
                             String toColor = " ";
 
-                            result.append("[").append(library.get(currentShelf).color(toColor)).append("]");
+                            result.append("[").append(bookshelf.get(currentShelf).color(toColor)).append("]");
                         }
 
                         result.append("\n---------------\n");
@@ -283,23 +283,23 @@ public class SearchGroupsInALibraryTest {
 
     @Test
     @DisplayName("30 groups of one shelf")
-    public void findGroups_fullLibraryAllGroupsOfOneShelf_correctOutput() {
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.MAGENTA, Tile.CYAN, Tile.MAGENTA)), 0);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.GREEN, Tile.WHITE, Tile.GREEN)), 1);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.MAGENTA, Tile.CYAN, Tile.MAGENTA)), 2);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.GREEN, Tile.WHITE, Tile.GREEN)), 3);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.MAGENTA, Tile.BLUE, Tile.MAGENTA)), 4);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.MAGENTA, Tile.CYAN)), 0);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.GREEN, Tile.WHITE)), 1);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.MAGENTA, Tile.CYAN)), 2);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.GREEN, Tile.WHITE)), 3);
-        library.insertTiles(new ArrayList<>(Arrays.asList(Tile.BLUE, Tile.MAGENTA, Tile.BLUE)), 4);
+    void findGroups_fullBookshelfAllGroupsOfOneShelf_correctOutput() {
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.MAGENTA, Tile.CYAN, Tile.MAGENTA)), 0);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.GREEN, Tile.WHITE, Tile.GREEN)), 1);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.MAGENTA, Tile.CYAN, Tile.MAGENTA)), 2);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.GREEN, Tile.WHITE, Tile.GREEN)), 3);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.MAGENTA, Tile.BLUE, Tile.MAGENTA)), 4);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.MAGENTA, Tile.CYAN)), 0);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.GREEN, Tile.WHITE)), 1);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.MAGENTA, Tile.CYAN)), 2);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.GREEN, Tile.WHITE)), 3);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.BLUE, Tile.MAGENTA, Tile.BLUE)), 4);
 
-        LibraryMask mask = new LibraryMask(library);
+        BookshelfMask mask = new BookshelfMask(bookshelf);
 
         do {
             Shelf next = fetcher.next();
-            if (filter.add(library.get(next))) {
+            if (filter.add(bookshelf.get(next))) {
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
                 } else {
@@ -319,15 +319,15 @@ public class SearchGroupsInALibraryTest {
                     StringBuilder result = new StringBuilder("---------------\n");
 
                     int count = 1;
-                    for (int row = 0; row < Library.ROWS; row++) {
-                        for (int column = 0; column < Library.COLUMNS; column++) {
+                    for (int row = 0; row < Bookshelf.ROWS; row++) {
+                        for (int column = 0; column < Bookshelf.COLUMNS; column++) {
                             Shelf currentShelf = Shelf.getInstance(row, column);
                             String toColor = " ";
                             if(numGroups == count){
                                 toColor = "#";
                             }
 
-                            result.append("[").append(library.get(currentShelf).color(toColor)).append("]");
+                            result.append("[").append(bookshelf.get(currentShelf).color(toColor)).append("]");
                             count++;
                         }
 

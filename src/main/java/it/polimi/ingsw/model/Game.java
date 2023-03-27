@@ -9,7 +9,7 @@ public class Game {
     private final String name;
     private List<Pair<Player, Boolean>> players;
     private final Board board;
-    private SharedObjective []sharedObjective;
+    private CommonGoal []commonGoal;
 
     private Optional<Player> winner;
     private Optional<Player> currentPlayer;
@@ -23,7 +23,7 @@ public class Game {
 
         this.name = name;
         board = new Board();
-        sharedObjective = new SharedObjective[2];
+        commonGoal = new CommonGoal[2];
         players = new ArrayList<>();
         winner = Optional.empty();
     }

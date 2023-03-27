@@ -50,7 +50,7 @@ public class AdjacencyFetcher implements Fetcher {
      */
     public AdjacencyFetcher() {
         stack = new Stack<>();
-        statuses = new ShelfStatus[Library.ROWS][Library.COLUMNS];
+        statuses = new ShelfStatus[Bookshelf.ROWS][Bookshelf.COLUMNS];
         firstShelfOfTheGroup = true;
 
         setAllShelvesToNotVisited();
@@ -61,7 +61,6 @@ public class AdjacencyFetcher implements Fetcher {
      * If a group has been completed (the stack is empty),
      * the method starts to visit another group by picking another unvisited shelf.
      * This method should always return an adjacent shelf that has not been visited yet.
-     * Return another adjacent shelf that has not been visited yet.
      * Throws IllegalStateException if the method cannot find another unvisited adjacent shelf to return.
      */
     @Override
@@ -218,11 +217,11 @@ public class AdjacencyFetcher implements Fetcher {
         } else if(shelf.getRow() == 0 && offset.getRowOffset() == -1) {
             // if the shelf is out of bounds, return false
             return false;
-        } else if(shelf.getRow() == Library.ROWS - 1 && offset.getRowOffset() == 1) {
+        } else if(shelf.getRow() == Bookshelf.ROWS - 1 && offset.getRowOffset() == 1) {
             return false;
         } else if(shelf.getColumn() == 0 && offset.getColumnOffset() == -1) {
             return false;
-        } else if(shelf.getColumn() == Library.COLUMNS - 1 && offset.getColumnOffset() == 1) {
+        } else if(shelf.getColumn() == Bookshelf.COLUMNS - 1 && offset.getColumnOffset() == 1) {
             return false;
         } else {
             // if the shelf is not out of bounds, check if it is not visited
@@ -234,8 +233,8 @@ public class AdjacencyFetcher implements Fetcher {
      * @return true if the {@link ShelfStatus status} of all the {@link Shelf shelves} is {@link ShelfStatus#VISITED}, false otherwise.
      */
     private boolean areAllShelvesVisited() {
-        for(int i = 0; i < Library.ROWS; i++) {
-            for(int j = 0; j < Library.COLUMNS; j++) {
+        for(int i = 0; i < Bookshelf.ROWS; i++) {
+            for(int j = 0; j < Bookshelf.COLUMNS; j++) {
                 if(statuses[i][j] != ShelfStatus.VISITED) {
                     return false;
                 }
@@ -248,8 +247,8 @@ public class AdjacencyFetcher implements Fetcher {
      * @return true if the {@link ShelfStatus status} of all the {@link Shelf shelves} is {@link ShelfStatus#NOT_VISITED}, false otherwise.
      */
     private boolean areAllShelvesNotVisited() {
-        for(int i = 0; i < Library.ROWS; i++) {
-            for(int j = 0; j < Library.COLUMNS; j++) {
+        for(int i = 0; i < Bookshelf.ROWS; i++) {
+            for(int j = 0; j < Bookshelf.COLUMNS; j++) {
                 if(statuses[i][j] != ShelfStatus.NOT_VISITED) {
                     return false;
                 }
@@ -263,8 +262,8 @@ public class AdjacencyFetcher implements Fetcher {
      * @return the next shelf to visit so the next shelf not visited, null otherwise.
      */
     private Shelf findAnotherShelf() {
-        for(int i = 0; i < Library.ROWS; i++) {
-            for(int j = 0; j < Library.COLUMNS; j++) {
+        for(int i = 0; i < Bookshelf.ROWS; i++) {
+            for(int j = 0; j < Bookshelf.COLUMNS; j++) {
                 if(statuses[i][j] == ShelfStatus.NOT_VISITED) {
                     return Shelf.getInstance(i, j);
                 }
@@ -278,8 +277,8 @@ public class AdjacencyFetcher implements Fetcher {
      * It is called when a new group is started.
      */
     private void setupNewGroup() {
-        for(int i = 0; i < Library.ROWS; i++) {
-            for(int j = 0; j < Library.COLUMNS; j++) {
+        for(int i = 0; i < Bookshelf.ROWS; i++) {
+            for(int j = 0; j < Bookshelf.COLUMNS; j++) {
                 if(statuses[i][j] == ShelfStatus.NOT_THE_SAME_COLOR) {
                     statuses[i][j] = ShelfStatus.NOT_VISITED;
                 }
@@ -291,8 +290,8 @@ public class AdjacencyFetcher implements Fetcher {
      * This method sets all the {@link Shelf shelves} statuses to {@link ShelfStatus#NOT_VISITED}.
      */
     private void setAllShelvesToNotVisited() {
-        for(int i = 0; i < Library.ROWS; i++) {
-            for(int j = 0; j < Library.COLUMNS; j++) {
+        for(int i = 0; i < Bookshelf.ROWS; i++) {
+            for(int j = 0; j < Bookshelf.COLUMNS; j++) {
                 statuses[i][j] = ShelfStatus.NOT_VISITED;
             }
         }

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.*;
 
 import java.util.List;
 
-public class BoardTest {
+class BoardTest {
     private Board board;
     @BeforeEach
     public void setUp() {
@@ -17,7 +17,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testFill() {
+    void testFill() {
         final boolean printBoard = false;
         Bag bag = new Bag();
 
@@ -62,7 +62,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testSelectAvailableTiles() throws IllegalExtractionException {
+    void testSelectAvailableTiles() throws IllegalExtractionException {
         fillBoard(board);
 
         Assertions.assertEquals(20, board.getSelectableTiles().size());
@@ -79,7 +79,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testWrongeSelectAfterOne() {
+    void testWrongeSelectAfterOne() {
         fillBoard(this.board);
 
         Assertions.assertThrows(IllegalExtractionException.class, () -> {
@@ -88,7 +88,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testWrongeSelectAfterTwo() throws IllegalExtractionException {
+    void testWrongeSelectAfterTwo() throws IllegalExtractionException {
         fillBoard(this.board);
         board.selectTile(5, 1);
         Assertions.assertThrows(IllegalExtractionException.class, () -> {
@@ -97,7 +97,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testWrongeSelectAfterThree() throws IllegalExtractionException {
+    void testWrongeSelectAfterThree() throws IllegalExtractionException {
         fillBoard(this.board);
         board.selectTile(7, 3);
         board.selectTile(6, 3);
@@ -107,7 +107,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testSelectVertical() throws IllegalExtractionException {
+    void testSelectVertical() throws IllegalExtractionException {
         fillBoard(this.board);
         board.selectTile(7, 3);
         board.selectTile(6, 3);
@@ -115,7 +115,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testSelectHorizontal() throws IllegalExtractionException {
+    void testSelectHorizontal() throws IllegalExtractionException {
         fillBoard(this.board);
         board.selectTile(7, 3);
         board.selectTile(6, 3);
@@ -123,14 +123,14 @@ public class BoardTest {
     }
 
     @Test
-    public void testSelectDrawOne() throws IllegalExtractionException {
+    void testSelectDrawOne() throws IllegalExtractionException {
         fillBoard(this.board);
         board.selectTile(7, 3);
         Assertions.assertEquals(1, board.draw().size());
     }
 
     @Test
-    public void testSelectDrawTwo() throws IllegalExtractionException {
+    void testSelectDrawTwo() throws IllegalExtractionException {
         fillBoard(this.board);
         board.selectTile(7, 3);
         board.selectTile(6, 3);
@@ -138,7 +138,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testSelectDrawThree() throws IllegalExtractionException {
+    void testSelectDrawThree() throws IllegalExtractionException {
         fillBoard(this.board);
         board.selectTile(7, 3);
         board.selectTile(6, 3);
@@ -147,7 +147,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testNeedRefill() throws IllegalExtractionException {
+    void testNeedRefill() throws IllegalExtractionException {
         fillBoard(this.board);
         Assertions.assertFalse(board.needsRefill());
 
@@ -167,7 +167,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testRemoveSameTile() throws IllegalExtractionException {
+    void testRemoveSameTile() throws IllegalExtractionException {
         fillBoard(this.board);
         board.selectTile(4, 0);
         board.selectTile(4, 1);

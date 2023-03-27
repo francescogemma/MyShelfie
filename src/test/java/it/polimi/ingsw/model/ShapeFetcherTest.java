@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-public class ShapeFetcherTest {
-    private final int[] libraryMock = new int[Library.ROWS * Library.COLUMNS];
+class ShapeFetcherTest {
+    private final int[] bookshelfMock = new int[Bookshelf.ROWS * Bookshelf.COLUMNS];
 
     private final static int MAXIMUM_NUM_OF_ORIGINS = 10;
 
@@ -26,7 +26,7 @@ public class ShapeFetcherTest {
             int height = (Integer) arguments.get()[1];
             int width = (Integer) arguments.get()[2];
 
-            boolean[] takenOrigin = new boolean[Library.ROWS * Library.COLUMNS];
+            boolean[] takenOrigin = new boolean[Bookshelf.ROWS * Bookshelf.COLUMNS];
             Arrays.fill(takenOrigin, false);
 
             int targetOriginsNum = random.nextInt(MAXIMUM_NUM_OF_ORIGINS) + 1;
@@ -34,12 +34,12 @@ public class ShapeFetcherTest {
             ArrayList<Shelf> origins = new ArrayList<>();
 
             while (targetOriginsNum > 0) {
-                int originRow = random.nextInt(Library.ROWS - height + 1);
-                int originColumn = random.nextInt(Library.COLUMNS - width + 1);
+                int originRow = random.nextInt(Bookshelf.ROWS - height + 1);
+                int originColumn = random.nextInt(Bookshelf.COLUMNS - width + 1);
 
-                if (!takenOrigin[originRow * Library.COLUMNS + originColumn]) {
+                if (!takenOrigin[originRow * Bookshelf.COLUMNS + originColumn]) {
                     origins.add(Shelf.getInstance(originRow, originColumn));
-                    takenOrigin[originRow * Library.COLUMNS + originColumn] = true;
+                    takenOrigin[originRow * Bookshelf.COLUMNS + originColumn] = true;
                 }
 
                 targetOriginsNum--;
@@ -53,18 +53,18 @@ public class ShapeFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        Arrays.fill(libraryMock, 0);
+        Arrays.fill(bookshelfMock, 0);
     }
 
     @ParameterizedTest
-    @DisplayName("Fetch all the shapes from the library mock")
+    @DisplayName("Fetch all the shapes from the bookshelf mock")
     @MethodSource("shapeOriginsProvider")
-    public void fetch_correctOutput(Shape shape, ArrayList<Shelf> origins) {
+    void fetch_correctOutput(Shape shape, ArrayList<Shelf> origins) {
         for (Shelf origin : origins) {
             for (Offset offset : shape.getOffsets()) {
                 Shelf currentShelf = origin.move(offset);
 
-                libraryMock[currentShelf.getRow() * Library.COLUMNS + currentShelf.getColumn()] = 1;
+                bookshelfMock[currentShelf.getRow() * Bookshelf.COLUMNS + currentShelf.getColumn()] = 1;
             }
         }
 
@@ -73,18 +73,18 @@ public class ShapeFetcherTest {
 
         Fetcher fetcher = new ShapeFetcher(shape);
 
-        int originRow = Library.ROWS;
-        int originColumn = Library.COLUMNS;
+        int originRow = Bookshelf.ROWS;
+        int originColumn = Bookshelf.COLUMNS;
         ArrayList<Shelf> shelves = new ArrayList<>();
 
         do {
             Shelf shelf = fetcher.next();
 
-            if (libraryMock[shelf.getRow() * Library.COLUMNS + shelf.getColumn()] == 0) {
+            if (bookshelfMock[shelf.getRow() * Bookshelf.COLUMNS + shelf.getColumn()] == 0) {
                 Assertions.assertFalse(fetcher.canFix());
 
-                originRow = Library.ROWS;
-                originColumn = Library.COLUMNS;
+                originRow = Bookshelf.ROWS;
+                originColumn = Bookshelf.COLUMNS;
                 shelves.clear();
 
                 continue;
@@ -109,8 +109,8 @@ public class ShapeFetcherTest {
 
                 Assertions.assertEquals(new Shape(offsets), shape);
 
-                originRow = Library.ROWS;
-                originColumn = Library.COLUMNS;
+                originRow = Bookshelf.ROWS;
+                originColumn = Bookshelf.COLUMNS;
                 shelves.clear();
             }
 

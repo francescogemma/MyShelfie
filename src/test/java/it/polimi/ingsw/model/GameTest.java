@@ -8,7 +8,7 @@ import org.junit.jupiter.api.*;
  * Tester for Game
  * @author Giacomo Groppi
  * */
-public class GameTest {
+class GameTest {
     private Game game;
 
     private void addPlayer (int number) {
@@ -29,7 +29,7 @@ public class GameTest {
     }
 
     @Test
-    public void testCurrentPlayer() {
+    void testCurrentPlayer() {
         Assertions.assertNull(game.getCurrentPlayer());
         addPlayer(3);
     }

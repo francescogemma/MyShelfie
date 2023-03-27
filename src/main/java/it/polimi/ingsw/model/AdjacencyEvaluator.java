@@ -1,7 +1,7 @@
 package it.polimi.ingsw.model;
 
 /**
- * Reads {@link LibraryMask a LibaryMask} and notes down its score
+ * Reads {@link BookshelfMask a LibaryMask} and notes down its score
  * according to the game rules, based on its size.
  *
  * @author Michele Miotti
@@ -15,13 +15,13 @@ public class AdjacencyEvaluator implements Evaluator {
         points = 0;
     }
     /**
-     * Add a {@link LibraryMask LibraryMask} and evaluate it.
-     * @param libraryMask will be taken account for, and will have an impact on the current score,
+     * Add a {@link BookshelfMask BookshelfMask} and evaluate it.
+     * @param bookshelfMask will be taken account for, and will have an impact on the current score,
      *                    if its size is greater than 2.
      * @return false every time, since it's always possible to gather new points from any state.
      */
-    public boolean add(LibraryMask libraryMask) {
-        points = convertSizeToPoints(libraryMask.getShelves().size());
+    public boolean add(BookshelfMask bookshelfMask) {
+        points += convertSizeToPoints(bookshelfMask.getShelves().size());
         // always return false since it's always possible to get new points
         return false;
     }

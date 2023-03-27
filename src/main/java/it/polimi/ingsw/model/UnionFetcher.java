@@ -3,7 +3,7 @@ package it.polimi.ingsw.model;
 import java.util.ArrayList;
 
 /**
- * Allows to extract all the {@link LibraryMask library masks} that can be extracted by the first
+ * Allows to extract all the {@link BookshelfMask bookshelf masks} that can be extracted by the first
  * {@link Fetcher fetcher} in a given list, then all the ones that can be extracted by the second fetcher in the list,
  * and so on, until the last fetcher.
  *

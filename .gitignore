@@ -42,3 +42,6 @@ fabric.properties
 target/
 uml/.$uml.svg.dtmp
 uml/.$uml.svg.bkp
+
+# Javadoc
+docs/
