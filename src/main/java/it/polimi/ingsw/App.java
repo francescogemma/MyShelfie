@@ -1,6 +1,12 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.model.*;
+import it.polimi.ingsw.model.bookshelf.*;
+import it.polimi.ingsw.model.fetcher.Fetcher;
+import it.polimi.ingsw.model.fetcher.ShapeFetcher;
+import it.polimi.ingsw.model.fetcher.UnionFetcher;
+import it.polimi.ingsw.model.filter.Filter;
+import it.polimi.ingsw.model.filter.NumDifferentColorFilter;
 
 import java.util.ArrayList;
 import java.util.Arrays;

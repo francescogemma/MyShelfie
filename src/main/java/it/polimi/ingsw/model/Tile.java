@@ -1,5 +1,9 @@
 package it.polimi.ingsw.model;
 
+import it.polimi.ingsw.model.bag.Bag;
+import it.polimi.ingsw.model.board.Board;
+import it.polimi.ingsw.model.bookshelf.Bookshelf;
+
 /**
  * Represents the type of the game tiles. They can be inserted inside a {@link Bookshelf bookshelf},
  * placed on the {@link Board board} or remain inside the {@link Bag bag}.
