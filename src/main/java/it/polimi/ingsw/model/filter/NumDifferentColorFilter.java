@@ -54,8 +54,20 @@ public class NumDifferentColorFilter implements Filter {
      *                  the criteria.
      * @param maxColors is the maximum number of different colors that a sequence should contain in order to satisfy
      *                  the criteria.
+     * @throws IllegalArgumentException if minColors is negative.
+     * @throws IllegalArgumentException if maxColors isn't positive.
      */
     public NumDifferentColorFilter(int minColors, int maxColors) {
+        if (minColors < 0) {
+            throw new IllegalArgumentException("The minimum number of colors in a different color filter must be " +
+                "non-negative");
+        }
+
+        if (maxColors <= 0) {
+            throw new IllegalArgumentException("The maximum number of colors in a different color filter must be " +
+                "positive");
+        }
+
         this.minColors = minColors;
         this.maxColors = maxColors;
 
