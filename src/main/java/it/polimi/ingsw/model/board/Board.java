@@ -6,7 +6,6 @@ import it.polimi.ingsw.model.Tile;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
@@ -138,15 +137,15 @@ class BoardSelector {
  * @author Giacomo Groppi
  * */
 public class Board {
-    public static final int rowBoard = 9;
-    public static final int columnBoard = 9;
+    public static final int ROW_BOARD = 9;
+    public static final int COLUMN_BOARD = 9;
     private BoardSelector boardSelector;
     private int occupied;
 
     /**
      * All the possible cell positions if the players were two.
      */
-    static final List<Coordinate> twoPlayerPosition = Coordinate.toList(Arrays.asList(
+    public static final List<Coordinate> TWO_PLAYER_POSITION = Coordinate.toList(Arrays.asList(
             new int [][] {
                                 {1, 3}, {1, 4},
                         {2, 2}, {2, 3}, {2, 4}, {2, 5},
@@ -160,7 +159,7 @@ public class Board {
     /**
      * All the possible cell positions if the players were three.
      */
-    static final List<Coordinate> threePlayerPosition = Coordinate.toList(Arrays.asList(
+    public static final List<Coordinate> THREE_PLAYER_POSITION = Coordinate.toList(Arrays.asList(
             new int[][] {
                                     {0, 3},
                                                             {2, 6},
@@ -174,7 +173,7 @@ public class Board {
     /**
      * All the possible cell positions if the players were four.
      */
-    static final List<Coordinate> fourPlayerPosition = Coordinate.toList(Arrays.asList(
+    public static final List<Coordinate> FOUR_PLAYER_POSITION = Coordinate.toList(Arrays.asList(
         new int[][] {
                 {0, 4}, {1, 5}, {4, 8}, {5, 7}, {8, 4}
     }));
@@ -182,7 +181,7 @@ public class Board {
     /**
      * tiles[i][j] will be null if the cell is empty
      */
-    private final Tile[][]tiles = new Tile[rowBoard][columnBoard];
+    private final Tile[][]tiles = new Tile[ROW_BOARD][COLUMN_BOARD];
 
     /**
      * Constructor of the Board class.
@@ -210,7 +209,7 @@ public class Board {
      * @return The {@link Tile Tile} selected.
     * */
     public Tile selectTile(Coordinate c) throws IllegalExtractionException, SelectionFullException {
-        if (this.isEmptyExtraction(c) || numberOfFreeSides(c, this::isEmptyExtraction) == 0) {
+        if (isOutOfBoard(c) || this.isEmptyExtraction(c)  || numberOfFreeSides(c, this::isEmptyExtraction) == 0) {
             throw new IllegalExtractionException("Can't extract tile at: [" + c.getRow() + ", " + c.getCol() + "]");
         }
 
@@ -233,7 +232,7 @@ public class Board {
                 .getSelected()
                 .stream()
                 .map(this::tileAt)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -251,7 +250,38 @@ public class Board {
     }
 
     private boolean isOutOfBoard (Coordinate c) {
-        return c.getRow() < 0 || c.getCol() < 0 || c.getRow() >= Board.rowBoard || c.getCol() >= Board.columnBoard;
+        return c.getRow() < 0 || c.getCol() < 0 || c.getRow() >= Board.ROW_BOARD || c.getCol() >= Board.COLUMN_BOARD;
+    }
+
+    public List<Coordinate> getSelectableCoordinate() {
+        List<Coordinate> res = new ArrayList<>();
+
+        if (this.boardSelector.sizeSelection() > 2) {
+            return new ArrayList<>();
+        }
+
+        Consumer<Coordinate> a = p -> {
+            if (numberOfFreeSides(p, this::isEmptyExtraction) > 0 && !isEmpty(p))
+                res.add(p);
+        };
+
+        switch (boardSelector.sizeSelection()) {
+            case 0 -> {
+                Board.TWO_PLAYER_POSITION.forEach(a);
+                Board.THREE_PLAYER_POSITION.forEach(a);
+                Board.FOUR_PLAYER_POSITION.forEach(a);
+            }
+            case 1, 2 -> {
+                boardSelector
+                        .getAvailableSelection()
+                        .stream()
+                        .filter(p -> !isOutOfBoard(p))
+                        .filter(p -> !isEmpty(p))
+                        .forEach(res::add);
+            }
+        }
+
+        return res;
     }
 
     /**
@@ -262,33 +292,10 @@ public class Board {
      * @return All the {@link Tile tiles} available for extraction.
     * */
     public List<Tile> getSelectableTiles() {
-        List<Tile> res = new ArrayList<>();
-
-        if (this.boardSelector.sizeSelection() > 2) {
-            return res;
-        }
-
-        Consumer<Coordinate> a = p -> {
-            if (numberOfFreeSides(p, this::isEmptyExtraction) > 0 && !isEmpty(p))
-                res.add(tileAt(p));
-        };
-
-        switch (boardSelector.sizeSelection()) {
-            case 0 -> {
-                Board.twoPlayerPosition.forEach(a);
-                Board.threePlayerPosition.forEach(a);
-                Board.fourPlayerPosition.forEach(a);
-            }
-            case 1, 2 -> {
-                boardSelector.getAvailableSelection()
-                        .forEach(t -> {
-                            if (!isOutOfBoard(t) && !isEmpty(t))
-                                res.add(tileAt(t));
-                        });
-            }
-        }
-
-        return res;
+        return this.getSelectableCoordinate()
+                .stream()
+                .map(this::tileAt)
+                .toList();
     }
 
     /**
@@ -310,9 +317,9 @@ public class Board {
             throw new IllegalArgumentException("The number of players must be between 2 and 4");
         }
 
-        final int s = Board.twoPlayerPosition.size()
-                + (numPlayer > 2 ? Board.threePlayerPosition.size() : 0)
-                + (numPlayer == 4 ? Board.fourPlayerPosition.size() : 0);
+        final int s = Board.TWO_PLAYER_POSITION.size()
+                + (numPlayer > 2 ? Board.THREE_PLAYER_POSITION.size() : 0)
+                + (numPlayer == 4 ? Board.FOUR_PLAYER_POSITION.size() : 0);
 
         return s == this.occupied;
     }
@@ -326,7 +333,7 @@ public class Board {
 
         this.boardSelector
                 .getSelected()
-                .forEach((t) -> res.add(this.remove(t)));
+                .forEach(t -> res.add(this.remove(t)));
 
         this.boardSelector = new BoardSelector();
 
@@ -342,10 +349,10 @@ public class Board {
         if (onBorder)
             free ++;
 
-        if (c.getCol() + 1 < Board.columnBoard && isEmptyFunc.test(new Coordinate(c.getRow(), c.getCol()+1)))
+        if (c.getCol() + 1 < Board.COLUMN_BOARD && isEmptyFunc.test(new Coordinate(c.getRow(), c.getCol()+1)))
                 free ++;
 
-        if (c.getRow() + 1 < Board.rowBoard && isEmptyFunc.test(new Coordinate(c.getRow() + 1, c.getCol())))
+        if (c.getRow() + 1 < Board.ROW_BOARD && isEmptyFunc.test(new Coordinate(c.getRow() + 1, c.getCol())))
                 free ++;
 
         if (c.getRow() != 0 && isEmptyFunc.test(new Coordinate(c.getRow() - 1, c.getCol())))
@@ -364,19 +371,19 @@ public class Board {
     private List<Coordinate> getAvailablePositionInsert(int numPlayer) {
         List<Coordinate> res = new ArrayList<>();
 
-        Board.twoPlayerPosition
+        Board.TWO_PLAYER_POSITION
                 .stream()
                 .filter(this::isEmpty)
                 .forEach(res::add);
 
         if (numPlayer > 2)
-            Board.threePlayerPosition
+            Board.THREE_PLAYER_POSITION
                     .stream()
                     .filter(this::isEmpty)
                     .forEach(res::add);
 
         if (numPlayer == 4)
-            Board.fourPlayerPosition
+            Board.FOUR_PLAYER_POSITION
                     .stream()
                     .filter(this::isEmpty)
                     .forEach(res::add);
@@ -419,9 +426,9 @@ public class Board {
         if (this.occupied == 0)
             return true;
 
-        return Board.twoPlayerPosition.stream().anyMatch(checkEdges) ||
-                Board.threePlayerPosition.stream().anyMatch(checkEdges) ||
-                Board.fourPlayerPosition.stream().anyMatch(checkEdges);
+        return Board.TWO_PLAYER_POSITION.stream().anyMatch(checkEdges) ||
+                Board.THREE_PLAYER_POSITION.stream().anyMatch(checkEdges) ||
+                Board.FOUR_PLAYER_POSITION.stream().anyMatch(checkEdges);
     }
 
     private Tile remove (Coordinate c) {

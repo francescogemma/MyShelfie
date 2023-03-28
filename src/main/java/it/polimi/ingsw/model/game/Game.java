@@ -14,7 +14,7 @@ public class Game {
     private List<Pair<Player, Boolean>> players;
     private final Board board;
     private CommonGoal []commonGoal;
-
+    private static final int INDEX_FIRST_PLAYER = 0;
     private Optional<Player> winner;
     private Optional<Player> currentPlayer;
 
@@ -33,7 +33,7 @@ public class Game {
     }
 
     Player getStartingPlayer() {
-        return this.players.get(0).getKey();
+        return this.players.get(INDEX_FIRST_PLAYER).getKey();
     }
 
     boolean isOver () {
@@ -48,6 +48,7 @@ public class Game {
             throw new RuntimeException("Player are already 4");
 
         this.players.add(new Pair<>(player, true));
+        this.connect(player);
     }
 
     private int indexOf(final Player player) {
@@ -59,13 +60,17 @@ public class Game {
         return -1;
     }
 
-    public boolean isConnected(Player player) {
+    public boolean isConnected(Player player) throws PlayerNotInGameException {
         final int index = this.indexOf(player);
+
+        if (index == -1)
+            throw new PlayerNotInGameException();
+
         return this.players.get(index).getValue();
     }
 
-    public boolean disconnected(final Player player) {
-        return !this.players.get(indexOf(player)).getValue();
+    public boolean disconnected(final Player player) throws PlayerNotInGameException {
+        return !isConnected(player);
     }
 
     public void connect(Player player) {

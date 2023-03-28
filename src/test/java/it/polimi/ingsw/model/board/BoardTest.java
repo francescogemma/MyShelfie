@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.board;
 
+import it.polimi.ingsw.model.Tile;
 import it.polimi.ingsw.model.bag.Bag;
 
 import it.polimi.ingsw.utils.Coordinate;
@@ -11,8 +12,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
     private Board board;
@@ -27,33 +31,41 @@ class BoardTest {
         Bag bag = new Bag();
 
         for (int i = 0; i < 33; i++) {
-            Assertions.assertFalse(board.isFull(2));
+            assertFalse(board.isFull(2));
             board.fillRandomly(bag.getRandomTile(), 2);
             if (printBoard) System.out.print(board);
 
         }
 
-        Assertions.assertTrue(board.isFull(2));
-        Assertions.assertFalse(board.isFull(3));
-        Assertions.assertFalse(board.isFull(4));
+        assertTrue(board.isFull(2));
+        assertFalse(board.isFull(3));
+        assertFalse(board.isFull(4));
 
         for (int i = 0; i < 7; i++) {
-            Assertions.assertFalse(board.isFull(3));
+            assertFalse(board.isFull(3));
             board.fillRandomly(bag.getRandomTile(), 3);
             if (printBoard) System.out.print(board);
         }
 
-        Assertions.assertTrue(board.isFull(3));
-        Assertions.assertFalse(board.isFull(4));
+        assertTrue(board.isFull(3));
+        assertFalse(board.isFull(4));
 
         for (int i = 0; i < 5; i++) {
-            Assertions.assertFalse(board.isFull(4));
+            assertFalse(board.isFull(4));
             board.fillRandomly(bag.getRandomTile(), 4);
             if (printBoard) System.out.print(board);
 
         }
 
-        Assertions.assertTrue(board.isFull(4));
+        assertTrue(board.isFull(4));
+    }
+
+    @Test
+    void fillRandomly_boardIsFull_ShouldThrowException() {
+        fillBoard(board);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            board.fillRandomly(Tile.BLUE, 4);
+        });
     }
 
     static void fillBoard(Board board) {
@@ -63,7 +75,7 @@ class BoardTest {
             board.fillRandomly(bag.getRandomTile(), 4);
         }
 
-        Assertions.assertTrue(board.isFull(4));
+        assertTrue(board.isFull(4));
     }
 
     @Test
@@ -154,21 +166,21 @@ class BoardTest {
     @Test
     void testNeedRefill() throws IllegalExtractionException, SelectionFullException {
         fillBoard(this.board);
-        Assertions.assertFalse(board.needsRefill());
+        assertFalse(board.needsRefill());
 
         board.selectTile(5, 1);
         board.selectTile(5, 2);
         board.selectTile(5, 3);
 
         Assertions.assertEquals(3, board.draw().size());
-        Assertions.assertFalse(board.needsRefill());
+        assertFalse(board.needsRefill());
 
         board.selectTile(4, 0);
         board.selectTile(4, 1);
 
         Assertions.assertEquals(2, board.draw().size());
 
-        Assertions.assertTrue(board.needsRefill());
+        assertTrue(board.needsRefill());
     }
 
     @Test
@@ -194,14 +206,51 @@ class BoardTest {
     }
 
     @Test
-    @Description("Make sure that the getSelectedTiles function does not return null.")
+    @Description("Make sure that getSelectedTiles does not return null.")
     void getSelectedTiles_testCombination_correctOutput() throws SelectionFullException, IllegalExtractionException {
         fillBoard(board);
         board.selectTile(4, 0);
         board.selectTile(4, 1);
         board.selectTile(4, 2);
 
-        Assertions.assertFalse(board.getSelectedTiles().contains(null));
+        assertFalse(board.getSelectedTiles().contains(null));
         Assertions.assertEquals(3, board.getSelectedTiles().size());
+    }
+
+    @Test
+    @Description("Make sure that needsRefill return false if we didn't touch any Tile on Board")
+    void needsRefill_testZeroExtraction_correctOutput () throws SelectionFullException, IllegalExtractionException {
+        fillBoard(board);
+        for (int i = 0; i < Board.TWO_PLAYER_POSITION.size() + Board.THREE_PLAYER_POSITION.size() + Board.FOUR_PLAYER_POSITION.size(); i++) {
+            board.selectTile(
+                    board.getSelectableCoordinate().get(0)
+            );
+            board.draw();
+        }
+
+        assertEquals(0, board.getSelectableCoordinate().size());
+
+        assertTrue(board.needsRefill());
+    }
+
+    @Test
+    void needsRefill_testMoreThanFourPlayer_ShouldThrowException() {
+        fillBoard(board);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            board.isFull(5);
+        });
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            board.isFull(1);
+        });
+    }
+
+    @Test
+    void selectTile_coordinateOutside_ShouldThrowException() {
+        fillBoard(board);
+        Assertions.assertThrows(IllegalExtractionException.class, () -> {
+            board.selectTile(-1, 5);
+        });
+
     }
 }
