@@ -1,8 +1,6 @@
 package it.polimi.ingsw.model.fetcher;
 
 import it.polimi.ingsw.model.bookshelf.Shelf;
-import it.polimi.ingsw.model.fetcher.AdjacencyFetcher;
-import it.polimi.ingsw.model.fetcher.Fetcher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

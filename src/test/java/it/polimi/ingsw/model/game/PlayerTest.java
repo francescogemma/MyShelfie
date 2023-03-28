@@ -1,13 +1,18 @@
 package it.polimi.ingsw.model.game;
 
-import it.polimi.ingsw.model.game.Player;
+import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 class PlayerTest {
     private Player player;
+    private Bookshelf bookshelf;
 
     @BeforeEach
     public void setUp() {
@@ -45,5 +50,16 @@ class PlayerTest {
     @DisplayName("Get the name of the player")
     void getName_nameOfThePlayer_correctName() {
         Assertions.assertEquals("TestingPlayer", player.getName());
+    }
+
+    @Test
+    @DisplayName("Set the bookshelf of the player")
+    void setBookshelf_bookshelfOfThePlayer_correctBookshelf() {
+        bookshelf = new Bookshelf();
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.MAGENTA, Tile.BLUE)), 2);
+        Assertions.assertNotEquals(bookshelf, player.getBookshelf());
+
+        player.setBookshelf(bookshelf);
+        Assertions.assertEquals(bookshelf, player.getBookshelf());
     }
 }

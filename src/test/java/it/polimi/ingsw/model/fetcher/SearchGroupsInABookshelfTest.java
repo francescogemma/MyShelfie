@@ -4,8 +4,6 @@ import it.polimi.ingsw.model.Tile;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMask;
 import it.polimi.ingsw.model.bookshelf.Shelf;
-import it.polimi.ingsw.model.fetcher.AdjacencyFetcher;
-import it.polimi.ingsw.model.fetcher.Fetcher;
 import it.polimi.ingsw.model.filter.Filter;
 import it.polimi.ingsw.model.filter.NumDifferentColorFilter;
 import org.junit.jupiter.api.Assertions;
