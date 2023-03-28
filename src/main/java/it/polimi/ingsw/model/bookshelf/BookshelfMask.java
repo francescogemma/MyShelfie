@@ -120,6 +120,22 @@ public class BookshelfMask {
         return bookshelf.get(shelf);
     }
 
+    public int countTilesOfColor(Tile tile) {
+        int count = 0;
+
+        if(tile == Tile.EMPTY) {
+            throw new IllegalArgumentException("Cannot count empty tiles");
+        }
+
+        for(Shelf shelf : this.getShelves()) {
+            if(this.tileAt(shelf) == tile) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder("---------------\n");
