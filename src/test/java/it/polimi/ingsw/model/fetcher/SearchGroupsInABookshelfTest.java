@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.fetcher;
 import it.polimi.ingsw.model.Tile;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMask;
+import it.polimi.ingsw.model.bookshelf.MockBookshelf;
 import it.polimi.ingsw.model.bookshelf.Shelf;
 import it.polimi.ingsw.model.filter.Filter;
 import it.polimi.ingsw.model.filter.NumDifferentColorFilter;
@@ -26,7 +27,6 @@ class SearchGroupsInABookshelfTest {
 
     @BeforeEach
     public void setUp() {
-        bookshelf = new Bookshelf();
         fetcher = new AdjacencyFetcher();
         filter = new NumDifferentColorFilter(1, 1);
         numGroups = 0;
@@ -37,16 +37,14 @@ class SearchGroupsInABookshelfTest {
     void findGroups_fullBookshelfOneColor_correctOutput() {
         int count = 0;
 
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 1);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 2);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 3);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 1);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 2);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 3);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
+        bookshelf = new MockBookshelf(new int[][]{
+                { 1, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1 }
+        });
 
         BookshelfMask mask = new BookshelfMask(bookshelf);
 
@@ -97,16 +95,14 @@ class SearchGroupsInABookshelfTest {
     @Test
     @DisplayName("3 concentric rectangles like groups")
     void findGroups_fullBookshelfConcentricRectanglesGroups_correctOutput() {
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.WHITE, Tile.WHITE)), 1);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.WHITE, Tile.BLUE)), 2);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.WHITE, Tile.WHITE)), 3);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 0);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.WHITE, Tile.CYAN)), 1);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.BLUE, Tile.WHITE, Tile.CYAN)), 2);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.WHITE, Tile.CYAN)), 3);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.CYAN, Tile.CYAN)), 4);
+        bookshelf = new MockBookshelf(new int[][]{
+                { 1, 1, 1, 1, 1 },
+                { 1, 2, 2, 2, 1 },
+                { 1, 2, 3, 2, 1 },
+                { 1, 2, 3, 2, 1 },
+                { 1, 2, 2, 2, 1 },
+                { 1, 1, 1, 1, 1 }
+        });
 
         BookshelfMask mask = new BookshelfMask(bookshelf);
 
@@ -159,13 +155,14 @@ class SearchGroupsInABookshelfTest {
     @Test
     @DisplayName("Normal bookshelf")
     void findGroups_normalBookshelf_correctOutput() {
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.BLUE)), 0);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.YELLOW, Tile.YELLOW, Tile.BLUE)), 1);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.YELLOW)), 2);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.YELLOW, Tile.YELLOW, Tile.BLUE)), 3);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.YELLOW, Tile.BLUE)), 4);
-        bookshelf.insertTiles(new ArrayList<>(Collections.nCopies(3, Tile.GREEN)), 0);
-        bookshelf.insertTiles(new ArrayList<>(Collections.nCopies(2, Tile.GREEN)), 1);
+        bookshelf = new MockBookshelf(new int[][]{
+                { 3, 0, 0, 0, 0 },
+                { 3, 1, 6, 0, 0 },
+                { 3, 1, 6, 1, 0 },
+                { 3, 3, 6, 6, 4 },
+                { 3, 4, 1, 1, 5 },
+                { 3, 3, 3, 3, 2 }
+        });
 
         BookshelfMask mask = new BookshelfMask(bookshelf);
 
@@ -190,13 +187,21 @@ class SearchGroupsInABookshelfTest {
             }
         } while (!fetcher.hasFinished());
 
-        Assertions.assertEquals(7, numGroups);
+        Assertions.assertEquals(9, numGroups);
     }
 
     @ParameterizedTest(name = "in column {0}")
     @DisplayName("Bookshelf with only one tile")
     @ValueSource(ints = {0, 1, 2, 3, 4})
     void findGroups_oneTileBookshelf_correctOutput(int col) {
+        bookshelf = new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
         bookshelf.insertTiles(new ArrayList<>(List.of(Tile.BLUE)), col);
 
         BookshelfMask mask = new BookshelfMask(bookshelf);
@@ -246,6 +251,15 @@ class SearchGroupsInABookshelfTest {
     @Test
     @DisplayName("Empty bookshelf")
     void findGroups_emptyBookshelf_correctOutput() {
+        bookshelf = new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+
         BookshelfMask mask = new BookshelfMask(bookshelf);
 
         do {
@@ -290,16 +304,14 @@ class SearchGroupsInABookshelfTest {
     @Test
     @DisplayName("30 groups of one shelf")
     void findGroups_fullBookshelfAllGroupsOfOneShelf_correctOutput() {
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.MAGENTA, Tile.CYAN, Tile.MAGENTA)), 0);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.GREEN, Tile.WHITE, Tile.GREEN)), 1);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.MAGENTA, Tile.CYAN, Tile.MAGENTA)), 2);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.GREEN, Tile.WHITE, Tile.GREEN)), 3);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.MAGENTA, Tile.BLUE, Tile.MAGENTA)), 4);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.MAGENTA, Tile.CYAN)), 0);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.GREEN, Tile.WHITE)), 1);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.MAGENTA, Tile.CYAN)), 2);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.WHITE, Tile.GREEN, Tile.WHITE)), 3);
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.BLUE, Tile.MAGENTA, Tile.BLUE)), 4);
+        bookshelf = new MockBookshelf(new int[][]{
+                { 1, 2, 3, 4, 5 },
+                { 5, 4, 6, 3, 1 },
+                { 1, 2, 3, 4, 5 },
+                { 5, 4, 6, 3, 1 },
+                { 1, 2, 3, 4, 5 },
+                { 5, 4, 6, 3, 1 },
+        });
 
         BookshelfMask mask = new BookshelfMask(bookshelf);
 
