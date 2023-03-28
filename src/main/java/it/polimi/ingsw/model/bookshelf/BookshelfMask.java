@@ -19,7 +19,7 @@ public class BookshelfMask {
     /**
      * The {@link Shelf shelves} in the set.
      */
-    private final ArrayList<Shelf> shelves = new ArrayList<>();
+    private final ArrayList<Shelf> shelves;
 
     /**
      * Constructor of the class.
@@ -28,6 +28,17 @@ public class BookshelfMask {
      */
     public BookshelfMask(Bookshelf bookshelf) {
         this.bookshelf = bookshelf;
+        shelves = new ArrayList<>();
+    }
+
+    /**
+     * Copy constructor for the class.
+     *
+     * @param bookshelfMask is the bookshelf mask to copy.
+     */
+    public BookshelfMask(BookshelfMask bookshelfMask) {
+        bookshelf = bookshelfMask.bookshelf;
+        shelves = new ArrayList<>(bookshelfMask.shelves);
     }
 
     /**
