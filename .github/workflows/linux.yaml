@@ -1,8 +1,8 @@
-name: Build and test
+name: Build on linux
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
   workflow_dispatch:
 
@@ -11,7 +11,7 @@ jobs:
     runs-on: [ubuntu-latest]
     steps:
       - name: Clone
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           submodules: recursive
@@ -30,4 +30,7 @@ jobs:
         run: |
           mvn test
 
+      - name: Build docs
+        run: |
+          mvn javadoc:javadoc
           
