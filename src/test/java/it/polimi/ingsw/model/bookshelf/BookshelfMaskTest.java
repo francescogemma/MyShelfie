@@ -109,4 +109,61 @@ class BookshelfMaskTest {
 
         Assertions.assertEquals(Tile.EMPTY, bookshelfMask.getSampleTile());
     }
+
+    @Test
+    @DisplayName("Count magenta tiles in the mask")
+    void countTilesOfColorMagenta_correctOutput() {
+        populateFullMask();
+        Assertions.assertEquals(3, bookshelfMask.countTilesOfColor(Tile.MAGENTA));
+    }
+
+    @Test
+    @DisplayName("Count yellow tiles in the mask")
+    void countTilesOfColorYellow_correctOutput() {
+        populateFullMask();
+        Assertions.assertEquals(3, bookshelfMask.countTilesOfColor(Tile.YELLOW));
+    }
+
+    @Test
+    @DisplayName("Count green tiles in the mask")
+    void countTilesOfColorGreen_correctOutput() {
+        populateFullMask();
+        Assertions.assertEquals(3, bookshelfMask.countTilesOfColor(Tile.GREEN));
+    }
+
+    @Test
+    @DisplayName("Count blue tiles in the mask")
+    void countTilesOfColorBlue_correctOutput() {
+        populateFullMask();
+        Assertions.assertEquals(4, bookshelfMask.countTilesOfColor(Tile.BLUE));
+    }
+
+    @Test
+    @DisplayName("Count cyan tiles in the mask")
+    void countTilesOfColorCyan_correctOutput() {
+        populateFullMask();
+        Assertions.assertEquals(3, bookshelfMask.countTilesOfColor(Tile.CYAN));
+    }
+
+    @Test
+    @DisplayName("Count white tiles in the mask")
+    void countTilesOfColorWhite_correctOutput() {
+        populateFullMask();
+        Assertions.assertEquals(4, bookshelfMask.countTilesOfColor(Tile.WHITE));
+    }
+
+    @Test
+    @DisplayName("Try to count empty tiles in the mask, should throw an IllegalArgumentException")
+    void countTilesOfColorEmpty_throwsIllegalArgumentException() {
+        populateFullMask();
+        Assertions.assertThrows(IllegalArgumentException.class, () -> bookshelfMask.countTilesOfColor(Tile.EMPTY));
+    }
+
+    private void populateFullMask() {
+        for(int row = 0; row < Bookshelf.ROWS; row++) {
+            for(int column = 0; column < Bookshelf.COLUMNS; column++) {
+                bookshelfMask.add(Shelf.getInstance(row, column));
+            }
+        }
+    }
 }

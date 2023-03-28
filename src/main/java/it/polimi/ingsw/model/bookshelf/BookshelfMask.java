@@ -120,6 +120,14 @@ public class BookshelfMask {
         return bookshelf.get(shelf);
     }
 
+    /**
+     * Count the number of shelves of a specific color in the mask.
+     * @param tile is the color we're counting
+     * @return the number of shelves of that color in the mask.
+     * @throws IllegalArgumentException if we are trying to count empty shelves.
+     *
+     * @author Francesco Gemma
+     */
     public int countTilesOfColor(Tile tile) {
         int count = 0;
 
