@@ -22,6 +22,9 @@ class BoardSelector {
         selected = new ArrayList<>();
     }
 
+    /**
+     * @return The number of points selected so far.
+     * */
     public int sizeSelection () {
         return this.selected.size();
     }
@@ -31,8 +34,7 @@ class BoardSelector {
      * @return true if the extraction is Vertical
      */
     protected boolean isVerticalExtraction () {
-        if (this.sizeSelection() != 2)
-            throw new RuntimeException();
+        assert sizeSelection() == 2;
 
         final int x0 = selected.get(0).getCol();
         final int x1 = selected.get(1).getCol();
@@ -59,7 +61,7 @@ class BoardSelector {
         List<Coordinate> res = new ArrayList<>();
         switch (sizeSelection()) {
             case 0 -> {
-                throw new RuntimeException("Can't call this function if sizeSelection() is equals to 0");
+                assert true: "Can't call this function if sizeSelection() is equals to 0";
             }
             case 1 -> {
                 final int r = this.selected.get(0).getRow();
@@ -110,13 +112,8 @@ class BoardSelector {
             throw new IllegalArgumentException("The specified coordinate already exists");
         }
 
-        switch (sizeSelection()) {
-            case 0 -> {}
-            case 1, 2 -> {
-                if (!getAvailableSelection().contains(c)) {
-                    throw new IllegalExtractionException();
-                }
-            }
+        if (sizeSelection() != 0 && (!getAvailableSelection().contains(c))) {
+                throw new IllegalExtractionException();
         }
 
         this.selected.add(c);
