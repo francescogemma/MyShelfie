@@ -4,7 +4,6 @@ import it.polimi.ingsw.model.bookshelf.BookshelfMask;
 import it.polimi.ingsw.model.bookshelf.Shelf;
 import it.polimi.ingsw.model.Tile;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +48,7 @@ public class PersonalGoalEvaluator implements Evaluator {
      * @param pointsMapping is a list of 6 elements, corresponding to the points awarded to a player
      *                      for successfully matching 1, 2, 3, ... tiles to their correct color.
      */
-    public PersonalGoalEvaluator(Map<Shelf, Tile> personalGoal, ArrayList<Integer> pointsMapping) {
+    public PersonalGoalEvaluator(Map<Shelf, Tile> personalGoal, List<Integer> pointsMapping) {
         this.personalGoal = new HashMap<>(personalGoal);
         this.pointsMapping = pointsMapping;
 
@@ -59,8 +58,9 @@ public class PersonalGoalEvaluator implements Evaluator {
 
     @Override
     public boolean add(BookshelfMask bookshelfMask) {
-        for (Shelf goalShelf : personalGoal.keySet()) {
-            if (bookshelfMask.tileAt(goalShelf) == personalGoal.get(goalShelf)) {
+        for (Map.Entry<Shelf, Tile> goalShelf : personalGoal.entrySet()) {
+            Shelf key = goalShelf.getKey();
+            if (bookshelfMask.tileAt(key) == personalGoal.get(key)) {
                 points = pointsMapping.get(successfulShelves++);
             }
         }
