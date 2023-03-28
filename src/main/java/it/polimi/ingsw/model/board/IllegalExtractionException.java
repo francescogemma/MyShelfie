@@ -1,4 +1,4 @@
-package it.polimi.ingsw.model.bag;
+package it.polimi.ingsw.model.board;
 
 public class IllegalExtractionException extends Exception {
     public IllegalExtractionException(String  s) {

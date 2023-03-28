@@ -1,7 +1,6 @@
 package it.polimi.ingsw.model.board;
 
 import it.polimi.ingsw.utils.Coordinate;
-import it.polimi.ingsw.model.bag.IllegalExtractionException;
 import it.polimi.ingsw.model.Tile;
 
 import java.util.*;
@@ -103,9 +102,9 @@ class BoardSelector {
      * @exception IllegalArgumentException if we are trying to extract more than 3 tiles
      * @exception IllegalArgumentException if [r, c] is already in the list
      */
-    public void select (Coordinate c) throws IllegalExtractionException {
+    public void select (Coordinate c) throws IllegalExtractionException, SelectionFullException {
         if (sizeSelection() > 2) {
-            throw new IllegalArgumentException("More than 3 tiles have already been selected");
+            throw new SelectionFullException();
         }
 
         if (contains(c)) {
@@ -146,11 +145,11 @@ public class Board {
 
     /**
      * All the possible cell positions if the players were two.
-     * */
+     */
     static final List<Coordinate> twoPlayerPosition = Coordinate.toList(Arrays.asList(
             new int [][] {
-                                    {1, 3}, {1, 4},
-                            {2, 2}, {2, 3}, {2, 4}, {2, 5},
+                                {1, 3}, {1, 4},
+                        {2, 2}, {2, 3}, {2, 4}, {2, 5},
                 {3, 1}, {3, 2}, {3, 3}, {3, 4}, {3, 5}, {3, 6}, {3, 7},
         {4, 0}, {4, 1}, {4, 2}, {4, 3}, {4, 4}, {4, 5}, {4, 6}, {4, 7},
                 {5, 1}, {5, 2}, {5, 3}, {5, 4}, {5, 5}, {5, 6},
@@ -160,7 +159,7 @@ public class Board {
 
     /**
      * All the possible cell positions if the players were three.
-     * */
+     */
     static final List<Coordinate> threePlayerPosition = Coordinate.toList(Arrays.asList(
             new int[][] {
                                     {0, 3},
@@ -174,7 +173,7 @@ public class Board {
 
     /**
      * All the possible cell positions if the players were four.
-     * */
+     */
     static final List<Coordinate> fourPlayerPosition = Coordinate.toList(Arrays.asList(
         new int[][] {
                 {0, 4}, {1, 5}, {4, 8}, {5, 7}, {8, 4}
@@ -191,7 +190,7 @@ public class Board {
      * to call the fillRandomly function to fill it.
      *
      * @see #fillRandomly(Tile, int)
-     * */
+     */
     public Board() {
         boardSelector = new BoardSelector();
         occupied = 0;
@@ -210,7 +209,7 @@ public class Board {
      * the Tiles previously selected.
      * @return The {@link Tile Tile} selected.
     * */
-    public Tile selectTile(Coordinate c) throws IllegalExtractionException {
+    public Tile selectTile(Coordinate c) throws IllegalExtractionException, SelectionFullException {
         if (this.isEmptyExtraction(c) || numberOfFreeSides(c, this::isEmptyExtraction) == 0) {
             throw new IllegalExtractionException("Can't extract tile at: [" + c.getRow() + ", " + c.getCol() + "]");
         }
@@ -219,7 +218,7 @@ public class Board {
         return this.tileAt(c);
     }
 
-    public Tile selectTile (int row, int col) throws IllegalExtractionException {
+    public Tile selectTile (int row, int col) throws IllegalExtractionException, SelectionFullException {
         return this.selectTile(new Coordinate(row, col));
     }
 
@@ -233,7 +232,7 @@ public class Board {
                 .boardSelector
                 .getSelected()
                 .stream()
-                .map((t) -> this.tileAt(t))
+                .map(this::tileAt)
                 .collect(Collectors.toList());
     }
 
