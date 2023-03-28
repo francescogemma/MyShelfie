@@ -39,21 +39,14 @@ public class CompatibleEvaluator implements Evaluator {
         this.targetMet = targetSetSize <= 1;
     }
 
-    /*
-     * Adds a {@link BookshelfMask mask} to the object.
-     * @param bookshelfMask is a mask that will be added to the object.
-     * @return true iff there's a set of added masks that is big enough.
-     */
     @Override
     public boolean add(BookshelfMask bookshelfMask) {
         for (BookshelfMaskSet bookshelfMaskSet : group) {
-            boolean intersectionFound = false;
-
             if (bookshelfMaskSet.isCompatible(bookshelfMask)) {
                 // duplicate current BookshelfMaskSet in group
                 // then, add non-intersecting mask to one of them
                 group.add(new BookshelfMaskSet(bookshelfMaskSet));
-                bookshelfMaskSet.addBookshelfMask(bookshelfMask);
+                bookshelfMaskSet.addBookshelfMask(new BookshelfMask(bookshelfMask));
 
                 // note down if this addition meets out target size
                 targetMet |= bookshelfMaskSet.getSize() >= targetSetSize;
@@ -64,16 +57,12 @@ public class CompatibleEvaluator implements Evaluator {
         }
         // create and add one more set with a single BookshelfMask
         BookshelfMaskSet bookshelfMaskSetLast = new BookshelfMaskSet(compatible);
-        bookshelfMaskSetLast.addBookshelfMask(bookshelfMask);
+        bookshelfMaskSetLast.addBookshelfMask(new BookshelfMask(bookshelfMask));
         group.add(bookshelfMaskSetLast);
 
         return targetMet;
     }
 
-    /*
-     * Getter method for earned points;
-     * Returns 0 if target has not been met.
-     */
     @Override
     public int getPoints() {
         if (targetMet) { return points; }
