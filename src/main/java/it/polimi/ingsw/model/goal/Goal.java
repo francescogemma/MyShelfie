@@ -6,7 +6,6 @@ import it.polimi.ingsw.model.bookshelf.Shelf;
 import it.polimi.ingsw.model.evaluator.Evaluator;
 import it.polimi.ingsw.model.fetcher.Fetcher;
 import it.polimi.ingsw.model.filter.Filter;
-import it.polimi.ingsw.model.game.Player;
 
 public abstract class Goal {
     private final Fetcher fetcher;
