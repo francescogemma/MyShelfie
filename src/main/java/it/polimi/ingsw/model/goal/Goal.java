@@ -9,19 +9,17 @@ import it.polimi.ingsw.model.filter.Filter;
 import it.polimi.ingsw.model.game.Player;
 
 public abstract class Goal {
-    private Fetcher fetcher;
-    private Filter filter;
-    private Evaluator evaluator;
+    private final Fetcher fetcher;
+    private final Filter filter;
+    private final Evaluator evaluator;
 
-    public Goal(Fetcher fetcher, Filter filter, Evaluator evaluator) {
+    protected Goal(Fetcher fetcher, Filter filter, Evaluator evaluator) {
         this.fetcher = fetcher;
         this.filter = filter;
         this.evaluator = evaluator;
     }
 
-    public final void calculateAndAddPoints(Player player) {
-        Bookshelf bookshelf = player.getBookshelf();
-
+    public final int calculatePoints(Bookshelf bookshelf) {
         BookshelfMask mask = new BookshelfMask(bookshelf);
 
         do {
@@ -37,16 +35,14 @@ public abstract class Goal {
             } else mask.add(next);
 
             if (fetcher.lastShelf()) {
-                if (filter.isSatisfied()) {
-                    if (evaluator.add(mask)) {
-                        break;
-                    }
+                if (filter.isSatisfied() && evaluator.add(mask)) {
+                    break;
                 }
                 filter.clear();
                 mask.clear();
             }
         } while (!fetcher.hasFinished());
 
-        player.addPoints(evaluator.getPoints());
+        return evaluator.getPoints();
     }
 }
