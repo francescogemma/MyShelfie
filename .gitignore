@@ -40,8 +40,8 @@ crashlytics-build.properties
 fabric.properties
 
 target/
-uml/.$uml.svg.dtmp
-uml/.$uml.svg.bkp
+deliverables/.$uml.svg.dtmp
+deliverables/.$uml.svg.bkp
 
 # Javadoc
 docs/
