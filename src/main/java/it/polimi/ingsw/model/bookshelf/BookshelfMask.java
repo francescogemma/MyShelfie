@@ -135,8 +135,8 @@ public class BookshelfMask {
             throw new IllegalArgumentException("Cannot count empty tiles");
         }
 
-        for(Shelf shelf : this.getShelves()) {
-            if(this.tileAt(shelf) == tile) {
+        for(Shelf shelf : shelves) {
+            if(tileAt(shelf) == tile) {
                 count++;
             }
         }

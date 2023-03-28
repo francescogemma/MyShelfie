@@ -521,8 +521,8 @@ public class Shape {
     static {
         ArrayList<Offset> offsets = new ArrayList<>();
 
-        for (int row = 0; row < STAIR_SIDE; row++) {
-            for (int column = 0; column < STAIR_SIDE; column++) {
+        for (int row = 0; row < Bookshelf.ROWS; row++) {
+            for (int column = 0; column < Bookshelf.COLUMNS; column++) {
                 offsets.add(Offset.getInstance(row, column));
             }
         }
