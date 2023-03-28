@@ -54,8 +54,9 @@ public class Bookshelf {
      * The content of the bookshelf. In particular inside content[i][j] is stored the tile that is on
      * the shelf at the ith row and jth column, inside the bookshelf.
      * (Remember that rows and columns are enumerated starting from 0).
+     * The field is protected to allow direct access from a mock subclass, used for testing purpose.
      */
-    private final Tile[][] content = new Tile[ROWS][COLUMNS];
+    protected final Tile[][] content = new Tile[ROWS][COLUMNS];
 
     /**
      * Constructor of the class.
