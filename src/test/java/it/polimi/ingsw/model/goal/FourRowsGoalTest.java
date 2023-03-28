@@ -61,7 +61,7 @@ class FourRowsGoalTest {
     }
 
     @Test
-    @DisplayName("Calculating points with a full bookshelf: goal satisfied")
+    @DisplayName("Calculating points with a full rows bookshelf: goal satisfied")
     void calculatePoints_fullBookshelf_goalNotSatisfied() {
         Bookshelf bookshelf = new MockBookshelf(new int[][] {
             { 1, 1, 1, 1, 1 },
