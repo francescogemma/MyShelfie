@@ -2,6 +2,8 @@ package it.polimi.ingsw.model.evaluator;
 
 import it.polimi.ingsw.model.bookshelf.BookshelfMask;
 
+import java.util.function.Predicate;
+
 /**
  * Simple evaluator that counts how many {@link BookshelfMask BookshelfMasks} have been fed
  * into its add method, and checks if the amount is great enough to grant a player their points.
@@ -20,19 +22,44 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
     private final int targetAmount;
 
     /**
+     * Predicate to determine if the provided {@link BookshelfMask BookshelfMask}
+     * has to be actually added to the counter.
+     */
+    private final Predicate<BookshelfMask> toCount;
+
+    /**
      * Class constructor.
+     * @param playersAmount is this game's player amount (2 to 4).
+     * @param targetAmount is the needed quantity of {@link BookshelfMask BookshelfMasks} to
+     *                     grant a player a non-zero amount of points.
+     */
+    public AtLeastEvaluator(int playersAmount, int targetAmount, Predicate<BookshelfMask> toCount) {
+        super(playersAmount);
+        this.toCount = toCount;
+        this.targetAmount = targetAmount;
+        maskCounter = 0;
+    }
+
+    /**
+     * Constructor if we don't require any kind of predicate.
+     * A predicate is created, and it always returns true.
      * @param playersAmount is this game's player amount (2 to 4).
      * @param targetAmount is the needed quantity of {@link BookshelfMask BookshelfMasks} to
      *                     grant a player a non-zero amount of points.
      */
     public AtLeastEvaluator(int playersAmount, int targetAmount) {
         super(playersAmount);
+        this.toCount = bookshelfMask -> true;
         this.targetAmount = targetAmount;
         maskCounter = 0;
     }
     @Override
     public boolean add(BookshelfMask bookshelfMask) {
-        return ++maskCounter >= targetAmount;
+        if (toCount.test(bookshelfMask)) {
+            maskCounter++;
+        }
+
+        return maskCounter >= targetAmount;
     }
 
     @Override
