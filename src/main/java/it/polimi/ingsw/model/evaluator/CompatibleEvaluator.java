@@ -15,10 +15,36 @@ import java.util.function.BiPredicate;
  * @author Michele Miotti
  */
 public class CompatibleEvaluator implements Evaluator {
+    /**
+     * This ArrayList contains {@link BookshelfMaskSet BookshelfMaskSets}.
+     * It represents the set of all possible compatible sets that can be made
+     * with all {@link BookshelfMask masks} given so far.
+     */
     private final ArrayList<BookshelfMaskSet> group;
+
+    /**
+     * If the target is met, the player will receive these points,
+     * otherwise, they will receive zero points.
+     */
     private final int points;
+
+    /**
+     * This is how big the biggest set in our group needs to be in order
+     * for this evaluator to consider its target met, and give the player
+     * their non-zero amount of points.
+     */
     private final int targetSetSize;
+
+    /**
+     * This BiPredicate dictates the type of CompatibleEvaluator we're using.
+     * By providing this object to the constructor, it is possible to customize the
+     * set of criteria that elements of the same set must follow in order to be added.
+     */
     private final BiPredicate<BookshelfMask, BookshelfMask> compatible;
+
+    /**
+     * Simple boolean value to determine if the player can receive a non-zero amount of points.
+     */
     private boolean targetMet;
 
     /**
@@ -46,7 +72,7 @@ public class CompatibleEvaluator implements Evaluator {
                 // duplicate current BookshelfMaskSet in group
                 // then, add non-intersecting mask to one of them
                 group.add(new BookshelfMaskSet(bookshelfMaskSet));
-                bookshelfMaskSet.addBookshelfMask(new BookshelfMask(bookshelfMask));
+                bookshelfMaskSet.addBookshelfMask(bookshelfMask);
 
                 // note down if this addition meets out target size
                 targetMet |= bookshelfMaskSet.getSize() >= targetSetSize;
@@ -57,7 +83,7 @@ public class CompatibleEvaluator implements Evaluator {
         }
         // create and add one more set with a single BookshelfMask
         BookshelfMaskSet bookshelfMaskSetLast = new BookshelfMaskSet(compatible);
-        bookshelfMaskSetLast.addBookshelfMask(new BookshelfMask(bookshelfMask));
+        bookshelfMaskSetLast.addBookshelfMask(bookshelfMask);
         group.add(bookshelfMaskSetLast);
 
         return targetMet;

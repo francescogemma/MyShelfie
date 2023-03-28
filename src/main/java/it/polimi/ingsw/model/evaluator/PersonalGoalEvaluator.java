@@ -23,17 +23,23 @@ public class PersonalGoalEvaluator implements Evaluator {
      * specific color. This information has to be provided to the constructor.
      */
     private final Map<Shelf, Tile> personalGoal;
+
     /**
      * This list maps each natural number up to 6 (x) to another number (y), which
      * represents the score that should be given to a player once x shelves contain
      * the expected color.
      */
     private final List<Integer> pointsMapping;
+
     /**
      * The amount of shelves that have a color that coincides with the specifics
      * given by the {@link this#personalGoal} object.
      */
     private int successfulShelves;
+
+    /**
+     * Points that should be given the player so far.
+     */
     private int points;
 
     /**
@@ -43,7 +49,7 @@ public class PersonalGoalEvaluator implements Evaluator {
      * @param pointsMapping is a list of 6 elements, corresponding to the points awarded to a player
      *                      for successfully matching 1, 2, 3, ... tiles to their correct color.
      */
-    public PersonalGoalEvaluator(Map personalGoal, ArrayList<Integer> pointsMapping) {
+    public PersonalGoalEvaluator(Map<Shelf, Tile> personalGoal, ArrayList<Integer> pointsMapping) {
         this.personalGoal = new HashMap<>(personalGoal);
         this.pointsMapping = pointsMapping;
 
@@ -51,11 +57,6 @@ public class PersonalGoalEvaluator implements Evaluator {
         points = 0;
     }
 
-    /*
-     * @param bookshelfMask needs to be a "full mask": all shelves must be contained.
-     * @return true, always, since the input should already contain all the information
-     * needed to get the score; This function should only be called once.
-     */
     @Override
     public boolean add(BookshelfMask bookshelfMask) {
         for (Shelf goalShelf : personalGoal.keySet()) {
@@ -66,9 +67,6 @@ public class PersonalGoalEvaluator implements Evaluator {
         return true;
     }
 
-    /*
-     * @return all points that have been acquired by color matches.
-     */
     @Override
     public int getPoints() {
         return points;

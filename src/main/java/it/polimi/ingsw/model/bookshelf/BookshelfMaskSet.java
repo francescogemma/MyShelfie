@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.bookshelf;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiPredicate;
 
 /**
@@ -9,7 +10,17 @@ import java.util.function.BiPredicate;
  * @author Michele Miotti
  */
 public class BookshelfMaskSet {
-    private final ArrayList<BookshelfMask> bookshelfMasks;
+    /**
+     * This list contains all copies of {@link BookshelfMask BookshelfMasks}
+     * that are contained in this set.
+     */
+    private final List<BookshelfMask> bookshelfMasks;
+
+    /**
+     * This BiPredicate will be used to check if an object can be added to the set
+     * via the isCompatible method. It checks if two {@link BookshelfMask Bookshelfmasks}
+     * are compatible relative to each other.
+     */
     private final BiPredicate<BookshelfMask, BookshelfMask> compatible;
 
     /**
@@ -34,7 +45,7 @@ public class BookshelfMaskSet {
      * Getter method for the {@link BookshelfMaskSet#compatible compatible} BiFunction.
      * @return this instance's {@link BookshelfMaskSet#compatible compatible} BiFunction.
      */
-    public BiPredicate getCompatible() {
+    public BiPredicate<BookshelfMask, BookshelfMask> getCompatible() {
         return compatible;
     }
 
@@ -48,16 +59,16 @@ public class BookshelfMaskSet {
     /**
      * @return the list of all contained {@link BookshelfMask BookshelfMasks}.
      */
-    public ArrayList<BookshelfMask> getBookshelfMasks() {
+    public List<BookshelfMask> getBookshelfMasks() {
         return new ArrayList<>(bookshelfMasks);
     }
 
     /**
-     * Add an element to the set.
+     * Add an element to the set (by copying it).
      * @param bookshelfMask will be added to the set.
      */
     public void addBookshelfMask(BookshelfMask bookshelfMask) {
-        bookshelfMasks.add(bookshelfMask);
+        bookshelfMasks.add(new BookshelfMask(bookshelfMask));
     }
 
     /**
