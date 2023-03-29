@@ -47,25 +47,14 @@ public class MockBookshelf extends Bookshelf {
 
         for (int j = 0; j < content[0].length; j++) {
             boolean findNonZero = false;
-            for (int i = 0; i < content.length; i++) {
-                final int value = content[i][j];
-                if (value != 0) {
-                    findNonZero = true;
-                } else {
-                    assert !findNonZero: content[i];
-                }
-            }
-        }
-
-        /*for (int[] ints : content) {
-            boolean findNonZero = false;
-            for (int value : ints) {
+            for (int[] ints : content) {
+                final int value = ints[j];
                 if (value != 0) {
                     findNonZero = true;
                 } else {
                     assert !findNonZero : ints;
                 }
             }
-        }*/
+        }
     }
 }
