@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 class ShapeFetcherTest {
-    private final int[] bookshelfMock = new int[Bookshelf.ROWS * Bookshelf.COLUMNS];
+    private final int[] mockBookshelf = new int[Bookshelf.ROWS * Bookshelf.COLUMNS];
 
     private final static int MAXIMUM_NUM_OF_ORIGINS = 10;
 
@@ -58,7 +58,7 @@ class ShapeFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        Arrays.fill(bookshelfMock, 0);
+        Arrays.fill(mockBookshelf, 0);
     }
 
     @ParameterizedTest
@@ -69,7 +69,7 @@ class ShapeFetcherTest {
             for (Offset offset : shape.getOffsets()) {
                 Shelf currentShelf = origin.move(offset);
 
-                bookshelfMock[currentShelf.getRow() * Bookshelf.COLUMNS + currentShelf.getColumn()] = 1;
+                mockBookshelf[currentShelf.getRow() * Bookshelf.COLUMNS + currentShelf.getColumn()] = 1;
             }
         }
 
@@ -85,7 +85,7 @@ class ShapeFetcherTest {
         do {
             Shelf shelf = fetcher.next();
 
-            if (bookshelfMock[shelf.getRow() * Bookshelf.COLUMNS + shelf.getColumn()] == 0) {
+            if (mockBookshelf[shelf.getRow() * Bookshelf.COLUMNS + shelf.getColumn()] == 0) {
                 Assertions.assertFalse(fetcher.canFix());
 
                 originRow = Bookshelf.ROWS;

@@ -21,7 +21,7 @@ class BookshelfMaskSetTest {
         BookshelfMask bookshelfMask = new BookshelfMask(new Bookshelf());
         bookshelfMaskSet.addBookshelfMask(bookshelfMask);
 
-        Assertions.assertNotEquals(bookshelfMask, bookshelfMaskSet.getBookshelfMasks().get(0));
+        Assertions.assertNotSame(bookshelfMask, bookshelfMaskSet.getBookshelfMasks().get(0));
     }
 
     @Test

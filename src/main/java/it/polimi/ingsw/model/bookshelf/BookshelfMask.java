@@ -145,6 +145,21 @@ public class BookshelfMask {
     }
 
     @Override
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+
+        if (!(other instanceof BookshelfMask)) {
+            return false;
+        }
+
+        BookshelfMask otherMask = (BookshelfMask) other;
+
+        return shelves.equals(otherMask.shelves);
+    }
+
+    @Override
     public String toString() {
         StringBuilder result = new StringBuilder("---------------\n");
 
