@@ -95,4 +95,14 @@ class CompatibleEvaluatorTest {
             compatibleEvaluator = new CompatibleEvaluator(3, 0, (a, b) -> true)
         );
     }
+
+    @Test
+    @DisplayName("Try to construct an evaluator with nonsense amount of players.")
+    void CompatibleEvaluator_tooManyPlayers_CorrectOutput() {
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+                compatibleEvaluator = new CompatibleEvaluator(32, 2, (a, b) -> true)
+        );
+    }
+
+
 }
