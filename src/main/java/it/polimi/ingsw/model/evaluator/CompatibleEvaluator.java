@@ -56,7 +56,7 @@ public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluato
         group = new ArrayList<>();
 
         if (targetGroupSize <= 1) {
-            throw  new IllegalArgumentException("There is no reason to use a compatible evaluator if the target group " +
+            throw new IllegalArgumentException("There is no reason to use a compatible evaluator if the target group " +
                 "size is less or equal than 1, use an at least evaluator instead");
         }
 
