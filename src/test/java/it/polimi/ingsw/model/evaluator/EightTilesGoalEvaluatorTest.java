@@ -23,6 +23,8 @@ class EightTilesGoalEvaluatorTest {
     @DisplayName("no mask added: 0 points")
     void calculatePoints_noMaskAdded_correctOutput() {
         Assertions.assertEquals(0, evaluator.getPoints());
+        evaluator.clear();
+        Assertions.assertEquals(0, evaluator.getPoints());
     }
 
     @Test
@@ -38,6 +40,8 @@ class EightTilesGoalEvaluatorTest {
         });
         mask = new BookshelfMask(bookshelf);
         Assertions.assertTrue(evaluator.add(mask));
+        Assertions.assertEquals(0, evaluator.getPoints());
+        evaluator.clear();
         Assertions.assertEquals(0, evaluator.getPoints());
     }
 
@@ -56,6 +60,8 @@ class EightTilesGoalEvaluatorTest {
         populateFullMask();
         Assertions.assertTrue(evaluator.add(mask));
         Assertions.assertEquals(8, evaluator.getPoints());
+        evaluator.clear();
+        Assertions.assertEquals(0, evaluator.getPoints());
     }
 
     @Test
@@ -73,6 +79,8 @@ class EightTilesGoalEvaluatorTest {
         populateFullMask();
         Assertions.assertTrue(evaluator.add(mask));
         Assertions.assertEquals(8, evaluator.getPoints());
+        evaluator.clear();
+        Assertions.assertEquals(0, evaluator.getPoints());
     }
 
     @Test
@@ -89,6 +97,8 @@ class EightTilesGoalEvaluatorTest {
         mask = new BookshelfMask(bookshelf);
         populateFullMask();
         Assertions.assertTrue(evaluator.add(mask));
+        Assertions.assertEquals(0, evaluator.getPoints());
+        evaluator.clear();
         Assertions.assertEquals(0, evaluator.getPoints());
     }
 
