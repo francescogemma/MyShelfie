@@ -2,6 +2,8 @@ package it.polimi.ingsw.model.bookshelf;
 
 import it.polimi.ingsw.model.Tile;
 
+import java.util.Arrays;
+
 public class MockBookshelf extends Bookshelf {
     private static Tile indexToTile(int index) {
         if (index == 0) {
@@ -42,5 +44,28 @@ public class MockBookshelf extends Bookshelf {
                 super.content[row][column] = indexToTile(content[row][column]);
             }
         }
+
+        for (int j = 0; j < content[0].length; j++) {
+            boolean findNonZero = false;
+            for (int i = 0; i < content.length; i++) {
+                final int value = content[i][j];
+                if (value != 0) {
+                    findNonZero = true;
+                } else {
+                    assert !findNonZero: content[i];
+                }
+            }
+        }
+
+        /*for (int[] ints : content) {
+            boolean findNonZero = false;
+            for (int value : ints) {
+                if (value != 0) {
+                    findNonZero = true;
+                } else {
+                    assert !findNonZero : ints;
+                }
+            }
+        }*/
     }
 }
