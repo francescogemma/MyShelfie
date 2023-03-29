@@ -42,6 +42,12 @@ public abstract class Goal {
             }
         } while (!fetcher.hasFinished());
 
-        return evaluator.getPoints();
+        filter.clear();
+
+        try {
+            return evaluator.getPoints();
+        } finally {
+            evaluator.clear();
+        }
     }
 }

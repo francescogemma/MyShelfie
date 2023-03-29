@@ -67,4 +67,9 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
         if (maskCounter < targetAmount) return 0;
         return super.getPoints();
     }
+
+    @Override
+    public void clear() {
+        maskCounter = 0;
+    }
 }

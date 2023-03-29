@@ -24,4 +24,11 @@ public interface Evaluator {
      * @return the amount of points based on the state so far.
      */
     int getPoints();
+
+    /**
+     * Resets the evaluator. This method should be invoked between an evaluation and the following.
+     *
+     * @author Cristiano Migali
+     */
+    void clear();
 }

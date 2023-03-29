@@ -48,14 +48,21 @@ public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluato
      *                        {@link CompatibleEvaluator#getPoints() getPoints} method to return a non-zero result.
      * @param compatible is a BiPredicate that defines the meaning of "compatibility" within elements of a set.
      *                   Said {@link BookshelfMaskSet sets} are stored in the {@link CompatibleEvaluator#group} variable.
+     * @throws IllegalArgumentException if targetGroupsSize is less or equal than 1, in that case it makes no sense to
+     *  check compatibility between a mask and itself.
      */
     public CompatibleEvaluator(int playersAmount, int targetGroupSize, BiPredicate<BookshelfMask, BookshelfMask> compatible) {
         super(playersAmount);
         group = new ArrayList<>();
 
+        if (targetGroupSize <= 1) {
+            throw  new IllegalArgumentException("There is no reason to use a compatible evaluator if the target group " +
+                "size is less or equal than 1, use an at least evaluator instead");
+        }
+
         this.compatible = compatible;
         this.targetSetSize = targetGroupSize;
-        this.targetMet = targetSetSize <= 1;
+        this.targetMet = false;
     }
 
     @Override
@@ -84,5 +91,11 @@ public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluato
     public int getPoints() {
         if (targetMet) { return super.getPoints(); }
         return 0;
+    }
+
+    @Override
+    public void clear() {
+        group.clear();
+        targetMet = false;
     }
 }

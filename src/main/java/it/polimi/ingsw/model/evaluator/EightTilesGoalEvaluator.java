@@ -13,12 +13,9 @@ public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Eval
 
     @Override
     public boolean add(BookshelfMask mask) {
-        satisfied = mask.countTilesOfColor(Tile.CYAN) >= 8 ||
-                mask.countTilesOfColor(Tile.YELLOW) >= 8 ||
-                mask.countTilesOfColor(Tile.BLUE) >= 8 ||
-                mask.countTilesOfColor(Tile.MAGENTA) >= 8 ||
-                mask.countTilesOfColor(Tile.GREEN) >= 8 ||
-                mask.countTilesOfColor(Tile.WHITE) >= 8;
+        for (Tile tile : Tile.values()) {
+            satisfied |= tile != Tile.EMPTY && mask.countTilesOfColor(tile) >= 8;
+        }
 
         return true;
     }
@@ -29,5 +26,10 @@ public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Eval
             return super.getPoints();
         }
         return 0;
+    }
+
+    @Override
+    public void clear() {
+        satisfied = false;
     }
 }

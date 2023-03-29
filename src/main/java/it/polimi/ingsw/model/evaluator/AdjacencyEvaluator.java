@@ -41,6 +41,11 @@ public class AdjacencyEvaluator implements Evaluator {
         return 0;
     }
 
+    @Override
+    public void clear() {
+        points = 0;
+    }
+
     /**
      * Gets the points gathered so far.
      */

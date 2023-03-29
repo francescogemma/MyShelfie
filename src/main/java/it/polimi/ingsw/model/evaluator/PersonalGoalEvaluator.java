@@ -71,4 +71,10 @@ public class PersonalGoalEvaluator implements Evaluator {
     public int getPoints() {
         return points;
     }
+
+    @Override
+    public void clear() {
+        successfulShelves = 0;
+        points = 0;
+    }
 }
