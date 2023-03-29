@@ -1,10 +1,7 @@
 package it.polimi.ingsw.model.fetcher;
 
 import it.polimi.ingsw.model.Tile;
-import it.polimi.ingsw.model.bookshelf.Bookshelf;
-import it.polimi.ingsw.model.bookshelf.BookshelfMask;
-import it.polimi.ingsw.model.bookshelf.MockBookshelf;
-import it.polimi.ingsw.model.bookshelf.Shelf;
+import it.polimi.ingsw.model.bookshelf.*;
 import it.polimi.ingsw.model.filter.Filter;
 import it.polimi.ingsw.model.filter.NumDifferentColorFilter;
 import org.junit.jupiter.api.Assertions;
@@ -15,8 +12,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 class SearchGroupsInABookshelfTest {
@@ -68,20 +63,16 @@ class SearchGroupsInABookshelfTest {
                 if (filter.isSatisfied()) {
                     numGroups++;
 
-                    StringBuilder result = new StringBuilder("---------------\n");
+                    BookshelfMask exactMask = new MockBookshelfMask(bookshelf, new int[][]{
+                            { 1, 1, 1, 1, 1 },
+                            { 1, 1, 1, 1, 1 },
+                            { 1, 1, 1, 1, 1 },
+                            { 1, 1, 1, 1, 1 },
+                            { 1, 1, 1, 1, 1 },
+                            { 1, 1, 1, 1, 1 }
+                    });
 
-                    for (int row = 0; row < Bookshelf.ROWS; row++) {
-                        for (int column = 0; column < Bookshelf.COLUMNS; column++) {
-                            Shelf currentShelf = Shelf.getInstance(row, column);
-                            String toColor = "#";
-
-                            result.append("[").append(bookshelf.get(currentShelf).color(toColor)).append("]");
-                        }
-
-                        result.append("\n---------------\n");
-                    }
-
-                    Assertions.assertEquals(result.toString(), mask.toString());
+                    Assertions.assertEquals(exactMask, mask);
                 }
                 filter.clear();
                 mask.clear();
@@ -122,27 +113,21 @@ class SearchGroupsInABookshelfTest {
                 if (filter.isSatisfied()) {
                     numGroups++;
 
-                    StringBuilder result = new StringBuilder("---------------\n");
+                    BookshelfMask exactMask = new BookshelfMask(bookshelf);
 
                     for (int row = 0; row < Bookshelf.ROWS; row++) {
                         for (int column = 0; column < Bookshelf.COLUMNS; column++) {
-                            Shelf currentShelf = Shelf.getInstance(row, column);
-                            String toColor = " ";
                             if(numGroups == 1 && (row == 0 || row == 5 || column == 0 || column == 4)) {
-                                toColor = "#";
+                                exactMask.add(Shelf.getInstance(row, column));
                             } else if(numGroups == 2 && ((row == 1 && column != 0 && column != 4) || (row == 4 && column != 0 && column != 4) || (column == 1 && row != 0 && row != 5) || (column == 3 && row != 0 && row != 5))) {
-                                toColor = "#";
+                                exactMask.add(Shelf.getInstance(row, column));
                             } else if(numGroups == 3 && column == 2 && (row == 2 || row == 3)) {
-                                toColor = "#";
+                                exactMask.add(Shelf.getInstance(row, column));
                             }
-
-                            result.append("[").append(bookshelf.get(currentShelf).color(toColor)).append("]");
                         }
-
-                        result.append("\n---------------\n");
                     }
 
-                    Assertions.assertEquals(result.toString(), mask.toString());
+                    Assertions.assertEquals(exactMask, mask);
                 }
                 filter.clear();
                 mask.clear();
@@ -222,23 +207,10 @@ class SearchGroupsInABookshelfTest {
                 if (filter.isSatisfied()) {
                     numGroups++;
 
-                    StringBuilder result = new StringBuilder("---------------\n");
+                    BookshelfMask exactMask = new BookshelfMask(bookshelf);
+                    exactMask.add(Shelf.getInstance(5, col));
 
-                    for (int row = 0; row < Bookshelf.ROWS; row++) {
-                        for (int column = 0; column < Bookshelf.COLUMNS; column++) {
-                            Shelf currentShelf = Shelf.getInstance(row, column);
-                            String toColor = " ";
-                            if(numGroups == 1 && row == 5 && column == col) {
-                                toColor = "#";
-                            }
-
-                            result.append("[").append(bookshelf.get(currentShelf).color(toColor)).append("]");
-                        }
-
-                        result.append("\n---------------\n");
-                    }
-
-                    Assertions.assertEquals(result.toString(), mask.toString());
+                    Assertions.assertEquals(exactMask, mask);
                 }
                 filter.clear();
                 mask.clear();
@@ -278,20 +250,8 @@ class SearchGroupsInABookshelfTest {
                 if (filter.isSatisfied()) {
                     numGroups++;
 
-                    StringBuilder result = new StringBuilder("---------------\n");
-
-                    for (int row = 0; row < Bookshelf.ROWS; row++) {
-                        for (int column = 0; column < Bookshelf.COLUMNS; column++) {
-                            Shelf currentShelf = Shelf.getInstance(row, column);
-                            String toColor = " ";
-
-                            result.append("[").append(bookshelf.get(currentShelf).color(toColor)).append("]");
-                        }
-
-                        result.append("\n---------------\n");
-                    }
-
-                    Assertions.assertEquals(result.toString(), mask.toString());
+                    BookshelfMask exactMask = new BookshelfMask(bookshelf);
+                    Assertions.assertEquals(exactMask, mask);
                 }
                 filter.clear();
                 mask.clear();
@@ -334,25 +294,19 @@ class SearchGroupsInABookshelfTest {
                     numGroups++;
                     Assertions.assertEquals(1, mask.getShelves().size());
 
-                    StringBuilder result = new StringBuilder("---------------\n");
+                    BookshelfMask exactMask = new BookshelfMask(bookshelf);
 
                     int count = 1;
                     for (int row = 0; row < Bookshelf.ROWS; row++) {
                         for (int column = 0; column < Bookshelf.COLUMNS; column++) {
-                            Shelf currentShelf = Shelf.getInstance(row, column);
-                            String toColor = " ";
                             if(numGroups == count){
-                                toColor = "#";
+                                exactMask.add(Shelf.getInstance(row, column));
                             }
-
-                            result.append("[").append(bookshelf.get(currentShelf).color(toColor)).append("]");
                             count++;
                         }
-
-                        result.append("\n---------------\n");
                     }
 
-                    Assertions.assertEquals(result.toString(), mask.toString());
+                    Assertions.assertEquals(exactMask, mask);
                 }
                 filter.clear();
                 mask.clear();
