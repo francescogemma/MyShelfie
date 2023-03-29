@@ -44,6 +44,9 @@ class TwoTwoByTwoSquaresGoalTest {
         });
 
         Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
     }
 
     @Test
@@ -60,5 +63,36 @@ class TwoTwoByTwoSquaresGoalTest {
         });
 
         Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
+    }
+
+    @Test
+    @DisplayName("Calculating points with two bookshelves: first time goal is satisfied, second time is not")
+    void calculatePoints_twoBookshelves_firstGoalSatisfiedSecondGoalNotSatisfied() {
+        Bookshelf firstBookshelf = new MockBookshelf(new int[][] {
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 2, 2 },
+            { 0, 0, 2, 2, 2 },
+            { 0, 1, 1, 2, 2 },
+            { 0, 1, 1, 3, 4 },
+            { 5, 6, 4, 5, 1 }
+        });
+
+        Bookshelf secondBookshelf = new MockBookshelf(new int[][] {
+            { 0, 0, 0, 0, 0 },
+            { 0, 3, 4, 5, 0 },
+            { 2, 1, 6, 6, 5 },
+            { 2, 1, 6, 6, 5 },
+            { 1, 2, 2, 3, 3 },
+            { 1, 1, 2, 3, 4 }
+        });
+
+        Assertions.assertEquals(8, goal.calculatePoints(firstBookshelf));
+        Assertions.assertEquals(6, goal.calculatePoints(firstBookshelf));
+        Assertions.assertEquals(4, goal.calculatePoints(firstBookshelf));
+        Assertions.assertEquals(0, goal.calculatePoints(secondBookshelf));
+        Assertions.assertEquals(2, goal.calculatePoints(firstBookshelf));
     }
 }
