@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 class DiagonalGoalTest {
     private CommonGoal goal;
@@ -32,62 +30,84 @@ class DiagonalGoalTest {
         Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
     }
 
-    @ParameterizedTest(name = "firstDiagonal: {0}")
-    @DisplayName("Calculating points when there is a main diagonal: goal satisfied")
-    @ValueSource(booleans = { true, false })
-    void calculatePoints_mainDiagonal_goalSatisfied(boolean firstDiagonal) {
+    @Test
+    @DisplayName("Calculating points when there is a main diagonal (first): goal satisfied")
+    void calculatePoints_firstMainDiagonal_goalSatisfied() {
         Bookshelf bookshelf;
 
-        if(firstDiagonal){
-            bookshelf = new MockBookshelf(new int[][] {
+        bookshelf = new MockBookshelf(new int[][] {
                     { 2, 0, 0, 0, 0 },
                     { 6, 2, 1, 1, 0 },
                     { 2, 2, 2, 2, 3 },
                     { 1, 4, 4, 2, 3 },
                     { 1, 4, 5, 5, 2 },
                     { 3, 5, 5, 1, 6 },
-            });
-        } else {
-            bookshelf = new MockBookshelf(new int[][] {
+        });
+
+        Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
+    }
+
+    @Test
+    @DisplayName("Calculating points when there is a main diagonal (second): goal satisfied")
+    void calculatePoints_secondMainDiagonal_goalSatisfied() {
+        Bookshelf bookshelf;
+
+        bookshelf = new MockBookshelf(new int[][] {
                     { 0, 0, 0, 0, 0 },
                     { 4, 1, 1, 1, 0 },
                     { 2, 4, 2, 2, 3 },
                     { 1, 4, 4, 5, 3 },
                     { 1, 4, 5, 4, 2 },
                     { 3, 5, 5, 1, 4 },
-            });
-        }
+        });
 
         Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
     }
 
-    @ParameterizedTest(name = "firstDiagonal: {0}")
-    @DisplayName("Calculating points when there is a second diagonal: goal satisfied")
-    @ValueSource(booleans = { true, false })
-    void calculatePoints_SecondDiagonal_goalSatisfied(boolean firstDiagonal) {
+    @Test
+    @DisplayName("Calculating points when there is a second diagonal (first): goal satisfied")
+    void calculatePoints_firstSecondDiagonal_goalSatisfied() {
         Bookshelf bookshelf;
 
-        if(firstDiagonal){
-            bookshelf = new MockBookshelf(new int[][] {
+        bookshelf = new MockBookshelf(new int[][] {
                     { 4, 0, 0, 0, 1 },
                     { 6, 2, 1, 1, 6 },
                     { 2, 2, 1, 2, 3 },
                     { 1, 1, 4, 2, 3 },
                     { 1, 4, 5, 5, 2 },
                     { 3, 5, 5, 1, 6 },
-            });
-        } else {
-            bookshelf = new MockBookshelf(new int[][] {
+        });
+
+        Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
+    }
+
+    @Test
+    @DisplayName("Calculating points when there is a second diagonal (second): goal satisfied")
+    void calculatePoints_secondSecondDiagonal_goalSatisfied() {
+        Bookshelf bookshelf;
+
+        bookshelf = new MockBookshelf(new int[][] {
                     { 0, 0, 0, 0, 0 },
                     { 4, 1, 1, 1, 6 },
                     { 2, 4, 2, 6, 3 },
                     { 1, 4, 6, 5, 3 },
                     { 1, 6, 5, 4, 2 },
                     { 6, 5, 5, 1, 4 },
-            });
-        }
+        });
 
         Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
     }
 
     @Test
@@ -103,5 +123,8 @@ class DiagonalGoalTest {
         });
 
         Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
     }
 }

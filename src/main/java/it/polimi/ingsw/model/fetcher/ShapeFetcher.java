@@ -120,4 +120,10 @@ public class ShapeFetcher implements Fetcher {
          */
         return false;
     }
+
+    @Override
+    public void clear() {
+        nextOffsetIndex = 0;
+        shapeOrigin = Shelf.origin();
+    }
 }

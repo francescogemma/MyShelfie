@@ -325,4 +325,11 @@ public class AdjacencyFetcher implements Fetcher {
     private ShelfStatus getShelfStatus(Shelf shelf) {
         return statuses[shelf.getRow()][shelf.getColumn()];
     }
+
+    @Override
+    public void clear() {
+        stack.clear();
+        setAllShelvesToNotVisited();
+        firstShelfOfTheGroup = true;
+    }
 }

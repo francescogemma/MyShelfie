@@ -35,6 +35,7 @@ public abstract class Goal {
 
             if (fetcher.lastShelf()) {
                 if (filter.isSatisfied() && evaluator.add(mask)) {
+                    fetcher.clear();
                     break;
                 }
                 filter.clear();

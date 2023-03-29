@@ -69,4 +69,6 @@ public interface Fetcher {
      * contains all the {@link Shelf shelves} extracted before the last one and doesn't contain the last extracted shelf.
      */
     boolean canFix();
+
+    void clear();
 }

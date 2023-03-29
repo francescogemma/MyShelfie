@@ -43,6 +43,9 @@ class EightTilesGoalTest {
         });
 
         Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
     }
 
     @Test
@@ -58,6 +61,9 @@ class EightTilesGoalTest {
         });
 
         Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
     }
 
     @Test
@@ -88,5 +94,8 @@ class EightTilesGoalTest {
         });
 
         Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
     }
 }

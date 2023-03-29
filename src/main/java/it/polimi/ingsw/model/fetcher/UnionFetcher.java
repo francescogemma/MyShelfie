@@ -90,4 +90,10 @@ public class UnionFetcher implements Fetcher {
 
         return true;
     }
+
+    @Override
+    public void clear() {
+        fetchers.get(currentFetcherIndex).clear();
+        currentFetcherIndex = 0;
+    }
 }
