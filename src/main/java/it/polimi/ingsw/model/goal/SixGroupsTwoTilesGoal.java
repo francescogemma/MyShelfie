@@ -8,6 +8,6 @@ public class SixGroupsTwoTilesGoal extends CommonGoal {
     public SixGroupsTwoTilesGoal(int numPlayers) {
         super(  new AdjacencyFetcher(),
                 new NumDifferentColorFilter(1, 1),
-                new AtLeastEvaluator(numPlayers, 2, bookshelfMask -> bookshelfMask.getShelves().size() >= 4));
+                new AtLeastEvaluator(numPlayers, 6, bookshelfMask -> bookshelfMask.getShelves().size() >= 2));
     }
 }
