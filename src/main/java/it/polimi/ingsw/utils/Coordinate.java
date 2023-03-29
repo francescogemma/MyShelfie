@@ -15,7 +15,7 @@ public class Coordinate {
     public static List<Coordinate> toList(Collection<int []> data) {
         return data
                 .stream()
-                .map((p) -> new Coordinate(p[0], p[1]))
+                .map(p -> new Coordinate(p[0], p[1]))
                 .toList();
     }
 
@@ -27,6 +27,14 @@ public class Coordinate {
         return this.row;
     }
 
+    public Coordinate down () {
+        return new Coordinate(this.row + 1, col);
+    }
+
+    public Coordinate right () {
+        return new Coordinate(this.row, col + 1);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this)
@@ -35,5 +43,10 @@ public class Coordinate {
             return this.col == o.col && this.row == o.row;
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + this.row + " " + col + "]";
     }
 }
