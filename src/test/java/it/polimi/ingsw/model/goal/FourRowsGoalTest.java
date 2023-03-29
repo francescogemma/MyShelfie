@@ -83,4 +83,43 @@ class FourRowsGoalTest {
         Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
         Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
     }
+
+    @Test
+    @DisplayName("goal satisfied and then not satisfied: points should return to 0")
+    void calculatePoints_goalSatisfiedThenNotSatisfied_pointsReturnToZero() {
+        Bookshelf bookshelf = new MockBookshelf(new int[][] {
+                { 1, 1, 1, 1, 1 },
+                { 2, 2, 2, 2, 2 },
+                { 3, 3, 3, 3, 3 },
+                { 4, 4, 4, 4, 4 },
+                { 5, 5, 5, 5, 5 },
+                { 6, 6, 6, 6, 6 },
+        });
+
+        Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
+
+        bookshelf = new MockBookshelf(new int[][]{
+                { 0, 0, 3, 2, 1 },
+                { 1, 1, 1, 4, 1 },
+                { 2, 2, 4, 2, 2 },
+                { 4, 4, 5, 2, 4 },
+                { 1, 4, 5, 6, 1 },
+                { 3, 5, 5, 1, 6 },
+        });
+
+        Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
+
+        bookshelf = new MockBookshelf(new int[][] {
+                { 0, 0, 0, 0, 0 },
+                { 1, 3, 1, 2, 1 },
+                { 2, 2, 2, 2, 2 },
+                { 3, 3, 6, 3, 3 },
+                { 4, 4, 4, 4, 4 },
+                { 5, 4, 3, 2, 1 },
+        });
+
+        Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
+    }
 }
