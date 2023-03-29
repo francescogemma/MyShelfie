@@ -50,8 +50,8 @@ class EightTilesGoalTest {
     void calculatePoints_moreThanEightTilesOfTypeOne_goalSatisfied() {
         Bookshelf bookshelf = new MockBookshelf(new int[][] {
             { 1, 6, 6, 1, 1 },
-            { 0, 6, 6, 1, 1 },
-            { 0, 6, 6, 3, 3 },
+            { 5, 6, 6, 1, 1 },
+            { 5, 6, 6, 3, 3 },
             { 1, 1, 1, 1, 3 },
             { 1, 2, 2, 1, 3 },
             { 1, 2, 2, 1, 3 },
