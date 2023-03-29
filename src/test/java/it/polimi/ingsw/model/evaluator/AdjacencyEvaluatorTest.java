@@ -95,4 +95,14 @@ class AdjacencyEvaluatorTest {
 
         Assertions.assertEquals(2 + 5 + 8 + 8 + 3, adjacencyEvaluator.getPoints());
     }
+
+    @Test
+    @DisplayName("Add two masks, clear, and check if point sum is 0")
+    void clear_correctOutput() {
+        adjacencyEvaluator.add(bookshelfMaskSizer(3));
+        adjacencyEvaluator.add(bookshelfMaskSizer(5));
+
+        adjacencyEvaluator.clear();
+        Assertions.assertEquals(0, adjacencyEvaluator.getPoints());
+    }
 }

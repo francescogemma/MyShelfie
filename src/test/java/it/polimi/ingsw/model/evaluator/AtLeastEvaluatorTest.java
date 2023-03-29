@@ -58,4 +58,18 @@ class AtLeastEvaluatorTest {
 
         Assertions.assertEquals(0, atLeastEvaluator.getPoints());
     }
+
+    @Test
+    @DisplayName("Insert more masks than needed, clear, check that no points are awarded.")
+    void clear_correctOutput() {
+        atLeastEvaluator = new AtLeastEvaluator(4, 12);
+
+        for (int i = 0; i < 16; i++) {
+            atLeastEvaluator.add(new BookshelfMask(new Bookshelf()));
+        }
+
+        atLeastEvaluator.clear();
+
+        Assertions.assertEquals(0, atLeastEvaluator.getPoints());
+    }
 }
