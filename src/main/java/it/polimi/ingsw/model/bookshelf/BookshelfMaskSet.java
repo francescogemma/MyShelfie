@@ -7,6 +7,7 @@ import java.util.function.BiPredicate;
 /**
  * A simple set of {@link BookshelfMask BookshelfMask} objects. Uses a custom BiPredicate to
  * check if a BookshelfMask is compatible with all elements of set.
+ *
  * @author Michele Miotti
  */
 public class BookshelfMaskSet {
