@@ -21,6 +21,7 @@ import it.polimi.ingsw.model.bookshelf.Shelf;
  *         returned false after the extraction of a shelf belonging to the last extractable bookshelf mask.
  *     </li>
  * </ul>
+ * With the method {@link Fetcher#clear()} we can "force" the fetcher back to its equilibrium state.
  *
  * @author Cristiano Migali
  */
@@ -70,5 +71,11 @@ public interface Fetcher {
      */
     boolean canFix();
 
+    /**
+     * Brings the fetcher back to its equilibrium state.
+     *
+     * @see Fetcher Definition of fetcher's equilibrium state
+     * @see Fetcher#hasFinished()
+     */
     void clear();
 }
