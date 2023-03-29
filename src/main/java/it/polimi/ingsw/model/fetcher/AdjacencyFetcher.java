@@ -4,12 +4,14 @@ import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.Offset;
 import it.polimi.ingsw.model.bookshelf.Shelf;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
 
 /**
  * Fetches all the groups of adjacent {@link Shelf shelves} with the same color.
  * It implements the {@link Fetcher} interface.
- * It uses a {@link Stack} to implement a DFS.
+ * It uses a {@link Deque} to implement the stack used in the DFS (Depth-first search).
  *
  * @see Fetcher
  * @see Shelf
@@ -38,7 +40,7 @@ public class AdjacencyFetcher implements Fetcher {
     }
 
     // stack used to implement the DFS
-    private final Stack<Shelf> stack;
+    private final Deque<Shelf> stack;
 
     // matrix of the statuses of the shelves
     private final ShelfStatus[][] statuses;
@@ -49,11 +51,11 @@ public class AdjacencyFetcher implements Fetcher {
 
     /**
      * Constructor of the class.
-     * It initializes the {@link Stack},
+     * It initializes the {@link Deque},
      * and it sets all the {@link Shelf shelves} to {@link ShelfStatus#NOT_VISITED}.
      */
     public AdjacencyFetcher() {
-        stack = new Stack<>();
+        stack = new ArrayDeque<>();
         statuses = new ShelfStatus[Bookshelf.ROWS][Bookshelf.COLUMNS];
         firstShelfOfTheGroup = true;
 
@@ -295,9 +297,7 @@ public class AdjacencyFetcher implements Fetcher {
      */
     private void setAllShelvesToNotVisited() {
         for(int i = 0; i < Bookshelf.ROWS; i++) {
-            for(int j = 0; j < Bookshelf.COLUMNS; j++) {
-                statuses[i][j] = ShelfStatus.NOT_VISITED;
-            }
+            Arrays.fill(statuses[i], ShelfStatus.NOT_VISITED);
         }
     }
 
@@ -314,6 +314,10 @@ public class AdjacencyFetcher implements Fetcher {
      * @param shelf the shelf to set to VISITED.
      */
     private void setShelfToVisited(Shelf shelf) {
+        if(shelf == null) {
+            throw new NullPointerException("Cannot set a null shelf to visited");
+        }
+
         statuses[shelf.getRow()][shelf.getColumn()] = ShelfStatus.VISITED;
     }
 
