@@ -5,25 +5,47 @@ import it.polimi.ingsw.model.Tile;
 import java.util.Arrays;
 
 public class MockBookshelf extends Bookshelf {
-    private static Tile indexToTile(int index) {
+    public static Tile indexToTile(int index) {
         if (index == 0) {
             return Tile.EMPTY;
         }
 
-        Tile result = Tile.GREEN;
-        boolean foundEmpty = false;
-        int i = 0;
-        while (i + (foundEmpty ? -1 : 0) < index) {
-            if (Tile.values()[i] != Tile.EMPTY) {
-                result = Tile.values()[i];
-            } else {
-                foundEmpty = true;
-            }
+        Tile tile = Tile.EMPTY;
+        for (Tile t : Tile.values()) {
+            if (t != Tile.EMPTY) {
+                tile = t;
+                index--;
 
-            i++;
+                if (index == 0) {
+                    break;
+                }
+            }
         }
 
-        return result;
+        if (tile == Tile.EMPTY) {
+            throw new IllegalStateException("Result of indexToTile must be empty iff index is 0");
+        }
+
+        return tile;
+    }
+
+    public static int tileToIndex(Tile tile) {
+        if (tile == Tile.EMPTY) {
+            return 0;
+        }
+
+        int index = 1;
+        for (Tile t : Tile.values()) {
+            if (t != Tile.EMPTY) {
+                if (t == tile) {
+                    return index;
+                }
+
+                index++;
+            }
+        }
+
+        throw new IllegalStateException("We must find tile in Tile.values when converting a tile to an index");
     }
 
     public MockBookshelf(int[][] content) {
