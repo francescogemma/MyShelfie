@@ -168,11 +168,25 @@ public class ShapeTest {
 
     @Test
     @DisplayName("Try to construct a shape with an offsets list that is not relative to the top-left shelf of the " +
-        "bounding box instance, should throw exception")
-    void construct_nonTopLeftDefinedOffsets_throwsIllegalArgumentException() {
+        "bounding box instance (with positive offsets), should throw exception")
+    void construct_nonTopLeftDefinedPositiveOffsets_throwsIllegalArgumentException() {
         ArrayList<Offset> offsets = new ArrayList<>(Arrays.asList(
             Offset.getInstance(0, 1), Offset.getInstance(1, 1),
             Offset.getInstance(1, 2)
+        ));
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            new Shape(offsets);
+        });
+    }
+
+    @Test
+    @DisplayName("Try to construct a shape with an offsets list that is not relative to the top-left shelf of the " +
+        "bounding box instance (with negative offsets), should throw exception")
+    void construct_nonTopLeftDefinedNegativeOffsets_throwsIllegalArgumentException() {
+        ArrayList<Offset> offsets = new ArrayList<>(Arrays.asList(
+            Offset.getInstance(0, -1), Offset.getInstance(0, 0),
+            Offset.getInstance(1, -1)
         ));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -343,5 +357,17 @@ public class ShapeTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             Shape.getRow(Bookshelf.COLUMNS + 1);
         });
+    }
+
+    @Test
+    @DisplayName("Check if a shape is equal to null")
+    void equals_null_false() {
+        Assertions.assertFalse(Shape.X.equals(null));
+    }
+
+    @Test
+    @DisplayName("Check if a shape is equal to an object which is not a shape")
+    void equals_NotAShape_false() {
+        Assertions.assertFalse(Shape.SQUARE.equals(new Object()));
     }
 }
