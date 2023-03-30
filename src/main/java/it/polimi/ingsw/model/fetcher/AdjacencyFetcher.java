@@ -191,6 +191,13 @@ public class AdjacencyFetcher implements Fetcher {
         return true;
     }
 
+    @Override
+    public void clear() {
+        stack.clear();
+        setAllShelvesToNotVisited();
+        firstShelfOfTheGroup = true;
+    }
+
     /**
      * This method checks if at least one of the {@link Shelf shelves} adjacent to the shelf passed as parameter is {@link ShelfStatus#NOT_VISITED}.
      * @param shelf the shelf from which we want to check if its adjacent shelves are not visited.
@@ -328,12 +335,5 @@ public class AdjacencyFetcher implements Fetcher {
      */
     private ShelfStatus getShelfStatus(Shelf shelf) {
         return statuses[shelf.getRow()][shelf.getColumn()];
-    }
-
-    @Override
-    public void clear() {
-        stack.clear();
-        setAllShelvesToNotVisited();
-        firstShelfOfTheGroup = true;
     }
 }

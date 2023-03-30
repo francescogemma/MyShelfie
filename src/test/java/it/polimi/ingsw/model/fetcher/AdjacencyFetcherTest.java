@@ -5,6 +5,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.ArrayList;
 
 class AdjacencyFetcherTest {
     private Fetcher fetcher;
@@ -218,6 +222,25 @@ class AdjacencyFetcherTest {
         }
     }
 
+    @Test
+    @DisplayName("hasFinished() return true in the equilibrium state (initial state)")
+    void hasFinished_hasFinishedInTheInitialState_correctOutput() {
+        Assertions.assertTrue(fetcher.hasFinished());
+    }
+
+    @ParameterizedTest(name = "after {0} next() calls")
+    @DisplayName("clear() method works correctly")
+    @MethodSource("numCallsProvider")
+    void clear_clearDuringFetch_correctOutput(int numCalls) {
+        Assertions.assertTrue(fetcher.hasFinished());
+        for(int i = 0; i < numCalls; i++) {
+            fetcher.next();
+            Assertions.assertFalse(fetcher.hasFinished());
+        }
+        fetcher.clear();
+        Assertions.assertTrue(fetcher.hasFinished());
+    }
+
     private void fetchGroups(int[][] matrix) {
         do {
             Shelf next = fetcher.next();
@@ -248,5 +271,13 @@ class AdjacencyFetcherTest {
             }
         }
         Assertions.assertEquals(expectedNumGroups, numGroups, "The number of groups is not correct");
+    }
+
+    private static ArrayList<Integer> numCallsProvider() {
+        ArrayList<Integer> list = new ArrayList<>();
+        for(int i = 0; i <= 30; i++) {
+            list.add(i);
+        }
+        return list;
     }
 }
