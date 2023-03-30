@@ -8,9 +8,11 @@ import it.polimi.ingsw.model.bookshelf.Shelf;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -124,5 +126,38 @@ class ShapeFetcherTest {
         for (boolean fetched : fetchedOrigin) {
             Assertions.assertTrue(fetched);
         }
+    }
+
+    @Test
+    @DisplayName("Call to next without invoking lastShelf or canFix afterwards, should throw exception")
+    void next_withoutLastShelfOrCanFix_throwsIllegalStateException() {
+        Fetcher fetcher = new ShapeFetcher(Shape.SQUARE);
+
+        for (int i = 0; i < Shape.SQUARE.getOffsets().size(); i++) {
+            fetcher.next();
+        }
+
+        Assertions.assertThrows(IllegalStateException.class, () -> {
+            fetcher.next();
+        });
+    }
+
+    @ParameterizedTest
+    @DisplayName("Clear the fetcher")
+    @ValueSource(ints = { 14, 3, 7, 19 })
+    void clear_duringFetch_inEquilibrium(int numOfNextCalls) {
+        Fetcher fetcher = new ShapeFetcher(Shape.SQUARE);
+
+        while (numOfNextCalls > 0) {
+            fetcher.next();
+
+            fetcher.lastShelf();
+
+            numOfNextCalls--;
+        }
+
+        fetcher.clear();
+
+        Assertions.assertTrue(fetcher.hasFinished());
     }
 }
