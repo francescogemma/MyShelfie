@@ -26,7 +26,8 @@ public class PersonalGoalEvaluator implements Evaluator {
     /**
      * This list maps each natural number up to 6 (x) to another number (y), which
      * represents the score that should be given to a player once x shelves contain
-     * the expected color.
+     * the expected color. The first element is the first amount of points that is
+     * given to the player.
      */
     private final List<Integer> pointsMapping;
 
