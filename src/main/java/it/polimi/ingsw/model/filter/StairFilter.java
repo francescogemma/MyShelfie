@@ -3,42 +3,60 @@ package it.polimi.ingsw.model.filter;
 import it.polimi.ingsw.model.Tile;
 import it.polimi.ingsw.utils.Coordinate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Giacomo Groppi
 * */
 public class StairFilter implements Filter{
-    private final boolean [][]position;
-    private Coordinate index;
+    private final List<Boolean[]> position;
+    private final List<Coordinate> coordinates = new ArrayList<>();
+    private int index;
     private boolean forNowOk;
 
-    public StairFilter(boolean[][] position) {
-        this.position = new boolean[position.length][position[0].length];
-        System.arraycopy(position, 0, this.position, 0, position.length);
+    public StairFilter(List<Boolean[]> position) {
+        this.position = new ArrayList<>();
+
+        for (int i = 0; i < position.size(); i++) {
+            this.position.add(new Boolean[position.get(i).length]);
+
+            for (int j = 0; j < position.get(i).length; j++) {
+                final Boolean value = position.get(i)[j];
+                if (value != null) {
+                    this.position.get(i)[j] = value;
+                    this.coordinates.add(new Coordinate(i, j));
+                }
+            }
+        }
+
         clear();
     }
 
     @Override
     public boolean add(Tile tile) {
+        if (index >= coordinates.size()) {
+            forNowOk = false;
+        }
+
         if (!this.forNowOk) {
             return false;
         }
 
-        // we should not receive this position
+        final Coordinate coordinate = coordinates.get(this.index);
+        final boolean value = position.get(coordinate.getRow())[coordinate.getCol()];
+
         if (tile == Tile.EMPTY) {
-            if (this.position[index.getRow()][index.getCol()]) {
+            if (value) {
                 forNowOk = false;
             }
         } else {
-            if (!this.position[index.getRow()][index.getCol()]){
+            if (!value) {
                 forNowOk = false;
             }
         }
 
-        if (index.getCol() - 1 == index.getRow()) {
-            index = new Coordinate(index.down().getRow(), 0);
-        } else {
-            index = index.right();
-        }
+        this.index ++;
 
         return false;
     }
@@ -50,14 +68,13 @@ public class StairFilter implements Filter{
 
     @Override
     public boolean isSatisfied() {
-        return this.index.getCol() == this.position[0].length &&
-                this.index.getRow() + 1 == this.position.length &&
-                forNowOk;
+        final int size = coordinates.size();
+        return forNowOk && index == size;
     }
 
     @Override
     public void clear() {
-        this.index = new Coordinate(0, 0);
+        this.index = 0;
         forNowOk = true;
     }
 }

@@ -15,19 +15,7 @@ import java.util.Arrays;
  * */
 public class XPatternGoal extends CommonGoal{
     public XPatternGoal(int numPlayer) {
-        super(new ShapeFetcher(
-                new Shape(
-                    new ArrayList<>(
-                        Arrays.asList(
-                            Offset.getInstance(0, 0),
-                            Offset.getInstance(0, 2),
-                            Offset.getInstance(1, 1),
-                            Offset.getInstance(2, 0),
-                            Offset.getInstance(2, 2)
-                        )
-                    )
-                )
-            ),
+        super(new ShapeFetcher(Shape.X),
             new NumDifferentColorFilter(1, 1),
             new AtLeastEvaluator(numPlayer, 1)
             );

@@ -17,12 +17,26 @@ class StairGoalTest {
     @Test
     void calculatePoints_stairFirstRow_correctOutput() {
         Bookshelf bookshelf = new MockBookshelf(new int[][]{
-                { 5, 0, 0, 0, 0 },
+                { 1, 0, 0, 0, 0 },
                 { 1, 1, 0, 0, 0 },
-                { 2, 2, 4, 0, 0 },
-                { 4, 3, 5, 2, 0 },
-                { 1, 4, 5, 6, 1 },
-                { 3, 5, 5, 1, 6 },
+                { 1, 1, 1, 0, 0 },
+                { 1, 1, 1, 1, 0 },
+                { 1, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1 },
+        });
+
+        Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+    }
+
+    @Test
+    void calculatePoints_stairFirstRow_correctOutput1() {
+        Bookshelf bookshelf = new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 1 },
+                { 0, 0, 0, 1, 1 },
+                { 0, 0, 1, 1, 1 },
+                { 0, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1 },
         });
 
         Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
@@ -43,6 +57,20 @@ class StairGoalTest {
     }
 
     @Test
+    void calculatePoints_stairSecondRow2_correctOutput () {
+        Bookshelf bookshelf = new MockBookshelf(new int[][]{
+                { 1, 0, 0, 0, 0 },
+                { 1, 0, 0, 0, 0 },
+                { 2, 2, 0, 0, 0 },
+                { 4, 3, 5, 0, 0 },
+                { 1, 4, 5, 6, 0 },
+                { 3, 5, 5, 1, 6 },
+        });
+
+        Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
+    }
+
+    @Test
     void calculatePoints_stairSecondRowBroken_correctOutput () {
         Bookshelf bookshelf = new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
@@ -51,6 +79,20 @@ class StairGoalTest {
                 { 4, 3, 5, 0, 0 },
                 { 1, 4, 5, 6, 0 },
                 { 3, 5, 5, 1, 6 },
+        });
+
+        Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
+    }
+
+    @Test
+    void calculatePoints_stairSecondRowBroken2_correctOutput () {
+        Bookshelf bookshelf = new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 1 },
+                { 0, 0, 0, 0, 1 },
+                { 0, 0, 0, 1, 1 },
+                { 0, 0, 1, 1, 1 },
+                { 0, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1 },
         });
 
         Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
