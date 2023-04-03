@@ -99,4 +99,32 @@ class BookshelfMaskSetTest {
         Assertions.assertTrue(bookshelfMaskSet.isCompatible(new BookshelfMask(bookshelfSecond)));
         Assertions.assertFalse(bookshelfMaskSet.isCompatible(new BookshelfMask(bookshelfThird)));
     }
+
+    @ParameterizedTest
+    @DisplayName("Check clearSet method")
+    @ValueSource(ints = {0, 4, 8, 12})
+    void clearSet_correctOutput(int n) {
+        BiPredicate<BookshelfMask, BookshelfMask> predicate = (a, b) -> true;
+        bookshelfMaskSet = new BookshelfMaskSet(predicate);
+
+        for (int i = 0; i < n; i++) {
+            bookshelfMaskSet.addBookshelfMask(new BookshelfMask(new Bookshelf()));
+        }
+
+        // add more articulate BookshelfMask from this bookshelf
+        Bookshelf bookshelf = new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 1, 1, 1, 1, 1 },
+                { 2, 2, 2, 2, 2 },
+                { 3, 3, 3, 3, 3 },
+                { 4, 4, 4, 4, 4 },
+                { 5, 5, 5, 5, 5 },
+        });
+        bookshelfMaskSet.addBookshelfMask(new BookshelfMask(bookshelf));
+
+        Assertions.assertEquals(n + 1, bookshelfMaskSet.getSize());
+
+        bookshelfMaskSet.clearSet();
+        Assertions.assertEquals(0, bookshelfMaskSet.getSize());
+    }
 }
