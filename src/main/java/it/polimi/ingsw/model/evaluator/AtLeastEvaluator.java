@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.evaluator;
 
 import it.polimi.ingsw.model.bookshelf.BookshelfMask;
+import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 
 import java.util.function.Predicate;
 
@@ -12,14 +13,11 @@ import java.util.function.Predicate;
  */
 public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
     /**
-     * The amount of masks inserted into the evaluator so far.
-     */
-    private int maskCounter;
-
-    /**
      * The needed amount of masks give the player a non-zero amount of points.
      */
     private final int targetAmount;
+
+    private BookshelfMaskSet bookshelfMaskSet;
 
     /**
      * Predicate to determine if the provided {@link BookshelfMask BookshelfMask}
@@ -35,9 +33,10 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
      */
     public AtLeastEvaluator(int playersAmount, int targetAmount, Predicate<BookshelfMask> toCount) {
         super(playersAmount);
+        bookshelfMaskSet = new BookshelfMaskSet((a, b) -> true);
+
         this.toCount = toCount;
         this.targetAmount = targetAmount;
-        maskCounter = 0;
     }
 
     /**
@@ -49,27 +48,40 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
      */
     public AtLeastEvaluator(int playersAmount, int targetAmount) {
         super(playersAmount);
+        bookshelfMaskSet = new BookshelfMaskSet((a, b) -> true);
+
         this.toCount = bookshelfMask -> true;
         this.targetAmount = targetAmount;
-        maskCounter = 0;
     }
+
     @Override
     public boolean add(BookshelfMask bookshelfMask) {
-        if (toCount.test(bookshelfMask)) {
-            maskCounter++;
+        // no need to add any mask if our target is already met
+        if (bookshelfMaskSet.getSize() >= targetAmount) {
+            return true;
         }
 
-        return maskCounter >= targetAmount;
+        // add mask to mask set
+        if (toCount.test(bookshelfMask)) {
+            bookshelfMaskSet.addBookshelfMask(bookshelfMask);
+        }
+
+        return bookshelfMaskSet.getSize() >= targetAmount;
     }
 
     @Override
     public int getPoints() {
-        if (maskCounter < targetAmount) return 0;
+        if (bookshelfMaskSet.getSize() < targetAmount) return 0;
         return super.getPoints();
     }
 
     @Override
+    public BookshelfMaskSet getPointMasks() {
+        return bookshelfMaskSet;
+    }
+
+    @Override
     public void clear() {
-        maskCounter = 0;
+        bookshelfMaskSet = new BookshelfMaskSet((a, b) -> true);
     }
 }
