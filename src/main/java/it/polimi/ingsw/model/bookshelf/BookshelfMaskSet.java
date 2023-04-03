@@ -85,4 +85,12 @@ public class BookshelfMaskSet {
         }
         return true;
     }
+
+    /**
+     * Clears the set by removing all elements.
+     * @author Francesco Gemma
+     */
+    public void clearSet() {
+        bookshelfMasks.clear();
+    }
 }
