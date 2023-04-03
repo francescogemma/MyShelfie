@@ -1,10 +1,7 @@
 package it.polimi.ingsw.model.goal;
 
 import it.polimi.ingsw.model.Tile;
-import it.polimi.ingsw.model.bookshelf.BookshelfMask;
-import it.polimi.ingsw.model.bookshelf.Offset;
-import it.polimi.ingsw.model.bookshelf.Shape;
-import it.polimi.ingsw.model.bookshelf.Shelf;
+import it.polimi.ingsw.model.bookshelf.*;
 import it.polimi.ingsw.model.evaluator.AtLeastEvaluator;
 import it.polimi.ingsw.model.evaluator.Evaluator;
 import it.polimi.ingsw.model.fetcher.Fetcher;
@@ -29,65 +26,19 @@ import java.util.function.Predicate;
  * @author Giacomo Groppi
  * */
 public class StairGoal extends CommonGoal{
-    /**
-     * Groups of coordinates which, if null within the bookshelf, satisfy the Goal.
-     * @see #check
-     * */
-    private static final List<List<Shelf>> DATA_STAIR = new ArrayList<>();
-
-    /**
-     * @return true iff the number of points satisfying the first map is equal to its size,
-     *  or this number is 0 and the number of points satisfying the second condition is equal to its size.
-     * */
-    private static boolean isSatisfied (List<Shelf> first, List<Shelf> second, BookshelfMask bookshelfMask) {
-        long sat;
-
-        Predicate<Shelf> match = shelf -> bookshelfMask.tileAt(shelf) != Tile.EMPTY;
-
-        sat = first
-                .stream()
-                .filter(match).count();
-
-        if (sat == 0)
-            return true;
-
-        if (sat != first.size())
-            return false;
-
-        return second
-                .stream().noneMatch(match);
-    }
-
     private static final Predicate<BookshelfMask> check = (BookshelfMask bookshelfMask) -> {
-        if (isSatisfied(DATA_STAIR.get(1), DATA_STAIR.get(0), bookshelfMask))
-            return true;
-        return isSatisfied(DATA_STAIR.get(3), DATA_STAIR.get(2), bookshelfMask);
+        List<Shelf> shelves = bookshelfMask.getShelves();
+        for (Shelf s: shelves) {
+            if (s.getRow() != 0) {
+                Shelf positionUp = s.move(Offset.getInstance(-1, 0));
+                if (bookshelfMask.tileAt(positionUp) == Tile.EMPTY)
+                    continue;
+                if (!shelves.contains(positionUp))
+                    return false;
+            }
+        }
+        return true;
     };
-
-    static {
-        for (int i = 0; i < 4; i++)
-            StairGoal.DATA_STAIR.add(new ArrayList<>());
-
-        for (int i = 0; i < 4; i++)
-            StairGoal.DATA_STAIR.get(0).add(
-                            Shelf.getInstance(i, i+1)
-                    );
-
-        for (int i = 0; i < 5; i++)
-            StairGoal.DATA_STAIR.get(1).add(
-                    Shelf.getInstance(i, i)
-            );
-
-        for (int i = 0; i < 4; i++)
-            StairGoal.DATA_STAIR.get(2).add(
-                    Shelf.getInstance(i, 3 - i)
-            );
-
-        for (int i = 0; i < 5; i++)
-            StairGoal.DATA_STAIR.get(3).add(
-                    Shelf.getInstance(i, 4 - i)
-            );
-    }
 
 
     /**
