@@ -503,7 +503,7 @@ public class Shape {
                  * With this condition the first two column of the stair are full (height 5),
                  * then the stair starts to go down from the third column (column 2).
                  */
-                if (row >= column - 1) {
+                if (row >= column) {
                     offsets.add(Offset.getInstance(row, column));
                 }
             }

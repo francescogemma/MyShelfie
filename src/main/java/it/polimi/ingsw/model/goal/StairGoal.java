@@ -6,29 +6,45 @@ import it.polimi.ingsw.model.bookshelf.Offset;
 import it.polimi.ingsw.model.bookshelf.Shape;
 import it.polimi.ingsw.model.bookshelf.Shelf;
 import it.polimi.ingsw.model.evaluator.AtLeastEvaluator;
+import it.polimi.ingsw.model.evaluator.Evaluator;
+import it.polimi.ingsw.model.fetcher.Fetcher;
 import it.polimi.ingsw.model.fetcher.ShapeFetcher;
 import it.polimi.ingsw.model.fetcher.UnionFetcher;
+import it.polimi.ingsw.model.filter.Filter;
 import it.polimi.ingsw.model.filter.NumDifferentColorFilter;
 
-import java.awt.print.Book;
 import java.util.*;
 import java.util.function.Predicate;
 
 /**
+ * This class represents a common goal:
+ * <p>
+ *  The tiles inside the library must take the form of a staircase.
+ * <p>
+ * It extends CommonGoal.
+ *
+ *  @see CommonGoal
+ *  @see Goal
+ *
  * @author Giacomo Groppi
  * */
-
 public class StairGoal extends CommonGoal{
-    private static final List<Map<Shelf, Tile>> DATA_STAIR = new ArrayList<>();
-    private static final Shape SHAPE_STAIR;
+    /**
+     * Groups of coordinates which, if null within the bookshelf, satisfy the Goal.
+     * @see #check
+     * */
+    private static final List<List<Shelf>> DATA_STAIR = new ArrayList<>();
 
-    private static boolean isSatisfied (Map<Shelf, Tile> first, Map<Shelf, Tile> second, BookshelfMask bookshelfMask) {
+    /**
+     * @return true iff the number of points satisfying the first map is equal to its size,
+     *  or this number is 0 and the number of points satisfying the second condition is equal to its size.
+     * */
+    private static boolean isSatisfied (List<Shelf> first, List<Shelf> second, BookshelfMask bookshelfMask) {
         long sat;
 
-        Predicate<Map.Entry<Shelf, Tile>> match = (object) -> bookshelfMask.tileAt(object.getKey()) != object.getValue();
+        Predicate<Shelf> match = shelf -> bookshelfMask.tileAt(shelf) != Tile.EMPTY;
 
         sat = first
-                .entrySet()
                 .stream()
                 .filter(match).count();
 
@@ -39,7 +55,6 @@ public class StairGoal extends CommonGoal{
             return false;
 
         return second
-                .entrySet()
                 .stream().noneMatch(match);
     }
 
@@ -51,52 +66,45 @@ public class StairGoal extends CommonGoal{
 
     static {
         for (int i = 0; i < 4; i++)
-            StairGoal.DATA_STAIR.add(new HashMap<>());
+            StairGoal.DATA_STAIR.add(new ArrayList<>());
 
         for (int i = 0; i < 4; i++)
-            StairGoal.DATA_STAIR.get(0).put(
-                            Shelf.getInstance(i, i+1),
-                            Tile.EMPTY
+            StairGoal.DATA_STAIR.get(0).add(
+                            Shelf.getInstance(i, i+1)
                     );
 
         for (int i = 0; i < 5; i++)
-            StairGoal.DATA_STAIR.get(1).put(
-                    Shelf.getInstance(i, i),
-                    Tile.EMPTY
+            StairGoal.DATA_STAIR.get(1).add(
+                    Shelf.getInstance(i, i)
             );
 
         for (int i = 0; i < 4; i++)
-            StairGoal.DATA_STAIR.get(2).put(
-                    Shelf.getInstance(i, 3 - i),
-                    Tile.EMPTY
+            StairGoal.DATA_STAIR.get(2).add(
+                    Shelf.getInstance(i, 3 - i)
             );
 
         for (int i = 0; i < 5; i++)
-            StairGoal.DATA_STAIR.get(3).put(
-                    Shelf.getInstance(i, 4 - i),
-                    Tile.EMPTY
+            StairGoal.DATA_STAIR.get(3).add(
+                    Shelf.getInstance(i, 4 - i)
             );
     }
 
-    static {
-        ArrayList<Offset> res = new ArrayList<>();
-        for (int i = 0; i <= 4; i++) {
-            for (int j = 0; j <= i; j++) {
-                res.add(Offset.getInstance(i, j));
-            }
-        }
 
-        SHAPE_STAIR = new Shape(res);
-    }
-
-    public StairGoal(int numPlayer) {
+    /**
+     * Constructor of the class.
+     *
+     * @see CommonGoal#CommonGoal(Fetcher, Filter, Evaluator)
+     *
+     * @param numPlayers the number of players in the game
+     * */
+    public StairGoal(int numPlayers) {
         super(new UnionFetcher(new ArrayList<>(
                         List.of(
-                                new ShapeFetcher(SHAPE_STAIR),
-                                new ShapeFetcher(SHAPE_STAIR.verticalFlip())
+                                new ShapeFetcher(Shape.ENLARGED_STAIR),
+                                new ShapeFetcher(Shape.ENLARGED_STAIR.verticalFlip())
                         )
                 )),
                 new NumDifferentColorFilter(1, 6),
-                new AtLeastEvaluator(numPlayer, 1, check));
+                new AtLeastEvaluator(numPlayers, 1, check));
     }
 }
