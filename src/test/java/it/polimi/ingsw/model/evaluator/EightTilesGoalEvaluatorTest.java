@@ -1,9 +1,6 @@
 package it.polimi.ingsw.model.evaluator;
 
-import it.polimi.ingsw.model.bookshelf.Bookshelf;
-import it.polimi.ingsw.model.bookshelf.BookshelfMask;
-import it.polimi.ingsw.model.bookshelf.MockBookshelf;
-import it.polimi.ingsw.model.bookshelf.Shelf;
+import it.polimi.ingsw.model.bookshelf.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,8 +20,11 @@ class EightTilesGoalEvaluatorTest {
     @DisplayName("no mask added: 0 points")
     void calculatePoints_noMaskAdded_correctOutput() {
         Assertions.assertEquals(0, evaluator.getPoints());
+        Assertions.assertEquals(0, evaluator.getPointMasks().getSize());
+
         evaluator.clear();
         Assertions.assertEquals(0, evaluator.getPoints());
+        Assertions.assertEquals(0, evaluator.getPointMasks().getSize());
     }
 
     @Test
@@ -41,8 +41,11 @@ class EightTilesGoalEvaluatorTest {
         mask = new BookshelfMask(bookshelf);
         Assertions.assertTrue(evaluator.add(mask));
         Assertions.assertEquals(0, evaluator.getPoints());
+        Assertions.assertEquals(0, evaluator.getPointMasks().getSize());
+
         evaluator.clear();
         Assertions.assertEquals(0, evaluator.getPoints());
+        Assertions.assertEquals(0, evaluator.getPointMasks().getSize());
     }
 
     @Test
@@ -60,8 +63,21 @@ class EightTilesGoalEvaluatorTest {
         populateFullMask();
         Assertions.assertTrue(evaluator.add(mask));
         Assertions.assertEquals(8, evaluator.getPoints());
+
+        BookshelfMaskSet pointMasks = new BookshelfMaskSet((a, b) -> true);
+        pointMasks.addBookshelfMask(new MockBookshelfMask(bookshelf, new int[][]{
+                { 1, 0, 0, 0, 0 },
+                { 1, 0, 0, 0, 0 },
+                { 1, 0, 0, 0, 0 },
+                { 1, 1, 0, 0, 0 },
+                { 1, 0, 0, 0, 0 },
+                { 1, 1, 0, 0, 0 },
+        }));
+        Assertions.assertTrue(compareMaskSets(pointMasks, evaluator.getPointMasks()));
+
         evaluator.clear();
         Assertions.assertEquals(0, evaluator.getPoints());
+        Assertions.assertEquals(0, evaluator.getPointMasks().getSize());
     }
 
     @Test
@@ -79,8 +95,21 @@ class EightTilesGoalEvaluatorTest {
         populateFullMask();
         Assertions.assertTrue(evaluator.add(mask));
         Assertions.assertEquals(8, evaluator.getPoints());
+
+        BookshelfMaskSet pointMasks = new BookshelfMaskSet((a, b) -> true);
+        pointMasks.addBookshelfMask(new MockBookshelfMask(bookshelf, new int[][]{
+                { 1, 0, 0, 0, 0 },
+                { 1, 0, 0, 0, 0 },
+                { 1, 0, 0, 0, 0 },
+                { 1, 0, 0, 0, 0 },
+                { 1, 0, 0, 0, 0 },
+                { 1, 1, 0, 1, 0 },
+        }));
+        Assertions.assertTrue(compareMaskSets(pointMasks, evaluator.getPointMasks()));
+
         evaluator.clear();
         Assertions.assertEquals(0, evaluator.getPoints());
+        Assertions.assertEquals(0, evaluator.getPointMasks().getSize());
     }
 
     @Test
@@ -98,8 +127,11 @@ class EightTilesGoalEvaluatorTest {
         populateFullMask();
         Assertions.assertTrue(evaluator.add(mask));
         Assertions.assertEquals(0, evaluator.getPoints());
+        Assertions.assertEquals(0, evaluator.getPointMasks().getSize());
+
         evaluator.clear();
         Assertions.assertEquals(0, evaluator.getPoints());
+        Assertions.assertEquals(0, evaluator.getPointMasks().getSize());
     }
 
     private void populateFullMask() {
@@ -108,5 +140,19 @@ class EightTilesGoalEvaluatorTest {
                 mask.add(Shelf.getInstance(row, column));
             }
         }
+    }
+
+    private boolean compareMaskSets(BookshelfMaskSet a, BookshelfMaskSet b) {
+        if(a.getSize() != b.getSize()) {
+            return false;
+        }
+
+        for(int i = 0; i < a.getSize(); i++) {
+            if(!a.getBookshelfMasks().get(i).equals(b.getBookshelfMasks().get(i))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

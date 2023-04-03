@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.evaluator;
 
 import it.polimi.ingsw.model.bookshelf.BookshelfMask;
+import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 import it.polimi.ingsw.model.bookshelf.Shelf;
 import it.polimi.ingsw.model.Tile;
 
@@ -41,6 +42,7 @@ public class PersonalGoalEvaluator implements Evaluator {
      * Points that should be given the player so far.
      */
     private int points;
+    private final BookshelfMaskSet pointMasks;
 
     /**
      * Type constructor.
@@ -55,6 +57,8 @@ public class PersonalGoalEvaluator implements Evaluator {
 
         successfulShelves = 0;
         points = 0;
+
+        pointMasks = new BookshelfMaskSet((a, b) -> true);
     }
 
     @Override
@@ -63,6 +67,11 @@ public class PersonalGoalEvaluator implements Evaluator {
             Shelf key = goalShelf.getKey();
             if (bookshelfMask.tileAt(key) == personalGoal.get(key)) {
                 points = pointsMapping.get(successfulShelves++);
+
+                BookshelfMask maskToAdd = new BookshelfMask(bookshelfMask);
+                maskToAdd.clear();
+                maskToAdd.add(key);
+                pointMasks.addBookshelfMask(maskToAdd);
             }
         }
         return true;
@@ -77,5 +86,11 @@ public class PersonalGoalEvaluator implements Evaluator {
     public void clear() {
         successfulShelves = 0;
         points = 0;
+        pointMasks.clearSet();
+    }
+
+    @Override
+    public BookshelfMaskSet getPointMasks() {
+        return pointMasks;
     }
 }

@@ -33,6 +33,7 @@ class PersonalGoalEvaluatorTest {
         personalGoalEvaluator = new PersonalGoalEvaluator(getPersonalGoal(), pointsMapping);
 
         Assertions.assertEquals(0, personalGoalEvaluator.getPoints());
+        Assertions.assertEquals(0, personalGoalEvaluator.getPointMasks().getSize());
     }
 
     @Test
@@ -52,11 +53,30 @@ class PersonalGoalEvaluatorTest {
             })
         );
 
+        BookshelfMask pointMask = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 1 }
+        });
+
         personalGoalEvaluator.add(bookshelfMask);
         Assertions.assertEquals(pointsMapping.get(0), personalGoalEvaluator.getPoints());
+        Assertions.assertEquals(1, personalGoalEvaluator.getPointMasks().getSize());
+        Assertions.assertEquals(pointMask, personalGoalEvaluator.getPointMasks().getBookshelfMasks().get(0));
 
         personalGoalEvaluator.clear();
         Assertions.assertEquals(0, personalGoalEvaluator.getPoints());
+        Assertions.assertEquals(0, personalGoalEvaluator.getPointMasks().getSize());
     }
 
     @Test
@@ -77,8 +97,26 @@ class PersonalGoalEvaluatorTest {
                 })
         );
 
+        BookshelfMask pointMask = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 1 }
+        });
+
         personalGoalEvaluator.add(bookshelfMask);
         Assertions.assertEquals(pointsMapping.get(0), personalGoalEvaluator.getPoints());
+        Assertions.assertEquals(1, personalGoalEvaluator.getPointMasks().getSize());
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask));
 
         // Points set 1
         personalGoalEvaluator.clear();
@@ -93,8 +131,43 @@ class PersonalGoalEvaluatorTest {
                 })
         );
 
+        BookshelfMask pointMask1 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 }
+        });
+
+        BookshelfMask pointMask2 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 1 }
+        });
+
         personalGoalEvaluator.add(bookshelfMask);
         Assertions.assertEquals(pointsMapping.get(1), personalGoalEvaluator.getPoints());
+        Assertions.assertEquals(2, personalGoalEvaluator.getPointMasks().getSize());
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask1));
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask2));
 
         // Points set 2
         personalGoalEvaluator.clear();
@@ -109,8 +182,60 @@ class PersonalGoalEvaluatorTest {
                 })
         );
 
+        pointMask1 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 }
+        });
+
+        pointMask2 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 1, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 }
+        });
+
+        BookshelfMask pointMask3 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 1 }
+        });
+
         personalGoalEvaluator.add(bookshelfMask);
         Assertions.assertEquals(pointsMapping.get(2), personalGoalEvaluator.getPoints());
+        Assertions.assertEquals(3, personalGoalEvaluator.getPointMasks().getSize());
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask1));
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask2));
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask3));
 
         // Points set 3
         personalGoalEvaluator.clear();
@@ -125,8 +250,77 @@ class PersonalGoalEvaluatorTest {
                 })
         );
 
+        pointMask1 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 }
+        });
+
+        pointMask2 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 1, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 }
+        });
+
+        pointMask3 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 }
+        });
+
+        BookshelfMask pointMask4 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 1 }
+        });
+
         personalGoalEvaluator.add(bookshelfMask);
         Assertions.assertEquals(pointsMapping.get(3), personalGoalEvaluator.getPoints());
+        Assertions.assertEquals(4, personalGoalEvaluator.getPointMasks().getSize());
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask1));
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask2));
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask3));
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask4));
 
         // Points set 4
         personalGoalEvaluator.clear();
@@ -141,8 +335,94 @@ class PersonalGoalEvaluatorTest {
                 })
         );
 
+        pointMask1 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 }
+        });
+
+        pointMask2 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 1, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 }
+        });
+
+        pointMask3 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 }
+        });
+
+        pointMask4 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 1, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 }
+        });
+
+        BookshelfMask pointMask5 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 1 }
+        });
+
         personalGoalEvaluator.add(bookshelfMask);
         Assertions.assertEquals(pointsMapping.get(4), personalGoalEvaluator.getPoints());
+        Assertions.assertEquals(5, personalGoalEvaluator.getPointMasks().getSize());
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask1));
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask2));
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask3));
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask4));
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask5));
 
         // Points set 5
         personalGoalEvaluator.clear();
@@ -157,8 +437,115 @@ class PersonalGoalEvaluatorTest {
                 })
         );
 
+        pointMask1 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.CYAN), 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 }
+        });
+
+        pointMask2 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.CYAN), 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 1, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 }
+        });
+
+        pointMask3 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.CYAN), 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 }
+        });
+
+        pointMask4 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.CYAN), 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 1, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 }
+        });
+
+        pointMask5 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.CYAN), 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 1 }
+        });
+
+        BookshelfMask pointMask6 = new MockBookshelfMask(new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.CYAN), 0 },
+                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN) }
+        }), new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 1, 0 },
+                { 0, 0, 0, 0, 0 }
+        });
+
         personalGoalEvaluator.add(bookshelfMask);
         Assertions.assertEquals(pointsMapping.get(5), personalGoalEvaluator.getPoints());
+        Assertions.assertEquals(6, personalGoalEvaluator.getPointMasks().getSize());
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask1));
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask2));
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask3));
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask4));
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask5));
+        Assertions.assertTrue(personalGoalEvaluator.getPointMasks().getBookshelfMasks().contains(pointMask6));
+
+        personalGoalEvaluator.clear();
+        Assertions.assertEquals(0, personalGoalEvaluator.getPoints());
+        Assertions.assertEquals(0, personalGoalEvaluator.getPointMasks().getSize());
     }
 
 }

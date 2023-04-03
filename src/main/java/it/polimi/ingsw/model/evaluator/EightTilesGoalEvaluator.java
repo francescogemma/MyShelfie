@@ -1,7 +1,10 @@
 package it.polimi.ingsw.model.evaluator;
 
 import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMask;
+import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
+import it.polimi.ingsw.model.bookshelf.Shelf;
 import it.polimi.ingsw.model.goal.EightTilesGoal;
 
 /**
@@ -19,6 +22,7 @@ import it.polimi.ingsw.model.goal.EightTilesGoal;
  */
 public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Evaluator {
     private boolean satisfied;
+    private final BookshelfMaskSet pointMasks;
 
     /**
      * Constructor of the class.
@@ -32,12 +36,31 @@ public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Eval
     public EightTilesGoalEvaluator(int playersAmount) {
         super(playersAmount);
         satisfied = false;
+        pointMasks = new BookshelfMaskSet((a, b) -> true);
     }
 
     @Override
     public boolean add(BookshelfMask mask) {
-        for (Tile tile : Tile.values()) {
-            satisfied |= tile != Tile.EMPTY && mask.countTilesOfColor(tile) >= 8;
+        for(Tile tile : Tile.values()) {
+            if(tile != Tile.EMPTY && mask.countTilesOfColor(tile) >= 8) {
+                satisfied = true;
+
+                BookshelfMask maskToAdd = new BookshelfMask(mask);
+                maskToAdd.clear();
+
+                int count = 0;
+                for(int row = 0; row < Bookshelf.ROWS && count < 8; row++) {
+                    for(int column = 0; column < Bookshelf.COLUMNS && count < 8; column++) {
+                        if(maskToAdd.tileAt(Shelf.getInstance(row, column)) == tile) {
+                            maskToAdd.add(Shelf.getInstance(row, column));
+                            count++;
+                        }
+                    }
+                }
+                pointMasks.addBookshelfMask(maskToAdd);
+
+                break;
+            }
         }
 
         return true;
@@ -54,5 +77,11 @@ public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Eval
     @Override
     public void clear() {
         satisfied = false;
+        pointMasks.clearSet();
+    }
+
+    @Override
+    public BookshelfMaskSet getPointMasks() {
+        return pointMasks;
     }
 }

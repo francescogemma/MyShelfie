@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.evaluator;
 
 import it.polimi.ingsw.model.bookshelf.BookshelfMask;
+import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 
 /**
  * Reads {@link BookshelfMask a LibaryMask} and notes down its score
@@ -10,11 +11,13 @@ import it.polimi.ingsw.model.bookshelf.BookshelfMask;
  */
 public class AdjacencyEvaluator implements Evaluator {
     private int points;
+    private final BookshelfMaskSet pointMasks;
     /**
      * Object constructor. Sets the current amount of points to 0.
      */
     public AdjacencyEvaluator() {
         points = 0;
+        pointMasks = new BookshelfMaskSet((a, b) -> true);
     }
     /**
      * Add a {@link BookshelfMask BookshelfMask} and evaluate it.
@@ -23,7 +26,11 @@ public class AdjacencyEvaluator implements Evaluator {
      * @return false every time, since it's always possible to gather new points from any state.
      */
     public boolean add(BookshelfMask bookshelfMask) {
-        points += convertSizeToPoints(bookshelfMask.getShelves().size());
+        if(convertSizeToPoints(bookshelfMask.getShelves().size()) > 0) {
+            points += convertSizeToPoints(bookshelfMask.getShelves().size());
+            pointMasks.addBookshelfMask(bookshelfMask);
+        }
+
         // always return false since it's always possible to get new points
         return false;
     }
@@ -44,12 +51,19 @@ public class AdjacencyEvaluator implements Evaluator {
     @Override
     public void clear() {
         points = 0;
+        pointMasks.clearSet();
     }
 
-    /**
+    /*
      * Gets the points gathered so far.
      */
+    @Override
     public int getPoints() {
         return points;
+    }
+
+    @Override
+    public BookshelfMaskSet getPointMasks() {
+        return pointMasks;
     }
 }
