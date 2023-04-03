@@ -22,7 +22,7 @@ import it.polimi.ingsw.model.goal.EightTilesGoal;
  */
 public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Evaluator {
     private boolean satisfied;
-    private final BookshelfMaskSet pointMasks;
+    private BookshelfMaskSet pointMasks;
 
     /**
      * Constructor of the class.
@@ -77,7 +77,7 @@ public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Eval
     @Override
     public void clear() {
         satisfied = false;
-        pointMasks.clearSet();
+        pointMasks = new BookshelfMaskSet((a, b) -> true);
     }
 
     @Override

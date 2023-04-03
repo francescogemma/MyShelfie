@@ -120,6 +120,7 @@ class CornersGoalTest {
         Assertions.assertEquals(8, goal.calculatePoints(firstBookshelf));
         Assertions.assertEquals(1, goal.getPointMasks().getSize());
         Assertions.assertEquals(pointMask, goal.getPointMasks().getBookshelfMasks().get(0));
+
         Assertions.assertEquals(6, goal.calculatePoints(firstBookshelf));
         Assertions.assertEquals(1, goal.getPointMasks().getSize());
         Assertions.assertEquals(pointMask, goal.getPointMasks().getBookshelfMasks().get(0));
@@ -130,6 +131,7 @@ class CornersGoalTest {
         Assertions.assertEquals(4, goal.calculatePoints(firstBookshelf));
         Assertions.assertEquals(1, goal.getPointMasks().getSize());
         Assertions.assertEquals(pointMask, goal.getPointMasks().getBookshelfMasks().get(0));
+
         Assertions.assertEquals(2, goal.calculatePoints(firstBookshelf));
         Assertions.assertEquals(1, goal.getPointMasks().getSize());
         Assertions.assertEquals(pointMask, goal.getPointMasks().getBookshelfMasks().get(0));

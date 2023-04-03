@@ -11,7 +11,7 @@ import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
  */
 public class AdjacencyEvaluator implements Evaluator {
     private int points;
-    private final BookshelfMaskSet pointMasks;
+    private BookshelfMaskSet pointMasks;
     /**
      * Object constructor. Sets the current amount of points to 0.
      */
@@ -53,7 +53,7 @@ public class AdjacencyEvaluator implements Evaluator {
     @Override
     public void clear() {
         points = 0;
-        pointMasks.clearSet();
+        pointMasks = new BookshelfMaskSet((a, b) -> true);
     }
 
     /*
