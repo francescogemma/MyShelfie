@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.evaluator;
 
 import it.polimi.ingsw.model.bookshelf.BookshelfMask;
+import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 
 /**
  * Generalizes a stage of goal checking by reading {@link BookshelfMask BookshelfMasks}
@@ -31,4 +32,12 @@ public interface Evaluator {
      * @author Cristiano Migali
      */
     void clear();
+
+    /**
+     * Returns a {@link BookshelfMaskSet set of masks} that consists in the reason for giving the player the current amount of points.
+     *
+     * @author Francesco Gemma
+     * @author Michele Miotti
+     */
+    BookshelfMaskSet getPointMasks();
 }
