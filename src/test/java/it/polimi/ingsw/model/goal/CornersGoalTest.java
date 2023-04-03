@@ -1,7 +1,9 @@
 package it.polimi.ingsw.model.goal;
 
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
+import it.polimi.ingsw.model.bookshelf.BookshelfMask;
 import it.polimi.ingsw.model.bookshelf.MockBookshelf;
+import it.polimi.ingsw.model.bookshelf.MockBookshelfMask;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,10 +29,30 @@ class CornersGoalTest {
             { 5, 5, 5, 5, 5 },
         });
 
+        BookshelfMask pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 1, 0, 0, 0, 1 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 1, 0, 0, 0, 1 },
+        });
+
         Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(1, goal.getPointMasks().getSize());
+        Assertions.assertEquals(pointMask, goal.getPointMasks().getBookshelfMasks().get(0));
+
         Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(1, goal.getPointMasks().getSize());
+        Assertions.assertEquals(pointMask, goal.getPointMasks().getBookshelfMasks().get(0));
+
         Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(1, goal.getPointMasks().getSize());
+        Assertions.assertEquals(pointMask, goal.getPointMasks().getBookshelfMasks().get(0));
+
         Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(1, goal.getPointMasks().getSize());
+        Assertions.assertEquals(pointMask, goal.getPointMasks().getBookshelfMasks().get(0));
     }
 
     @Test
@@ -46,6 +68,7 @@ class CornersGoalTest {
         });
 
         Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(0, goal.getPointMasks().getSize());
     }
 
     @Test
@@ -61,6 +84,7 @@ class CornersGoalTest {
         });
 
         Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(0, goal.getPointMasks().getSize());
     }
 
     @Test
@@ -84,10 +108,30 @@ class CornersGoalTest {
             { 1, 2, 1, 2, 1 }
         });
 
+        BookshelfMask pointMask = new MockBookshelfMask(firstBookshelf, new int[][]{
+                { 1, 0, 0, 0, 1 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 1, 0, 0, 0, 1 },
+        });
+
         Assertions.assertEquals(8, goal.calculatePoints(firstBookshelf));
+        Assertions.assertEquals(1, goal.getPointMasks().getSize());
+        Assertions.assertEquals(pointMask, goal.getPointMasks().getBookshelfMasks().get(0));
         Assertions.assertEquals(6, goal.calculatePoints(firstBookshelf));
+        Assertions.assertEquals(1, goal.getPointMasks().getSize());
+        Assertions.assertEquals(pointMask, goal.getPointMasks().getBookshelfMasks().get(0));
+
         Assertions.assertEquals(0, goal.calculatePoints(secondBookshelf));
+        Assertions.assertEquals(0, goal.getPointMasks().getSize());
+
         Assertions.assertEquals(4, goal.calculatePoints(firstBookshelf));
+        Assertions.assertEquals(1, goal.getPointMasks().getSize());
+        Assertions.assertEquals(pointMask, goal.getPointMasks().getBookshelfMasks().get(0));
         Assertions.assertEquals(2, goal.calculatePoints(firstBookshelf));
+        Assertions.assertEquals(1, goal.getPointMasks().getSize());
+        Assertions.assertEquals(pointMask, goal.getPointMasks().getBookshelfMasks().get(0));
     }
 }
