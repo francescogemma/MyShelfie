@@ -19,12 +19,14 @@ public class AdjacencyEvaluator implements Evaluator {
         points = 0;
         pointMasks = new BookshelfMaskSet((a, b) -> true);
     }
-    /**
+
+    /*
      * Add a {@link BookshelfMask BookshelfMask} and evaluate it.
      * @param bookshelfMask will be taken account for, and will have an impact on the current score,
      *                    if its size is greater than 2.
      * @return false every time, since it's always possible to gather new points from any state.
      */
+    @Override
     public boolean add(BookshelfMask bookshelfMask) {
         if(convertSizeToPoints(bookshelfMask.getShelves().size()) > 0) {
             points += convertSizeToPoints(bookshelfMask.getShelves().size());
