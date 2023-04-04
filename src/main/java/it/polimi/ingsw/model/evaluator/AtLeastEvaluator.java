@@ -17,6 +17,9 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
      */
     private final int targetAmount;
 
+    /**
+     * This set stores all masks gathered so far.
+     */
     private BookshelfMaskSet bookshelfMaskSet;
 
     /**

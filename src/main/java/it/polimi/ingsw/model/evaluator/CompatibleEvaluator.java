@@ -27,6 +27,8 @@ public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluato
      * for this evaluator to consider its target met, and give the player
      * their non-zero amount of points.
      */
+
+    private BookshelfMaskSet biggestSet;
     private final int targetSetSize;
 
     /**
@@ -67,6 +69,11 @@ public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluato
 
     @Override
     public boolean add(BookshelfMask bookshelfMask) {
+        // no need to do all checks if we've already met our target
+        if (targetMet) {
+            return true;
+        }
+
         for (BookshelfMaskSet bookshelfMaskSet : group) {
             if (bookshelfMaskSet.isCompatible(bookshelfMask)) {
                 // duplicate current BookshelfMaskSet in group
@@ -76,7 +83,10 @@ public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluato
 
                 // note down if this addition meets out target size
                 targetMet |= bookshelfMaskSet.getSize() >= targetSetSize;
-                if (targetMet) { return true; }
+                if (targetMet) {
+                    biggestSet = bookshelfMaskSet;
+                    return true;
+                }
             }
         }
         // create and add one more set with a single BookshelfMask
@@ -91,6 +101,11 @@ public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluato
     public int getPoints() {
         if (targetMet) { return super.getPoints(); }
         return 0;
+    }
+
+    @Override
+    public BookshelfMaskSet getPointMasks() {
+        return biggestSet;
     }
 
     @Override
