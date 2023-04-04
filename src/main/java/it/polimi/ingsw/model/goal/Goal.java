@@ -49,8 +49,13 @@ public abstract class Goal {
         filter.clear();
 
         try {
-            pointMasks = evaluator.getPointMasks();
-            return evaluator.getPoints();
+            int points = evaluator.getPoints();
+            if(points == 0) {
+                pointMasks = new BookshelfMaskSet((a, b) -> true);
+            } else {
+                pointMasks = evaluator.getPointMasks();
+            }
+            return points;
         } finally {
             evaluator.clear();
         }
