@@ -109,10 +109,6 @@ class SixGroupsTwoTilesGoalTest {
                 { 0, 0, 0, 0, 0 },
         });
 
-        for (BookshelfMask bookshelfMask : goal.getPointMasks().getBookshelfMasks()) {
-            Assertions.assertEquals(2, bookshelfMask.getShelves().size());
-        }
-
         Assertions.assertTrue(goal.getPointMasks().contains(pointMask));
         Assertions.assertEquals(6, goal.getPointMasks().getSize());
     }
@@ -138,40 +134,7 @@ class SixGroupsTwoTilesGoalTest {
         BookshelfMask pointMask = new MockBookshelfMask(bookshelf, new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 1, 0, 0, 0 },
-                { 0, 1, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-        });
-        if (goal.getPointMasks().contains(pointMask)) {
-            maskCounter++;
-        }
-        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 1, 0, 0, 0, 0 },
-                { 1, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-        });
-        if (goal.getPointMasks().contains(pointMask)) {
-            maskCounter++;
-        }
-        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
                 { 1, 1, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-        });
-        if (goal.getPointMasks().contains(pointMask)) {
-            maskCounter++;
-        }
-        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
                 { 1, 0, 0, 0, 0 },
                 { 1, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -185,6 +148,39 @@ class SixGroupsTwoTilesGoalTest {
                 { 0, 0, 1, 1, 0 },
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+        if (goal.getPointMasks().contains(pointMask)) {
+            maskCounter++;
+        }
+        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 1, 1, 0, 0 },
+                { 0, 0, 1, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+        if (goal.getPointMasks().contains(pointMask)) {
+            maskCounter++;
+        }
+        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 1, 0, 0, 0 },
+                { 1, 1, 0, 0, 0 },
+        });
+        if (goal.getPointMasks().contains(pointMask)) {
+            maskCounter++;
+        }
+        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 1 },
+                { 0, 0, 0, 0, 1 },
                 { 0, 0, 0, 0, 0 },
         });
         if (goal.getPointMasks().contains(pointMask)) {
@@ -212,66 +208,6 @@ class SixGroupsTwoTilesGoalTest {
         if (goal.getPointMasks().contains(pointMask)) {
             maskCounter++;
         }
-        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 1 },
-                { 0, 0, 0, 0, 1 },
-                { 0, 0, 0, 0, 0 },
-        });
-        if (goal.getPointMasks().contains(pointMask)) {
-            maskCounter++;
-        }
-        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 1, 1, 0, 0, 0 },
-        });
-        if (goal.getPointMasks().contains(pointMask)) {
-            maskCounter++;
-        }
-        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 1, 0, 0, 0 },
-                { 0, 1, 0, 0, 0 },
-        });
-        if (goal.getPointMasks().contains(pointMask)) {
-            maskCounter++;
-        }
-        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 1, 1, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-        });
-        if (goal.getPointMasks().contains(pointMask)) {
-            maskCounter++;
-        }
-        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-                { 0, 0, 1, 0, 0 },
-                { 0, 0, 1, 0, 0 },
-                { 0, 0, 0, 0, 0 },
-        });
-        if (goal.getPointMasks().contains(pointMask)) {
-            maskCounter++;
-        }
-
-        // TODO: Look into the reason for this test failure, and either fix the corresponding class, or the tester.
-        for (BookshelfMask bookshelfMask : goal.getPointMasks().getBookshelfMasks()) {
-            Assertions.assertEquals(2, bookshelfMask.getShelves().size());
-        }
 
         Assertions.assertEquals(6, goal.getPointMasks().getSize());
         Assertions.assertEquals(6, maskCounter);
@@ -298,15 +234,83 @@ class SixGroupsTwoTilesGoalTest {
             { 1, 1, 2, 2, 4 }
         });
 
+        BookshelfMask firstMask = new MockBookshelfMask(firstBookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 1, 1, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+
+        BookshelfMask secondMask = new MockBookshelfMask(firstBookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 1, 0, 0, 0, 0 },
+                { 1, 0, 0, 0, 0 },
+                { 1, 0, 0, 0, 0 },
+        });
+
+        BookshelfMask thirdMask = new MockBookshelfMask(firstBookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 1, 1, 1, 0 },
+                { 0, 1, 0, 1, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+
+        BookshelfMask fourthMask = new MockBookshelfMask(firstBookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 1, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+
+        BookshelfMask fifthMask = new MockBookshelfMask(firstBookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 1 },
+                { 0, 0, 0, 1, 1 },
+        });
+
+        BookshelfMask sixthMask = new MockBookshelfMask(firstBookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 0, 0 },
+                { 0, 1, 1, 0, 0 },
+        });
+
         Assertions.assertEquals(8, goal.calculatePoints(firstBookshelf));
         Assertions.assertEquals(6, goal.calculatePoints(firstBookshelf));
+        Assertions.assertEquals(6, goal.getPointMasks().getSize());
 
-        // TODO: Add testing for mask size and state here, after fully understanding how this class should work.
+        Assertions.assertTrue(goal.getPointMasks().contains(firstMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(secondMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(thirdMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(fourthMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(fifthMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(sixthMask));
 
         Assertions.assertEquals(0, goal.calculatePoints(secondBookshelf));
         Assertions.assertEquals(0, goal.getPointMasks().getSize());
 
         Assertions.assertEquals(4, goal.calculatePoints(firstBookshelf));
         Assertions.assertEquals(2, goal.calculatePoints(firstBookshelf));
+        Assertions.assertEquals(6, goal.getPointMasks().getSize());
+
+        Assertions.assertTrue(goal.getPointMasks().contains(firstMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(secondMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(thirdMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(fourthMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(fifthMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(sixthMask));
     }
 }
