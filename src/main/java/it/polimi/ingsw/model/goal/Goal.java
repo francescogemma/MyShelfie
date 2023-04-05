@@ -10,7 +10,7 @@ import it.polimi.ingsw.model.filter.Filter;
 
 /**
  * This abstract class represents a generic goal,
- * and provide a general implementation of the method used to calculate the points and
+ * and provides a general implementation of the method used to calculate the points and
  * retrieve all the {@link BookshelfMask masks} that satisfy the goal.
  *
  * @author Cristiano Migali
