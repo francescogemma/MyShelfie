@@ -482,18 +482,16 @@ public class Shape {
     )));
 
     /**
-     * The width and height of an {@link Shape#ENLARGED_STAIR enlarged stair}.
+     * The width and height of a {@link Shape#STAIR stair}.
      */
     private static final int STAIR_SIDE = 5;
 
     /**
      * The shape of a stair directed down-right with height and width equal to {@value STAIR_SIDE}.
-     * It is said to be enlarged since above each column forming the stair after the first one from the left
-     * (which is the higher), there is an additional shelf.
      */
-    public static final Shape ENLARGED_STAIR;
+    public static final Shape STAIR;
 
-    // Builds the ENLARGED_STAIR
+    // Builds the STAIR
     static {
         ArrayList<Offset> offsets = new ArrayList<>();
 
@@ -509,7 +507,7 @@ public class Shape {
             }
         }
 
-        ENLARGED_STAIR = new Shape(offsets);
+        STAIR = new Shape(offsets);
     }
 
     /**

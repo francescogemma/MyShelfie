@@ -1,7 +1,9 @@
 package it.polimi.ingsw.model.goal;
 
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
+import it.polimi.ingsw.model.bookshelf.BookshelfMask;
 import it.polimi.ingsw.model.bookshelf.MockBookshelf;
+import it.polimi.ingsw.model.bookshelf.MockBookshelfMask;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +27,19 @@ class StairGoalTest {
                 { 1, 1, 1, 1, 1 },
         });
 
+        BookshelfMask pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 1, 0, 0, 0, 0 },
+                { 1, 1, 0, 0, 0 },
+                { 1, 1, 1, 0, 0 },
+                { 1, 1, 1, 1, 0 },
+                { 1, 1, 1, 1, 1 },
+                { 0, 0, 0, 0, 0 },
+        });
+
         Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(1, goal.getPointMasks().getSize());
+        Assertions.assertTrue(goal.getPointMasks().contains(pointMask));
+
     }
 
     @Test
@@ -39,7 +53,18 @@ class StairGoalTest {
                 { 1, 1, 1, 1, 1 },
         });
 
+        BookshelfMask pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 1 },
+                { 0, 0, 0, 1, 1 },
+                { 0, 0, 1, 1, 1 },
+                { 0, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1 },
+                { 0, 0, 0, 0, 0 },
+        });
+
         Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(1, goal.getPointMasks().getSize());
+        Assertions.assertTrue(goal.getPointMasks().contains(pointMask));
     }
 
     @Test
@@ -53,7 +78,18 @@ class StairGoalTest {
                 { 3, 5, 5, 1, 6 },
         });
 
+        BookshelfMask pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 1, 0, 0, 0, 0 },
+                { 1, 1, 0, 0, 0 },
+                { 1, 1, 1, 0, 0 },
+                { 1, 1, 1, 1, 0 },
+                { 1, 1, 1, 1, 1 },
+        });
+
         Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(1, goal.getPointMasks().getSize());
+        Assertions.assertTrue(goal.getPointMasks().contains(pointMask));
     }
 
     @Test
@@ -68,6 +104,7 @@ class StairGoalTest {
         });
 
         Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(0, goal.getPointMasks().getSize());
     }
 
     @Test
@@ -82,6 +119,7 @@ class StairGoalTest {
         });
 
         Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(0, goal.getPointMasks().getSize());
     }
 
     @Test
@@ -96,6 +134,7 @@ class StairGoalTest {
         });
 
         Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(0, goal.getPointMasks().getSize());
     }
 
     @Test
@@ -110,6 +149,7 @@ class StairGoalTest {
         });
 
         Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(0, goal.getPointMasks().getSize());
     }
 
     @Test
@@ -124,6 +164,7 @@ class StairGoalTest {
         });
 
         Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(0, goal.getPointMasks().getSize());
 
         bookshelf = new MockBookshelf(new int[][]{
                 {0, 0, 0, 0, 0},
@@ -133,7 +174,19 @@ class StairGoalTest {
                 {0, 1, 1, 1, 1},
                 {1, 1, 1, 1, 1}
         });
+
+        BookshelfMask pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                {0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 1},
+                {0, 0, 0, 1, 1},
+                {0, 0, 1, 1, 1},
+                {0, 1, 1, 1, 1},
+                {1, 1, 1, 1, 1}
+        });
+
         Assertions.assertEquals(8, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(1, goal.getPointMasks().getSize());
+        Assertions.assertTrue(goal.getPointMasks().contains(pointMask));
     }
 
     @Test
@@ -148,6 +201,7 @@ class StairGoalTest {
         });
 
         Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(0, goal.getPointMasks().getSize());
     }
 
     @Test
@@ -162,5 +216,6 @@ class StairGoalTest {
         });
 
         Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(0, goal.getPointMasks().getSize());
     }
 }

@@ -51,8 +51,8 @@ public class StairGoal extends CommonGoal{
     public StairGoal(int numPlayers) {
         super(new UnionFetcher(new ArrayList<>(
                         List.of(
-                                new ShapeFetcher(Shape.ENLARGED_STAIR),
-                                new ShapeFetcher(Shape.ENLARGED_STAIR.verticalFlip())
+                                new ShapeFetcher(Shape.STAIR),
+                                new ShapeFetcher(Shape.STAIR.verticalFlip())
                         )
                 )),
                 new NumDifferentColorFilter(1, 6),
