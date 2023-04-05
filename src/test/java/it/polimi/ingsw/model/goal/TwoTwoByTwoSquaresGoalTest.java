@@ -1,7 +1,9 @@
 package it.polimi.ingsw.model.goal;
 
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
+import it.polimi.ingsw.model.bookshelf.BookshelfMask;
 import it.polimi.ingsw.model.bookshelf.MockBookshelf;
+import it.polimi.ingsw.model.bookshelf.MockBookshelfMask;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +30,7 @@ class TwoTwoByTwoSquaresGoalTest {
         });
 
         Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(0, goal.getPointMasks().getSize());
     }
 
     @Test
@@ -47,6 +50,27 @@ class TwoTwoByTwoSquaresGoalTest {
         Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
         Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
         Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
+
+        BookshelfMask pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 1, 0 },
+                { 0, 0, 1, 1, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+        Assertions.assertTrue(goal.getPointMasks().contains(pointMask));
+
+        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 1, 1, 0, 0 },
+                { 0, 1, 1, 0, 0 },
+        });
+        Assertions.assertTrue(goal.getPointMasks().contains(pointMask));
+        Assertions.assertEquals(2, goal.getPointMasks().getSize());
     }
 
     @Test
@@ -66,6 +90,27 @@ class TwoTwoByTwoSquaresGoalTest {
         Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
         Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
         Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
+
+        BookshelfMask pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 1, 1 },
+                { 0, 0, 0, 1, 1 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+        Assertions.assertTrue(goal.getPointMasks().contains(pointMask));
+
+        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 1, 1, 0, 0 },
+                { 0, 1, 1, 0, 0 },
+        });
+        Assertions.assertTrue(goal.getPointMasks().contains(pointMask));
+        Assertions.assertEquals(2, goal.getPointMasks().getSize());
     }
 
     @Test
@@ -89,10 +134,53 @@ class TwoTwoByTwoSquaresGoalTest {
             { 1, 1, 2, 3, 4 }
         });
 
+        BookshelfMask firstMask = new MockBookshelfMask(firstBookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 1, 1 },
+                { 0, 0, 0, 1, 1 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+
+        BookshelfMask secondMask = new MockBookshelfMask(firstBookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 1, 1 },
+                { 0, 0, 0, 1, 1 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+
+        BookshelfMask thirdMask = new MockBookshelfMask(firstBookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 1, 1, 0, 0 },
+                { 0, 1, 1, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+
+        // check point correctness
         Assertions.assertEquals(8, goal.calculatePoints(firstBookshelf));
         Assertions.assertEquals(6, goal.calculatePoints(firstBookshelf));
-        Assertions.assertEquals(4, goal.calculatePoints(firstBookshelf));
+
+        // check mask correctness
+        Assertions.assertTrue(goal.getPointMasks().contains(firstMask) || goal.getPointMasks().contains(secondMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(thirdMask));
+        Assertions.assertEquals(2, goal.getPointMasks().getSize());
+
+        // wrong case zero everything check
         Assertions.assertEquals(0, goal.calculatePoints(secondBookshelf));
+        Assertions.assertEquals(0, goal.getPointMasks().getSize());
+
+        // good case again; check point correctness
+        Assertions.assertEquals(4, goal.calculatePoints(firstBookshelf));
         Assertions.assertEquals(2, goal.calculatePoints(firstBookshelf));
+
+        // check mask correctness
+        Assertions.assertTrue(goal.getPointMasks().contains(firstMask) || goal.getPointMasks().contains(secondMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(thirdMask));
+        Assertions.assertEquals(2, goal.getPointMasks().getSize());
     }
 }
