@@ -152,4 +152,17 @@ public class Bookshelf {
             row--;
         }
     }
+
+    /**
+     * @return returns true iff it is not possible to insert new Tiles in the bookshelf.
+     * @author Giacomo Groppi
+     * */
+    public boolean isFull () {
+        for (int i = 0; i < Bookshelf.COLUMNS; i++) {
+            if (this.get(Shelf.getInstance(0, i)) == Tile.EMPTY)
+                return false;
+        }
+
+        return true;
+    }
 }

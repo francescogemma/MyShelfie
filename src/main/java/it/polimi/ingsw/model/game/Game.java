@@ -1,22 +1,15 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.board.Board;
+import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Pair;
 import it.polimi.ingsw.model.goal.CommonGoal;
+import it.polimi.ingsw.model.game.GameState;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class Game {
-    private final String name;
-    private List<Pair<Player, Boolean>> players;
-    private final Board board;
-    private CommonGoal []commonGoal;
-    private static final int INDEX_FIRST_PLAYER = 0;
-    private Optional<Player> winner;
-    private Optional<Player> currentPlayer;
+    private GameState gameState;
 
     public Game(String name) {
         if (name == null)
@@ -25,65 +18,56 @@ public class Game {
         if (name.length() == 0)
             throw new IllegalArgumentException("String is empty");
 
-        this.name = name;
-        board = new Board();
-        commonGoal = new CommonGoal[2];
-        players = new ArrayList<>();
-        winner = Optional.empty();
+        gameState = new AddPlayerState(name);
     }
 
     Player getStartingPlayer() {
-        return this.players.get(INDEX_FIRST_PLAYER).getKey();
+        return this.gameState.getStartingPlayer();
     }
 
     boolean isOver () {
-        return winner.isPresent();
+        return this.gameState.isOver();
     }
 
-    public void addPlayer(Player player) {
-        if (player == null)
-            throw new NullPointerException();
-
-        if (this.players.size() >= 4)
-            throw new RuntimeException("Player are already 4");
-
-        this.players.add(new Pair<>(player, true));
-        this.connect(player);
+    public void addPlayer(Player player) throws IllegalFlowException {
+        this.gameState.addPlayer(player);
+        this.gameState = gameState.getNextState();
     }
 
-    private int indexOf(final Player player) {
-        int i;
-        for (i = 0; i < this.players.size(); i++) {
-            if (players.get(i).getKey().equals(player))
-                return i;
-        }
-        return -1;
+    public void selectTile(final Player player, Collection<Coordinate> position, int col) throws IllegalFlowException {
+        this.gameState.selectTile(player, position, col);
+        gameState = gameState.getNextState();
+    }
+
+    public void startGame () throws IllegalFlowException {
+        gameState.startGame();
+        gameState = gameState.getNextState();
     }
 
     public boolean isConnected(Player player) throws PlayerNotInGameException {
-        final int index = this.indexOf(player);
-
-        if (index == -1)
-            throw new PlayerNotInGameException();
-
-        return this.players.get(index).getValue();
+        return this.gameState.isConnected(player);
     }
 
-    public boolean disconnected(final Player player) throws PlayerNotInGameException {
-        return !isConnected(player);
+    public void disconnect(final Player player) throws PlayerNotInGameException {
+        this.gameState.disconnect(player);
     }
 
-    public void connect(Player player) {
-        final int index = this.indexOf(player);
-        this.players.get(index).setValue(true);
+    /**
+     * In caso un utente di disconnetti dalla partita la funzione viene
+     * chiamata quando l'utente si riconnetta alla partita.
+     * */
+    public void connect(Player player) throws PlayerNotInGameException {
+        this.gameState.connect(player);
     }
 
     public String getName() {
-        return this.name;
+        return this.gameState.getName();
     }
 
-    public Optional<Player> getCurrentPlayer() {
-        return this.currentPlayer;
+    public Player getCurrentPlayer() throws IllegalFlowException {
+        Player p = this.gameState.getCurrentPlayer();
+        gameState = gameState.getNextState();
+        return p;
     }
 
     @Override
@@ -92,12 +76,6 @@ public class Game {
         if (o == null || getClass() != o.getClass()) return false;
 
         Game game = (Game) o;
-
-        return Objects.equals(name, game.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return name != null ? name.hashCode() : 0;
+        return this.gameState.equals(game.gameState);
     }
 }

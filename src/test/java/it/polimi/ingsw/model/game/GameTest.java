@@ -12,7 +12,7 @@ import org.junit.jupiter.api.*;
 class GameTest {
     private Game game;
 
-    private void addPlayer (int number) throws PlayerNotInGameException {
+    private void addPlayer (int number) throws PlayerNotInGameException, IllegalFlowException {
         assert number > 1 && number < 5;
         int i;
 
@@ -20,30 +20,37 @@ class GameTest {
             Player p = new Player("Name" + i);
             game.addPlayer(p);
             Assertions.assertTrue(game.isConnected(p));
-            Assertions.assertFalse(game.disconnected(p));
         }
     }
 
     @BeforeEach
     public void setUp() {
         game = new Game("TestingGame");
-        Assertions.assertEquals(game.getName(), "TestingGame");
+        Assertions.assertEquals("TestingGame", game.getName());
     }
 
     @Test
-    void testCurrentPlayer() throws PlayerNotInGameException {
-        Assertions.assertNull(game.getCurrentPlayer());
+    void testCurrentPlayer() throws PlayerNotInGameException, IllegalFlowException {
+        Assertions.assertThrows(IllegalFlowException.class, () -> {
+            game.getCurrentPlayer();
+        });
         addPlayer(3);
+
+        Assertions.assertThrows(IllegalFlowException.class, () -> {
+             game.getCurrentPlayer();
+        });
+
+        game.startGame();
+        Assertions.assertNotNull(game.getCurrentPlayer());
     }
 
     @Test
-    void isOver_empty_correctOutput() throws PlayerNotInGameException {
+    void isOver_empty_correctOutput() throws PlayerNotInGameException, IllegalFlowException {
         addPlayer(2);
-        Assertions.assertEquals(this.game.getCurrentPlayer(), null);
     }
 
     @Test
-    void getStartingPlayer_empty_correctOutput() throws PlayerNotInGameException {
+    void getStartingPlayer_empty_correctOutput() throws PlayerNotInGameException, IllegalFlowException {
         addPlayer(2);
         Assertions.assertNotNull(this.game.getStartingPlayer());
     }
@@ -56,15 +63,15 @@ class GameTest {
     }
 
     @Test
-    void addPlayer_moreThanFourPlayers_ShouldThrowException() throws PlayerNotInGameException {
+    void addPlayer_moreThanFourPlayers_ShouldThrowException() throws PlayerNotInGameException, IllegalFlowException {
         addPlayer(4);
-        Assertions.assertThrows(RuntimeException.class, () -> {
+        Assertions.assertThrows(IllegalFlowException.class, () -> {
             this.game.addPlayer(new Player("test"));
         });
     }
 
     @Test
-    void isConnected_playerNotExistsConnected_ShouldThrowException() throws PlayerNotInGameException {
+    void isConnected_playerNotExistsConnected_ShouldThrowException() throws PlayerNotInGameException, IllegalFlowException {
         addPlayer(3);
         Assertions.assertThrows(PlayerNotInGameException.class, () -> {
             game.isConnected(new Player("Test"));
