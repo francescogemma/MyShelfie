@@ -87,6 +87,19 @@ public class BookshelfMaskSet {
     }
 
     /**
+     * This method tells the user if the provided mask is inside the set or not
+     * @param bookshelfMask will be provided in order to be compared to all other masks in set
+     * @return true if the provided mask is inside the set or not
+     */
+    public boolean contains(BookshelfMask bookshelfMask) {
+        for (BookshelfMask containedBookshelfMask : bookshelfMasks) {
+            if (bookshelfMask.equals(containedBookshelfMask)) return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Clears the set by removing all elements.
      * @author Francesco Gemma
      */
