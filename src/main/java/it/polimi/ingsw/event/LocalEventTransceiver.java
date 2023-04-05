@@ -1,21 +1,30 @@
 package it.polimi.ingsw.event;
 
+import it.polimi.ingsw.event.data.EventData;
+import it.polimi.ingsw.event.receiver.EventListener;
+import it.polimi.ingsw.event.receiver.EventReceiver;
+import it.polimi.ingsw.event.transmitter.EventTransmitter;
+
 import java.util.*;
 
-public class LocalEventTransceiver implements EventTransmitter<Object>, EventReceiver<Object> {
-    private final Map<String, List<EventListener<Object>>> listeners = new HashMap<>();
+public class LocalEventTransceiver implements EventTransmitter, EventReceiver<EventData> {
+    private final List<EventListener<EventData>> listeners = new ArrayList<>();
+
+    private final Object lock = new Object();
 
     @Override
-    public void registerListener(String eventId, EventListener<Object> listener) {
-        listeners.computeIfAbsent(eventId, id -> new ArrayList<>());
-
-        listeners.get(eventId).add(listener);
+    public void registerListener(EventListener<EventData> listener) {
+        synchronized (lock) {
+            listeners.add(listener);
+        }
     }
 
     @Override
-    public void broadcast(Event<Object> event) {
-        for (EventListener<Object> listener : listeners.get(event.getId())) {
-            listener.handle(event.getData());
+    public void broadcast(EventData data) {
+        synchronized (lock) {
+            for (EventListener<EventData> listener : listeners) {
+                listener.handle(data);
+            }
         }
     }
 }

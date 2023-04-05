@@ -3,60 +3,98 @@ package it.polimi.ingsw.event;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import it.polimi.ingsw.event.data.InsertTilesEventData;
+import it.polimi.ingsw.event.data.LoginEventData;
+import it.polimi.ingsw.event.data.MessageEventData;
+import it.polimi.ingsw.event.data.wrapper.SyncEventDataWrapper;
+import it.polimi.ingsw.event.receiver.CastEventReceiver;
+import it.polimi.ingsw.model.Tile;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.HashMap;
+import javax.swing.plaf.synth.ColorType;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class Main {
+    public static void main(String[] args) {
+        MockNetworkEventTransceiver networkTransceiver = new MockNetworkEventTransceiver();
+        Controller controller = new Controller();
+        VirtualView virtualView = new VirtualView(networkTransceiver, controller);
+
+        Requester<MessageEventData, LoginEventData> loginOnNetwork = MessageEventData.requester(networkTransceiver, networkTransceiver);
+        Requester<MessageEventData, InsertTilesEventData> insertTiles = MessageEventData.requester(networkTransceiver,
+            networkTransceiver);
+
+        System.out.println(loginOnNetwork.request(new LoginEventData("foo", "notBar")).getMessage());
+        System.out.println(insertTiles.request(new InsertTilesEventData(0, Arrays.asList(Tile.MAGENTA, Tile.GREEN))).getMessage());
+
+        System.out.println(loginOnNetwork.request(new LoginEventData("foo", "bar")).getMessage());
+
+        networkTransceiver.broadcast(new MessageEventData("Hello, I'm authenticated"));
+
+        System.out.println(insertTiles.request(new InsertTilesEventData(0, Arrays.asList(Tile.MAGENTA, Tile.GREEN))).getMessage());
+    }
+}
+
+class VirtualView {
+    private final MockNetworkEventTransceiver networkTransceiver;
+    private final Controller controller;
+    private String username = null;
+
+    public VirtualView(MockNetworkEventTransceiver networkTransceiver, Controller controller) {
+        this.networkTransceiver = networkTransceiver;
+        this.controller = controller;
+
+        LoginEventData.responder(networkTransceiver, networkTransceiver, data -> {
+                if (isAuthenticated()) {
+                    return new MessageEventData("You're already authenticated!");
+                }
+
+                if (controller.authenticate(data.getUsername(), data.getPassword())) {
+                    username = data.getUsername();
+
+                    return new MessageEventData("Successful login!");
+                }
+
+                return new MessageEventData("Login failed!");
+            });
+
+        MessageEventData.castEventReceiver(networkTransceiver).registerListener(data -> {
+            if (isAuthenticated()) {
+                controller.printMessage(username, data.getMessage());
+            }
+        });
+
+        InsertTilesEventData.responder(networkTransceiver, networkTransceiver, data -> {
+            if (!isAuthenticated()) {
+                return new MessageEventData("You can't perform this while you're not authenticated");
+            }
+
+            controller.printTiles(data.getTiles());
+
+            return new MessageEventData("Nice insertion!");
+        });
+    }
+
+    public boolean isAuthenticated() {
+        return username != null;
+    }
+}
+
+class Controller {
     private final static Map<String, String> credentials = Map.of("foo", "bar");
 
-    public static void main(String[] args) {
-        LocalEventTransceiver transceiver = new LocalEventTransceiver();
+    public boolean authenticate(String username, String password) {
+        return credentials.get(username) != null && credentials.get(username).equals(password);
+    }
 
-        AuthenticatedEventReceiver<MessageEventData> authReceiver = new AuthenticatedEventReceiver<>(transceiver);
+    public void printMessage(String username, String message) {
+        System.out.println(username + ": " + message);
+    }
 
-        authReceiver.registerListener("AUTHORIZED_MESSAGE", authMessageEventData -> {
-            System.out.println(authMessageEventData.getUsername());
-            System.out.println(authMessageEventData.getPassword());
-            System.out.println(authMessageEventData.getWrappedData().getMessage());
-        });
-
-        AuthenticatedEventTransmitter<MessageEventData> authTransmitter = new AuthenticatedEventTransmitter<>("foo",
-            "bar", transceiver);
-
-        authTransmitter.broadcast(new Event<>("MESSAGE", new MessageEventData("Hello")));
-
-        CastEventReceiver<MessageEventData> messageReceiver = new CastEventReceiver<>(transceiver);
-
-        messageReceiver.registerListener("MESSAGE", messageEventData -> {
-            System.out.println(messageEventData.getMessage());
-        });
-
-        CastEventTransmitter<MessageEventData> messageTransmitter = new CastEventTransmitter<>(transceiver);
-
-        messageTransmitter.broadcast(new Event<MessageEventData>("MESSAGE", new MessageEventData("world")));
-
-        GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapterFactory(new EventTypeAdapterFactory());
-        Gson gson = builder.create();
-
-
-        SyncEventData<AuthenticatedEventData<MessageEventData>> authEventData = new SyncEventData<>(314, new AuthenticatedEventData<>("m", "n", new MessageEventData("ciao")));
-        Event<Object> event = new Event<>("SYNCHRONIZED_AUTHORIZED_MESSAGE", authEventData);
-
-        String json = gson.toJson(event, new TypeToken<Event<Object>>(){ }.getType());
-        System.out.println(json);
-
-        Event<Object> deserEvent = gson.fromJson(json, new TypeToken<Event<Object>>(){ }.getType());
-        SyncEventData<AuthenticatedEventData<MessageEventData>> deserAuthEventData = (SyncEventData<AuthenticatedEventData<MessageEventData>>) deserEvent.getData();
-        Event<SyncEventData<AuthenticatedEventData<MessageEventData>>> castedDeserEvent = new Event<>(deserEvent.getId(), deserAuthEventData);
-
-        System.out.println(castedDeserEvent.getId());
-        System.out.println(castedDeserEvent.getData().getCount());
-        System.out.println(castedDeserEvent.getData().getWrappedData().getUsername());
-        System.out.println(castedDeserEvent.getData().getWrappedData().getPassword());
-        System.out.println(castedDeserEvent.getData().getWrappedData().getWrappedData().getMessage());
+    public void printTiles(List<Tile> tiles) {
+        for (Tile tile : tiles) {
+            System.out.println(tile.color(tile.toString()));
+        }
     }
 }
