@@ -1,7 +1,9 @@
 package it.polimi.ingsw.model.goal;
 
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
+import it.polimi.ingsw.model.bookshelf.BookshelfMask;
 import it.polimi.ingsw.model.bookshelf.MockBookshelf;
+import it.polimi.ingsw.model.bookshelf.MockBookshelfMask;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +18,7 @@ class FourGroupsFourTilesGoalTest {
     }
 
     @Test
-    @DisplayName("Calculating points when there are only three groups of four: goal not satisfied")
+    @DisplayName("Calculating points with only three groups of four tiles: goal not satisfied")
     void calculatePoints_threeGroupsOfFour_goalNotSatisfied() {
         Bookshelf bookshelf = new MockBookshelf(new int[][]{
             { 0, 0, 0, 0, 0 },
@@ -28,6 +30,7 @@ class FourGroupsFourTilesGoalTest {
         });
 
         Assertions.assertEquals(0, goal.calculatePoints(bookshelf));
+        Assertions.assertEquals(0, goal.getPointMasks().getSize());
     }
 
     @Test
@@ -46,6 +49,46 @@ class FourGroupsFourTilesGoalTest {
         Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
         Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
         Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
+
+        BookshelfMask pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 1, 1, 1, 0, 0 },
+                { 1, 0, 0, 0, 0 },
+                { 1, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+        Assertions.assertTrue(goal.getPointMasks().contains(pointMask));
+
+        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 1 },
+                { 0, 0, 1, 1, 1 },
+                { 0, 0, 1, 1, 1 },
+        });
+        Assertions.assertTrue(goal.getPointMasks().contains(pointMask));
+
+        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 1, 1 },
+                { 0, 1, 1, 1, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+        Assertions.assertTrue(goal.getPointMasks().contains(pointMask));
+
+        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 1, 1, 0, 0, 0 },
+                { 1, 1, 0, 0, 0 },
+        });
+        Assertions.assertTrue(goal.getPointMasks().contains(pointMask));
     }
 
     @Test
@@ -64,10 +107,73 @@ class FourGroupsFourTilesGoalTest {
         Assertions.assertEquals(6, goal.calculatePoints(bookshelf));
         Assertions.assertEquals(4, goal.calculatePoints(bookshelf));
         Assertions.assertEquals(2, goal.calculatePoints(bookshelf));
+
+        int maskCounter = 0;
+        BookshelfMask pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 1, 1, 0, 0 },
+                { 0, 1, 1, 0, 0 },
+                { 0, 1, 1, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+        if (goal.getPointMasks().contains(pointMask)) {
+            maskCounter++;
+        }
+
+        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 1, 1 },
+                { 0, 0, 0, 1, 1 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+        if (goal.getPointMasks().contains(pointMask)) {
+            maskCounter++;
+        }
+
+        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 1, 1 },
+                { 0, 0, 0, 0, 1 },
+                { 0, 0, 0, 0, 1 },
+                { 0, 0, 0, 0, 1 },
+        });
+        if (goal.getPointMasks().contains(pointMask)) {
+            maskCounter++;
+        }
+
+        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 1, 1, 1, 1, 0 },
+                { 1, 0, 0, 1, 0 },
+                { 1, 0, 0, 1, 0 },
+        });
+        if (goal.getPointMasks().contains(pointMask)) {
+            maskCounter++;
+        }
+
+        pointMask = new MockBookshelfMask(bookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 1, 1, 0, 0 },
+                { 0, 1, 1, 0, 0 },
+        });
+        if (goal.getPointMasks().contains(pointMask)) {
+            maskCounter++;
+        }
+
+        Assertions.assertEquals(4, maskCounter);
     }
 
     @Test
-    @DisplayName("Calculating points with two bookshelves: first time goal is satisfied, second time is not")
+    @DisplayName("Calculating points with two bookshelves: first time goal is satisfied, second time not")
     void calculatePoints_twoBookshelves_firstGoalSatisfiedSecondGoalNotSatisfied() {
         Bookshelf firstBookshelf = new MockBookshelf(new int[][] {
             { 0, 0, 0, 0, 0 },
@@ -89,8 +195,57 @@ class FourGroupsFourTilesGoalTest {
 
         Assertions.assertEquals(8, goal.calculatePoints(firstBookshelf));
         Assertions.assertEquals(6, goal.calculatePoints(firstBookshelf));
+
+        BookshelfMask firstMask = new MockBookshelfMask(firstBookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 1, 0, 0, 0 },
+                { 0, 1, 0, 0, 0 },
+                { 1, 1, 0, 0, 0 },
+        });
+
+        BookshelfMask secondMask = new MockBookshelfMask(firstBookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 1 },
+                { 0, 0, 1, 1, 1 },
+        });
+
+        BookshelfMask thirdMask = new MockBookshelfMask(firstBookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 1, 0 },
+                { 0, 0, 1, 1, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+
+        BookshelfMask fourthMask = new MockBookshelfMask(firstBookshelf, new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 1, 1 },
+                { 0, 0, 0, 0, 1 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+        });
+
+        Assertions.assertTrue(goal.getPointMasks().contains(firstMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(secondMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(thirdMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(fourthMask));
+
         Assertions.assertEquals(0, goal.calculatePoints(secondBookshelf));
+        Assertions.assertEquals(0, goal.getPointMasks().getSize());
+
         Assertions.assertEquals(4, goal.calculatePoints(firstBookshelf));
         Assertions.assertEquals(2, goal.calculatePoints(firstBookshelf));
+
+        Assertions.assertTrue(goal.getPointMasks().contains(firstMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(secondMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(thirdMask));
+        Assertions.assertTrue(goal.getPointMasks().contains(fourthMask));
     }
 }
