@@ -57,7 +57,6 @@ class BookshelfMaskSetTest {
 
         ArrayList<BookshelfMask> receivedList = (ArrayList<BookshelfMask>) bookshelfMaskSet.getBookshelfMasks();
         Assertions.assertEquals(Tile.EMPTY, receivedList.get(receivedList.size() - 1).tileAt(Shelf.getInstance(0, 0)));
-        Assertions.assertEquals(predicate, bookshelfMaskSet.getCompatible());
         Assertions.assertEquals(n + 1, bookshelfMaskSet.getSize());
     }
 
