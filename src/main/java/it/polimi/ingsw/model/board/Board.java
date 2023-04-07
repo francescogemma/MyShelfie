@@ -206,7 +206,14 @@ public class Board {
      * @return The {@link Tile Tile} selected.
     * */
     public Tile selectTile(Coordinate c) throws IllegalExtractionException, SelectionFullException {
-        if (isOutOfBoard(c) || this.isEmptyExtraction(c)  || numberOfFreeSides(c, this::isEmptyExtraction) == 0) {
+        if (isOutOfBoard(c)) {
+            throw new IllegalArgumentException("It's out of the board");
+        }
+
+        if (this.isEmptyExtraction(c))
+            throw new IllegalExtractionException("Can't extract tile at: [" + c.getRow() + ", " + c.getCol() + "] because it's already selected");
+
+        if (numberOfFreeSides(c, this::isEmptyExtraction) == 0) {
             throw new IllegalExtractionException("Can't extract tile at: [" + c.getRow() + ", " + c.getCol() + "]");
         }
 
@@ -221,7 +228,7 @@ public class Board {
     /**
      * The function returns the set of tiles selected up to this point.
      * The function does not remove the objects from the board.
-     * @return All Tiles selected so far.
+     * @return All Tiles selected so far [sorted by selection].
      */
     public List<Tile> getSelectedTiles() {
         return this
@@ -436,6 +443,10 @@ public class Board {
         this.occupied --;
         this.tiles[c.getRow()][c.getCol()] = null;
         return t;
+    }
+
+    public void forgetSelection () {
+        this.boardSelector = new BoardSelector();
     }
 
     @Override

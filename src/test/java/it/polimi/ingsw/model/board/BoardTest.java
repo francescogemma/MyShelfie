@@ -248,7 +248,7 @@ class BoardTest {
     @Test
     void selectTile_coordinateOutside_ShouldThrowException() {
         fillBoard(board);
-        Assertions.assertThrows(IllegalExtractionException.class, () -> {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
             board.selectTile(-1, 5);
         });
 

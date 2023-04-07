@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.bookshelf;
 import it.polimi.ingsw.model.Tile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Represents a bookshelf in the game. It is composed of a grid of shelves with {@value ROWS} rows and
@@ -161,6 +162,28 @@ public class Bookshelf {
         for (int i = 0; i < Bookshelf.COLUMNS; i++) {
             if (this.get(Shelf.getInstance(0, i)) == Tile.EMPTY)
                 return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == this)
+            return true;
+        if (other.getClass() != this.getClass())
+            return false;
+
+        Bookshelf b = (Bookshelf) other;
+
+        for (int i = 0; i < this.content.length; i++) {
+            for (int j = 0; j < this.content[i].length; j++) {
+                final Tile t1 = b.content[i][j];
+                final Tile t2 =   content[i][j];
+                if (!t1.equals(t2)) {
+                    return false;
+                }
+            }
         }
 
         return true;

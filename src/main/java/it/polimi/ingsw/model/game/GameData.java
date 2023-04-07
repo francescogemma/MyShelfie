@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.bag.Bag;
+import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.utils.Pair;
 import jdk.jshell.spi.ExecutionControl;
 import it.polimi.ingsw.model.goal.*;
@@ -21,15 +22,16 @@ public class GameData {
     protected Optional<Player> winner;
     protected CommonGoal []commonGoal;
 
+    protected Board board;
+
     public GameData(String name) {
         this.name = name;
         commonGoal = new CommonGoal[2];
         winner = Optional.empty();
         bag = new Bag();
         players = new ArrayList<>();
+        board = new Board();
     }
-
-
 
     @Override
     public boolean equals(Object obj) {

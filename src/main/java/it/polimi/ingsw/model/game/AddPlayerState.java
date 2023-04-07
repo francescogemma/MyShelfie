@@ -13,8 +13,13 @@ public class AddPlayerState extends GameState{
     public void addPlayer(Player player) throws IllegalFlowException {
         if (player == null)
             throw new NullPointerException();
+
         if (this.gameData.players.size() == 4)
             throw new IllegalFlowException("Player are already 4");
+
+        if (this.containsPlayer(player))
+            throw new IllegalFlowException("Player is already in this game");
+
         this.gameData.players.add(new Pair<>(player, true));
 
         try {
@@ -26,9 +31,10 @@ public class AddPlayerState extends GameState{
 
     @Override
     public void startGame() throws IllegalFlowException {
-        if (this.gameData.players.isEmpty()) {
+        if (this.gameData.players.size() < 2) {
             throw new IllegalFlowException("This game contains 0 players...");
         }
+        this.fillBagIfNecessary();
         askForStartGame = true;
     }
 

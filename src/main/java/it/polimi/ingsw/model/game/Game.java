@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.board.Board;
+import it.polimi.ingsw.model.board.IllegalExtractionException;
+import it.polimi.ingsw.model.board.SelectionFullException;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Pair;
 import it.polimi.ingsw.model.goal.CommonGoal;
@@ -34,7 +36,7 @@ public class Game {
         this.gameState = gameState.getNextState();
     }
 
-    public void selectTile(final Player player, Collection<Coordinate> position, int col) throws IllegalFlowException {
+    public void selectTile(final Player player, Collection<Coordinate> position, int col) throws IllegalFlowException, SelectionFullException, IllegalExtractionException {
         this.gameState.selectTile(player, position, col);
         gameState = gameState.getNextState();
     }
@@ -68,6 +70,14 @@ public class Game {
         Player p = this.gameState.getCurrentPlayer();
         gameState = gameState.getNextState();
         return p;
+    }
+
+    public Player getWinner () throws IllegalFlowException {
+        return gameState.getWinner();
+    }
+
+    public Collection<Coordinate> getSelectableTile () throws IllegalFlowException {
+        return gameState.getSelectableTile();
     }
 
     @Override

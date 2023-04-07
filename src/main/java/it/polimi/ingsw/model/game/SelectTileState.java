@@ -1,7 +1,12 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.board.IllegalExtractionException;
+import it.polimi.ingsw.model.board.SelectionFullException;
 import it.polimi.ingsw.utils.Coordinate;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 public abstract class SelectTileState extends GameState{
@@ -32,13 +37,47 @@ public abstract class SelectTileState extends GameState{
         ).getKey();
     }
 
+    public Collection<Coordinate> getSelectableTile () throws IllegalFlowException {
+        return this
+                .gameData
+                .board
+                .getSelectableCoordinate();
+    }
+
     @Override
-    public void selectTile(Player player, Collection<Coordinate> position, int col) throws IllegalFlowException {
+    public void selectTile(Player player, Collection<Coordinate> positions, int col) throws IllegalFlowException, IllegalExtractionException, SelectionFullException {
+        if (player == null)
+            throw new NullPointerException();
+
         assert !selectNext: "This function has already been called";
-        selectNext = true;
+
         if (this.currentPlayer != player) {
             throw new IllegalFlowException();
         }
+
+        for (Coordinate pos : positions) {
+            try {
+                this.gameData.board.selectTile(pos);
+            } catch (SelectionFullException | IllegalExtractionException e) {
+                this.gameData.board.forgetSelection();
+                throw e;
+            }
+        }
+
+        // TODO remove new ArrayList<>() and pass a collection
+        ArrayList<Tile> tileSelected = new ArrayList<>(this.gameData.board.getSelectedTiles());
+
+        try {
+            currentPlayer.getBookshelf().insertTiles(tileSelected, col);
+        } catch (RuntimeException e) {
+            // TODO change RuntimeException with the correct throw
+            this.gameData.board.forgetSelection();
+            throw e;
+        }
+
+        this.gameData.board.draw();
+
+        selectNext = true;
     }
 
     @Override
