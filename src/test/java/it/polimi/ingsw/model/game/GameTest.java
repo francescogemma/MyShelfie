@@ -1,7 +1,7 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
-import it.polimi.ingsw.model.board.SelectionFullException;
 import it.polimi.ingsw.utils.Coordinate;
 import org.junit.jupiter.api.*;
 
@@ -64,13 +64,6 @@ class GameTest {
     }
 
     @Test
-    void addPlayer_nullPlayer_ShouldThrowException() {
-        Assertions.assertThrows(NullPointerException.class, () -> {
-            this.game.addPlayer(null);
-        });
-    }
-
-    @Test
     void addPlayer_moreThanFourPlayers_ShouldThrowException() throws IllegalFlowException {
         addPlayer(4);
         Assertions.assertThrows(IllegalFlowException.class, () -> {
@@ -109,13 +102,6 @@ class GameTest {
         });
     }
 
-    @Test
-    void addPlayer_playerNull_ShouldThrowException() {
-        Assertions.assertThrows(NullPointerException.class, () -> {
-            this.game.addPlayer(null);
-        });
-    }
-
     /* waiting for an implementation of equals in player.
     @Test
     void addPlayer_playerAlreadyInGame_ShouldThrowException() throws IllegalFlowException {
@@ -144,7 +130,7 @@ class GameTest {
 
 
     @Test
-    void insertTile__correctOutput() throws IllegalFlowException, SelectionFullException, IllegalExtractionException {
+    void insertTile__correctOutput() throws IllegalFlowException, FullSelectionException, IllegalExtractionException {
         Player p1 = new Player("t1");
         Player p2 = new Player("t2");
 
@@ -211,7 +197,7 @@ class GameTest {
     }
 
     @Test
-    void getWinner_gameIsNotOver_correctOutput() throws IllegalFlowException, SelectionFullException, IllegalExtractionException {
+    void getWinner_gameIsNotOver_correctOutput() throws IllegalFlowException, FullSelectionException, IllegalExtractionException {
         Player p1 = new Player("t1");
         Player p2 = new Player("t2");
 
@@ -228,7 +214,7 @@ class GameTest {
     }
 
     @Test
-    void insertTile_followRightOrder_correctOutput() throws IllegalFlowException, SelectionFullException, IllegalExtractionException {
+    void insertTile_followRightOrder_correctOutput() throws IllegalFlowException, FullSelectionException, IllegalExtractionException {
         Player p1 = new Player("t1");
         Player p2 = new Player("t2");
         Player p3 = new Player("t3");

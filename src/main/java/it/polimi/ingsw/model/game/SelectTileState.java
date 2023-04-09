@@ -2,7 +2,7 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
-import it.polimi.ingsw.model.board.SelectionFullException;
+import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.utils.Coordinate;
 
 import java.util.Collection;
@@ -42,7 +42,7 @@ public abstract class SelectTileState extends GameState{
     }
 
     @Override
-    public void selectTile(Player player, Collection<Coordinate> positions, int col) throws IllegalFlowException, IllegalExtractionException, SelectionFullException {
+    public void selectTile(Player player, Collection<Coordinate> positions, int col) throws IllegalFlowException, IllegalExtractionException, FullSelectionException {
         if (player == null)
             throw new NullPointerException();
 
@@ -55,7 +55,7 @@ public abstract class SelectTileState extends GameState{
         for (Coordinate pos : positions) {
             try {
                 this.gameData.board.selectTile(pos);
-            } catch (SelectionFullException | IllegalExtractionException e) {
+            } catch (FullSelectionException | IllegalExtractionException e) {
                 this.gameData.board.forgetSelection();
                 throw e;
             }

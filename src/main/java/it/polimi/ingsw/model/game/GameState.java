@@ -3,7 +3,7 @@ package it.polimi.ingsw.model.game;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
-import it.polimi.ingsw.model.board.SelectionFullException;
+import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.utils.Coordinate;
 
 import java.util.Collection;
@@ -37,7 +37,7 @@ abstract class GameState{
      *
      * */
     @SuppressWarnings("unused")
-    protected void selectTile (Player player, Collection<Coordinate> coordinate, int col) throws IllegalFlowException, IllegalExtractionException, SelectionFullException {
+    protected void selectTile (Player player, Collection<Coordinate> coordinate, int col) throws IllegalFlowException, IllegalExtractionException, FullSelectionException {
         throw new IllegalFlowException();
     }
 
