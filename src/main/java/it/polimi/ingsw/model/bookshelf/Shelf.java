@@ -138,10 +138,6 @@ public class Shelf {
      * (otherRow, otherColumn).
      */
     public boolean before(Shelf other) {
-        if (other == null) {
-            throw new NullPointerException();
-        }
-
         if (row != other.row) {
             return row < other.row;
         }

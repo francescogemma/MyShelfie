@@ -32,10 +32,6 @@ public class UnionFetcher implements Fetcher {
      * @throws IllegalArgumentException if the list of fetchers has less than 2 elements.
      */
     public UnionFetcher(List<Fetcher> fetchers) {
-        if (fetchers == null) {
-            throw new NullPointerException("fetchers must be non-null when creating a UnionFetcher");
-        }
-
         if (fetchers.size() < 2) {
             throw new IllegalArgumentException("at least 2 fetchers are required to construct a UnionFetcher");
         }

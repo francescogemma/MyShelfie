@@ -166,7 +166,7 @@ public class ShapeTest {
     @Test
     @DisplayName("Try to construct a shape with an offsets list that is not relative to the top-left shelf of the " +
         "bounding box instance (with positive offsets), should throw exception")
-    void construct_nonTopLeftDefinedPositiveOffsets_throwsIllegalArgumentException() {
+    void constructor_nonTopLeftDefinedPositiveOffsets_throwsIllegalArgumentException() {
         List<Offset> offsets = List.of(
             Offset.getInstance(0, 1), Offset.getInstance(1, 1),
             Offset.getInstance(1, 2)
@@ -180,7 +180,7 @@ public class ShapeTest {
     @Test
     @DisplayName("Try to construct a shape with an offsets list that is not relative to the top-left shelf of the " +
         "bounding box instance (with negative offsets), should throw exception")
-    void construct_nonTopLeftDefinedNegativeOffsets_throwsIllegalArgumentException() {
+    void constructor_nonTopLeftDefinedNegativeOffsets_throwsIllegalArgumentException() {
         List<Offset> offsets = List.of(
             Offset.getInstance(0, -1), Offset.getInstance(0, 0),
             Offset.getInstance(1, -1)

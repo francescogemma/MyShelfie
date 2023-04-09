@@ -9,9 +9,7 @@ public class AcceptsAllFilter implements Filter {
     }
 
     @Override
-    public void forgetLastTile() {
-
-    }
+    public void forgetLastTile() { }
 
     @Override
     public boolean isSatisfied() {

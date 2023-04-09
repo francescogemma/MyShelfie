@@ -94,5 +94,27 @@ class UnionFetcherTest {
         Assertions.assertEquals(fetchedOneByOneMasks, fetchedAllTogetherMasks);
     }
 
-    // TODO: Test clear method
+    @Test
+    @DisplayName("Try to construct a UnionFetcher with not enoguh fetchers")
+    void constructor_notEnoughFetchers_throwsIllegalArgumentException() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+           new UnionFetcher(List.of(new ShapeFetcher(Shape.SQUARE)));
+        });
+    }
+
+    @Test
+    @DisplayName("Clear the fetcher and assert that it is at the equilibrium state")
+    void clear_duringFetch_inEquilibrium() {
+        Fetcher fetcher = new UnionFetcher(List.of(new ShapeFetcher(Shape.DOMINOES.get(0)),
+            new ShapeFetcher(Shape.DOMINOES.get(1))));
+
+        for (int i = 0; i < 7; i++) {
+            fetcher.next();
+            fetcher.lastShelf();
+        }
+
+        fetcher.clear();
+
+        Assertions.assertTrue(fetcher.hasFinished());
+    }
 }
