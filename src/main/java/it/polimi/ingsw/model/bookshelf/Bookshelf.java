@@ -116,7 +116,7 @@ public class Bookshelf {
      * all the tiles in tile. So the tiles at the beginning of the tiles list will be inserted in lower rows than the
      * ones at the end of the tiles list.
      *
-     * @param tileColors is the list of the tiles that we are going to insert.
+     * @param tiles is the list of the tiles that we are going to insert.
      * @param column is the index of the column where we want to do the insertion.
      * @throws IllegalArgumentException
      * <ul>

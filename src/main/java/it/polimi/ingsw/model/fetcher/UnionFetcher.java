@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.bookshelf.BookshelfMask;
 import it.polimi.ingsw.model.bookshelf.Shelf;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Allows to extract all the {@link BookshelfMask bookshelf masks} that can be extracted by the first
@@ -16,7 +17,7 @@ public class UnionFetcher implements Fetcher {
     /**
      * The list of fetchers.
      */
-    private final ArrayList<Fetcher> fetchers;
+    private final List<Fetcher> fetchers;
 
     /**
      * The current fetcher in the list from which we are performing the extraction.
@@ -30,7 +31,7 @@ public class UnionFetcher implements Fetcher {
      * @throws NullPointerException if fetchers is null.
      * @throws IllegalArgumentException if the list of fetchers has less than 2 elements.
      */
-    public UnionFetcher(ArrayList<Fetcher> fetchers) {
+    public UnionFetcher(List<Fetcher> fetchers) {
         if (fetchers == null) {
             throw new NullPointerException("fetchers must be non-null when creating a UnionFetcher");
         }

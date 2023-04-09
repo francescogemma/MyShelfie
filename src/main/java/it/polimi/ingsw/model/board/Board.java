@@ -185,7 +185,7 @@ public class Board {
      * Initially, it represents an empty Board, so it will be necessary
      * to call the fillRandomly function to fill it.
      *
-     * @see #fillRandomly(TileColor, int)
+     * @see #fillRandomly(Tile, int)
      */
     public Board() {
         boardSelector = new BoardSelector();
@@ -398,7 +398,7 @@ public class Board {
     /**
      * The function places the {@link Tile tile} in a random position within the
      * board.
-     * The function places the {@link TIle tile} in a legal position, therefore it is guaranteed that the
+     * The function places the {@link Tile tile} in a legal position, therefore it is guaranteed that the
      * {@link Tile tile} inserted will have at least one occupied side, if such position exists.
     */
     public void fillRandomly(final Tile tile, final int numPlayer) {
