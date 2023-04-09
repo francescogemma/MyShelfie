@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class InsertTilesEventData extends EventData {
+public class InsertTilesEventData implements EventData {
     private int column;
     private List<TileColor> tileColors;
 

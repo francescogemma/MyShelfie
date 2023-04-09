@@ -8,7 +8,7 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
-public class LoginEventData extends EventData {
+public class LoginEventData implements EventData {
     private final String username;
     private final String password;
 
