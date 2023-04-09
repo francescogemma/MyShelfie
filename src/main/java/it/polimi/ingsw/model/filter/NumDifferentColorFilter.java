@@ -5,7 +5,7 @@ import it.polimi.ingsw.model.tile.TileColor;
 import java.util.Arrays;
 
 /**
- * Allows to filter a sequence of tiles by the number of different colors in it.
+ * Allows to filter a sequence of tile colors by the number of different colors in it.
  * The sequence must not contain empty tiles in order to satisfy the criteria.
  *
  * @author Cristiano Migali
@@ -22,13 +22,13 @@ public class NumDifferentColorFilter implements Filter {
     private final int maxColors;
 
     /**
-     * The number of different colors inside the sequence before the insertion of the last added tile.
+     * The number of different colors inside the sequence before the insertion of the last added tile color.
      */
     private int countBeforeLast;
 
     /**
-     * The colors that were present inside the sequence before the addition of the last tile.
-     * In particular a color (represented by a tile) was present in the sequence iff
+     * The colors that were present inside the sequence before the addition of the last tile color.
+     * In particular a color was present in the sequence iff
      * {@code yetAddedBeforeLast[tile.ordinal()]} is true.
      */
     private final boolean[] yetAddedBeforeLast = new boolean[TileColor.values().length];
@@ -40,7 +40,7 @@ public class NumDifferentColorFilter implements Filter {
 
     /**
      * The colors that are present inside the sequence.
-     * In particular a color (represented by a tile) is present in the sequence iff
+     * In particular a color is present in the sequence iff
      * {@code yetAdded[tile.ordinal()]} is true.
      */
     private final boolean[] yetAdded = new boolean[TileColor.values().length];
@@ -92,8 +92,8 @@ public class NumDifferentColorFilter implements Filter {
         }
 
         /*
-         * Since the number of different colors inside the sequence can only grow by adding new tiles,
-         * if we don't remove the last added tile, the criteria can't be satisfied.
+         * Since the number of different colors inside the sequence can only grow by adding new tile colors,
+         * if we don't remove the last added tile color, the criteria can't be satisfied.
          */
         return count > maxColors;
     }

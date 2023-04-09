@@ -31,7 +31,7 @@ public class StairGoal extends CommonGoal{
         for (Shelf s: shelves) {
             if (s.getRow() != 0) {
                 Shelf positionUp = s.move(Offset.getInstance(-1, 0));
-                if (bookshelfMask.tileAt(positionUp) == TileColor.EMPTY)
+                if (bookshelfMask.getTileColorAt(positionUp) == TileColor.EMPTY)
                     continue;
                 if (!shelves.contains(positionUp))
                     return false;

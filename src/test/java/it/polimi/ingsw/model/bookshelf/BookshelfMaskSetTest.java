@@ -56,7 +56,7 @@ class BookshelfMaskSetTest {
         bookshelfMaskSet.addBookshelfMask(new BookshelfMask(bookshelf));
 
         List<BookshelfMask> receivedList = bookshelfMaskSet.getBookshelfMasks();
-        Assertions.assertEquals(TileColor.EMPTY, receivedList.get(receivedList.size() - 1).tileAt(Shelf.getInstance(0, 0)));
+        Assertions.assertEquals(TileColor.EMPTY, receivedList.get(receivedList.size() - 1).getTileColorAt(Shelf.getInstance(0, 0)));
         Assertions.assertEquals(n + 1, bookshelfMaskSet.getSize());
     }
 
@@ -64,7 +64,7 @@ class BookshelfMaskSetTest {
     @DisplayName("Control if compatibility checks work correctly")
     void isCompatible_variousMasks_correctOutput() {
         bookshelfMaskSet = new BookshelfMaskSet(
-                (a, b) -> a.tileAt(Shelf.getInstance(1, 1)) == b.tileAt(Shelf.getInstance(2, 2))
+                (a, b) -> a.getTileColorAt(Shelf.getInstance(1, 1)) == b.getTileColorAt(Shelf.getInstance(2, 2))
         );
 
         Bookshelf bookshelfFirst = new MockBookshelf(new int[][]{
@@ -123,7 +123,7 @@ class BookshelfMaskSetTest {
 
         Assertions.assertEquals(n + 1, bookshelfMaskSet.getSize());
 
-        bookshelfMaskSet.clearSet();
+        bookshelfMaskSet.clear();
         Assertions.assertEquals(0, bookshelfMaskSet.getSize());
     }
 }

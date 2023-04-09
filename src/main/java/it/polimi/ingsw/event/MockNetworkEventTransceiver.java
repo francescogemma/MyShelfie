@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MockNetworkEventTransceiver implements EventTransmitter, EventReceiver<EventData> {
-
     private final Object lock = new Object();
     private final List<String> serializedEvents = new ArrayList<>();
     private final List<EventListener<EventData>> listeners = new ArrayList<>();

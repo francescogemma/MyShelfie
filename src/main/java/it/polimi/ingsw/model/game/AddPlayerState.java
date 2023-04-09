@@ -2,7 +2,9 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.utils.Pair;
 
-public class AddPlayerState extends GameState{
+public class AddPlayerState extends GameState {
+    // TODO: Add JavaDoc for private fields in this class
+
     private boolean askForStartGame;
     public AddPlayerState(String name) {
         super(new GameData(name));
@@ -11,9 +13,6 @@ public class AddPlayerState extends GameState{
 
     @Override
     public void addPlayer(Player player) throws IllegalFlowException {
-        if (player == null)
-            throw new NullPointerException();
-
         if (this.gameData.players.size() == 4)
             throw new IllegalFlowException("Player are already 4");
 

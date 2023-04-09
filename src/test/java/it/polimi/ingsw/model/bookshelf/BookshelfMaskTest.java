@@ -118,7 +118,7 @@ class BookshelfMaskTest {
     void getSampleTile_correctOutput() {
         bookshelfMask.add(Shelf.origin());
 
-        Assertions.assertEquals(TileColor.EMPTY, bookshelfMask.getSampleTile());
+        Assertions.assertEquals(TileColor.EMPTY, bookshelfMask.getSampleTileColor());
     }
 
     @Test

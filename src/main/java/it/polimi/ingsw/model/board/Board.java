@@ -1,7 +1,6 @@
 package it.polimi.ingsw.model.board;
 
 import it.polimi.ingsw.model.tile.Tile;
-import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.utils.Coordinate;
 
 import java.util.*;
@@ -45,7 +44,7 @@ class BoardSelector {
     /**
      * The function checks in all the possible previous selections
      * and returns whether the coordinate has already been selected.
-     * @param c the point for check
+     * @param c the point to check
      * @return true iff c is already selected
      * */
     protected boolean contains(Coordinate c) {
@@ -103,9 +102,9 @@ class BoardSelector {
      * @exception IllegalArgumentException if we are trying to extract more than 3 tiles
      * @exception IllegalArgumentException if [r, c] is already in the list
      */
-    public void select (Coordinate c) throws IllegalExtractionException, SelectionFullException {
+    public void select (Coordinate c) throws IllegalExtractionException, FullSelectionException {
         if (selectionSize() > 2) {
-            throw new SelectionFullException();
+            throw new FullSelectionException();
         }
 
         if (contains(c)) {
@@ -134,6 +133,8 @@ class BoardSelector {
  * @author Giacomo Groppi
  * */
 public class Board {
+    // TODO: JavaDoc for some private fields is missing (we must add it :( [Laboratorio 2 - Javadoc-1.pdf, slide number 9])
+
     public static final int BOARD_ROWS = 9;
     public static final int COLUMN_BOARDS = 9;
     private BoardSelector boardSelector;
@@ -203,9 +204,9 @@ public class Board {
      * The function selects the Tile for extraction, it handles both the case where a Tile without
      * a free side is selected, and if a Tile is selected that cannot be extracted together with
      * the Tiles previously selected.
-     * @return The {@link TileColor Tile} selected.
+     * @return The {@link Tile Tile} selected.
     * */
-    public Tile selectTile(Coordinate c) throws IllegalExtractionException, SelectionFullException {
+    public Tile selectTile(Coordinate c) throws IllegalExtractionException, FullSelectionException {
         if (isOutOfBoard(c)) {
             throw new IllegalArgumentException("It's out of the board");
         }
@@ -221,7 +222,7 @@ public class Board {
         return this.tileAt(c);
     }
 
-    public Tile selectTile (int row, int col) throws IllegalExtractionException, SelectionFullException {
+    public Tile selectTile (int row, int col) throws IllegalExtractionException, FullSelectionException {
         return this.selectTile(new Coordinate(row, col));
     }
 
@@ -257,6 +258,11 @@ public class Board {
         return c.getRow() < 0 || c.getCol() < 0 || c.getRow() >= Board.BOARD_ROWS || c.getCol() >= Board.COLUMN_BOARDS;
     }
 
+    /* TODO: Also cells selected after the first must have at least free side (at the beginning of the round),
+     * that is they must have an adjacent cell which is empty.
+     * The code now allows to select tiles that haven't any free side at the beginning of the round but get some
+     * because of previous selections.
+     */
     public List<Coordinate> getSelectableCoordinate() {
         List<Coordinate> res = new ArrayList<>();
 
@@ -293,7 +299,7 @@ public class Board {
      * all the {@link Tile tiles} that can be extracted in a single extraction.
      * In case there were multiple extractions before the call, the function will only return the legal extractions
      * from that point onwards.
-     * @return All the {@link TileColor tiles} available for extraction.
+     * @return All the {@link Tile tiles} available for extraction.
     * */
     public List<Tile> getSelectableTiles() {
         return this.getSelectableCoordinate()

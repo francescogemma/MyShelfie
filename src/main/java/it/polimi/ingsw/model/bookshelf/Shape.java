@@ -77,7 +77,6 @@ public class Shape {
      *                there are no shelves in that row to the right of the last one anymore.
      *                Then we go down to the next row with some shelves and start again from the left-most.
      *                We continue this process until we have covered all the shelves.
-     * @throws NullPointerException if offsets is null.
      * @throws IllegalArgumentException <ul>
      *     <li> if offsets is empty.</li>
      *     <li> if there is an offset which is in a row greater than the one of the following
@@ -93,10 +92,6 @@ public class Shape {
      * @see Shape Bounding box
      */
     public Shape(List<Offset> offsets) {
-        if (offsets == null) {
-            throw new NullPointerException("offsets must be non-null when constructing a shape");
-        }
-
         if (offsets.isEmpty()) {
             throw new IllegalArgumentException("offsets must be non-empty when constructing a shape");
         }
@@ -497,10 +492,6 @@ public class Shape {
 
         for (int row = 0; row < STAIR_SIDE; row++) {
             for (int column = 0; column < STAIR_SIDE; column++) {
-                /*
-                 * With this condition the first two column of the stair are full (height 5),
-                 * then the stair starts to go down from the third column (column 2).
-                 */
                 if (row >= column) {
                     offsets.add(Offset.getInstance(row, column));
                 }

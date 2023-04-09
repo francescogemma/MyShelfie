@@ -1,22 +1,17 @@
 package it.polimi.ingsw.model.game;
 
-import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
-import it.polimi.ingsw.model.board.SelectionFullException;
+import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.utils.Coordinate;
-import it.polimi.ingsw.utils.Pair;
-import it.polimi.ingsw.model.goal.CommonGoal;
-import it.polimi.ingsw.model.game.GameState;
 
 import java.util.*;
 
 public class Game {
+    // TODO: Add JavaDoc for this class
+
     private GameState gameState;
 
     public Game(String name) {
-        if (name == null)
-            throw new NullPointerException();
-
         if (name.length() == 0)
             throw new IllegalArgumentException("String is empty");
 
@@ -36,7 +31,7 @@ public class Game {
         this.gameState = gameState.getNextState();
     }
 
-    public void selectTile(final Player player, Collection<Coordinate> position, int col) throws IllegalFlowException, SelectionFullException, IllegalExtractionException {
+    public void selectTile(final Player player, Collection<Coordinate> position, int col) throws IllegalFlowException, FullSelectionException, IllegalExtractionException {
         this.gameState.selectTile(player, position, col);
         gameState = gameState.getNextState();
     }
@@ -54,6 +49,7 @@ public class Game {
         this.gameState.disconnect(player);
     }
 
+    // TODO: Translate this JavaDoc to english
     /**
      * In caso un utente di disconnetti dalla partita la funzione viene
      * chiamata quando l'utente si riconnetta alla partita.

@@ -3,7 +3,9 @@ package it.polimi.ingsw.event;
 import it.polimi.ingsw.event.data.InsertTilesEventData;
 import it.polimi.ingsw.event.data.LoginEventData;
 import it.polimi.ingsw.event.data.MessageEventData;
+import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
+import it.polimi.ingsw.model.tile.TileVersion;
 
 import java.util.List;
 import java.util.Map;
@@ -19,16 +21,22 @@ public class Main {
             networkTransceiver);
 
         System.out.println(loginOnNetwork.request(new LoginEventData("foo", "notBar")).getMessage());
-        System.out.println(insertTiles.request(new InsertTilesEventData(0, List.of(TileColor.MAGENTA,
-            TileColor.GREEN))).getMessage());
+        System.out.println(insertTiles.request(new InsertTilesEventData(0, List.of(
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.SECOND),
+            Tile.getInstance(TileColor.GREEN, TileVersion.THIRD)))).getMessage());
 
         System.out.println(loginOnNetwork.request(new LoginEventData("foo", "bar")).getMessage());
 
         networkTransceiver.broadcast(new MessageEventData("Hello, I'm authenticated"));
 
-        System.out.println(insertTiles.request(new InsertTilesEventData(0, List.of(TileColor.MAGENTA, TileColor.GREEN))).getMessage());
-        System.out.println(insertTiles.request(new InsertTilesEventData(0, List.of(TileColor.MAGENTA,
-            TileColor.GREEN, TileColor.BLUE, TileColor.WHITE))).getMessage());
+        System.out.println(insertTiles.request(new InsertTilesEventData(0, List.of(
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
+            Tile.getInstance(TileColor.GREEN, TileVersion.THIRD)))).getMessage());
+        System.out.println(insertTiles.request(new InsertTilesEventData(0, List.of(
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.SECOND),
+            Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
+            Tile.getInstance(TileColor.BLUE, TileVersion.SECOND),
+            Tile.getInstance(TileColor.WHITE, TileVersion.FIRST)))).getMessage());
 
         networkTransceiver.broadcast(new MessageEventData("[!:-D]"));
     }
@@ -94,9 +102,9 @@ class Controller {
         System.out.println(username + ": " + message);
     }
 
-    public void printTiles(String username, List<TileColor> tileColors) {
-        for (TileColor tileColor : tileColors) {
-            System.out.println(username + " added a " + tileColor.color(tileColor.toString()) + " tile");
+    public void printTiles(String username, List<Tile> tiles) {
+        for (Tile tile : tiles) {
+            System.out.println(username + " added a " + tile.getColor().color(tile.getVersion().toString()) + " tile");
         }
     }
 }

@@ -3,6 +3,7 @@ import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.tile.TileVersion;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -14,18 +15,52 @@ import java.util.Random;
 public class Bag {
     /**
      * Specifies how different versions of the same tile are distributed in the bag.
+     *
+     * @author Cristiano Migali
      */
     private static final int[] VERSIONS_DISTRIBUTION = new int[Tile.NUM_OF_DIFFERENT_NON_EMPTY_TILES];
 
+    /**
+     * It is the total number of non-empty tiles in the game.
+     *
+     * @author Cristiano Migali
+     */
+    private static final int NUM_OF_NON_EMPTY_TILES = 132;
+
+    /**
+     * Sets the number of {@link Tile tiles} with a specified {@link TileColor color}
+     * and {@link TileVersion verions} inside the bag at the beginning of the game.
+     *
+     * @param tileColor is the color of the tile.
+     * @param tileVersion is the version of the tile.
+     * @param num is the amount of tiles with the specified color and version that will be in the bag at the
+     * beginning of the game.
+     *
+     * @author Cristiano Migali
+     */
     private static void setVersionsDistribution(TileColor tileColor, TileVersion tileVersion, int num) {
+        if (getVersionsDistribution(tileColor, tileVersion) != -1) {
+            throw new IllegalStateException("Version distribution must be set only one time");
+        }
+
         VERSIONS_DISTRIBUTION[Tile.nonEmptyTileToIndex(Tile.getInstance(tileColor, tileVersion))] = num;
     }
 
+    /**
+     * @param tileColor is the color of the tile.
+     * @param tileVersion is the version of the tile.
+     * @return the amount of tiles with the specified color and version that will be in the bag at the beginning
+     * of the game.
+     *
+     * @author Cristiano Migali
+     */
     private static int getVersionsDistribution(TileColor tileColor, TileVersion tileVersion) {
         return VERSIONS_DISTRIBUTION[Tile.nonEmptyTileToIndex(Tile.getInstance(tileColor, tileVersion))];
     }
 
     static  {
+        Arrays.fill(VERSIONS_DISTRIBUTION, -1);
+
         setVersionsDistribution(TileColor.GREEN, TileVersion.FIRST, 8);
         setVersionsDistribution(TileColor.GREEN, TileVersion.SECOND, 7);
         setVersionsDistribution(TileColor.GREEN, TileVersion.THIRD, 7);
@@ -49,6 +84,18 @@ public class Bag {
         setVersionsDistribution(TileColor.MAGENTA, TileVersion.FIRST, 8);
         setVersionsDistribution(TileColor.MAGENTA, TileVersion.SECOND, 7);
         setVersionsDistribution(TileColor.MAGENTA, TileVersion.THIRD, 7);
+
+        int sum = 0;
+        for (int distribution : VERSIONS_DISTRIBUTION) {
+            if (distribution == -1) {
+                throw new IllegalStateException("A version distribution hasn't been set");
+            }
+            sum += distribution;
+        }
+
+        if (sum != NUM_OF_NON_EMPTY_TILES) {
+            throw new IllegalStateException("Versions distribution doesn't add up to " + NUM_OF_NON_EMPTY_TILES);
+        }
     }
 
     private int remaining;
@@ -57,7 +104,7 @@ public class Bag {
 
     /**
      * Constructor of the class.
-     * It initializes all 22*6 {@link TileColor tile}
+     * It initializes all 22*6 {@link Tile tiles}
      * */
     public Bag() {
         for (TileColor tileColor : TileColor.values()) {
@@ -71,10 +118,7 @@ public class Bag {
 
         lastExtraction = -1;
 
-        remaining = 0;
-        for (int num : VERSIONS_DISTRIBUTION) {
-            remaining += num;
-        }
+        remaining = NUM_OF_NON_EMPTY_TILES;
     }
 
     public Bag (final Bag bag) {
@@ -87,9 +131,9 @@ public class Bag {
     }
 
     /**
-     * The function selects a random {@link TileColor tile} from the bag and removes it.
-     * @return a random {@link TileColor tile}
-     * @see TileColor
+     * The function selects a random {@link Tile tile} from the bag and removes it.
+     * @return a random {@link Tile tile}
+     * @see Tile
      * */
     public Tile getRandomTile() {
         if (this.isEmpty()) {
@@ -155,7 +199,7 @@ public class Bag {
     }
 
     /**
-     * @return return the number of tiles left in the class.
+     * @return the number of tiles left in the bag.
      * */
     protected int getRemaining() {
         return this.remaining;

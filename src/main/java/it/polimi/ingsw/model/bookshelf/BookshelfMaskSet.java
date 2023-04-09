@@ -46,6 +46,8 @@ public class BookshelfMaskSet {
         });
     }
 
+    // TODO: Refactor all the code using deprecated methods inside this class
+
     /**
      * @deprecated constructor. Please use the normal constructor, and add your biPredicate with the addBiPredicate method.
      * @param compatible defines the set of criteria used for compatibility checking.
@@ -171,7 +173,7 @@ public class BookshelfMaskSet {
      * Clears the set by removing all elements.
      * @author Francesco Gemma
      */
-    public void clearSet() {
+    public void clear() {
         bookshelfMasks.clear();
     }
 }

@@ -12,7 +12,7 @@ import java.util.List;
  * disposed along the row.
  * Rows and columns are enumerated starting from 0, in particular, row 0 is the top row in the bookshelf and column 0
  * is the left-most column in the bookshelf.
- * All the shelves have the same size. Each shelf can contain a {@link TileColor tile} (or be empty).
+ * All the shelves have the same size. Each shelf can contain a {@link Tile tile} (or be empty).
  * If a shelf is empty, all the shelves on the same column, in the rows above, must be empty too. In fact tiles can be
  * inserted in a bookshelf only in such a way that, to fill a shelf, you must also fill all the shelves below.
  *
@@ -73,15 +73,11 @@ public class Bookshelf {
     }
 
     /**
-     * @param shelf where we want to know what kind of {@link TileColor tile} is in it.
+     * @param shelf where we want to know what kind of {@link TileColor color} is the {@link Tile tile} in it.
      * @return the {@link TileColor color of the tile} inside the specified shelf.
      * @throws NullPointerException if shelf is null.
      */
     public TileColor getTileColorAt(Shelf shelf) {
-        if (shelf == null) {
-            throw new NullPointerException("When retrieving a tile from the bookshelf, shelf must be non-null");
-        }
-
         return content[shelf.getRow()][shelf.getColumn()].getColor();
     }
 
@@ -110,7 +106,7 @@ public class Bookshelf {
     }
 
     /**
-     * Insert {@link TileColor tiles} inside the bookshelf in such a way to preserve the invariant property of the bookshelf:
+     * Insert {@link Tile tiles} inside the bookshelf in such a way to preserve the invariant property of the bookshelf:
      * if a shelf is non-empty, all the shelves below it must be non-empty. We put the first tile inside tiles in the
      * empty shelf at the specified column which is in the lowest row, and keep going like this until we have inserted
      * all the tiles in tile. So the tiles at the beginning of the tiles list will be inserted in lower rows than the
@@ -155,7 +151,7 @@ public class Bookshelf {
     }
 
     /**
-     * @return returns true iff it is not possible to insert new Tiles in the bookshelf.
+     * @return true iff it is not possible to insert new Tiles in the bookshelf.
      * @author Giacomo Groppi
      * */
     public boolean isFull () {

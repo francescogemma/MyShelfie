@@ -78,7 +78,7 @@ public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluato
         for (BookshelfMaskSet bookshelfMaskSet : group) {
             if (bookshelfMaskSet.isCompatible(bookshelfMask)) {
                 // duplicate current BookshelfMaskSet in group
-                // then, add non-intersecting mask to one of them
+                // then, add the compatible mask to one of them
                 group.add(new BookshelfMaskSet(bookshelfMaskSet));
                 bookshelfMaskSet.addBookshelfMask(bookshelfMask);
 

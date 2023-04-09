@@ -24,4 +24,6 @@ public abstract class CommonGoal extends Goal{
     protected CommonGoal(Fetcher fetcher, Filter filter, Evaluator evaluator) {
         super(fetcher, filter, evaluator);
     }
+
+    // TODO: Add getTwoRandomCommonGoals
 }

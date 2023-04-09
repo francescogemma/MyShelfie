@@ -10,6 +10,7 @@ import it.polimi.ingsw.model.bookshelf.Bookshelf;
 public class Player {
     private String name;
     private Bookshelf bookshelf;
+    // TODO: Add personal goal support
     // PersonalGoal personalGoal;
     private int points;
 

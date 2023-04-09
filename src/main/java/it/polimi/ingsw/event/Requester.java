@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class Requester<ReceivedDataType extends EventData, SentDataType extends EventData> {
+public class Requester<R extends EventData, S extends EventData> {
     private final EventTransmitter transmitter;
 
     private static final Object nextRequestCountLock = new Object();
@@ -19,12 +19,12 @@ public class Requester<ReceivedDataType extends EventData, SentDataType extends 
 
     private final Object responsesLock = new Object();
     private final Set<Integer> waitingFor = new HashSet<>();
-    private final Map<Integer, ReceivedDataType> responses = new HashMap<>();
+    private final Map<Integer, R> responses = new HashMap<>();
 
     public Requester(String responseEventId, EventTransmitter transmitter, EventReceiver<EventData> receiver) {
         this.transmitter = transmitter;
 
-        new CastEventReceiver<SyncEventDataWrapper<ReceivedDataType>>(SyncEventDataWrapper.WRAPPER_ID + "_" + responseEventId,
+        new CastEventReceiver<SyncEventDataWrapper<R>>(SyncEventDataWrapper.WRAPPER_ID + "_" + responseEventId,
             receiver).registerListener(data -> {
                 synchronized (responsesLock) {
                     if (waitingFor.contains(data.getCount())) {
@@ -37,7 +37,7 @@ public class Requester<ReceivedDataType extends EventData, SentDataType extends 
         });
     }
 
-    public ReceivedDataType request(SentDataType data) {
+    public R request(S data) {
         int count;
 
         synchronized (nextRequestCountLock) {
@@ -49,7 +49,7 @@ public class Requester<ReceivedDataType extends EventData, SentDataType extends 
             waitingFor.add(count);
         }
 
-        transmitter.broadcast(new SyncEventDataWrapper<SentDataType>(count, data));
+        transmitter.broadcast(new SyncEventDataWrapper<S>(count, data));
 
         synchronized (responsesLock) {
             while (responses.get(count) == null) {

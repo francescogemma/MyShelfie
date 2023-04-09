@@ -10,7 +10,7 @@ import it.polimi.ingsw.model.goal.EightTilesGoal;
 /**
  * This class represents an evaluator for the common goal {@link EightTilesGoal}.
  * <p>
- * It simply counts the number of tiles of the same type to determine if the goal is satisfied or not.
+ * It simply counts the number of tiles of the same color to determine if the goal is satisfied or not.
  * <p>
  * It extends CommonGoalEvaluator and implements Evaluator.
  *
@@ -51,7 +51,7 @@ public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Eval
                 int count = 0;
                 for(int row = 0; row < Bookshelf.ROWS && count < 8; row++) {
                     for(int column = 0; column < Bookshelf.COLUMNS && count < 8; column++) {
-                        if(maskToAdd.tileAt(Shelf.getInstance(row, column)) == tileColor) {
+                        if(maskToAdd.getTileColorAt(Shelf.getInstance(row, column)) == tileColor) {
                             maskToAdd.add(Shelf.getInstance(row, column));
                             count++;
                         }

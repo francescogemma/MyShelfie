@@ -5,6 +5,7 @@ import it.polimi.ingsw.event.Responder;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
+import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
 
 import java.util.ArrayList;
@@ -13,19 +14,19 @@ import java.util.function.Function;
 
 public class InsertTilesEventData implements EventData {
     private int column;
-    private List<TileColor> tileColors;
+    private List<Tile> tiles;
 
-    public InsertTilesEventData(int column, List<TileColor> tileColors) {
+    public InsertTilesEventData(int column, List<Tile> tiles) {
         this.column = column;
-        this.tileColors = new ArrayList<>(tileColors);
+        this.tiles = new ArrayList<>(tiles);
     }
 
     public int getColumn() {
         return column;
     }
 
-    public List<TileColor> getTiles() {
-        return new ArrayList<>(tileColors);
+    public List<Tile> getTiles() {
+        return new ArrayList<>(tiles);
     }
 
     public static final String ID = "INSERT_TILES";

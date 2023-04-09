@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  * This {@link Evaluator evaluator} gets a single full {@link BookshelfMask BookshelfMask} and
- * finds all {@link TileColor tiles} that coincide with the specifics provided by a
+ * finds all {@link it.polimi.ingsw.model.tile.Tile tiles} that coincide with the specifics provided by a
  * {@link PersonalGoalEvaluator#personalGoal} map, that relates all 6 special
  * shelves to their expected tile.
  *
@@ -65,7 +65,7 @@ public class PersonalGoalEvaluator implements Evaluator {
     public boolean add(BookshelfMask bookshelfMask) {
         for (Map.Entry<Shelf, TileColor> goalShelf : personalGoal.entrySet()) {
             Shelf key = goalShelf.getKey();
-            if (bookshelfMask.tileAt(key) == personalGoal.get(key)) {
+            if (bookshelfMask.getTileColorAt(key) == personalGoal.get(key)) {
                 points = pointsMapping.get(successfulShelves++);
 
                 BookshelfMask maskToAdd = new BookshelfMask(bookshelfMask);

@@ -78,11 +78,11 @@ public class BookshelfMask {
     }
 
     /**
-     * @return the tile inside a shelf in the set.
+     * @return the {@link TileColor color} of the tile inside a shelf in the set.
      *
      * @author Michele Miotti
      */
-    public TileColor getSampleTile() {
+    public TileColor getSampleTileColor() {
         return bookshelf.getTileColorAt(shelves.get(0));
     }
 
@@ -108,16 +108,16 @@ public class BookshelfMask {
      * same color.
      */
     public static final BiPredicate<BookshelfMask, BookshelfMask> DO_NOT_INTERSECT_AND_SAME_COLOR = (first, second) ->
-        first.getSampleTile() == second.getSampleTile() && DO_NOT_INTERSECT.test(first, second);
+        first.getSampleTileColor() == second.getSampleTileColor() && DO_NOT_INTERSECT.test(first, second);
 
     /**
-     * Gets a specific shelf's content.
+     * Gets the color of the tile inside the specified shelf.
      * @param shelf is where we're sampling for color
-     * @return the {@link TileColor tile} at that location.
+     * @return the {@link TileColor tile color} at that location.
      *
      * @author Michele Miotti
      */
-    public TileColor tileAt(Shelf shelf) {
+    public TileColor getTileColorAt(Shelf shelf) {
         return bookshelf.getTileColorAt(shelf);
     }
 
@@ -137,7 +137,7 @@ public class BookshelfMask {
         }
 
         for(Shelf shelf : shelves) {
-            if(tileAt(shelf) == tileColor) {
+            if(getTileColorAt(shelf) == tileColor) {
                 count++;
             }
         }

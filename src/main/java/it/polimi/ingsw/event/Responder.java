@@ -8,13 +8,13 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
-public class Responder<ReceivedDataType extends EventData, SentDataType extends EventData> {
+public class Responder<R extends EventData, S extends EventData> {
     public Responder(String requestEventId, EventTransmitter transmitter, EventReceiver<EventData> receiver,
-                     Function<ReceivedDataType, SentDataType> response) {
-        new CastEventReceiver<SyncEventDataWrapper<ReceivedDataType>>(
+                     Function<R, S> response) {
+        new CastEventReceiver<SyncEventDataWrapper<R>>(
             SyncEventDataWrapper.WRAPPER_ID + "_" + requestEventId,
             receiver).registerListener(data ->
-                transmitter.broadcast(new SyncEventDataWrapper<SentDataType>(data.getCount(),
+                transmitter.broadcast(new SyncEventDataWrapper<S>(data.getCount(),
                     response.apply(data.getWrappedData()))));
     }
 }
