@@ -1,17 +1,10 @@
 package it.polimi.ingsw.event;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import it.polimi.ingsw.event.data.InsertTilesEventData;
 import it.polimi.ingsw.event.data.LoginEventData;
 import it.polimi.ingsw.event.data.MessageEventData;
-import it.polimi.ingsw.event.data.wrapper.SyncEventDataWrapper;
-import it.polimi.ingsw.event.receiver.CastEventReceiver;
-import it.polimi.ingsw.model.Tile;
-import it.polimi.ingsw.model.bookshelf.Bookshelf;
+import it.polimi.ingsw.model.tile.TileColor;
 
-import javax.swing.plaf.synth.ColorType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -27,16 +20,16 @@ public class Main {
             networkTransceiver);
 
         System.out.println(loginOnNetwork.request(new LoginEventData("foo", "notBar")).getMessage());
-        System.out.println(insertTiles.request(new InsertTilesEventData(0, Arrays.asList(Tile.MAGENTA,
-            Tile.GREEN))).getMessage());
+        System.out.println(insertTiles.request(new InsertTilesEventData(0, Arrays.asList(TileColor.MAGENTA,
+            TileColor.GREEN))).getMessage());
 
         System.out.println(loginOnNetwork.request(new LoginEventData("foo", "bar")).getMessage());
 
         networkTransceiver.broadcast(new MessageEventData("Hello, I'm authenticated"));
 
-        System.out.println(insertTiles.request(new InsertTilesEventData(0, Arrays.asList(Tile.MAGENTA, Tile.GREEN))).getMessage());
-        System.out.println(insertTiles.request(new InsertTilesEventData(0, Arrays.asList(Tile.MAGENTA,
-            Tile.GREEN, Tile.BLUE, Tile.WHITE))).getMessage());
+        System.out.println(insertTiles.request(new InsertTilesEventData(0, Arrays.asList(TileColor.MAGENTA, TileColor.GREEN))).getMessage());
+        System.out.println(insertTiles.request(new InsertTilesEventData(0, Arrays.asList(TileColor.MAGENTA,
+            TileColor.GREEN, TileColor.BLUE, TileColor.WHITE))).getMessage());
 
         networkTransceiver.broadcast(new MessageEventData("[!:-D]"));
     }
@@ -102,9 +95,9 @@ class Controller {
         System.out.println(username + ": " + message);
     }
 
-    public void printTiles(String username, List<Tile> tiles) {
-        for (Tile tile : tiles) {
-            System.out.println(username + " added a " + tile.color(tile.toString()) + " tile");
+    public void printTiles(String username, List<TileColor> tileColors) {
+        for (TileColor tileColor : tileColors) {
+            System.out.println(username + " added a " + tileColor.color(tileColor.toString()) + " tile");
         }
     }
 }

@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.bookshelf;
 
-import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,7 +56,7 @@ class BookshelfMaskSetTest {
         bookshelfMaskSet.addBookshelfMask(new BookshelfMask(bookshelf));
 
         ArrayList<BookshelfMask> receivedList = (ArrayList<BookshelfMask>) bookshelfMaskSet.getBookshelfMasks();
-        Assertions.assertEquals(Tile.EMPTY, receivedList.get(receivedList.size() - 1).tileAt(Shelf.getInstance(0, 0)));
+        Assertions.assertEquals(TileColor.EMPTY, receivedList.get(receivedList.size() - 1).tileAt(Shelf.getInstance(0, 0)));
         Assertions.assertEquals(n + 1, bookshelfMaskSet.getSize());
     }
 

@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.filter;
 
-import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.utils.Coordinate;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class StairFilter implements Filter{
     }
 
     @Override
-    public boolean add(Tile tile) {
+    public boolean add(TileColor tileColor) {
         if (index >= coordinates.size()) {
             forNowOk = false;
         }
@@ -46,7 +46,7 @@ public class StairFilter implements Filter{
         final Coordinate coordinate = coordinates.get(this.index);
         final boolean value = position.get(coordinate.getRow())[coordinate.getCol()];
 
-        if (tile == Tile.EMPTY) {
+        if (tileColor == TileColor.EMPTY) {
             if (value) {
                 forNowOk = false;
             }

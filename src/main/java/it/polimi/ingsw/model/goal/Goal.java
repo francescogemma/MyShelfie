@@ -64,7 +64,7 @@ public abstract class Goal {
         do {
             Shelf next = fetcher.next();
 
-            if (filter.add(bookshelf.get(next))) {
+            if (filter.add(bookshelf.getTileColorAt(next))) {
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
                 } else {

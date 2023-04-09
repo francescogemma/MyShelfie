@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.evaluator;
 
-import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMask;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
@@ -41,8 +41,8 @@ public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Eval
 
     @Override
     public boolean add(BookshelfMask mask) {
-        for(Tile tile : Tile.values()) {
-            if(tile != Tile.EMPTY && mask.countTilesOfColor(tile) >= 8) {
+        for(TileColor tileColor : TileColor.values()) {
+            if(tileColor != TileColor.EMPTY && mask.countTilesOfColor(tileColor) >= 8) {
                 satisfied = true;
 
                 BookshelfMask maskToAdd = new BookshelfMask(mask);
@@ -51,7 +51,7 @@ public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Eval
                 int count = 0;
                 for(int row = 0; row < Bookshelf.ROWS && count < 8; row++) {
                     for(int column = 0; column < Bookshelf.COLUMNS && count < 8; column++) {
-                        if(maskToAdd.tileAt(Shelf.getInstance(row, column)) == tile) {
+                        if(maskToAdd.tileAt(Shelf.getInstance(row, column)) == tileColor) {
                             maskToAdd.add(Shelf.getInstance(row, column));
                             count++;
                         }

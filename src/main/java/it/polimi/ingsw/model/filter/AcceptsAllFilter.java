@@ -1,10 +1,10 @@
 package it.polimi.ingsw.model.filter;
 
-import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
 
 public class AcceptsAllFilter implements Filter {
     @Override
-    public boolean add(Tile tile) {
+    public boolean add(TileColor tileColor) {
         return false;
     }
 

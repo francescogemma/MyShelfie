@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.goal;
 
-import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.bookshelf.*;
 import it.polimi.ingsw.model.evaluator.AtLeastEvaluator;
 import it.polimi.ingsw.model.evaluator.Evaluator;
@@ -31,7 +31,7 @@ public class StairGoal extends CommonGoal{
         for (Shelf s: shelves) {
             if (s.getRow() != 0) {
                 Shelf positionUp = s.move(Offset.getInstance(-1, 0));
-                if (bookshelfMask.tileAt(positionUp) == Tile.EMPTY)
+                if (bookshelfMask.tileAt(positionUp) == TileColor.EMPTY)
                     continue;
                 if (!shelves.contains(positionUp))
                     return false;

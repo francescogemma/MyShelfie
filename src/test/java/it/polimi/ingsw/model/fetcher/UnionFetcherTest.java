@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.fetcher;
 
-import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.bookshelf.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,7 +36,7 @@ class UnionFetcherTest {
                         }
                     }
 
-                    mockBookshelf[row][column] = random.nextInt(Tile.values().length);
+                    mockBookshelf[row][column] = random.nextInt(TileColor.values().length);
                 }
             }
 

@@ -1,4 +1,4 @@
-package it.polimi.ingsw.model;
+package it.polimi.ingsw.model.tile;
 
 import it.polimi.ingsw.model.bag.Bag;
 import it.polimi.ingsw.model.board.Board;
@@ -10,7 +10,7 @@ import it.polimi.ingsw.model.bookshelf.Bookshelf;
  *
  * @author Giacomo Groppi, Cristiano Migali
  */
-public enum Tile {
+public enum TileColor {
     GREEN("green", "\033[30;42m"),
     WHITE("white", "\033[30;47m"),
     YELLOW("yellow", "\033[30;43m"),
@@ -35,7 +35,7 @@ public enum Tile {
      * @param name is the name of the type of the tile.
      * @param color is the ANSI escape sequence that allows to color a string with the color represented by the tile.
      */
-    Tile(String name, String color) {
+    TileColor(String name, String color) {
         this.colorCode = color;
         this.name = name;
     }
@@ -52,5 +52,48 @@ public enum Tile {
     @Override
     public String toString() {
         return this.name;
+    }
+
+    public static TileColor indexToTileColor(int index) {
+        if (index == 0) {
+            return TileColor.EMPTY;
+        }
+
+        TileColor tileColor = TileColor.EMPTY;
+        for (TileColor t : TileColor.values()) {
+            if (t != TileColor.EMPTY) {
+                tileColor = t;
+                index--;
+
+                if (index == 0) {
+                    break;
+                }
+            }
+        }
+
+        if (tileColor == TileColor.EMPTY) {
+            throw new IllegalStateException("Result of indexToTile must be empty iff index is 0");
+        }
+
+        return tileColor;
+    }
+
+    public static int tileColorToIndex(TileColor tileColor) {
+        if (tileColor == TileColor.EMPTY) {
+            return 0;
+        }
+
+        int index = 1;
+        for (TileColor t : TileColor.values()) {
+            if (t != TileColor.EMPTY) {
+                if (t == tileColor) {
+                    return index;
+                }
+
+                index++;
+            }
+        }
+
+        throw new IllegalStateException("We must find tile in Tile.values when converting a tile to an index");
     }
 }

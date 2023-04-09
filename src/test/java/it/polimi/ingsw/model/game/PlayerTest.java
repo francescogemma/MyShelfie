@@ -1,7 +1,9 @@
 package it.polimi.ingsw.model.game;
 
-import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.tile.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
+import it.polimi.ingsw.model.tile.TileVersion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -56,7 +58,11 @@ class PlayerTest {
     @DisplayName("Set the bookshelf of the player")
     void setBookshelf_bookshelfOfThePlayer_correctBookshelf() {
         bookshelf = new Bookshelf();
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(Tile.CYAN, Tile.MAGENTA, Tile.BLUE)), 2);
+        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
+            Tile.getInstance(TileColor.CYAN, TileVersion.FIRST),
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
+            Tile.getInstance(TileColor.BLUE, TileVersion.FIRST)
+        )), 2);
         Assertions.assertNotEquals(bookshelf, player.getBookshelf());
 
         player.setBookshelf(bookshelf);

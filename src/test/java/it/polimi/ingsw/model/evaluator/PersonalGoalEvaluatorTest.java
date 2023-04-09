@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.evaluator;
 
-import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.bookshelf.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -13,15 +13,15 @@ import java.util.HashMap;
 class PersonalGoalEvaluatorTest {
     PersonalGoalEvaluator personalGoalEvaluator;
 
-    private static HashMap<Shelf, Tile> getPersonalGoal() {
-        HashMap<Shelf, Tile> personalGoal = new HashMap<>();
+    private static HashMap<Shelf, TileColor> getPersonalGoal() {
+        HashMap<Shelf, TileColor> personalGoal = new HashMap<>();
 
-        personalGoal.put(Shelf.getInstance(5, 4), Tile.GREEN);
-        personalGoal.put(Shelf.getInstance(2, 2), Tile.YELLOW);
-        personalGoal.put(Shelf.getInstance(3, 1), Tile.BLUE);
-        personalGoal.put(Shelf.getInstance(3, 2), Tile.MAGENTA);
-        personalGoal.put(Shelf.getInstance(4, 1), Tile.WHITE);
-        personalGoal.put(Shelf.getInstance(4, 3), Tile.CYAN);
+        personalGoal.put(Shelf.getInstance(5, 4), TileColor.GREEN);
+        personalGoal.put(Shelf.getInstance(2, 2), TileColor.YELLOW);
+        personalGoal.put(Shelf.getInstance(3, 1), TileColor.BLUE);
+        personalGoal.put(Shelf.getInstance(3, 2), TileColor.MAGENTA);
+        personalGoal.put(Shelf.getInstance(4, 1), TileColor.WHITE);
+        personalGoal.put(Shelf.getInstance(4, 3), TileColor.CYAN);
 
         return personalGoal;
     }
@@ -49,7 +49,7 @@ class PersonalGoalEvaluatorTest {
                     { 0, 0, 0, 0, 0 },
                     { 0, 0, 0, 0, 0 },
                     { 0, 0, 0, 0, 0 },
-                    { 0, 0, 0, 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                    { 0, 0, 0, 0, TileColor.tileColorToIndex(TileColor.GREEN) }
             })
         );
 
@@ -59,7 +59,7 @@ class PersonalGoalEvaluatorTest {
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, 0, 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -93,7 +93,7 @@ class PersonalGoalEvaluatorTest {
                         { 0, 0, 0, 0, 0 },
                         { 0, 0, 0, 0, 0 },
                         { 0, 0, 0, 0, 0 },
-                        { 0, 0, 0, 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                        { 0, 0, 0, 0, TileColor.tileColorToIndex(TileColor.GREEN) }
                 })
         );
 
@@ -103,7 +103,7 @@ class PersonalGoalEvaluatorTest {
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, 0, 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -124,20 +124,20 @@ class PersonalGoalEvaluatorTest {
                 new MockBookshelf(new int[][]{
                         { 0, 0, 0, 0, 0 },
                         { 0, 0, 0, 0, 0 },
-                        { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                        { 0, 0, MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                        { 0, 0, MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                        { 0, 0, MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                        { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                        { 0, 0, TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                        { 0, 0, TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                        { 0, 0, TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
                 })
         );
 
         BookshelfMask pointMask1 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, 0, TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, 0, TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, 0, TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -150,10 +150,10 @@ class PersonalGoalEvaluatorTest {
         BookshelfMask pointMask2 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, 0, TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, 0, TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, 0, TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -175,20 +175,20 @@ class PersonalGoalEvaluatorTest {
                 new MockBookshelf(new int[][]{
                         { 0, 0, 0, 0, 0 },
                         { 0, 0, 0, 0, 0 },
-                        { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                        { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                        { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                        { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                        { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                        { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                        { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                        { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
                 })
         );
 
         pointMask1 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -201,10 +201,10 @@ class PersonalGoalEvaluatorTest {
         pointMask2 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -217,10 +217,10 @@ class PersonalGoalEvaluatorTest {
         BookshelfMask pointMask3 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -243,20 +243,20 @@ class PersonalGoalEvaluatorTest {
                 new MockBookshelf(new int[][]{
                         { 0, 0, 0, 0, 0 },
                         { 0, 0, 0, 0, 0 },
-                        { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                        { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                        { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                        { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                        { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                        { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                        { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                        { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
                 })
         );
 
         pointMask1 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -269,10 +269,10 @@ class PersonalGoalEvaluatorTest {
         pointMask2 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -285,10 +285,10 @@ class PersonalGoalEvaluatorTest {
         pointMask3 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -301,10 +301,10 @@ class PersonalGoalEvaluatorTest {
         BookshelfMask pointMask4 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -328,20 +328,20 @@ class PersonalGoalEvaluatorTest {
                 new MockBookshelf(new int[][]{
                         { 0, 0, 0, 0, 0 },
                         { 0, 0, 0, 0, 0 },
-                        { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                        { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                        { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                        { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                        { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                        { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                        { 0, TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                        { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
                 })
         );
 
         pointMask1 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -354,10 +354,10 @@ class PersonalGoalEvaluatorTest {
         pointMask2 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -370,10 +370,10 @@ class PersonalGoalEvaluatorTest {
         pointMask3 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -386,10 +386,10 @@ class PersonalGoalEvaluatorTest {
         pointMask4 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -402,10 +402,10 @@ class PersonalGoalEvaluatorTest {
         BookshelfMask pointMask5 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), 0, MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), 0, TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -430,20 +430,20 @@ class PersonalGoalEvaluatorTest {
                 new MockBookshelf(new int[][]{
                         { 0, 0, 0, 0, 0 },
                         { 0, 0, 0, 0, 0 },
-                        { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                        { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                        { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.CYAN), 0 },
-                        { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN) }
+                        { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                        { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                        { 0, TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.CYAN), 0 },
+                        { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN) }
                 })
         );
 
         pointMask1 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.CYAN), 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.CYAN), 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -456,10 +456,10 @@ class PersonalGoalEvaluatorTest {
         pointMask2 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.CYAN), 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.CYAN), 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -472,10 +472,10 @@ class PersonalGoalEvaluatorTest {
         pointMask3 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.CYAN), 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.CYAN), 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -488,10 +488,10 @@ class PersonalGoalEvaluatorTest {
         pointMask4 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.CYAN), 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.CYAN), 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -504,10 +504,10 @@ class PersonalGoalEvaluatorTest {
         pointMask5 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.CYAN), 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.CYAN), 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
@@ -520,10 +520,10 @@ class PersonalGoalEvaluatorTest {
         BookshelfMask pointMask6 = new MockBookshelfMask(new MockBookshelf(new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
-                { 0, 0, MockBookshelf.tileToIndex(Tile.YELLOW), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.BLUE), MockBookshelf.tileToIndex(Tile.MAGENTA), 0, 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.CYAN), 0 },
-                { 0, MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.GREEN), MockBookshelf.tileToIndex(Tile.WHITE), MockBookshelf.tileToIndex(Tile.GREEN) }
+                { 0, 0, TileColor.tileColorToIndex(TileColor.YELLOW), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.BLUE), TileColor.tileColorToIndex(TileColor.MAGENTA), 0, 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.CYAN), 0 },
+                { 0, TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.GREEN), TileColor.tileColorToIndex(TileColor.WHITE), TileColor.tileColorToIndex(TileColor.GREEN) }
         }), new int[][]{
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },

@@ -1,10 +1,8 @@
 package it.polimi.ingsw.model.bookshelf;
 
-import it.polimi.ingsw.model.Tile;
-import it.polimi.ingsw.model.bookshelf.Bookshelf;
-import it.polimi.ingsw.model.bookshelf.BookshelfMask;
-import it.polimi.ingsw.model.bookshelf.Offset;
-import it.polimi.ingsw.model.bookshelf.Shelf;
+import it.polimi.ingsw.model.tile.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
+import it.polimi.ingsw.model.tile.TileVersion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,35 +19,47 @@ class BookshelfMaskTest {
         Bookshelf bookshelf = new Bookshelf();
 
         bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
-            Tile.MAGENTA, Tile.YELLOW, Tile.GREEN
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
+            Tile.getInstance(TileColor.YELLOW, TileVersion.FIRST),
+            Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
         )), 0);
 
         bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
-            Tile.BLUE, Tile.CYAN
+            Tile.getInstance(TileColor.BLUE, TileVersion.FIRST),
+            Tile.getInstance(TileColor.CYAN, TileVersion.FIRST)
         )), 0);
 
         bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
-            Tile.GREEN, Tile.MAGENTA, Tile.WHITE
+            Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
+            Tile.getInstance(TileColor.WHITE, TileVersion.FIRST)
         )), 1);
 
         bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
-            Tile.WHITE, Tile.WHITE, Tile.YELLOW
+            Tile.getInstance(TileColor.WHITE, TileVersion.FIRST),
+            Tile.getInstance(TileColor.WHITE, TileVersion.FIRST),
+            Tile.getInstance(TileColor.YELLOW, TileVersion.FIRST)
         )), 2);
 
         bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
-            Tile.BLUE
+            Tile.getInstance(TileColor.BLUE, TileVersion.FIRST)
         )), 2);
 
         bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
-            Tile.BLUE, Tile.CYAN
+            Tile.getInstance(TileColor.BLUE, TileVersion.FIRST),
+            Tile.getInstance(TileColor.CYAN, TileVersion.FIRST)
         )), 3);
 
         bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
-            Tile.MAGENTA, Tile.YELLOW, Tile.GREEN
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
+            Tile.getInstance(TileColor.YELLOW, TileVersion.FIRST),
+            Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
         )), 4);
 
         bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
-            Tile.BLUE, Tile.CYAN, Tile.WHITE
+            Tile.getInstance(TileColor.BLUE, TileVersion.FIRST),
+            Tile.getInstance(TileColor.CYAN, TileVersion.FIRST),
+            Tile.getInstance(TileColor.WHITE, TileVersion.FIRST)
         )), 4);
 
         bookshelfMask = new BookshelfMask(bookshelf);
@@ -107,56 +117,56 @@ class BookshelfMaskTest {
     void getSampleTile_correctOutput() {
         bookshelfMask.add(Shelf.origin());
 
-        Assertions.assertEquals(Tile.EMPTY, bookshelfMask.getSampleTile());
+        Assertions.assertEquals(TileColor.EMPTY, bookshelfMask.getSampleTile());
     }
 
     @Test
     @DisplayName("Count magenta tiles in the mask")
     void countTilesOfColorMagenta_correctOutput() {
         populateFullMask();
-        Assertions.assertEquals(3, bookshelfMask.countTilesOfColor(Tile.MAGENTA));
+        Assertions.assertEquals(3, bookshelfMask.countTilesOfColor(TileColor.MAGENTA));
     }
 
     @Test
     @DisplayName("Count yellow tiles in the mask")
     void countTilesOfColorYellow_correctOutput() {
         populateFullMask();
-        Assertions.assertEquals(3, bookshelfMask.countTilesOfColor(Tile.YELLOW));
+        Assertions.assertEquals(3, bookshelfMask.countTilesOfColor(TileColor.YELLOW));
     }
 
     @Test
     @DisplayName("Count green tiles in the mask")
     void countTilesOfColorGreen_correctOutput() {
         populateFullMask();
-        Assertions.assertEquals(3, bookshelfMask.countTilesOfColor(Tile.GREEN));
+        Assertions.assertEquals(3, bookshelfMask.countTilesOfColor(TileColor.GREEN));
     }
 
     @Test
     @DisplayName("Count blue tiles in the mask")
     void countTilesOfColorBlue_correctOutput() {
         populateFullMask();
-        Assertions.assertEquals(4, bookshelfMask.countTilesOfColor(Tile.BLUE));
+        Assertions.assertEquals(4, bookshelfMask.countTilesOfColor(TileColor.BLUE));
     }
 
     @Test
     @DisplayName("Count cyan tiles in the mask")
     void countTilesOfColorCyan_correctOutput() {
         populateFullMask();
-        Assertions.assertEquals(3, bookshelfMask.countTilesOfColor(Tile.CYAN));
+        Assertions.assertEquals(3, bookshelfMask.countTilesOfColor(TileColor.CYAN));
     }
 
     @Test
     @DisplayName("Count white tiles in the mask")
     void countTilesOfColorWhite_correctOutput() {
         populateFullMask();
-        Assertions.assertEquals(4, bookshelfMask.countTilesOfColor(Tile.WHITE));
+        Assertions.assertEquals(4, bookshelfMask.countTilesOfColor(TileColor.WHITE));
     }
 
     @Test
     @DisplayName("Try to count empty tiles in the mask, should throw an IllegalArgumentException")
     void countTilesOfColorEmpty_throwsIllegalArgumentException() {
         populateFullMask();
-        Assertions.assertThrows(IllegalArgumentException.class, () -> bookshelfMask.countTilesOfColor(Tile.EMPTY));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> bookshelfMask.countTilesOfColor(TileColor.EMPTY));
     }
 
     private void populateFullMask() {

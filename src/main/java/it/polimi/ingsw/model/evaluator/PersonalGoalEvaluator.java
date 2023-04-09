@@ -1,9 +1,9 @@
 package it.polimi.ingsw.model.evaluator;
 
+import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.bookshelf.BookshelfMask;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 import it.polimi.ingsw.model.bookshelf.Shelf;
-import it.polimi.ingsw.model.Tile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  * This {@link Evaluator evaluator} gets a single full {@link BookshelfMask BookshelfMask} and
- * finds all {@link Tile tiles} that coincide with the specifics provided by a
+ * finds all {@link TileColor tiles} that coincide with the specifics provided by a
  * {@link PersonalGoalEvaluator#personalGoal} map, that relates all 6 special
  * shelves to their expected tile.
  *
@@ -22,7 +22,7 @@ public class PersonalGoalEvaluator implements Evaluator {
      * This map relates each one of the 6 special shelves with one
      * specific color. This information has to be provided to the constructor.
      */
-    private final Map<Shelf, Tile> personalGoal;
+    private final Map<Shelf, TileColor> personalGoal;
 
     /**
      * This list maps each natural number up to 6 (x) to another number (y), which
@@ -51,7 +51,7 @@ public class PersonalGoalEvaluator implements Evaluator {
      * @param pointsMapping is a list of 6 elements, corresponding to the points awarded to a player
      *                      for successfully matching 1, 2, 3, ... tiles to their correct color.
      */
-    public PersonalGoalEvaluator(Map<Shelf, Tile> personalGoal, List<Integer> pointsMapping) {
+    public PersonalGoalEvaluator(Map<Shelf, TileColor> personalGoal, List<Integer> pointsMapping) {
         this.personalGoal = new HashMap<>(personalGoal);
         this.pointsMapping = pointsMapping;
 
@@ -63,7 +63,7 @@ public class PersonalGoalEvaluator implements Evaluator {
 
     @Override
     public boolean add(BookshelfMask bookshelfMask) {
-        for (Map.Entry<Shelf, Tile> goalShelf : personalGoal.entrySet()) {
+        for (Map.Entry<Shelf, TileColor> goalShelf : personalGoal.entrySet()) {
             Shelf key = goalShelf.getKey();
             if (bookshelfMask.tileAt(key) == personalGoal.get(key)) {
                 points = pointsMapping.get(successfulShelves++);

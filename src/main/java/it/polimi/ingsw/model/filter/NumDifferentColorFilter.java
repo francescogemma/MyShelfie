@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.filter;
 
-import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
 
 import java.util.Arrays;
 
@@ -31,7 +31,7 @@ public class NumDifferentColorFilter implements Filter {
      * In particular a color (represented by a tile) was present in the sequence iff
      * {@code yetAddedBeforeLast[tile.ordinal()]} is true.
      */
-    private final boolean[] yetAddedBeforeLast = new boolean[Tile.values().length];
+    private final boolean[] yetAddedBeforeLast = new boolean[TileColor.values().length];
 
     /**
      * The number of different colors inside the sequence.
@@ -43,7 +43,7 @@ public class NumDifferentColorFilter implements Filter {
      * In particular a color (represented by a tile) is present in the sequence iff
      * {@code yetAdded[tile.ordinal()]} is true.
      */
-    private final boolean[] yetAdded = new boolean[Tile.values().length];
+    private final boolean[] yetAdded = new boolean[TileColor.values().length];
 
     /**
      * Constructor of the class.
@@ -75,19 +75,19 @@ public class NumDifferentColorFilter implements Filter {
     }
 
     @Override
-    public boolean add(Tile tile) {
+    public boolean add(TileColor tileColor) {
         countBeforeLast = count;
-        for (Tile t : Tile.values()) {
+        for (TileColor t : TileColor.values()) {
             yetAddedBeforeLast[t.ordinal()] = yetAdded[t.ordinal()];
         }
 
-        if (!yetAdded[tile.ordinal()]) {
+        if (!yetAdded[tileColor.ordinal()]) {
             count++;
         }
 
-        yetAdded[tile.ordinal()] = true;
+        yetAdded[tileColor.ordinal()] = true;
 
-        if (tile == Tile.EMPTY) {
+        if (tileColor == TileColor.EMPTY) {
             return true;
         }
 
@@ -101,7 +101,7 @@ public class NumDifferentColorFilter implements Filter {
     @Override
     public void forgetLastTile() {
         count = countBeforeLast;
-        for (Tile t : Tile.values()) {
+        for (TileColor t : TileColor.values()) {
             yetAdded[t.ordinal()] = yetAddedBeforeLast[t.ordinal()];
         }
     }
@@ -109,7 +109,7 @@ public class NumDifferentColorFilter implements Filter {
     @Override
     public boolean isSatisfied() {
         return minColors <= count && count <= maxColors &&
-            !yetAdded[Tile.EMPTY.ordinal()];
+            !yetAdded[TileColor.EMPTY.ordinal()];
     }
 
     @Override

@@ -1,8 +1,8 @@
 package it.polimi.ingsw.model.bookshelf;
 
-import it.polimi.ingsw.model.Tile;
-import it.polimi.ingsw.model.bookshelf.Bookshelf;
-import it.polimi.ingsw.model.bookshelf.Shelf;
+import it.polimi.ingsw.model.tile.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
+import it.polimi.ingsw.model.tile.TileVersion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -59,7 +59,7 @@ class BookshelfTest {
     @DisplayName("Try to get tile in null shelf, should throw exception")
     void get_nullShelf_throwsNullPointerException() {
         Assertions.assertThrows(NullPointerException.class, () -> {
-            bookshelf.get(null);
+            bookshelf.getTileColorAt(null);
         });
     }
 
@@ -67,15 +67,18 @@ class BookshelfTest {
     @DisplayName("Insert tiles inside the bookshelf")
     void insertTiles_correctInput_correctOutput() {
         ArrayList<Tile> firstInsertion = new ArrayList<>(Arrays.asList(
-            Tile.GREEN, Tile.BLUE, Tile.CYAN
+            Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
+            Tile.getInstance(TileColor.BLUE, TileVersion.FIRST),
+            Tile.getInstance(TileColor.CYAN, TileVersion.FIRST)
         ));
 
         ArrayList<Tile> secondInsertion = new ArrayList<>(Arrays.asList(
-            Tile.YELLOW, Tile.MAGENTA
+            Tile.getInstance(TileColor.YELLOW, TileVersion.FIRST),
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST)
         ));
 
         ArrayList<Tile> thirdInsertion = new ArrayList<>(Arrays.asList(
-           Tile.BLUE
+            Tile.getInstance(TileColor.BLUE, TileVersion.FIRST)
         ));
 
         bookshelf.insertTiles(firstInsertion, 0);
@@ -83,25 +86,27 @@ class BookshelfTest {
         bookshelf.insertTiles(thirdInsertion, 0);
 
         // This test case also exerts get code
-        Assertions.assertEquals(Tile.GREEN,
-            bookshelf.get(Shelf.getInstance(Bookshelf.ROWS - 1, 0)));
-        Assertions.assertEquals(Tile.BLUE,
-            bookshelf.get(Shelf.getInstance(Bookshelf.ROWS - 2, 0)));
-        Assertions.assertEquals(Tile.CYAN,
-            bookshelf.get(Shelf.getInstance(Bookshelf.ROWS - 3, 0)));
-        Assertions.assertEquals(Tile.YELLOW,
-            bookshelf.get(Shelf.getInstance(Bookshelf.ROWS - 1, 1)));
-        Assertions.assertEquals(Tile.MAGENTA,
-            bookshelf.get(Shelf.getInstance(Bookshelf.ROWS - 2, 1)));
-        Assertions.assertEquals(Tile.BLUE,
-            bookshelf.get(Shelf.getInstance(Bookshelf.ROWS - 4, 0)));
+        Assertions.assertEquals(TileColor.GREEN,
+            bookshelf.getTileColorAt(Shelf.getInstance(Bookshelf.ROWS - 1, 0)));
+        Assertions.assertEquals(TileColor.BLUE,
+            bookshelf.getTileColorAt(Shelf.getInstance(Bookshelf.ROWS - 2, 0)));
+        Assertions.assertEquals(TileColor.CYAN,
+            bookshelf.getTileColorAt(Shelf.getInstance(Bookshelf.ROWS - 3, 0)));
+        Assertions.assertEquals(TileColor.YELLOW,
+            bookshelf.getTileColorAt(Shelf.getInstance(Bookshelf.ROWS - 1, 1)));
+        Assertions.assertEquals(TileColor.MAGENTA,
+            bookshelf.getTileColorAt(Shelf.getInstance(Bookshelf.ROWS - 2, 1)));
+        Assertions.assertEquals(TileColor.BLUE,
+            bookshelf.getTileColorAt(Shelf.getInstance(Bookshelf.ROWS - 4, 0)));
     }
 
     @Test
     @DisplayName("Try to insert tiles in a column outside of the bookshelf, should throw exception")
     void insertTiles_columnOutsideTheBookshelf_throwsIllegalArgumentException() {
         ArrayList<Tile> insertion = new ArrayList<>(Arrays.asList(
-           Tile.MAGENTA, Tile.MAGENTA, Tile.MAGENTA
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST)
         ));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -113,7 +118,10 @@ class BookshelfTest {
     @DisplayName("Try to insert more tiles than the maximum insertion size, should throw exception")
     void insertTiles_tooManyTilesInSingleInsertion_throwsIllegalArgumentException() {
         ArrayList<Tile> insertion = new ArrayList<>(Arrays.asList(
-           Tile.MAGENTA, Tile.MAGENTA, Tile.MAGENTA, Tile.MAGENTA
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
+           Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
+           Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
+           Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST)
         ));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -125,7 +133,9 @@ class BookshelfTest {
     @DisplayName("Try to insert an empty tile inside the bookshelf, should throw exception")
     void insertTiles_emptyTileInInsertion_throwsIllegalArgumentException() {
         ArrayList<Tile> insertion = new ArrayList<>(Arrays.asList(
-            Tile.MAGENTA, Tile.EMPTY, Tile.MAGENTA
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
+            Tile.getInstance(TileColor.EMPTY, TileVersion.FIRST),
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST)
         ));
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -137,15 +147,19 @@ class BookshelfTest {
     @DisplayName("Try to insert more tiles than the ones which fit inside a column, should throw exception")
     void insertTiles_moreTilesThanAvailableSpaceInColumn_throwsRuntimeException() {
         ArrayList<Tile> firstInsertion = new ArrayList<>(Arrays.asList(
-           Tile.MAGENTA, Tile.MAGENTA, Tile.MAGENTA
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST)
         ));
 
         ArrayList<Tile> secondInsertion = new ArrayList<>(Arrays.asList(
-           Tile.MAGENTA, Tile.MAGENTA
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST)
         ));
 
         ArrayList<Tile> thirdInsertion = new ArrayList<>(Arrays.asList(
-            Tile.MAGENTA, Tile.MAGENTA
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
+            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST)
         ));
 
         bookshelf.insertTiles(firstInsertion, 0);

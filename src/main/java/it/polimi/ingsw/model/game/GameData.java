@@ -5,7 +5,6 @@ import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.utils.Pair;
 import jdk.jshell.spi.ExecutionControl;
 import it.polimi.ingsw.model.goal.*;
-import it.polimi.ingsw.model.*;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,9 +1,11 @@
 package it.polimi.ingsw.model.fetcher;
 
-import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.tile.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.bookshelf.*;
 import it.polimi.ingsw.model.filter.Filter;
 import it.polimi.ingsw.model.filter.NumDifferentColorFilter;
+import it.polimi.ingsw.model.tile.TileVersion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +47,7 @@ class SearchGroupsInABookshelfTest {
 
         do {
             Shelf next = fetcher.next();
-            if (filter.add(bookshelf.get(next))) {
+            if (filter.add(bookshelf.getTileColorAt(next))) {
                 count = 0;
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
@@ -99,7 +101,7 @@ class SearchGroupsInABookshelfTest {
 
         do {
             Shelf next = fetcher.next();
-            if (filter.add(bookshelf.get(next))) {
+            if (filter.add(bookshelf.getTileColorAt(next))) {
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
                 } else {
@@ -153,7 +155,7 @@ class SearchGroupsInABookshelfTest {
 
         do {
             Shelf next = fetcher.next();
-            if (filter.add(bookshelf.get(next))) {
+            if (filter.add(bookshelf.getTileColorAt(next))) {
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
                 } else {
@@ -187,13 +189,15 @@ class SearchGroupsInABookshelfTest {
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
         });
-        bookshelf.insertTiles(new ArrayList<>(List.of(Tile.BLUE)), col);
+        bookshelf.insertTiles(new ArrayList<>(List.of(
+            Tile.getInstance(TileColor.BLUE, TileVersion.FIRST)
+        )), col);
 
         BookshelfMask mask = new BookshelfMask(bookshelf);
 
         do {
             Shelf next = fetcher.next();
-            if (filter.add(bookshelf.get(next))) {
+            if (filter.add(bookshelf.getTileColorAt(next))) {
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
                 } else {
@@ -236,7 +240,7 @@ class SearchGroupsInABookshelfTest {
 
         do {
             Shelf next = fetcher.next();
-            if (filter.add(bookshelf.get(next))) {
+            if (filter.add(bookshelf.getTileColorAt(next))) {
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
                 } else {
@@ -277,7 +281,7 @@ class SearchGroupsInABookshelfTest {
 
         do {
             Shelf next = fetcher.next();
-            if (filter.add(bookshelf.get(next))) {
+            if (filter.add(bookshelf.getTileColorAt(next))) {
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
                 } else {

@@ -1,6 +1,6 @@
 package it.polimi.ingsw.model.bookshelf;
 
-import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
 
 import java.util.ArrayList;
 import java.util.function.BiPredicate;
@@ -81,8 +81,8 @@ public class BookshelfMask {
      *
      * @author Michele Miotti
      */
-    public Tile getSampleTile() {
-        return bookshelf.get(shelves.get(0));
+    public TileColor getSampleTile() {
+        return bookshelf.getTileColorAt(shelves.get(0));
     }
 
     /**
@@ -112,31 +112,31 @@ public class BookshelfMask {
     /**
      * Gets a specific shelf's content.
      * @param shelf is where we're sampling for color
-     * @return the {@link Tile tile} at that location.
+     * @return the {@link TileColor tile} at that location.
      *
      * @author Michele Miotti
      */
-    public Tile tileAt(Shelf shelf) {
-        return bookshelf.get(shelf);
+    public TileColor tileAt(Shelf shelf) {
+        return bookshelf.getTileColorAt(shelf);
     }
 
     /**
      * Count the number of shelves of a specific color in the mask.
-     * @param tile is the color we're counting
+     * @param tileColor is the color we're counting
      * @return the number of shelves of that color in the mask.
      * @throws IllegalArgumentException if we are trying to count empty shelves.
      *
      * @author Francesco Gemma
      */
-    public int countTilesOfColor(Tile tile) {
+    public int countTilesOfColor(TileColor tileColor) {
         int count = 0;
 
-        if(tile == Tile.EMPTY) {
+        if(tileColor == TileColor.EMPTY) {
             throw new IllegalArgumentException("Cannot count empty tiles");
         }
 
         for(Shelf shelf : shelves) {
-            if(tileAt(shelf) == tile) {
+            if(tileAt(shelf) == tileColor) {
                 count++;
             }
         }
@@ -171,7 +171,7 @@ public class BookshelfMask {
                     toColor = "#";
                 }
 
-                result.append("[").append(bookshelf.get(currentShelf).color(toColor)).append("]");
+                result.append("[").append(bookshelf.getTileColorAt(currentShelf).color(toColor)).append("]");
             }
 
             result.append("\n---------------\n");

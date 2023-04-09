@@ -1,9 +1,10 @@
 package it.polimi.ingsw.model.bookshelf;
 
-import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.tile.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
+import it.polimi.ingsw.model.tile.TileVersion;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Represents a bookshelf in the game. It is composed of a grid of shelves with {@value ROWS} rows and
@@ -11,7 +12,7 @@ import java.util.Arrays;
  * disposed along the row.
  * Rows and columns are enumerated starting from 0, in particular, row 0 is the top row in the bookshelf and column 0
  * is the left-most column in the bookshelf.
- * All the shelves have the same size. Each shelf can contain a {@link Tile tile} (or be empty).
+ * All the shelves have the same size. Each shelf can contain a {@link TileColor tile} (or be empty).
  * If a shelf is empty, all the shelves on the same column, in the rows above, must be empty too. In fact tiles can be
  * inserted in a bookshelf only in such a way that, to fill a shelf, you must also fill all the shelves below.
  *
@@ -66,22 +67,22 @@ public class Bookshelf {
     public Bookshelf() {
         for (int row = 0; row < ROWS; row++) {
             for (int column = 0; column < COLUMNS; column++) {
-                content[row][column] = Tile.EMPTY;
+                content[row][column] = Tile.getInstance(TileColor.EMPTY, TileVersion.FIRST);
             }
         }
     }
 
     /**
-     * @param shelf where we want to know what kind of {@link Tile tile} is in it.
-     * @return the {@link Tile tile} inside the specified shelf.
+     * @param shelf where we want to know what kind of {@link TileColor tile} is in it.
+     * @return the {@link TileColor color of the tile} inside the specified shelf.
      * @throws NullPointerException if shelf is null.
      */
-    public Tile get(Shelf shelf) {
+    public TileColor getTileColorAt(Shelf shelf) {
         if (shelf == null) {
             throw new NullPointerException("When retrieving a tile from the bookshelf, shelf must be non-null");
         }
 
-        return content[shelf.getRow()][shelf.getColumn()];
+        return content[shelf.getRow()][shelf.getColumn()].getColor();
     }
 
     /**
@@ -100,7 +101,7 @@ public class Bookshelf {
          * and count until we reach a shelf which is not empty.
          */
         for (int row = 0; row < Bookshelf.ROWS; row++) {
-            if (content[row][column] != Tile.EMPTY) {
+            if (content[row][column].getColor() != TileColor.EMPTY) {
                 return row;
             }
         }
@@ -109,13 +110,13 @@ public class Bookshelf {
     }
 
     /**
-     * Insert {@link Tile tiles} inside the bookshelf in such a way to preserve the invariant property of the bookshelf:
+     * Insert {@link TileColor tiles} inside the bookshelf in such a way to preserve the invariant property of the bookshelf:
      * if a shelf is non-empty, all the shelves below it must be non-empty. We put the first tile inside tiles in the
      * empty shelf at the specified column which is in the lowest row, and keep going like this until we have inserted
      * all the tiles in tile. So the tiles at the beginning of the tiles list will be inserted in lower rows than the
      * ones at the end of the tiles list.
      *
-     * @param tiles is the list of the tiles that we are going to insert.
+     * @param tileColors is the list of the tiles that we are going to insert.
      * @param column is the index of the column where we want to do the insertion.
      * @throws IllegalArgumentException
      * <ul>
@@ -136,7 +137,7 @@ public class Bookshelf {
         }
 
         for (Tile tile : tiles) {
-            if (tile == Tile.EMPTY) {
+            if (tile.getColor() == TileColor.EMPTY) {
                 throw new IllegalArgumentException("You can't insert an empty tile inside a bookshelf");
             }
         }
@@ -160,7 +161,7 @@ public class Bookshelf {
      * */
     public boolean isFull () {
         for (int i = 0; i < Bookshelf.COLUMNS; i++) {
-            if (this.get(Shelf.getInstance(0, i)) == Tile.EMPTY)
+            if (this.getTileColorAt(Shelf.getInstance(0, i)) == TileColor.EMPTY)
                 return false;
         }
 

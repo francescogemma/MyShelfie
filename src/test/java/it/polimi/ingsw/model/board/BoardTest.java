@@ -1,20 +1,12 @@
 package it.polimi.ingsw.model.board;
 
-import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.tile.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.bag.Bag;
 
-import it.polimi.ingsw.utils.Coordinate;
+import it.polimi.ingsw.model.tile.TileVersion;
 import jdk.jfr.Description;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -64,7 +56,9 @@ class BoardTest {
     void fillRandomly_boardIsFull_ShouldThrowException() {
         fillBoard(board);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            board.fillRandomly(Tile.BLUE, 4);
+            board.fillRandomly(
+                Tile.getInstance(TileColor.BLUE, TileVersion.FIRST),
+                4);
         });
     }
 
@@ -221,7 +215,7 @@ class BoardTest {
     @Description("Make sure that needsRefill return false if we didn't touch any Tile on Board")
     void needsRefill_testZeroExtraction_correctOutput () throws SelectionFullException, IllegalExtractionException {
         fillBoard(board);
-        for (int i = 0; i < Board.TWO_PLAYER_POSITION.size() + Board.THREE_PLAYER_POSITION.size() + Board.FOUR_PLAYER_POSITION.size(); i++) {
+        for (int i = 0; i < Board.TWO_PLAYER_POSITIONS.size() + Board.THREE_PLAYER_POSITIONS.size() + Board.FOUR_PLAYER_POSITIONS.size(); i++) {
             board.selectTile(
                     board.getSelectableCoordinate().get(0)
             );

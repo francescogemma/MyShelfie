@@ -13,7 +13,7 @@ public class CalculatePoints {
 
         do {
             Shelf next = fetcher.next();
-            if (filter.add(bookshelf.get(next))) {
+            if (filter.add(bookshelf.getTileColorAt(next))) {
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
                 } else {
@@ -39,7 +39,7 @@ public class CalculatePoints {
 
         do {
             Shelf next = fetcher.next();
-            if (filter.add(bookshelf.get(next))) {
+            if (filter.add(bookshelf.getTileColorAt(next))) {
                 if (fetcher.canFix()) {
                     filter.forgetLastTile();
                 } else {
