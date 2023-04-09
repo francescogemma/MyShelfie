@@ -19,7 +19,7 @@ public class MockNetworkEventTransceiver implements EventTransmitter, EventRecei
     private final Gson gson;
 
     public MockNetworkEventTransceiver() {
-        gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapterFactory(new EventDataTypeAdapterFactory()).create();
+        gson = new GsonBuilder().registerTypeAdapterFactory(new EventDataTypeAdapterFactory()).create();
 
         new Thread(() -> {
             synchronized (lock) {

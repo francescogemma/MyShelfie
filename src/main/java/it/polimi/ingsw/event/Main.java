@@ -9,6 +9,7 @@ import it.polimi.ingsw.event.data.MessageEventData;
 import it.polimi.ingsw.event.data.wrapper.SyncEventDataWrapper;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.model.Tile;
+import it.polimi.ingsw.model.bookshelf.Bookshelf;
 
 import javax.swing.plaf.synth.ColorType;
 import java.util.Arrays;
@@ -26,13 +27,18 @@ public class Main {
             networkTransceiver);
 
         System.out.println(loginOnNetwork.request(new LoginEventData("foo", "notBar")).getMessage());
-        System.out.println(insertTiles.request(new InsertTilesEventData(0, Arrays.asList(Tile.MAGENTA, Tile.GREEN))).getMessage());
+        System.out.println(insertTiles.request(new InsertTilesEventData(0, Arrays.asList(Tile.MAGENTA,
+            Tile.GREEN))).getMessage());
 
         System.out.println(loginOnNetwork.request(new LoginEventData("foo", "bar")).getMessage());
 
         networkTransceiver.broadcast(new MessageEventData("Hello, I'm authenticated"));
 
         System.out.println(insertTiles.request(new InsertTilesEventData(0, Arrays.asList(Tile.MAGENTA, Tile.GREEN))).getMessage());
+        System.out.println(insertTiles.request(new InsertTilesEventData(0, Arrays.asList(Tile.MAGENTA,
+            Tile.GREEN, Tile.BLUE, Tile.WHITE))).getMessage());
+
+        networkTransceiver.broadcast(new MessageEventData("[!:-D]"));
     }
 }
 
@@ -70,7 +76,11 @@ class VirtualView {
                 return new MessageEventData("You can't perform this while you're not authenticated");
             }
 
-            controller.printTiles(data.getTiles());
+            if (data.getTiles().size() > 3) {
+                return new MessageEventData("You're trying to insert too many tiles!");
+            }
+
+            controller.printTiles(username, data.getTiles());
 
             return new MessageEventData("Nice insertion!");
         });
@@ -92,9 +102,9 @@ class Controller {
         System.out.println(username + ": " + message);
     }
 
-    public void printTiles(List<Tile> tiles) {
+    public void printTiles(String username, List<Tile> tiles) {
         for (Tile tile : tiles) {
-            System.out.println(tile.color(tile.toString()));
+            System.out.println(username + " added a " + tile.color(tile.toString()) + " tile");
         }
     }
 }

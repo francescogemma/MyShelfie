@@ -7,7 +7,9 @@ import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Requester<ReceivedDataType extends EventData, SentDataType extends EventData> {
     private final EventTransmitter transmitter;
@@ -16,6 +18,7 @@ public class Requester<ReceivedDataType extends EventData, SentDataType extends 
     private static int nextRequestCount = 0;
 
     private final Object responsesLock = new Object();
+    private final Set<Integer> waitingFor = new HashSet<>();
     private final Map<Integer, ReceivedDataType> responses = new HashMap<>();
 
     public Requester(String responseEventId, EventTransmitter transmitter, EventReceiver<EventData> receiver) {
@@ -24,9 +27,12 @@ public class Requester<ReceivedDataType extends EventData, SentDataType extends 
         new CastEventReceiver<SyncEventDataWrapper<ReceivedDataType>>(SyncEventDataWrapper.WRAPPER_ID + "_" + responseEventId,
             receiver).registerListener(data -> {
                 synchronized (responsesLock) {
-                    responses.put(data.getCount(), data.getWrappedData());
+                    if (waitingFor.contains(data.getCount())) {
+                        waitingFor.remove(data.getCount());
+                        responses.put(data.getCount(), data.getWrappedData());
 
-                    responsesLock.notifyAll();
+                        responsesLock.notifyAll();
+                    }
                 }
         });
     }
@@ -37,6 +43,10 @@ public class Requester<ReceivedDataType extends EventData, SentDataType extends 
         synchronized (nextRequestCountLock) {
             count = nextRequestCount;
             nextRequestCount++;
+        }
+
+        synchronized (responsesLock) {
+            waitingFor.add(count);
         }
 
         transmitter.broadcast(new SyncEventDataWrapper<SentDataType>(count, data));
