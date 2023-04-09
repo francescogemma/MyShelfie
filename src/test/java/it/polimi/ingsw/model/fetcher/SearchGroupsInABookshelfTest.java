@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.ArrayList;
 import java.util.List;
 
 class SearchGroupsInABookshelfTest {
@@ -189,9 +188,9 @@ class SearchGroupsInABookshelfTest {
                 { 0, 0, 0, 0, 0 },
                 { 0, 0, 0, 0, 0 },
         });
-        bookshelf.insertTiles(new ArrayList<>(List.of(
+        bookshelf.insertTiles(List.of(
             Tile.getInstance(TileColor.BLUE, TileVersion.FIRST)
-        )), col);
+        ), col);
 
         BookshelfMask mask = new BookshelfMask(bookshelf);
 

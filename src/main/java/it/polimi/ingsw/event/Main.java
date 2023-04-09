@@ -5,7 +5,6 @@ import it.polimi.ingsw.event.data.LoginEventData;
 import it.polimi.ingsw.event.data.MessageEventData;
 import it.polimi.ingsw.model.tile.TileColor;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -20,15 +19,15 @@ public class Main {
             networkTransceiver);
 
         System.out.println(loginOnNetwork.request(new LoginEventData("foo", "notBar")).getMessage());
-        System.out.println(insertTiles.request(new InsertTilesEventData(0, Arrays.asList(TileColor.MAGENTA,
+        System.out.println(insertTiles.request(new InsertTilesEventData(0, List.of(TileColor.MAGENTA,
             TileColor.GREEN))).getMessage());
 
         System.out.println(loginOnNetwork.request(new LoginEventData("foo", "bar")).getMessage());
 
         networkTransceiver.broadcast(new MessageEventData("Hello, I'm authenticated"));
 
-        System.out.println(insertTiles.request(new InsertTilesEventData(0, Arrays.asList(TileColor.MAGENTA, TileColor.GREEN))).getMessage());
-        System.out.println(insertTiles.request(new InsertTilesEventData(0, Arrays.asList(TileColor.MAGENTA,
+        System.out.println(insertTiles.request(new InsertTilesEventData(0, List.of(TileColor.MAGENTA, TileColor.GREEN))).getMessage());
+        System.out.println(insertTiles.request(new InsertTilesEventData(0, List.of(TileColor.MAGENTA,
             TileColor.GREEN, TileColor.BLUE, TileColor.WHITE))).getMessage());
 
         networkTransceiver.broadcast(new MessageEventData("[!:-D]"));

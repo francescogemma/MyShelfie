@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.bookshelf;
 import it.polimi.ingsw.model.tile.TileColor;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiPredicate;
 
 /**
@@ -19,7 +20,7 @@ public class BookshelfMask {
     /**
      * The {@link Shelf shelves} in the set.
      */
-    private final ArrayList<Shelf> shelves;
+    private final List<Shelf> shelves;
 
     /**
      * Constructor of the class.
@@ -72,7 +73,7 @@ public class BookshelfMask {
     /**
      * @return all the {@link Shelf shelves} inside the set.
      */
-    public ArrayList<Shelf> getShelves() {
+    public List<Shelf> getShelves() {
         return new ArrayList<>(shelves);
     }
 

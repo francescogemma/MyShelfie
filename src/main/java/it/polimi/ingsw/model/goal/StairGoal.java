@@ -49,11 +49,9 @@ public class StairGoal extends CommonGoal{
      * @param numPlayers the number of players in the game
      * */
     public StairGoal(int numPlayers) {
-        super(new UnionFetcher(new ArrayList<>(
-                        List.of(
-                                new ShapeFetcher(Shape.STAIR),
-                                new ShapeFetcher(Shape.STAIR.verticalFlip())
-                        )
+        super(new UnionFetcher(List.of(
+                    new ShapeFetcher(Shape.STAIR),
+                    new ShapeFetcher(Shape.STAIR.verticalFlip())
                 )),
                 new NumDifferentColorFilter(1, 6),
                 new AtLeastEvaluator(numPlayers, 1, check));

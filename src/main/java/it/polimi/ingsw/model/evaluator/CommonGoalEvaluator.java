@@ -1,7 +1,7 @@
 package it.polimi.ingsw.model.evaluator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class should be extended by all evaluators that have "lowering points".
@@ -15,7 +15,7 @@ public abstract class CommonGoalEvaluator implements Evaluator {
      * This attribute contains all points that should be given to a player.
      * The last point to be given is the first element of the array.
      */
-    private final ArrayList<Integer> pointStack;
+    private final List<Integer> pointStack;
 
     /**
      * This constructor is needed to initiate the pointStack attribute, since its
@@ -25,9 +25,10 @@ public abstract class CommonGoalEvaluator implements Evaluator {
      */
     protected CommonGoalEvaluator(int playersAmount) {
         switch (playersAmount) {
-            case 2 -> pointStack = new ArrayList<>(Arrays.asList(4, 8));
-            case 3 -> pointStack = new ArrayList<>(Arrays.asList(4, 6, 8));
-            case 4 -> pointStack = new ArrayList<>(Arrays.asList(2, 4, 6, 8));
+            // These must be ArrayList, List.of returns an ImmutableList on which remove or add are undefined.
+            case 2 -> pointStack = new ArrayList<>(List.of(4, 8));
+            case 3 -> pointStack = new ArrayList<>(List.of(4, 6, 8));
+            case 4 -> pointStack = new ArrayList<>(List.of(2, 4, 6, 8));
 
             default -> throw new IllegalArgumentException("Players must be between 2 and 4.");
         }

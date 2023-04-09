@@ -4,7 +4,7 @@ import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.tile.TileVersion;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a bookshelf in the game. It is composed of a grid of shelves with {@value ROWS} rows and
@@ -126,7 +126,7 @@ public class Bookshelf {
      * </ul>
      * @throws RuntimeException if there isn't enough space inside the specified column to put all the tiles.
      */
-    public void insertTiles(ArrayList<Tile> tiles, int column) {
+    public void insertTiles(List<Tile> tiles, int column) {
         if (!isColumnInsideTheBookshelf(column)) {
             throw new IllegalArgumentException("Given column index outside the bookshelf when performing an insertion");
         }

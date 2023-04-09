@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 class ShapeFetcherTest {
@@ -23,13 +24,13 @@ class ShapeFetcherTest {
 
     private final static int MAXIMUM_NUM_OF_ORIGINS = 10;
 
-    private static ArrayList<Arguments> shapeOriginsProvider() {
-        ArrayList<Arguments> shapesOrigins = new ArrayList<>();
+    private static List<Arguments> shapeOriginsProvider() {
+        List<Arguments> shapesOrigins = new ArrayList<>();
 
         Random random = new Random(371318);
 
         for (Arguments arguments : ShapeTest.offsetsHeightWidthProvider()) {
-            ArrayList<Offset> offsets = (ArrayList<Offset>) arguments.get()[0];
+            List<Offset> offsets = (List<Offset>) arguments.get()[0];
             int height = (Integer) arguments.get()[1];
             int width = (Integer) arguments.get()[2];
 
@@ -38,7 +39,7 @@ class ShapeFetcherTest {
 
             int targetOriginsNum = random.nextInt(MAXIMUM_NUM_OF_ORIGINS) + 1;
 
-            ArrayList<Shelf> origins = new ArrayList<>();
+            List<Shelf> origins = new ArrayList<>();
 
             while (targetOriginsNum > 0) {
                 int originRow = random.nextInt(Bookshelf.ROWS - height + 1);
@@ -66,7 +67,7 @@ class ShapeFetcherTest {
     @ParameterizedTest
     @DisplayName("Fetch all the shapes from the bookshelf mock")
     @MethodSource("shapeOriginsProvider")
-    void fetch_correctOutput(Shape shape, ArrayList<Shelf> origins) {
+    void fetch_correctOutput(Shape shape, List<Shelf> origins) {
         for (Shelf origin : origins) {
             for (Offset offset : shape.getOffsets()) {
                 Shelf currentShelf = origin.move(offset);
@@ -82,7 +83,7 @@ class ShapeFetcherTest {
 
         int originRow = Bookshelf.ROWS;
         int originColumn = Bookshelf.COLUMNS;
-        ArrayList<Shelf> shelves = new ArrayList<>();
+        List<Shelf> shelves = new ArrayList<>();
 
         do {
             Shelf shelf = fetcher.next();
@@ -108,7 +109,7 @@ class ShapeFetcherTest {
                     fetchedOrigin[fetchedOriginIndex] = true;
                 }
 
-                ArrayList<Offset> offsets = new ArrayList<>();
+                List<Offset> offsets = new ArrayList<>();
                 for (Shelf s : shelves) {
                     offsets.add(Offset.getInstance(s.getRow() - originRow,
                         s.getColumn() - originColumn));

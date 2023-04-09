@@ -1,7 +1,7 @@
 package it.polimi.ingsw.model.bookshelf;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * Represents a free shape inside a {@link Bookshelf bookshelf}, that is a set of {@link Shelf shelves} with
@@ -59,7 +59,7 @@ public class Shape {
      * @see Shape Bounding box
      * @see Offset
      */
-    private final ArrayList<Offset> offsets;
+    private final List<Offset> offsets;
 
     /**
      * Constructor of the class.
@@ -92,7 +92,7 @@ public class Shape {
      * @see Offset
      * @see Shape Bounding box
      */
-    public Shape(ArrayList<Offset> offsets) {
+    public Shape(List<Offset> offsets) {
         if (offsets == null) {
             throw new NullPointerException("offsets must be non-null when constructing a shape");
         }
@@ -177,7 +177,7 @@ public class Shape {
     /**
      * @return the sequence of offsets which defines the topology of the shape.
      */
-    public ArrayList<Offset> getOffsets() {
+    public List<Offset> getOffsets() {
         return new ArrayList<>(offsets);
     }
 
@@ -186,7 +186,7 @@ public class Shape {
      * The original shape is not affected since it's immutable.
      */
     public Shape verticalFlip() {
-        ArrayList<Offset> flippedOffsets = new ArrayList<>();
+        List<Offset> flippedOffsets = new ArrayList<>();
 
         /*
          * In order to vertically flip the shape while keeping the offsets list
@@ -213,192 +213,192 @@ public class Shape {
     /**
      * A list with all the dominoes, that is shapes with 2 connected shelves.
      */
-    public static final ArrayList<Shape> DOMINOES = new ArrayList<>(Arrays.asList(
+    public static final List<Shape> DOMINOES = List.of(
         /* #
          * #
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
             Offset.getInstance(0, 0),
             Offset.getInstance(1, 0)
-        ))),
+        )),
         /* ##
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
             Offset.getInstance(0, 0),   Offset.getInstance(0, 1)
-        )))
-    ));
+        ))
+    );
 
     /**
      * The shape with all 4 corners of a {@link Bookshelf bookshelf}.
      */
-    public static final Shape CORNERS = new Shape(new ArrayList<>(Arrays.asList(
+    public static final Shape CORNERS = new Shape(List.of(
         Offset.getInstance(0, 0), Offset.getInstance(0, 4),
         Offset.getInstance(5, 0), Offset.getInstance(5, 4)
-    )));
+    ));
 
     /**
      * A list with all the tetrominoes, that is shapes with 4 connected shelves.
      *
      * @see <a href="https://en.wikipedia.org/wiki/Tetromino">Wikipedia page of tetrimonoes</a>
      */
-    public static final ArrayList<Shape> TETROMINOES = new ArrayList<>(Arrays.asList(
+    public static final List<Shape> TETROMINOES = List.of(
         /*  #
          *  #
          * ##
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
                                                             Offset.getInstance(0, 1),
                                                             Offset.getInstance(1, 1),
             Offset.getInstance(2, 0),   Offset.getInstance(2, 1)
-        ))),
+        )),
         /* ###
          *   #
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
             Offset.getInstance(0, 0),   Offset.getInstance(0, 1),   Offset.getInstance(0, 2),
                                                                                                             Offset.getInstance(1, 2)
-        ))),
+        )),
         /* ##
          * #
          * #
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
             Offset.getInstance(0, 0),   Offset.getInstance(0, 1),
             Offset.getInstance(1, 0),
             Offset.getInstance(2, 0)
-        ))),
+        )),
         /* #
          * ###
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
             Offset.getInstance(0, 0),
             Offset.getInstance(1, 0),   Offset.getInstance(1, 1),   Offset.getInstance(1, 2)
-        ))),
+        )),
         /*  ##
          * ##
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
                                                             Offset.getInstance(0, 1), Offset.getInstance(0, 2),
             Offset.getInstance(1, 0), Offset.getInstance(1, 1)
-        ))),
+        )),
         /* #
          * ##
          *  #
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
             Offset.getInstance(0, 0),
             Offset.getInstance(1, 0),   Offset.getInstance(1, 1),
                                                             Offset.getInstance(2, 1)
-        ))),
+        )),
         /* ###
          *  #
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
             Offset.getInstance(0, 0),   Offset.getInstance(0, 1),   Offset.getInstance(0, 2),
                                                             Offset.getInstance(1, 1)
-        ))),
+        )),
         /* #
          * ##
          * #
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
             Offset.getInstance(0, 0),
             Offset.getInstance(1, 0),   Offset.getInstance(1, 1),
             Offset.getInstance(2, 0)
-        ))),
+        )),
         /* ####
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
             Offset.getInstance(0, 0), Offset.getInstance(0, 1), Offset.getInstance(0, 2), Offset.getInstance(0, 3)
-        ))),
+        )),
         /* ##
          * ##
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
             Offset.getInstance(0, 0),   Offset.getInstance(0, 1),
             Offset.getInstance(1, 0),   Offset.getInstance(1, 1)
-        ))),
+        )),
         /* ##
          *  #
          *  #
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
             Offset.getInstance(0, 0),   Offset.getInstance(0, 1),
                                                             Offset.getInstance(1, 1),
                                                             Offset.getInstance(2, 1)
-        ))),
+        )),
         /*   #
          * ###
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
                                                                                                         Offset.getInstance(0, 2),
             Offset.getInstance(1, 0),   Offset.getInstance(1, 1), Offset.getInstance(1, 2)
-        ))),
+        )),
         /* #
          * #
          * ##
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
             Offset.getInstance(0, 0),
             Offset.getInstance(1, 0),
             Offset.getInstance(2, 0),   Offset.getInstance(2, 1)
-        ))),
+        )),
         /* ###
          * #
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
             Offset.getInstance(0, 0),   Offset.getInstance(0, 1),   Offset.getInstance(0, 2),
             Offset.getInstance(1, 0)
-        ))),
+        )),
         /* ##
          *  ##
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
             Offset.getInstance(0, 0),   Offset.getInstance(0, 1),
                                                             Offset.getInstance(1, 1),   Offset.getInstance(1, 2)
-        ))),
+        )),
         /*  #
          * ##
          * #
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
                                                             Offset.getInstance(0, 1),
             Offset.getInstance(1, 0),   Offset.getInstance(1, 1),
             Offset.getInstance(2, 0)
-        ))),
+        )),
         /*  #
          * ###
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
                                                             Offset.getInstance(0, 1),
             Offset.getInstance(1, 0),   Offset.getInstance(1, 1),   Offset.getInstance(1, 2)
-        ))),
+        )),
         /*  #
          * ##
          *  #
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
                                                             Offset.getInstance(0, 1),
             Offset.getInstance(1, 0),   Offset.getInstance(1, 1),
                                                             Offset.getInstance(2, 1)
-        ))),
+        )),
         /* #
          * #
          * #
          * #
          */
-        new Shape(new ArrayList<>(Arrays.asList(
+        new Shape(List.of(
             Offset.getInstance(0, 0),
             Offset.getInstance(1, 0),
             Offset.getInstance(2, 0),
             Offset.getInstance(3, 0)
-        )))
-    ));
+        ))
+    );
 
-    public static final Shape SQUARE = new Shape(new ArrayList<>(Arrays.asList(
+    public static final Shape SQUARE = new Shape(List.of(
         Offset.getInstance(0, 0), Offset.getInstance(0, 1),
         Offset.getInstance(1, 0), Offset.getInstance(1, 1)
-    )));
+    ));
 
     /**
      * @param height is the height of the column.
@@ -411,7 +411,7 @@ public class Shape {
             throw new IllegalArgumentException("Height of a column must be positive");
         }
 
-        ArrayList<Offset> columnOffsets = new ArrayList<>();
+        List<Offset> columnOffsets = new ArrayList<>();
 
         for (int i = 0; i < height; i++) {
             try {
@@ -435,7 +435,7 @@ public class Shape {
             throw new IllegalArgumentException("Size of a diagonal must be positive");
         }
 
-        ArrayList<Offset> diagonalOffsets = new ArrayList<>();
+        List<Offset> diagonalOffsets = new ArrayList<>();
 
         for (int i = 0; i < size; i++) {
             try {
@@ -459,7 +459,7 @@ public class Shape {
             throw new IllegalArgumentException("Width of a row must be positive");
         }
 
-        ArrayList<Offset> rowOffsets = new ArrayList<>();
+        List<Offset> rowOffsets = new ArrayList<>();
 
         for (int i = 0; i < width; i++) {
             try {
@@ -475,11 +475,11 @@ public class Shape {
     /**
      * The shape of a 3x3 X.
      */
-    public static final Shape X = new Shape(new ArrayList<>(Arrays.asList(
+    public static final Shape X = new Shape(List.of(
         Offset.getInstance(0, 0), Offset.getInstance(0, 2),
         Offset.getInstance(1, 1),
         Offset.getInstance(2, 0), Offset.getInstance(2, 2)
-    )));
+    ));
 
     /**
      * The width and height of a {@link Shape#STAIR stair}.
@@ -493,7 +493,7 @@ public class Shape {
 
     // Builds the STAIR
     static {
-        ArrayList<Offset> offsets = new ArrayList<>();
+        List<Offset> offsets = new ArrayList<>();
 
         for (int row = 0; row < STAIR_SIDE; row++) {
             for (int column = 0; column < STAIR_SIDE; column++) {
@@ -517,7 +517,7 @@ public class Shape {
 
     // Builds the WHOLE_BOOKSHELF
     static {
-        ArrayList<Offset> offsets = new ArrayList<>();
+        List<Offset> offsets = new ArrayList<>();
 
         for (int row = 0; row < Bookshelf.ROWS; row++) {
             for (int column = 0; column < Bookshelf.COLUMNS; column++) {

@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
+import java.util.List;
 
 class AdjacencyEvaluatorTest {
     private AdjacencyEvaluator adjacencyEvaluator;
@@ -32,8 +33,8 @@ class AdjacencyEvaluatorTest {
         return bookshelfMask;
     }
 
-    private static ArrayList<Arguments> bookshelfMaskAndSizeProvider() {
-        ArrayList<Arguments> arguments = new ArrayList<>();
+    private static List<Arguments> bookshelfMaskAndSizeProvider() {
+        List<Arguments> arguments = new ArrayList<>();
         for (int i = 0; i < 16; i++) {
             arguments.add(Arguments.arguments(bookshelfMaskSizer(i), i));
         }

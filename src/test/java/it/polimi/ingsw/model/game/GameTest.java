@@ -2,14 +2,10 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.board.IllegalExtractionException;
 import it.polimi.ingsw.model.board.SelectionFullException;
-import it.polimi.ingsw.model.game.Game;
-import it.polimi.ingsw.model.game.Player;
 import it.polimi.ingsw.utils.Coordinate;
-import it.polimi.ingsw.utils.Pair;
 import org.junit.jupiter.api.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * Tester for Game
@@ -155,10 +151,10 @@ class GameTest {
         game.addPlayer(p2);
 
         this.game.startGame();
-        this.game.selectTile(p1, new ArrayList<>(Arrays.asList(
+        this.game.selectTile(p1, List.of(
                 new Coordinate(1, 3),
                 new Coordinate(1, 4)
-        )), 0);
+        ), 0);
     }
 
     @Test
@@ -171,11 +167,11 @@ class GameTest {
 
         this.game.startGame();
         Assertions.assertThrows(IllegalFlowException.class, () -> {
-            this.game.selectTile(p2, new ArrayList<>(Arrays.asList(
+            this.game.selectTile(p2, List.of(
                     new Coordinate(4, 1),
                     new Coordinate(4, 2),
                     new Coordinate(4, 3)
-            )), 0);
+            ), 0);
         });
     }
 
@@ -190,11 +186,11 @@ class GameTest {
         this.game.startGame();
 
         Assertions.assertThrows(NullPointerException.class, () -> {
-            this.game.selectTile(null, new ArrayList<>(Arrays.asList(
+            this.game.selectTile(null, List.of(
                     new Coordinate(4, 1),
                     new Coordinate(4, 2),
                     new Coordinate(4, 3)
-            )), 0);
+            ), 0);
         });
     }
 
@@ -223,12 +219,10 @@ class GameTest {
 
         game.startGame();
 
-        game.selectTile(p1, new ArrayList<>(
-                Arrays.asList(
+        game.selectTile(p1, List.of(
                         new Coordinate(4, 0),
                         new Coordinate(4, 1),
                         new Coordinate(4, 2)
-                )
         ), 0);
     }
 }

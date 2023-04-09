@@ -1,9 +1,5 @@
 package it.polimi.ingsw.model.bookshelf;
 
-import it.polimi.ingsw.model.bookshelf.Bookshelf;
-import it.polimi.ingsw.model.bookshelf.Offset;
-import it.polimi.ingsw.model.bookshelf.Shape;
-import it.polimi.ingsw.model.bookshelf.Shelf;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,15 +9,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class ShapeTest {
     private final static int NUM_OF_SHAPES_TO_GENERATE = 10000;
 
-    public static ArrayList<Arguments> offsetsHeightWidthProvider() {
+    public static List<Arguments> offsetsHeightWidthProvider() {
         Random random = new Random(315346);
 
-        ArrayList<Arguments> offsetsListsHeightsWidths = new ArrayList<>();
+        List<Arguments> offsetsListsHeightsWidths = new ArrayList<>();
 
         for (int i = 0; i < NUM_OF_SHAPES_TO_GENERATE; i++) {
             int height = random.nextInt(Bookshelf.ROWS) + 1;
@@ -45,7 +42,7 @@ public class ShapeTest {
                 shelvesToTake--;
             }
 
-            ArrayList<Integer> availableIndexes = new ArrayList<>();
+            List<Integer> availableIndexes = new ArrayList<>();
             for (int j = 1; j < height * width - 1; j++) {
                 availableIndexes.add(j);
             }
@@ -56,7 +53,7 @@ public class ShapeTest {
                 shelvesToTake--;
             }
 
-            ArrayList<Offset> offsets = new ArrayList<>();
+            List<Offset> offsets = new ArrayList<>();
             for (int row = 0; row < height; row++) {
                 for (int column = 0; column < width; column++) {
                     if (takenShelves[row * width + column]) {
@@ -71,8 +68,8 @@ public class ShapeTest {
         return offsetsListsHeightsWidths;
     }
 
-    private static ArrayList<Integer> heightProvider() {
-        ArrayList<Integer> heights = new ArrayList<>();
+    private static List<Integer> heightProvider() {
+        List<Integer> heights = new ArrayList<>();
 
         for (int i = 1; i <= Bookshelf.ROWS; i++) {
             heights.add(i);
@@ -81,8 +78,8 @@ public class ShapeTest {
         return heights;
     }
 
-    private static ArrayList<Integer> widthProvider() {
-        ArrayList<Integer> widths = new ArrayList<>();
+    private static List<Integer> widthProvider() {
+        List<Integer> widths = new ArrayList<>();
 
         for (int i = 1; i <= Bookshelf.COLUMNS; i++) {
             widths.add(i);
@@ -91,16 +88,16 @@ public class ShapeTest {
         return widths;
     }
 
-    private static ArrayList<Integer> sizeProvider() {
+    private static List<Integer> sizeProvider() {
         return widthProvider().size() > heightProvider().size() ? heightProvider() : widthProvider();
     }
 
     @Test
     @DisplayName("Construct a shape with a correct list of offsets")
     void constructor_correctOffsets_correctOutput() {
-        ArrayList<Offset> offsets = new ArrayList<>(Arrays.asList(Offset.getInstance(0, 1),
+        List<Offset> offsets = List.of(Offset.getInstance(0, 1),
             Offset.getInstance(1, 0), Offset.getInstance(1, 1), Offset.getInstance(1, 2),
-            Offset.getInstance(2, 0), Offset.getInstance(2, 2)));
+            Offset.getInstance(2, 0), Offset.getInstance(2, 2));
 
         Shape shape = new Shape(offsets);
 
@@ -120,7 +117,7 @@ public class ShapeTest {
     @DisplayName("Try to construct a shape with an empty offsets list, should throw exception")
     void constructor_emptyOffsets_throwsIllegalArgumentException() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new Shape(new ArrayList<>());
+            new Shape(List.of());
         });
     }
 
@@ -128,10 +125,10 @@ public class ShapeTest {
     @DisplayName("Try to construct a shape with an offsets list that has non-monotonic row offsets, " +
         "should throw exception")
     void constructor_nonMonotonicRowOffsets_throwsIllegalArgumentException() {
-        ArrayList<Offset> offsets = new ArrayList<>(Arrays.asList(
+        List<Offset> offsets = List.of(
             Offset.getInstance(0, 0), Offset.getInstance(1, 0),
             Offset.getInstance(0, 1)
-        ));
+        );
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             new Shape(offsets);
@@ -142,10 +139,10 @@ public class ShapeTest {
     @DisplayName("Try to construct a shape with an offsets list that has non-monotonic column offsets " +
         "in the same row, should throw exception")
     void constructor_nonMonotonicColumnInSameRowOffsets_throwsIllegalArgumentException() {
-        ArrayList<Offset> offsets = new ArrayList<>(Arrays.asList(
+        List<Offset> offsets = List.of(
             Offset.getInstance(0, 0), Offset.getInstance(1, 0),
             Offset.getInstance(1, 2), Offset.getInstance(1, 1)
-        ));
+        );
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             new Shape(offsets);
@@ -156,10 +153,10 @@ public class ShapeTest {
     @DisplayName("Try to construct a shape with an offsets list that has duplicated offsets in adjacent positions, " +
         "should throw exception")
     void constructor_duplicatedOffsets_throwsIllegalArgumentException() {
-        ArrayList<Offset> offsets = new ArrayList<>(Arrays.asList(
+        List<Offset> offsets = List.of(
             Offset.getInstance(0, 0), Offset.getInstance(1, 0),
             Offset.getInstance(1, 1), Offset.getInstance(1, 1)
-        ));
+        );
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             new Shape(offsets);
@@ -170,10 +167,10 @@ public class ShapeTest {
     @DisplayName("Try to construct a shape with an offsets list that is not relative to the top-left shelf of the " +
         "bounding box instance (with positive offsets), should throw exception")
     void construct_nonTopLeftDefinedPositiveOffsets_throwsIllegalArgumentException() {
-        ArrayList<Offset> offsets = new ArrayList<>(Arrays.asList(
+        List<Offset> offsets = List.of(
             Offset.getInstance(0, 1), Offset.getInstance(1, 1),
             Offset.getInstance(1, 2)
-        ));
+        );
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             new Shape(offsets);
@@ -184,10 +181,10 @@ public class ShapeTest {
     @DisplayName("Try to construct a shape with an offsets list that is not relative to the top-left shelf of the " +
         "bounding box instance (with negative offsets), should throw exception")
     void construct_nonTopLeftDefinedNegativeOffsets_throwsIllegalArgumentException() {
-        ArrayList<Offset> offsets = new ArrayList<>(Arrays.asList(
+        List<Offset> offsets = List.of(
             Offset.getInstance(0, -1), Offset.getInstance(0, 0),
             Offset.getInstance(1, -1)
-        ));
+        );
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             new Shape(offsets);
@@ -197,21 +194,21 @@ public class ShapeTest {
     @ParameterizedTest
     @DisplayName("Get width of random generated shape")
     @MethodSource("offsetsHeightWidthProvider")
-    void getHeight_correctOutput(ArrayList<Offset> offsets, int height, int width) {
+    void getHeight_correctOutput(List<Offset> offsets, int height, int width) {
         Assertions.assertEquals(height, new Shape(offsets).getHeight());
     }
 
     @ParameterizedTest
     @DisplayName("Get width of random generated shape")
     @MethodSource("offsetsHeightWidthProvider")
-    void getWidth_correctOutput(ArrayList<Offset> offsets, int height, int width) {
+    void getWidth_correctOutput(List<Offset> offsets, int height, int width) {
         Assertions.assertEquals(width, new Shape(offsets).getWidth());
     }
 
     @ParameterizedTest
     @DisplayName("Vertical flip of random generated shape")
     @MethodSource("offsetsHeightWidthProvider")
-    void verticalFlip_correctOutput(ArrayList<Offset> offsets, int height, int width) {
+    void verticalFlip_correctOutput(List<Offset> offsets, int height, int width) {
         Shape originalShape = new Shape(offsets);
         Shape flippedShape = originalShape.verticalFlip();
 

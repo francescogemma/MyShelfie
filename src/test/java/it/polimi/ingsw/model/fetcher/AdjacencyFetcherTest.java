@@ -9,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
+import java.util.List;
 
 class AdjacencyFetcherTest {
     private Fetcher fetcher;
@@ -273,8 +274,8 @@ class AdjacencyFetcherTest {
         Assertions.assertEquals(expectedNumGroups, numGroups, "The number of groups is not correct");
     }
 
-    private static ArrayList<Integer> numCallsProvider() {
-        ArrayList<Integer> list = new ArrayList<>();
+    private static List<Integer> numCallsProvider() {
+        List<Integer> list = new ArrayList<>();
         for(int i = 0; i <= 30; i++) {
             list.add(i);
         }

@@ -4,6 +4,7 @@ import it.polimi.ingsw.model.bookshelf.BookshelfMask;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiPredicate;
 
 /**
@@ -16,11 +17,11 @@ import java.util.function.BiPredicate;
  */
 public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluator {
     /**
-     * This ArrayList contains {@link BookshelfMaskSet BookshelfMaskSets}.
+     * This list contains {@link BookshelfMaskSet BookshelfMaskSets}.
      * It represents the set of all possible compatible sets that can be made
      * with all {@link BookshelfMask masks} given so far.
      */
-    private final ArrayList<BookshelfMaskSet> group;
+    private final List<BookshelfMaskSet> group;
 
     /**
      * This is how big the biggest set in our group needs to be in order

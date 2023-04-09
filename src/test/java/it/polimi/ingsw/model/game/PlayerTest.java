@@ -9,8 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 class PlayerTest {
     private Player player;
@@ -58,11 +57,11 @@ class PlayerTest {
     @DisplayName("Set the bookshelf of the player")
     void setBookshelf_bookshelfOfThePlayer_correctBookshelf() {
         bookshelf = new Bookshelf();
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
+        bookshelf.insertTiles(List.of(
             Tile.getInstance(TileColor.CYAN, TileVersion.FIRST),
             Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
             Tile.getInstance(TileColor.BLUE, TileVersion.FIRST)
-        )), 2);
+        ), 2);
         Assertions.assertNotEquals(bookshelf, player.getBookshelf());
 
         player.setBookshelf(bookshelf);

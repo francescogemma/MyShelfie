@@ -2,7 +2,7 @@ package it.polimi.ingsw.model.fetcher;
 
 import it.polimi.ingsw.model.bookshelf.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Allows to extract all the {@link BookshelfMask bookshelf masks} inside a {@link Bookshelf bookshelf} with a
@@ -16,7 +16,7 @@ public class ShapeFetcher implements Fetcher {
      *
      * @see Shape
      */
-    private final ArrayList<Offset> offsets;
+    private final List<Offset> offsets;
 
     /**
      * The index of the offset of the {@link Shape shape} that allows to calculate the next {@link Shelf shelf}

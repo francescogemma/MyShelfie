@@ -1,8 +1,5 @@
 package it.polimi.ingsw.model.bookshelf;
 
-import it.polimi.ingsw.model.bookshelf.Bookshelf;
-import it.polimi.ingsw.model.bookshelf.Offset;
-import it.polimi.ingsw.model.bookshelf.Shelf;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,11 +8,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 class ShelfTest {
-    private static ArrayList<Arguments> rowColumnProvider() {
-        ArrayList<Arguments> rowsColumns = new ArrayList<>();
+    private static List<Arguments> rowColumnProvider() {
+        List<Arguments> rowsColumns = new ArrayList<>();
 
         for (int row = 0; row < Bookshelf.ROWS; row++) {
             for (int column = 0; column < Bookshelf.COLUMNS; column++) {
@@ -26,8 +24,8 @@ class ShelfTest {
         return rowsColumns;
     }
 
-    private static ArrayList<Arguments> rowColumnOffsetProvider() {
-        ArrayList<Arguments> rowsColumnsOffsets = new ArrayList<>();
+    private static List<Arguments> rowColumnOffsetProvider() {
+        List<Arguments> rowsColumnsOffsets = new ArrayList<>();
 
         for (int startRow = 0; startRow < Bookshelf.ROWS; startRow++) {
             for (int startColumn = 0; startColumn < Bookshelf.COLUMNS; startColumn++) {

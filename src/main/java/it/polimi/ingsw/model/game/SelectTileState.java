@@ -1,13 +1,12 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.tile.Tile;
-import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
 import it.polimi.ingsw.model.board.SelectionFullException;
 import it.polimi.ingsw.utils.Coordinate;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public abstract class SelectTileState extends GameState{
     protected final Player currentPlayer;
@@ -64,8 +63,7 @@ public abstract class SelectTileState extends GameState{
             }
         }
 
-        // TODO remove new ArrayList<>() and pass a collection
-        ArrayList<Tile> tileColorSelected = new ArrayList<>(this.gameData.board.getSelectedTiles());
+        List<Tile> tileColorSelected = this.gameData.board.getSelectedTiles();
 
         try {
             currentPlayer.getBookshelf().insertTiles(tileColorSelected, col);

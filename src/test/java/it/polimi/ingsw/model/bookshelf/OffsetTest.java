@@ -1,7 +1,5 @@
 package it.polimi.ingsw.model.bookshelf;
 
-import it.polimi.ingsw.model.bookshelf.Bookshelf;
-import it.polimi.ingsw.model.bookshelf.Offset;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,10 +8,11 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
+import java.util.List;
 
 class OffsetTest {
-    private static ArrayList<Arguments> rowOffsetColumnOffsetProvider() {
-        ArrayList<Arguments> rowOffsetsColumnOffsets = new ArrayList<>();
+    private static List<Arguments> rowOffsetColumnOffsetProvider() {
+        List<Arguments> rowOffsetsColumnOffsets = new ArrayList<>();
 
         for (int startRow = 0; startRow < Bookshelf.ROWS; startRow++) {
             for (int startColumn = 0; startColumn < Bookshelf.COLUMNS; startColumn++) {
@@ -28,8 +27,8 @@ class OffsetTest {
         return rowOffsetsColumnOffsets;
     }
 
-    private static ArrayList<Arguments> firstRowOffsetColumnOffsetSecondRowOffsetColumnOffsetProvider() {
-        ArrayList<Arguments> firstOffsetsSecondOffsets = new ArrayList<>();
+    private static List<Arguments> firstRowOffsetColumnOffsetSecondRowOffsetColumnOffsetProvider() {
+        List<Arguments> firstOffsetsSecondOffsets = new ArrayList<>();
 
         for (int firstRow = 0; firstRow < Bookshelf.ROWS; firstRow++) {
             for (int firstColumn = 0; firstColumn < Bookshelf.COLUMNS; firstColumn++) {
@@ -51,8 +50,8 @@ class OffsetTest {
         return firstOffsetsSecondOffsets;
     }
 
-    private static ArrayList<Integer> horizontalAmountProvider() {
-        ArrayList<Integer> amounts = new ArrayList<>();
+    private static List<Integer> horizontalAmountProvider() {
+        List<Integer> amounts = new ArrayList<>();
 
         for (int amount = -Bookshelf.COLUMNS + 1; amount < Bookshelf.COLUMNS; amount++) {
             amounts.add(amount);
@@ -61,8 +60,8 @@ class OffsetTest {
         return amounts;
     }
 
-    private static ArrayList<Integer> verticalAmountProvider() {
-        ArrayList<Integer> amounts = new ArrayList<>();
+    private static List<Integer> verticalAmountProvider() {
+        List<Integer> amounts = new ArrayList<>();
 
         for (int amount = -Bookshelf.ROWS + 1; amount < Bookshelf.ROWS; amount++) {
             amounts.add(amount);

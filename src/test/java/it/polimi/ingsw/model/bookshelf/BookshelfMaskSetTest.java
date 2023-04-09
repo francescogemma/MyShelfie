@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiPredicate;
 
 class BookshelfMaskSetTest {
@@ -55,7 +55,7 @@ class BookshelfMaskSetTest {
         });
         bookshelfMaskSet.addBookshelfMask(new BookshelfMask(bookshelf));
 
-        ArrayList<BookshelfMask> receivedList = (ArrayList<BookshelfMask>) bookshelfMaskSet.getBookshelfMasks();
+        List<BookshelfMask> receivedList = bookshelfMaskSet.getBookshelfMasks();
         Assertions.assertEquals(TileColor.EMPTY, receivedList.get(receivedList.size() - 1).tileAt(Shelf.getInstance(0, 0)));
         Assertions.assertEquals(n + 1, bookshelfMaskSet.getSize());
     }

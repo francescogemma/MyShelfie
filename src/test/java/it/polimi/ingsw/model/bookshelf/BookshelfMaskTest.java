@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 class BookshelfMaskTest {
     private BookshelfMask bookshelfMask;
@@ -18,49 +18,49 @@ class BookshelfMaskTest {
     public void setUp() {
         Bookshelf bookshelf = new Bookshelf();
 
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
+        bookshelf.insertTiles(List.of(
             Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
             Tile.getInstance(TileColor.YELLOW, TileVersion.FIRST),
             Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-        )), 0);
+        ), 0);
 
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
+        bookshelf.insertTiles(List.of(
             Tile.getInstance(TileColor.BLUE, TileVersion.FIRST),
             Tile.getInstance(TileColor.CYAN, TileVersion.FIRST)
-        )), 0);
+        ), 0);
 
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
+        bookshelf.insertTiles(List.of(
             Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
             Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
             Tile.getInstance(TileColor.WHITE, TileVersion.FIRST)
-        )), 1);
+        ), 1);
 
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
+        bookshelf.insertTiles(List.of(
             Tile.getInstance(TileColor.WHITE, TileVersion.FIRST),
             Tile.getInstance(TileColor.WHITE, TileVersion.FIRST),
             Tile.getInstance(TileColor.YELLOW, TileVersion.FIRST)
-        )), 2);
+        ), 2);
 
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
+        bookshelf.insertTiles(List.of(
             Tile.getInstance(TileColor.BLUE, TileVersion.FIRST)
-        )), 2);
+        ), 2);
 
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
+        bookshelf.insertTiles(List.of(
             Tile.getInstance(TileColor.BLUE, TileVersion.FIRST),
             Tile.getInstance(TileColor.CYAN, TileVersion.FIRST)
-        )), 3);
+        ), 3);
 
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
+        bookshelf.insertTiles(List.of(
             Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
             Tile.getInstance(TileColor.YELLOW, TileVersion.FIRST),
             Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-        )), 4);
+        ), 4);
 
-        bookshelf.insertTiles(new ArrayList<>(Arrays.asList(
+        bookshelf.insertTiles(List.of(
             Tile.getInstance(TileColor.BLUE, TileVersion.FIRST),
             Tile.getInstance(TileColor.CYAN, TileVersion.FIRST),
             Tile.getInstance(TileColor.WHITE, TileVersion.FIRST)
-        )), 4);
+        ), 4);
 
         bookshelfMask = new BookshelfMask(bookshelf);
     }
@@ -92,7 +92,8 @@ class BookshelfMaskTest {
     @Test
     @DisplayName("Fill the mask with several shelves and get them back")
     void addAndGetShelves_correctInput_correctOutput() {
-        ArrayList<Shelf> toAdd = new ArrayList<>(Arrays.asList(
+        // This must be an ArrayList, sort is not supported on the ImmutableList returned by List.of.
+        List<Shelf> toAdd = new ArrayList<>(List.of(
            Shelf.getInstance(1, 1), Shelf.getInstance(1, 2),
            Shelf.getInstance(3, 4), Shelf.getInstance(2, 2)
         ));

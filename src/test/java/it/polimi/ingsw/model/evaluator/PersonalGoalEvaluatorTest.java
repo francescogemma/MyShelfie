@@ -6,9 +6,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 class PersonalGoalEvaluatorTest {
     PersonalGoalEvaluator personalGoalEvaluator;
@@ -29,7 +28,7 @@ class PersonalGoalEvaluatorTest {
     @Test
     @DisplayName("Create blank evaluator, don't add anything, expect 0.")
     void getPoints_enoughMasks_correctOutput() {
-        ArrayList<Integer> pointsMapping = new ArrayList<>(Arrays.asList(3, 1, 4, 1, 5, 9));
+        List<Integer> pointsMapping = List.of(3, 1, 4, 1, 5, 9);
         personalGoalEvaluator = new PersonalGoalEvaluator(getPersonalGoal(), pointsMapping);
 
         Assertions.assertEquals(0, personalGoalEvaluator.getPoints());
@@ -39,7 +38,7 @@ class PersonalGoalEvaluatorTest {
     @Test
     @DisplayName("Create blank evaluator, add enough to win, clear, get 0 again.")
     void clear_afterWinningCondition_correctOutput() {
-        ArrayList<Integer> pointsMapping = new ArrayList<>(Arrays.asList(3, 1, 4, 1, 5, 9));
+        List<Integer> pointsMapping = List.of(3, 1, 4, 1, 5, 9);
         personalGoalEvaluator = new PersonalGoalEvaluator(getPersonalGoal(), pointsMapping);
 
         BookshelfMask bookshelfMask = new BookshelfMask(
@@ -82,7 +81,7 @@ class PersonalGoalEvaluatorTest {
     @Test
     @DisplayName("Create blank evaluator, add enough to win each point amount element.")
     void getPoints_allWinningConditions_correctOutput() {
-        ArrayList<Integer> pointsMapping = new ArrayList<>(Arrays.asList(3, 1, 4, 2, 5, 9));
+        List<Integer> pointsMapping = List.of(3, 1, 4, 2, 5, 9);
         personalGoalEvaluator = new PersonalGoalEvaluator(getPersonalGoal(), pointsMapping);
 
         // Points set 0

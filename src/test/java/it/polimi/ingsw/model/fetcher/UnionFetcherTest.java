@@ -6,18 +6,15 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 class UnionFetcherTest {
     private final static int NUM_OF_FETCHES = 1000;
 
-    private static ArrayList<int[][]> mockBookshelfProvider() {
+    private static List<int[][]> mockBookshelfProvider() {
         Random random = new Random(368865);
 
-        ArrayList<int[][]> mockBookshelves = new ArrayList<>();
+        List<int[][]> mockBookshelves = new ArrayList<>();
 
         for (int i = 0; i < NUM_OF_FETCHES; i++) {
             int[][] mockBookshelf = new int[Bookshelf.ROWS][Bookshelf.COLUMNS];
@@ -46,8 +43,8 @@ class UnionFetcherTest {
         return mockBookshelves;
     }
 
-    private ArrayList<BookshelfMask> fetchAllMasks(Fetcher fetcher, int[][] mockBookshelf) {
-        ArrayList<BookshelfMask> masks = new ArrayList<>();
+    private List<BookshelfMask> fetchAllMasks(Fetcher fetcher, int[][] mockBookshelf) {
+        List<BookshelfMask> masks = new ArrayList<>();
 
         BookshelfMask mask = new BookshelfMask(new Bookshelf());
         Optional<Integer> currentGroupValue = Optional.empty();
@@ -84,15 +81,15 @@ class UnionFetcherTest {
         Fetcher secondFetcher = new AdjacencyFetcher();
         Fetcher thirdFetcher = new ShapeFetcher(Shape.TETROMINOES.get(2));
 
-        ArrayList<BookshelfMask> fetchedOneByOneMasks = new ArrayList<>(fetchAllMasks(firstFetcher, mockBookshelf));
+        List<BookshelfMask> fetchedOneByOneMasks = fetchAllMasks(firstFetcher, mockBookshelf);
         fetchedOneByOneMasks.addAll(fetchAllMasks(secondFetcher, mockBookshelf));
         fetchedOneByOneMasks.addAll(fetchAllMasks(thirdFetcher, mockBookshelf));
 
-        Fetcher unionFetcher = new UnionFetcher(new ArrayList<>(Arrays.asList(
+        Fetcher unionFetcher = new UnionFetcher(List.of(
             firstFetcher, secondFetcher, thirdFetcher
-        )));
+        ));
 
-        ArrayList<BookshelfMask> fetchedAllTogetherMasks = fetchAllMasks(unionFetcher, mockBookshelf);
+        List<BookshelfMask> fetchedAllTogetherMasks = fetchAllMasks(unionFetcher, mockBookshelf);
 
         Assertions.assertEquals(fetchedOneByOneMasks, fetchedAllTogetherMasks);
     }
