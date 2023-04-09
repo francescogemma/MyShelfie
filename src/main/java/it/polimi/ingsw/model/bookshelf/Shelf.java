@@ -99,12 +99,12 @@ public class Shelf {
      * @return a shelf in location (row + offset.getRowOffset(), column + offset.getColumnOffset()) where (row, column)
      * is the location of the shelf on which this method is invoked. The original shelf is not affected since it's
      * immutable.
-     * @throws RuntimeException if we try to move a shelf to a location which is outside the bookshelf.
+     * @throws MoveOutOfBookshelfException if we try to move a shelf to a location which is outside the bookshelf.
      */
     public Shelf move(Offset offset) {
         if (!Bookshelf.isRowInsideTheBookshelf(row + offset.getRowOffset()) ||
             !Bookshelf.isColumnInsideTheBookshelf(column + offset.getColumnOffset())) {
-            throw new RuntimeException("Trying to move " + this + " of " + offset);
+            throw new MoveOutOfBookshelfException(this, offset);
         }
 
         return getInstance(row + offset.getRowOffset(), column + offset.getColumnOffset());

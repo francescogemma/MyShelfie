@@ -144,7 +144,7 @@ class BookshelfTest {
 
     @Test
     @DisplayName("Try to insert more tiles than the ones which fit inside a column, should throw exception")
-    void insertTiles_moreTilesThanAvailableSpaceInColumn_throwsRuntimeException() {
+    void insertTiles_moreTilesThanAvailableSpaceInColumn_throwsNotEnoughSpaceInColumnException() {
         List<Tile> firstInsertion = List.of(
             Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
             Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
@@ -164,7 +164,7 @@ class BookshelfTest {
         bookshelf.insertTiles(firstInsertion, 0);
         bookshelf.insertTiles(secondInsertion, 0);
 
-        Assertions.assertThrows(RuntimeException.class, () -> {
+        Assertions.assertThrows(NotEnoughSpaceInColumnException.class, () -> {
             bookshelf.insertTiles(thirdInsertion, 0);
         });
     }

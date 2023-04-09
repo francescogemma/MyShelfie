@@ -124,7 +124,7 @@ public class Bookshelf {
      *     <li> if the number of tiles in tiles is bigger than the maximum insertion size: {@value MAX_INSERTION_SIZE}. </li>
      *     <li> if there is an empty tile inside tiles. </li>
      * </ul>
-     * @throws RuntimeException if there isn't enough space inside the specified column to put all the tiles.
+     * @throws NotEnoughSpaceInColumnException if there isn't enough space inside the specified column to put all the tiles.
      */
     public void insertTiles(List<Tile> tiles, int column) {
         if (!isColumnInsideTheBookshelf(column)) {
@@ -144,8 +144,7 @@ public class Bookshelf {
 
         final int numEmptyShelves = countEmptyShelves(column);
         if (numEmptyShelves < tiles.size()) {
-            throw new RuntimeException("column " + column + " has not enough free space to insert "
-                + tiles.size() + " tiles");
+            throw new NotEnoughSpaceInColumnException(column, tiles.size());
         }
 
         int row = numEmptyShelves - 1;

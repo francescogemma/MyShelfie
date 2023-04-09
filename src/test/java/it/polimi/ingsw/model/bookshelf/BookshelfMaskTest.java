@@ -79,12 +79,12 @@ class BookshelfMaskTest {
 
     @Test
     @DisplayName("Try to insert duplicate shelf in the mask")
-    void add_duplicateShelf_throwsRuntimeException() {
+    void add_duplicateShelf_throwsDuplicateShelfException() {
         bookshelfMask.add(Shelf.origin());
         bookshelfMask.add(Shelf.origin().move(Offset.right()));
         bookshelfMask.add(Shelf.origin().move(Offset.down()));
 
-        Assertions.assertThrows(RuntimeException.class, () -> {
+        Assertions.assertThrows(DuplicateShelfException.class, () -> {
            bookshelfMask.add(Shelf.origin());
         });
     }

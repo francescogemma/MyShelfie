@@ -133,7 +133,7 @@ public class Shape {
         for (Offset offset : offsets) {
             try {
                 currentShelf = Shelf.origin().move(offset);
-            } catch (RuntimeException e) {
+            } catch (MoveOutOfBookshelfException e) {
                 throw new IllegalArgumentException("offsets are not defined with respect to the top-left " +
                     "shelf of the instance of the bounding box");
             }

@@ -107,8 +107,8 @@ class ShelfTest {
 
     @Test
     @DisplayName("Trying to move shelf outside the bookshelf, should throw exception")
-    void move_tooBigOffset_throwsRuntimeException() {
-        Assertions.assertThrows(RuntimeException.class, () -> {
+    void move_tooBigOffset_throwsMoveOutOfBookshelfException() {
+        Assertions.assertThrows(MoveOutOfBookshelfException.class, () -> {
             Shelf.origin().move(Offset.left());
         });
     }

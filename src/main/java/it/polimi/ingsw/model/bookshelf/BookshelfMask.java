@@ -53,12 +53,12 @@ public class BookshelfMask {
      * Adds a {@link Shelf shelf} to the set.
      *
      * @param shelf is the shelf that we are going to add to the set.
-     * @throws RuntimeException if the shelf is already in the set.
+     * @throws DuplicateShelfException if the shelf is already in the set.
      */
     public void add(Shelf shelf) {
         for (int i = 0; i < shelves.size(); i++) {
             if (shelf.equals(shelves.get(i))) {
-                throw new RuntimeException(shelf + " has already been inserted in the mask");
+                throw new DuplicateShelfException(shelf);
             }
 
             if (shelf.before(shelves.get(i))) {
