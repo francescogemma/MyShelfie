@@ -24,19 +24,17 @@ public abstract class SelectTileState extends GameState{
      * */
     protected Player getNextPlayer () {
         int currentIndex = 0;
+        final int numberOfPlayers = this.gameData.players.size();
 
-        try {
-            currentIndex = this.indexOf(this.currentPlayer);
-        } catch (PlayerNotInGameException ignored) {
-            assert false: "nextPlayer is not a player in this game :(";
-        }
+        currentIndex = this.indexOf(this.currentPlayer);
 
         return this.gameData.players.get(
-                (currentIndex + 1) % 4
+                (currentIndex + 1) % numberOfPlayers
         ).getKey();
     }
 
-    public Collection<Coordinate> getSelectableTile () throws IllegalFlowException {
+    @Override
+    public Collection<Coordinate> getSelectableTile () {
         return this
                 .gameData
                 .board

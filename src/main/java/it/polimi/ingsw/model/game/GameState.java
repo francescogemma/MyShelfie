@@ -64,6 +64,10 @@ abstract class GameState{
 
     boolean isConnected (Player p) throws PlayerNotInGameException {
         final int index = this.indexOf(p);
+
+        if (index < 0)
+            throw new PlayerNotInGameException();
+
         return this.gameData.players.get(index).getValue();
     }
 
@@ -71,18 +75,23 @@ abstract class GameState{
         return this.gameData.name;
     }
 
-    protected int indexOf(Player player) throws PlayerNotInGameException {
+    protected int indexOf(Player player) {
         int i;
         for (i = 0; i < this.gameData.players.size(); i++) {
             if (this.gameData.players.get(i).getKey().equals(player)) {
                 return i;
             }
         }
-        throw new PlayerNotInGameException();
+
+        return -1;
     }
 
     private void setConnected(Player player, boolean connect) throws PlayerNotInGameException {
         final int index = indexOf(player);
+
+        if (index < 0)
+            throw new PlayerNotInGameException();
+
         this.gameData.players.get(index).setValue(connect);
     }
 
@@ -94,7 +103,7 @@ abstract class GameState{
         setConnected(player, false);
     }
 
-    protected void setWinner(Player player) throws PlayerNotInGameException {
+    protected void setWinner(Player player) {
         this.indexOf(player);
 
         if (this.gameData.winner.isPresent())

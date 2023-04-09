@@ -6,11 +6,7 @@ public class SelectTileWithNoWinnerState extends SelectTileState{
     }
 
     private void setWinner() {
-        try {
-            setWinner(currentPlayer);
-        } catch (PlayerNotInGameException e) {
-            assert false: "Player it's not in this game";
-        }
+        setWinner(currentPlayer);
     }
 
     @Override

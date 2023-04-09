@@ -5,6 +5,7 @@ import it.polimi.ingsw.model.board.SelectionFullException;
 import it.polimi.ingsw.utils.Coordinate;
 import org.junit.jupiter.api.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -223,6 +224,45 @@ class GameTest {
                         new Coordinate(4, 0),
                         new Coordinate(4, 1),
                         new Coordinate(4, 2)
+        ), 0);
+    }
+
+    @Test
+    void insertTile_followRightOrder_correctOutput() throws IllegalFlowException, SelectionFullException, IllegalExtractionException {
+        Player p1 = new Player("t1");
+        Player p2 = new Player("t2");
+        Player p3 = new Player("t3");
+
+        game.addPlayer(p1);
+        game.addPlayer(p2);
+        game.addPlayer(p3);
+
+        game.startGame();
+
+        Assertions.assertEquals(game.getCurrentPlayer(), p1);
+
+        game.selectTile(p1, new ArrayList<>(
+                List.of(
+                        new Coordinate(4, 0)
+                )
+        ), 0);
+
+        game.selectTile(p2, new ArrayList<>(
+                List.of(
+                        new Coordinate(4, 1)
+                )
+        ), 0);
+
+        game.selectTile(p3, new ArrayList<>(
+                List.of(
+                        new Coordinate(4, 2)
+                )
+        ), 0);
+
+        game.selectTile(p1, new ArrayList<>(
+                List.of(
+                        new Coordinate(4, 3)
+                )
         ), 0);
     }
 }
