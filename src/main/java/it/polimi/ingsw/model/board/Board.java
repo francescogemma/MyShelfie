@@ -108,7 +108,7 @@ class BoardSelector {
         }
 
         if (contains(c)) {
-            throw new IllegalArgumentException("The specified coordinate already exists");
+            throw new IllegalExtractionException("The specified coordinate already exists");
         }
 
         if (selectionSize() != 0 && (!getAvailableSelection().contains(c))) {
@@ -211,10 +211,10 @@ public class Board {
             throw new IllegalArgumentException("It's out of the board");
         }
 
-        if (this.isEmptyExtraction(c))
-            throw new IllegalExtractionException("Can't extract tile at: [" + c.getRow() + ", " + c.getCol() + "] because it's already selected");
+        if (this.isEmpty(c))
+            throw new IllegalExtractionException("Can't extract tile at: [" + c.getRow() + ", " + c.getCol() + "] because tile is empty");
 
-        if (numberOfFreeSides(c, this::isEmptyExtraction) == 0) {
+        if (numberOfFreeSides(c) == 0) {
             throw new IllegalExtractionException("Can't extract tile at: [" + c.getRow() + ", " + c.getCol() + "]");
         }
 
@@ -244,14 +244,8 @@ public class Board {
      * @return return true if tiles[row][col] is on border
      * */
     private boolean hasEdgeOnBorder(Coordinate c) {
-        return c.getRow() == tiles.length || c.getCol() == tiles.length ||
+        return c.getRow() + 1 == tiles.length || c.getCol() + 1== tiles.length ||
                 c.getRow() == 0 || c.getCol() == 0;
-    }
-
-    private boolean isEmptyExtraction(Coordinate c) {
-        if (this.boardSelector.contains(c))
-            return true;
-        return this.isEmpty(c);
     }
 
     private boolean isOutOfBoard (Coordinate c) {
@@ -271,7 +265,7 @@ public class Board {
         }
 
         Consumer<Coordinate> a = p -> {
-            if (numberOfFreeSides(p, this::isEmptyExtraction) > 0 && !isEmpty(p))
+            if (numberOfFreeSides(p) > 0 && !isEmpty(p))
                 res.add(p);
         };
 
@@ -287,6 +281,7 @@ public class Board {
                         .stream()
                         .filter(p -> !isOutOfBoard(p))
                         .filter(p -> !isEmpty(p))
+                        .filter(p -> numberOfFreeSides(p) > 0)
                         .forEach(res::add);
             }
         }
@@ -350,32 +345,36 @@ public class Board {
         return res;
     }
 
-    private int numberOfFreeSides(Coordinate c, Predicate<Coordinate> isEmptyFunc) {
+    private int numberOfFreeSides(Coordinate c) {
         if (this.isOutOfBoard(c))
             throw new IllegalArgumentException("row or col out of bound: row: " + c.getRow() + " col: " + c.getCol());
 
         int free = 0;
         final boolean onBorder = this.hasEdgeOnBorder(c);
         if (onBorder)
-            free ++;
+            free++;
 
-        if (c.getCol() + 1 < Board.COLUMN_BOARDS && isEmptyFunc.test(new Coordinate(c.getRow(), c.getCol()+1)))
+        if (c.getCol() + 1 < Board.COLUMN_BOARDS &&
+                isEmpty(c.right())) {
+            free++;
+        }
+
+        if (c.getRow() + 1 < Board.BOARD_ROWS &&
+                isEmpty(c.down())) {
+            free++;
+        }
+
+        if (c.getRow() != 0 &&
+                isEmpty(c.top())) {
                 free ++;
+        }
 
-        if (c.getRow() + 1 < Board.BOARD_ROWS && isEmptyFunc.test(new Coordinate(c.getRow() + 1, c.getCol())))
-                free ++;
-
-        if (c.getRow() != 0 && isEmptyFunc.test(new Coordinate(c.getRow() - 1, c.getCol())))
-                free ++;
-
-        if (c.getCol() != 0 && isEmptyFunc.test(new Coordinate(c.getRow(), c.getCol() - 1)))
+        if (c.getCol() != 0 &&
+                isEmpty(c.left())) {
                 free++;
+        }
 
         return free;
-    }
-
-    private int numberOfFreeSides(Coordinate c) {
-        return numberOfFreeSides(c, this::isEmpty);
     }
 
     private List<Coordinate> getAvailablePositionInsert(int numPlayer) {
@@ -430,13 +429,13 @@ public class Board {
      * @return true if it is necessary to fill the board
      */
     public boolean needsRefill() {
-        Predicate<Coordinate> checkEdges = (final Coordinate c) ->
-                !isEmpty(c) && (numberOfFreeSides(c) == 4);
+        Predicate<Coordinate> checkEdges = c ->
+            !isEmpty(c) && (numberOfFreeSides(c) == 4);
 
         if (this.occupied == 0)
             return true;
 
-        return Board.TWO_PLAYER_POSITIONS.stream().anyMatch(checkEdges) ||
+        return  Board.TWO_PLAYER_POSITIONS.stream().anyMatch(checkEdges) ||
                 Board.THREE_PLAYER_POSITIONS.stream().anyMatch(checkEdges) ||
                 Board.FOUR_PLAYER_POSITIONS.stream().anyMatch(checkEdges);
     }

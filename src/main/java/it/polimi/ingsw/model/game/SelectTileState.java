@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.model.bookshelf.NotEnoughSpaceInColumnException;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
 import it.polimi.ingsw.model.board.FullSelectionException;
@@ -65,8 +66,7 @@ public abstract class SelectTileState extends GameState{
 
         try {
             currentPlayer.getBookshelf().insertTiles(tileColorSelected, col);
-        } catch (RuntimeException e) {
-            // TODO change RuntimeException with the correct throw
+        } catch (NotEnoughSpaceInColumnException e) {
             this.gameData.board.forgetSelection();
             throw e;
         }

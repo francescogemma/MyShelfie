@@ -49,15 +49,17 @@ public class Game {
         this.gameState.disconnect(player);
     }
 
-    // TODO: Translate this JavaDoc to english
     /**
-     * In caso un utente di disconnetti dalla partita la funzione viene
-     * chiamata quando l'utente si riconnetta alla partita.
+     * Function used to reconnect a player, already in the game, who was disconnected from the network.
+     * @throws PlayerNotInGameException iff player is not in this game
      * */
     public void connect(Player player) throws PlayerNotInGameException {
         this.gameState.connect(player);
     }
 
+    /**
+     * @return Name of the game.
+     */
     public String getName() {
         return this.gameState.getName();
     }

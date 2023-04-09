@@ -207,9 +207,13 @@ class GameTest {
         game.startGame();
 
         game.selectTile(p1, List.of(
-                        new Coordinate(4, 0),
+                new Coordinate(4, 0)
+        ), 0);
+
+        game.selectTile(p2, List.of(
+                        new Coordinate(3, 1),
                         new Coordinate(4, 1),
-                        new Coordinate(4, 2)
+                        new Coordinate(5, 1)
         ), 0);
     }
 

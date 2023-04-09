@@ -10,10 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-// TODO: Translate this JavaDoc to english
-
 /**
- * Nella funzione vengono definiti tutti i dati e i getter disponibili dalla classe Game
+ * Class used only to store game data.
  * */
 public class GameData {
     protected static final int INDEX_FIRST_PLAYER = 0;

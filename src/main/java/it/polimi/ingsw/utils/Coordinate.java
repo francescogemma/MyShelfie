@@ -35,6 +35,14 @@ public class Coordinate {
         return new Coordinate(this.row, col + 1);
     }
 
+    public Coordinate top () {
+        return new Coordinate(this.row - 1, this.col);
+    }
+
+    public Coordinate left () {
+        return new Coordinate(this.row, this.col - 1);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this)
