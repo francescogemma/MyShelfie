@@ -20,7 +20,7 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
     /**
      * This set stores all masks gathered so far.
      */
-    private BookshelfMaskSet bookshelfMaskSet;
+    private final BookshelfMaskSet bookshelfMaskSet;
 
     /**
      * Class constructor.
@@ -29,11 +29,10 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
      *                     grant a player a non-zero amount of points.
      */
     public AtLeastEvaluator(int playersAmount, int targetAmount, Predicate<BookshelfMask> toCount) {
-        super(playersAmount);
-        bookshelfMaskSet = new BookshelfMaskSet();
-        bookshelfMaskSet.addPredicate(toCount);
+        // call simple constructor
+        this(playersAmount, targetAmount);
 
-        this.targetAmount = targetAmount;
+        bookshelfMaskSet.addPredicate(toCount);
     }
 
     /**
@@ -45,8 +44,8 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
      */
     public AtLeastEvaluator(int playersAmount, int targetAmount) {
         super(playersAmount);
-        bookshelfMaskSet = new BookshelfMaskSet();
 
+        bookshelfMaskSet = new BookshelfMaskSet();
         this.targetAmount = targetAmount;
     }
 

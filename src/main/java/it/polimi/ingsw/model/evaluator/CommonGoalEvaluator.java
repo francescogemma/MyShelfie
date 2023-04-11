@@ -25,7 +25,7 @@ public abstract class CommonGoalEvaluator implements Evaluator {
      */
     protected CommonGoalEvaluator(int playersAmount) {
         switch (playersAmount) {
-            // These must be ArrayList, List.of returns an ImmutableList on which remove or add are unsupported.
+            // These must be ArrayList. "List.of" returns an ImmutableList on which remove or add are unsupported.
             case 2 -> pointStack = new ArrayList<>(List.of(4, 8));
             case 3 -> pointStack = new ArrayList<>(List.of(4, 6, 8));
             case 4 -> pointStack = new ArrayList<>(List.of(2, 4, 6, 8));
