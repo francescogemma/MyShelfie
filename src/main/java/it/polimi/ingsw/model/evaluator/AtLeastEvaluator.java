@@ -23,12 +23,6 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
     private BookshelfMaskSet bookshelfMaskSet;
 
     /**
-     * Predicate to determine if the provided {@link BookshelfMask BookshelfMask}
-     * has to be actually added to the counter.
-     */
-    private final Predicate<BookshelfMask> toCount;
-
-    /**
      * Class constructor.
      * @param playersAmount is this game's player amount (2 to 4).
      * @param targetAmount is the needed quantity of {@link BookshelfMask BookshelfMasks} to
@@ -37,8 +31,8 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
     public AtLeastEvaluator(int playersAmount, int targetAmount, Predicate<BookshelfMask> toCount) {
         super(playersAmount);
         bookshelfMaskSet = new BookshelfMaskSet();
+        bookshelfMaskSet.addPredicate(toCount);
 
-        this.toCount = toCount;
         this.targetAmount = targetAmount;
     }
 
@@ -53,22 +47,20 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
         super(playersAmount);
         bookshelfMaskSet = new BookshelfMaskSet();
 
-        this.toCount = bookshelfMask -> true;
         this.targetAmount = targetAmount;
     }
 
     @Override
     public boolean add(BookshelfMask bookshelfMask) {
-        // no need to add any mask if our target is already met
+        // no need to add any mask if our target is already met.
         if (bookshelfMaskSet.getSize() >= targetAmount) {
             return true;
         }
 
-        // add mask to mask set
-        if (toCount.test(bookshelfMask)) {
-            bookshelfMaskSet.addBookshelfMask(bookshelfMask);
-        }
+        // add mask to mask set (if it's compatible).
+        bookshelfMaskSet.add(bookshelfMask);
 
+        // return true if that addition helped us meet the target.
         return bookshelfMaskSet.getSize() >= targetAmount;
     }
 
@@ -80,11 +72,11 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
 
     @Override
     public BookshelfMaskSet getPointMasks() {
-        return bookshelfMaskSet;
+        return new BookshelfMaskSet(bookshelfMaskSet);
     }
 
     @Override
     public void clear() {
-        bookshelfMaskSet = new BookshelfMaskSet();
+        bookshelfMaskSet.clear();
     }
 }

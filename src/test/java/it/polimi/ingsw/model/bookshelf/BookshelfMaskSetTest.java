@@ -19,7 +19,7 @@ class BookshelfMaskSetTest {
         bookshelfMaskSet = new BookshelfMaskSet();
 
         BookshelfMask bookshelfMask = new BookshelfMask(new Bookshelf());
-        bookshelfMaskSet.addBookshelfMask(bookshelfMask);
+        bookshelfMaskSet.add(bookshelfMask);
 
         Assertions.assertNotSame(bookshelfMask, bookshelfMaskSet.getBookshelfMasks().get(0));
     }
@@ -40,7 +40,7 @@ class BookshelfMaskSetTest {
         bookshelfMaskSet = new BookshelfMaskSet();
 
         for (int i = 0; i < n; i++) {
-            bookshelfMaskSet.addBookshelfMask(new BookshelfMask(new Bookshelf()));
+            bookshelfMaskSet.add(new BookshelfMask(new Bookshelf()));
         }
 
         // add more articulate BookshelfMask from this bookshelf
@@ -52,7 +52,7 @@ class BookshelfMaskSetTest {
                 { 4, 4, 4, 4, 4 },
                 { 5, 5, 5, 5, 5 },
         });
-        bookshelfMaskSet.addBookshelfMask(new BookshelfMask(bookshelf));
+        bookshelfMaskSet.add(new BookshelfMask(bookshelf));
 
         List<BookshelfMask> receivedList = bookshelfMaskSet.getBookshelfMasks();
         Assertions.assertEquals(TileColor.EMPTY, receivedList.get(receivedList.size() - 1).getTileColorAt(Shelf.getInstance(0, 0)));
@@ -60,8 +60,8 @@ class BookshelfMaskSetTest {
     }
 
     @Test
-    @DisplayName("Control if compatibility checks work correctly")
-    void isCompatible_variousMasks_correctOutput() {
+    @DisplayName("Control if biPredicate compatibility checks work correctly")
+    void add_variousMasksBiPredicate_correctOutput() {
         bookshelfMaskSet = new BookshelfMaskSet();
         bookshelfMaskSet.addBiPredicate((a, b) ->
                 a.getTileColorAt(Shelf.getInstance(1, 1)) == b.getTileColorAt(Shelf.getInstance(2, 2))
@@ -99,6 +99,46 @@ class BookshelfMaskSetTest {
         Assertions.assertFalse(bookshelfMaskSet.add(new BookshelfMask(bookshelfThird)));
     }
 
+    @Test
+    @DisplayName("Control if predicate compatibility checks work correctly")
+    void add_variousMasksPredicate_correctOutput() {
+        bookshelfMaskSet = new BookshelfMaskSet();
+        bookshelfMaskSet.addPredicate(a ->
+                a.getTileColorAt(Shelf.getInstance(1, 1)) == TileColor.GREEN
+        );
+
+        Bookshelf bookshelfFirst = new MockBookshelf(new int[][]{
+                { 0, 0, 0, 0, 0 },
+                { 1, TileColor.tileColorToIndex(TileColor.GREEN), 1, 1, 1 },
+                { 2, 2, 2, 2, 2 },
+                { 3, 3, 3, 3, 3 },
+                { 4, 4, 4, 4, 4 },
+                { 5, 5, 5, 5, 5 },
+        });
+
+        Bookshelf bookshelfSecond = new MockBookshelf(new int[][]{
+                { 0, 1, 2, 3, 2 },
+                { 1, TileColor.tileColorToIndex(TileColor.GREEN), 1, 1, 1 },
+                { 2, 2, 1, 2, 2 },
+                { 2, 3, 2, 3, 1 },
+                { 4, 4, 4, 4, 4 },
+                { 5, 4, 3, 2, 3 },
+        });
+
+        Bookshelf bookshelfThird = new MockBookshelf(new int[][]{
+                { 4, 5, 4, 3, 1 },
+                { 1, TileColor.tileColorToIndex(TileColor.YELLOW), 1, 1, 1 },
+                { 2, 2, 2, 2, 2 },
+                { 3, 3, 3, 3, 3 },
+                { 1, 3, 2, 5, 1 },
+                { 5, 4, 5, 2, 1 },
+        });
+
+        Assertions.assertTrue(bookshelfMaskSet.add(new BookshelfMask(bookshelfFirst)));
+        Assertions.assertTrue(bookshelfMaskSet.add(new BookshelfMask(bookshelfSecond)));
+        Assertions.assertFalse(bookshelfMaskSet.add(new BookshelfMask(bookshelfThird)));
+    }
+
     @ParameterizedTest
     @DisplayName("Check clearSet method")
     @ValueSource(ints = {0, 4, 8, 12})
@@ -106,7 +146,7 @@ class BookshelfMaskSetTest {
         bookshelfMaskSet = new BookshelfMaskSet();
 
         for (int i = 0; i < n; i++) {
-            bookshelfMaskSet.addBookshelfMask(new BookshelfMask(new Bookshelf()));
+            bookshelfMaskSet.add(new BookshelfMask(new Bookshelf()));
         }
 
         // add more articulate BookshelfMask from this bookshelf
@@ -118,7 +158,7 @@ class BookshelfMaskSetTest {
                 { 4, 4, 4, 4, 4 },
                 { 5, 5, 5, 5, 5 },
         });
-        bookshelfMaskSet.addBookshelfMask(new BookshelfMask(bookshelf));
+        bookshelfMaskSet.add(new BookshelfMask(bookshelf));
 
         Assertions.assertEquals(n + 1, bookshelfMaskSet.getSize());
 

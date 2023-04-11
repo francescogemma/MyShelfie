@@ -100,8 +100,8 @@ class AdjacencyEvaluatorTest {
         adjacencyEvaluator.add(mask2);
 
         BookshelfMaskSet bookshelfMaskSet = new BookshelfMaskSet();
-        bookshelfMaskSet.addBookshelfMask(mask1);
-        bookshelfMaskSet.addBookshelfMask(mask2);
+        bookshelfMaskSet.add(mask1);
+        bookshelfMaskSet.add(mask2);
 
         Assertions.assertEquals(5 + 2, adjacencyEvaluator.getPoints());
         Assertions.assertTrue(compareMaskSets(bookshelfMaskSet, adjacencyEvaluator.getPointMasks()));
@@ -125,11 +125,11 @@ class AdjacencyEvaluatorTest {
         adjacencyEvaluator.add(mask6);
 
         BookshelfMaskSet bookshelfMaskSet = new BookshelfMaskSet();
-        bookshelfMaskSet.addBookshelfMask(mask1);
-        bookshelfMaskSet.addBookshelfMask(mask2);
-        bookshelfMaskSet.addBookshelfMask(mask3);
-        bookshelfMaskSet.addBookshelfMask(mask5);
-        bookshelfMaskSet.addBookshelfMask(mask6);
+        bookshelfMaskSet.add(mask1);
+        bookshelfMaskSet.add(mask2);
+        bookshelfMaskSet.add(mask3);
+        bookshelfMaskSet.add(mask5);
+        bookshelfMaskSet.add(mask6);
 
         Assertions.assertEquals(2 + 5 + 8 + 8 + 3, adjacencyEvaluator.getPoints());
         Assertions.assertTrue(compareMaskSets(bookshelfMaskSet, adjacencyEvaluator.getPointMasks()));

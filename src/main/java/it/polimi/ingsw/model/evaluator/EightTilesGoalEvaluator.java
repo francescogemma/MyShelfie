@@ -57,7 +57,7 @@ public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Eval
                         }
                     }
                 }
-                pointMasks.addBookshelfMask(maskToAdd);
+                pointMasks.add(maskToAdd);
 
                 break;
             }

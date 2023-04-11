@@ -71,7 +71,7 @@ public class PersonalGoalEvaluator implements Evaluator {
                 BookshelfMask maskToAdd = new BookshelfMask(bookshelfMask);
                 maskToAdd.clear();
                 maskToAdd.add(key);
-                pointMasks.addBookshelfMask(maskToAdd);
+                pointMasks.add(maskToAdd);
             }
         }
         return true;
@@ -86,7 +86,7 @@ public class PersonalGoalEvaluator implements Evaluator {
     public void clear() {
         successfulShelves = 0;
         points = 0;
-        pointMasks = new BookshelfMaskSet();
+        pointMasks.clear();
     }
 
     @Override

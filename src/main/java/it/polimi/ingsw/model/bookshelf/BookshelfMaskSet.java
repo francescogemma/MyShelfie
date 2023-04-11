@@ -46,18 +46,6 @@ public class BookshelfMaskSet {
         });
     }
 
-    // TODO: Refactor all the code using deprecated methods inside this class
-
-    /**
-     * @deprecated constructor. Please use the normal constructor, and add your biPredicate with the addBiPredicate method.
-     * @param compatible defines the set of criteria used for compatibility checking.
-     */
-    @Deprecated public BookshelfMaskSet(BiPredicate<BookshelfMask, BookshelfMask> compatible) {
-        bookshelfMasks = new ArrayList<>();
-        predicate = a -> true;
-        addBiPredicate(compatible);
-    }
-
     /**
      * Constructor, with no set constraints applied.
      */
@@ -106,14 +94,6 @@ public class BookshelfMaskSet {
     public Predicate<BookshelfMask> getPredicate() { return predicate; }
 
     /**
-     * @deprecated getter method for a non-existent biPredicate object.
-     * @return a synthetic biPredicate object.
-     */
-    @Deprecated public BiPredicate<BookshelfMask, BookshelfMask> getCompatible() {
-        return (a, b) -> getPredicate().test(b);
-    }
-
-    /**
      * @return the amount of elements in this set.
      */
     public int getSize() {
@@ -125,15 +105,6 @@ public class BookshelfMaskSet {
      */
     public List<BookshelfMask> getBookshelfMasks() {
         return new ArrayList<>(bookshelfMasks);
-    }
-
-    /**
-     * Add an element to the set (by copying it).
-     * @param bookshelfMask will be added to the set.
-     * @deprecated please use "add".
-     */
-    @Deprecated public void addBookshelfMask(BookshelfMask bookshelfMask) {
-        bookshelfMasks.add(new BookshelfMask(bookshelfMask));
     }
 
     /**
@@ -151,7 +122,7 @@ public class BookshelfMaskSet {
 
     /**
      * This method checks if the given input is compatible with all other elements of the set.
-     * You don't need to use this method to check before adding, the add method already checks for that.
+     * You don't need to use this method to check before adding, the add method already checks for t
      * @param bookshelfMask will be checked against all other elements.
      * @return true if all compatibility criteria are met with all set elements.
      */

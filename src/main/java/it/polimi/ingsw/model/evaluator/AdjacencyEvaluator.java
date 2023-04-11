@@ -24,7 +24,7 @@ public class AdjacencyEvaluator implements Evaluator {
     public boolean add(BookshelfMask bookshelfMask) {
         if(convertSizeToPoints(bookshelfMask.getShelves().size()) > 0) {
             points += convertSizeToPoints(bookshelfMask.getShelves().size());
-            pointMasks.addBookshelfMask(bookshelfMask);
+            pointMasks.add(bookshelfMask);
         }
 
         // always return false since it's always possible to get new points
