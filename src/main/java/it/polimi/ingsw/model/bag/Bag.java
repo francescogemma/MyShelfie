@@ -140,16 +140,19 @@ public class Bag {
             throw new IllegalStateException("Bag is empty");
         }
 
-        final int index = new Random().nextInt(Tile.NUM_OF_DIFFERENT_NON_EMPTY_TILES);
+        int index = new Random().nextInt(this.remaining);
+        int type;
 
-        for (int i = 0; i < Tile.NUM_OF_DIFFERENT_NON_EMPTY_TILES; i++) {
-            final int realIndex = (index + i) % Tile.NUM_OF_DIFFERENT_NON_EMPTY_TILES;
-            if (getAvailable(realIndex) != 0) {
-                return this.removeAndReturn(realIndex);
+        for (type = 0; type < Tile.NUM_OF_DIFFERENT_NON_EMPTY_TILES; type ++) {
+            final int remainingPerType = getAvailable(type);
+            if (index < remainingPerType) {
+                break;
             }
+
+            index -= remainingPerType;
         }
 
-        throw new InternalError("Internal error: loop should never finish");
+        return this.removeAndReturn(type);
     }
 
     /**
