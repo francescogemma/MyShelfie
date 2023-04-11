@@ -80,7 +80,7 @@ public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluato
                 // duplicate current BookshelfMaskSet in group
                 // then, add the compatible mask to one of them
                 group.add(new BookshelfMaskSet(bookshelfMaskSet));
-                bookshelfMaskSet.addBookshelfMask(bookshelfMask);
+                bookshelfMaskSet.add(bookshelfMask);
 
                 // note down if this addition meets out target size
                 targetMet |= bookshelfMaskSet.getSize() >= targetSetSize;
@@ -92,7 +92,7 @@ public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluato
         }
         // create and add one more set with a single BookshelfMask
         BookshelfMaskSet bookshelfMaskSetLast = new BookshelfMaskSet(compatible);
-        bookshelfMaskSetLast.addBookshelfMask(bookshelfMask);
+        bookshelfMaskSetLast.add(bookshelfMask);
         group.add(bookshelfMaskSetLast);
 
         return targetMet;

@@ -94,9 +94,9 @@ class BookshelfMaskSetTest {
                 { 5, 4, 5, 2, 1 },
         });
 
-        bookshelfMaskSet.addBookshelfMask(new BookshelfMask(bookshelfFirst));
-        Assertions.assertTrue(bookshelfMaskSet.isCompatible(new BookshelfMask(bookshelfSecond)));
-        Assertions.assertFalse(bookshelfMaskSet.isCompatible(new BookshelfMask(bookshelfThird)));
+        bookshelfMaskSet.add(new BookshelfMask(bookshelfFirst));
+        Assertions.assertTrue(bookshelfMaskSet.add(new BookshelfMask(bookshelfSecond)));
+        Assertions.assertFalse(bookshelfMaskSet.add(new BookshelfMask(bookshelfThird)));
     }
 
     @ParameterizedTest

@@ -151,11 +151,11 @@ public class BookshelfMaskSet {
 
     /**
      * This method checks if the given input is compatible with all other elements of the set.
+     * You don't need to use this method to check before adding, the add method already checks for that.
      * @param bookshelfMask will be checked against all other elements.
      * @return true if all compatibility criteria are met with all set elements.
-     * @deprecated because compatibility checks are an internal process of this object. Use the "add" method instead.
      */
-    @Deprecated public boolean isCompatible(BookshelfMask bookshelfMask) { return predicate.test(bookshelfMask); }
+    public boolean isCompatible(BookshelfMask bookshelfMask) { return predicate.test(bookshelfMask); }
 
     /**
      * This method tells the user if the provided mask is inside the set or not.
