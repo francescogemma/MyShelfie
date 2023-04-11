@@ -39,26 +39,41 @@ public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Eval
         pointMasks = new BookshelfMaskSet();
     }
 
+    /**
+     * Helper method to clean up a mask based on specified color.
+     * @param bookshelfMask will be copied, emptied, and returned with correct tiles.
+     * @param tileColor is the color that will characterize the newly created mask
+     * @return a mask subset of the input that contains only the specified color.
+     */
+    private BookshelfMask filterColor(BookshelfMask bookshelfMask, TileColor tileColor) {
+        // create a new mask with same properties of original, but completely empty.
+        BookshelfMask maskToAdd = new BookshelfMask(bookshelfMask);
+        maskToAdd.clear();
+
+        // counter used to break the computation if we've already reached 8 tiles.
+        int count = 0;
+
+        // look through all tiles and add the correctly-coloured ones to the mask.
+        for (int row = 0; row < Bookshelf.ROWS && count < 8; row++) {
+            for (int column = 0; column < Bookshelf.COLUMNS && count < 8; column++) {
+                if (maskToAdd.getTileColorAt(Shelf.getInstance(row, column)) == tileColor) {
+                    maskToAdd.add(Shelf.getInstance(row, column));
+                    count++;
+                }
+            }
+        }
+
+        return maskToAdd;
+    }
+
     @Override
     public boolean add(BookshelfMask mask) {
-        for(TileColor tileColor : TileColor.values()) {
-            if(tileColor != TileColor.EMPTY && mask.countTilesOfColor(tileColor) >= 8) {
+        for (TileColor tileColor : TileColor.values()) {
+            if (tileColor != TileColor.EMPTY && mask.countTilesOfColor(tileColor) >= 8) {
                 satisfied = true;
 
-                BookshelfMask maskToAdd = new BookshelfMask(mask);
-                maskToAdd.clear();
-
-                int count = 0;
-                for(int row = 0; row < Bookshelf.ROWS && count < 8; row++) {
-                    for(int column = 0; column < Bookshelf.COLUMNS && count < 8; column++) {
-                        if(maskToAdd.getTileColorAt(Shelf.getInstance(row, column)) == tileColor) {
-                            maskToAdd.add(Shelf.getInstance(row, column));
-                            count++;
-                        }
-                    }
-                }
-                pointMasks.add(maskToAdd);
-
+                // add that mask, without unrelated colors.
+                pointMasks.add(filterColor(mask, tileColor));
                 break;
             }
         }

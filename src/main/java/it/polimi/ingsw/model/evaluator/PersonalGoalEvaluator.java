@@ -42,7 +42,7 @@ public class PersonalGoalEvaluator implements Evaluator {
      * Points that should be given the player so far.
      */
     private int points;
-    private BookshelfMaskSet pointMasks;
+    private final BookshelfMaskSet pointMasks;
 
     /**
      * Type constructor.
