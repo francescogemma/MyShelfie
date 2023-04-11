@@ -39,7 +39,7 @@ public abstract class Goal {
         this.fetcher = fetcher;
         this.filter = filter;
         this.evaluator = evaluator;
-        pointMasks = new BookshelfMaskSet((a, b) -> true);
+        pointMasks = new BookshelfMaskSet();
     }
 
     /**
@@ -91,7 +91,7 @@ public abstract class Goal {
         try {
             int points = evaluator.getPoints();
             if(points == 0) {
-                pointMasks = new BookshelfMaskSet((a, b) -> true);
+                pointMasks = new BookshelfMaskSet();
             } else if(points > 0) {
                 pointMasks = evaluator.getPointMasks();
             } else {

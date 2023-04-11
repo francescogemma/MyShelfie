@@ -16,7 +16,7 @@ class BookshelfMaskSetTest {
     @Test
     @DisplayName("Add a mask and check that it is actually a copy")
     void addBookshelfMask_maskCopy_correctOutput() {
-        bookshelfMaskSet = new BookshelfMaskSet((a, b) -> true);
+        bookshelfMaskSet = new BookshelfMaskSet();
 
         BookshelfMask bookshelfMask = new BookshelfMask(new Bookshelf());
         bookshelfMaskSet.addBookshelfMask(bookshelfMask);
@@ -27,7 +27,7 @@ class BookshelfMaskSetTest {
     @Test
     @DisplayName("Create a set from another set and check that content is the same.")
     void BookshelfMaskSet_BookshelfMaskSet_correctOutput() {
-        bookshelfMaskSet = new BookshelfMaskSet((a, b) -> true);
+        bookshelfMaskSet = new BookshelfMaskSet();
         BookshelfMaskSet bookshelfMaskSetCopy = new BookshelfMaskSet(bookshelfMaskSet);
 
         Assertions.assertEquals(bookshelfMaskSet.getBookshelfMasks(), bookshelfMaskSetCopy.getBookshelfMasks());
@@ -37,8 +37,7 @@ class BookshelfMaskSetTest {
     @DisplayName("Check all getter methods.")
     @ValueSource(ints = {0, 4, 8, 12})
     void getters_correctOutput(int n) {
-        BiPredicate<BookshelfMask, BookshelfMask> predicate = (a, b) -> true;
-        bookshelfMaskSet = new BookshelfMaskSet(predicate);
+        bookshelfMaskSet = new BookshelfMaskSet();
 
         for (int i = 0; i < n; i++) {
             bookshelfMaskSet.addBookshelfMask(new BookshelfMask(new Bookshelf()));
@@ -63,8 +62,9 @@ class BookshelfMaskSetTest {
     @Test
     @DisplayName("Control if compatibility checks work correctly")
     void isCompatible_variousMasks_correctOutput() {
-        bookshelfMaskSet = new BookshelfMaskSet(
-                (a, b) -> a.getTileColorAt(Shelf.getInstance(1, 1)) == b.getTileColorAt(Shelf.getInstance(2, 2))
+        bookshelfMaskSet = new BookshelfMaskSet();
+        bookshelfMaskSet.addBiPredicate((a, b) ->
+                a.getTileColorAt(Shelf.getInstance(1, 1)) == b.getTileColorAt(Shelf.getInstance(2, 2))
         );
 
         Bookshelf bookshelfFirst = new MockBookshelf(new int[][]{
@@ -103,8 +103,7 @@ class BookshelfMaskSetTest {
     @DisplayName("Check clearSet method")
     @ValueSource(ints = {0, 4, 8, 12})
     void clearSet_correctOutput(int n) {
-        BiPredicate<BookshelfMask, BookshelfMask> predicate = (a, b) -> true;
-        bookshelfMaskSet = new BookshelfMaskSet(predicate);
+        bookshelfMaskSet = new BookshelfMaskSet();
 
         for (int i = 0; i < n; i++) {
             bookshelfMaskSet.addBookshelfMask(new BookshelfMask(new Bookshelf()));

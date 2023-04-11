@@ -36,7 +36,7 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
      */
     public AtLeastEvaluator(int playersAmount, int targetAmount, Predicate<BookshelfMask> toCount) {
         super(playersAmount);
-        bookshelfMaskSet = new BookshelfMaskSet((a, b) -> true);
+        bookshelfMaskSet = new BookshelfMaskSet();
 
         this.toCount = toCount;
         this.targetAmount = targetAmount;
@@ -51,7 +51,7 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
      */
     public AtLeastEvaluator(int playersAmount, int targetAmount) {
         super(playersAmount);
-        bookshelfMaskSet = new BookshelfMaskSet((a, b) -> true);
+        bookshelfMaskSet = new BookshelfMaskSet();
 
         this.toCount = bookshelfMask -> true;
         this.targetAmount = targetAmount;
@@ -85,6 +85,6 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
 
     @Override
     public void clear() {
-        bookshelfMaskSet = new BookshelfMaskSet((a, b) -> true);
+        bookshelfMaskSet = new BookshelfMaskSet();
     }
 }

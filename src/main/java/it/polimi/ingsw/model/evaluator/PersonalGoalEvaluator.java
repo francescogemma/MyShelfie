@@ -58,7 +58,7 @@ public class PersonalGoalEvaluator implements Evaluator {
         successfulShelves = 0;
         points = 0;
 
-        pointMasks = new BookshelfMaskSet((a, b) -> true);
+        pointMasks = new BookshelfMaskSet();
     }
 
     @Override
@@ -86,7 +86,7 @@ public class PersonalGoalEvaluator implements Evaluator {
     public void clear() {
         successfulShelves = 0;
         points = 0;
-        pointMasks = new BookshelfMaskSet((a, b) -> true);
+        pointMasks = new BookshelfMaskSet();
     }
 
     @Override

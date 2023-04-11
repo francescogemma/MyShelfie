@@ -91,7 +91,8 @@ public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluato
             }
         }
         // create and add one more set with a single BookshelfMask
-        BookshelfMaskSet bookshelfMaskSetLast = new BookshelfMaskSet(compatible);
+        BookshelfMaskSet bookshelfMaskSetLast = new BookshelfMaskSet();
+        bookshelfMaskSetLast.addBiPredicate(compatible);
         bookshelfMaskSetLast.add(bookshelfMask);
         group.add(bookshelfMaskSetLast);
 

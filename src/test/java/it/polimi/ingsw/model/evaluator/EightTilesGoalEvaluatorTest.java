@@ -64,7 +64,7 @@ class EightTilesGoalEvaluatorTest {
         Assertions.assertTrue(evaluator.add(mask));
         Assertions.assertEquals(8, evaluator.getPoints());
 
-        BookshelfMaskSet pointMasks = new BookshelfMaskSet((a, b) -> true);
+        BookshelfMaskSet pointMasks = new BookshelfMaskSet();
         pointMasks.addBookshelfMask(new MockBookshelfMask(bookshelf, new int[][]{
                 { 1, 0, 0, 0, 0 },
                 { 1, 0, 0, 0, 0 },
@@ -96,7 +96,7 @@ class EightTilesGoalEvaluatorTest {
         Assertions.assertTrue(evaluator.add(mask));
         Assertions.assertEquals(8, evaluator.getPoints());
 
-        BookshelfMaskSet pointMasks = new BookshelfMaskSet((a, b) -> true);
+        BookshelfMaskSet pointMasks = new BookshelfMaskSet();
         pointMasks.addBookshelfMask(new MockBookshelfMask(bookshelf, new int[][]{
                 { 1, 0, 0, 0, 0 },
                 { 1, 0, 0, 0, 0 },

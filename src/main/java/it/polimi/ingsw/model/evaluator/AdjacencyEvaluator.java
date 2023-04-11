@@ -17,7 +17,7 @@ public class AdjacencyEvaluator implements Evaluator {
      */
     public AdjacencyEvaluator() {
         points = 0;
-        pointMasks = new BookshelfMaskSet((a, b) -> true);
+        pointMasks = new BookshelfMaskSet();
     }
 
     @Override
@@ -47,7 +47,7 @@ public class AdjacencyEvaluator implements Evaluator {
     @Override
     public void clear() {
         points = 0;
-        pointMasks = new BookshelfMaskSet((a, b) -> true);
+        pointMasks = new BookshelfMaskSet();
     }
 
     /*

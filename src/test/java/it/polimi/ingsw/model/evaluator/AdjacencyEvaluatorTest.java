@@ -99,7 +99,7 @@ class AdjacencyEvaluatorTest {
         adjacencyEvaluator.add(mask1);
         adjacencyEvaluator.add(mask2);
 
-        BookshelfMaskSet bookshelfMaskSet = new BookshelfMaskSet((a, b) -> true);
+        BookshelfMaskSet bookshelfMaskSet = new BookshelfMaskSet();
         bookshelfMaskSet.addBookshelfMask(mask1);
         bookshelfMaskSet.addBookshelfMask(mask2);
 
@@ -124,7 +124,7 @@ class AdjacencyEvaluatorTest {
         adjacencyEvaluator.add(mask5);
         adjacencyEvaluator.add(mask6);
 
-        BookshelfMaskSet bookshelfMaskSet = new BookshelfMaskSet((a, b) -> true);
+        BookshelfMaskSet bookshelfMaskSet = new BookshelfMaskSet();
         bookshelfMaskSet.addBookshelfMask(mask1);
         bookshelfMaskSet.addBookshelfMask(mask2);
         bookshelfMaskSet.addBookshelfMask(mask3);

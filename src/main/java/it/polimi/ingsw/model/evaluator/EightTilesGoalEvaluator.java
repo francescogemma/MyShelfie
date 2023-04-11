@@ -36,7 +36,7 @@ public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Eval
     public EightTilesGoalEvaluator(int playersAmount) {
         super(playersAmount);
         satisfied = false;
-        pointMasks = new BookshelfMaskSet((a, b) -> true);
+        pointMasks = new BookshelfMaskSet();
     }
 
     @Override
@@ -77,7 +77,7 @@ public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Eval
     @Override
     public void clear() {
         satisfied = false;
-        pointMasks = new BookshelfMaskSet((a, b) -> true);
+        pointMasks = new BookshelfMaskSet();
     }
 
     @Override
