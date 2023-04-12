@@ -16,7 +16,7 @@ public class Player {
     private PersonalGoal personalGoal;
     private int points;
     private boolean isConnected;
-    private boolean[] achievedCommonGoals;
+    private final boolean[] achievedCommonGoals;
 
     /**
      * Constructor of the class.

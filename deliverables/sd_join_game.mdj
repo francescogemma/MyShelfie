@@ -54,7 +54,7 @@
 													},
 													"font": "Arial;13;0",
 													"left": 32.72998046875,
-													"top": 85,
+													"top": 13,
 													"width": 60.2490234375,
 													"height": 13,
 													"text": "JoinGame"
@@ -67,7 +67,7 @@
 													},
 													"font": "Arial;13;1",
 													"left": 13,
-													"top": 85,
+													"top": 13,
 													"width": 14.72998046875,
 													"height": 13,
 													"text": "sd"
@@ -75,9 +75,9 @@
 											],
 											"font": "Arial;13;0",
 											"left": 8,
-											"top": 80,
+											"top": 8,
 											"width": 3273,
-											"height": 1609,
+											"height": 1681,
 											"nameLabel": {
 												"$ref": "AAAAAAGHdeDPyQr+4aY="
 											},
