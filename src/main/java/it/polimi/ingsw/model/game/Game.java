@@ -13,7 +13,7 @@ public class Game {
     private final String name;
     private final List<Player> players;
     private Optional<Player> winner;
-    private final CommonGoal[] commonGoals;
+    private CommonGoal[] commonGoals;
     private final Bag bag;
     private final Board board;
     private boolean isStarted;
@@ -29,9 +29,6 @@ public class Game {
         this.players = new ArrayList<>();
 
         this.winner = Optional.empty();
-
-        // TODO: Get two random common goals
-        this.commonGoals = new CommonGoal[]{ null, null };
 
         this.bag = new Bag();
         this.board = new Board();
@@ -84,6 +81,9 @@ public class Game {
         }
 
         this.currentPlayerIndex = FIRST_PLAYER_INDEX;
+
+        this.commonGoals = CommonGoal.getTwoRandomCommonGoals(players.size());
+
         isStarted = true;
     }
 

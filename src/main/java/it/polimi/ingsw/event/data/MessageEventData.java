@@ -8,6 +8,7 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
+// TODO: Remove this useless event (use ResponseEventData instead)
 public class MessageEventData implements EventData {
     private final String message;
 

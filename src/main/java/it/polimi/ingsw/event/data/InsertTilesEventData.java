@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+// TODO: Remove this useless event (tiles will be inserted one at the time)
 public class InsertTilesEventData implements EventData {
     private int column;
     private List<Tile> tiles;
