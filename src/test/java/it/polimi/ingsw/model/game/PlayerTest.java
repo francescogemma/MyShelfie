@@ -50,21 +50,8 @@ class PlayerTest {
     @Test
     @DisplayName("Get the name of the player")
     void getName_nameOfThePlayer_correctName() {
-        Assertions.assertEquals("TestingPlayer", player.getName());
+        Assertions.assertEquals("TestingPlayer", player.getUsername());
     }
 
-    @Test
-    @DisplayName("Set the bookshelf of the player")
-    void setBookshelf_bookshelfOfThePlayer_correctBookshelf() {
-        bookshelf = new Bookshelf();
-        bookshelf.insertTiles(List.of(
-            Tile.getInstance(TileColor.CYAN, TileVersion.FIRST),
-            Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST),
-            Tile.getInstance(TileColor.BLUE, TileVersion.FIRST)
-        ), 2);
-        Assertions.assertNotEquals(bookshelf, player.getBookshelf());
-
-        player.setBookshelf(bookshelf);
-        Assertions.assertEquals(bookshelf, player.getBookshelf());
-    }
+    // TODO: Add tests after refactoring
 }

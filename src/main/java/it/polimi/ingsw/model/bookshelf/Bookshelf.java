@@ -117,6 +117,7 @@ public class Bookshelf {
      * @throws IllegalArgumentException
      * <ul>
      *     <li> if column isn't the index of a column inside the bookshelf. </li>
+     *     <li> if tiles is empty </li>
      *     <li> if the number of tiles in tiles is bigger than the maximum insertion size: {@value MAX_INSERTION_SIZE}. </li>
      *     <li> if there is an empty tile inside tiles. </li>
      * </ul>
@@ -125,6 +126,10 @@ public class Bookshelf {
     public void insertTiles(List<Tile> tiles, int column) {
         if (!isColumnInsideTheBookshelf(column)) {
             throw new IllegalArgumentException("Given column index outside the bookshelf when performing an insertion");
+        }
+
+        if (tiles.isEmpty()) {
+            throw new IllegalArgumentException("You can't perform an empty insertion");
         }
 
         if (tiles.size() > MAX_INSERTION_SIZE) {

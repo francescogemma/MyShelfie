@@ -3,10 +3,12 @@ package it.polimi.ingsw.event;
 import it.polimi.ingsw.event.data.InsertTilesEventData;
 import it.polimi.ingsw.event.data.LoginEventData;
 import it.polimi.ingsw.event.data.MessageEventData;
+import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.tile.TileVersion;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -92,6 +94,9 @@ class VirtualView {
 }
 
 class Controller {
+    private Game game;
+    private ArrayList<VirtualView> views;
+
     private final static Map<String, String> credentials = Map.of("foo", "bar");
 
     public boolean authenticate(String username, String password) {

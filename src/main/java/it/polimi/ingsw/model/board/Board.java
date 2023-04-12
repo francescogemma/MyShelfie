@@ -450,6 +450,7 @@ public class Board {
         return t;
     }
 
+    // TODO: Allow to deselect one tile at the time
     public void forgetSelection () {
         this.boardSelector = new BoardSelector();
     }

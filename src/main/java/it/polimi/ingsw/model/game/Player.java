@@ -1,35 +1,41 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
+import it.polimi.ingsw.model.goal.PersonalGoal;
 
 /**
  * This class represents a player of the {@link Game game}.
- * It contains the name of the player, his {@link Player#points}, his {@link Bookshelf bookshelf} and his personal goal.
+ * It contains the username of the player, his {@link Player#points}, his {@link Bookshelf bookshelf} and his personal goal.
  * @author Francesco Gemma
  */
 public class Player {
-    private String name;
-    private Bookshelf bookshelf;
-    // TODO: Add personal goal support
-    // PersonalGoal personalGoal;
+    // TODO: Add JavaDoc and appropriate testing for added features
+
+    private final String username;
+    private final Bookshelf bookshelf;
+    private PersonalGoal personalGoal;
     private int points;
+    private boolean isConnected;
+    private boolean[] achievedCommonGoals;
 
     /**
      * Constructor of the class.
      * Sets the name of the player, his points to 0 and creates a new {@link Bookshelf bookshelf}.
-     * @param name the name of the player.
+     * @param username the name of the player.
      */
-    public Player(String name) {
-        this.name = name;
+    public Player(String username) {
+        this.username = username;
         this.bookshelf = new Bookshelf();
         this.points = 0;
+        this.isConnected = true;
+        this.achievedCommonGoals = new boolean[]{ false, false };
     }
 
     /**
-     * @return {@link Player#name}
+     * @return {@link Player#username}
      */
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
     /**
@@ -59,11 +65,27 @@ public class Player {
         return bookshelf;
     }
 
-    /**
-     * This method sets the {@link Player#bookshelf} of the player.
-     * @param bookshelf the new {@link Bookshelf}.
-     */
-    public void setBookshelf(Bookshelf bookshelf) {
-        this.bookshelf = bookshelf;
+    public void setPersonalGoal(PersonalGoal personalGoal) {
+        this.personalGoal = personalGoal;
+    }
+
+    public PersonalGoal getPersonalGoal() {
+        return this.personalGoal;
+    }
+
+    public void setConnectionState(boolean isConnected) {
+        this.isConnected = isConnected;
+    }
+
+    public boolean isConnected() {
+        return isConnected;
+    }
+
+    public void achievedCommonGoal(int index) {
+        achievedCommonGoals[index] = true;
+    }
+
+    public boolean hasAchievedCommonGoal(int index) {
+        return achievedCommonGoals[index];
     }
 }
