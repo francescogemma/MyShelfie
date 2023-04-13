@@ -91,7 +91,7 @@ class XPatternGoalTest {
     }
 
     @Test
-    void calculatePoints_XPatternWithoutTopLeft () {
+    void calculatePoints__XPatternWithoutTopLeft () {
         Bookshelf bookshelf = new MockBookshelf(new int[][]{
                 { 0, 0, 3, 2, 1 },
                 { 1, 1, 1, 4, 1 },

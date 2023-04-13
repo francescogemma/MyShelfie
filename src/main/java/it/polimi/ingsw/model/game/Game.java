@@ -13,8 +13,6 @@ import java.util.*;
  * @author Cristiano Migali
  * */
 public class Game {
-    // TODO: Add JavaDoc for this class
-
     /*
      * The index of the first player in the list of players.
      */
@@ -114,7 +112,7 @@ public class Game {
     }
 
     /**
-     * Adds a player to the game with the given username.
+     * Adds a player to the game with the given username or reconnects that player.
      * @param username the username of the player to add
      * @throws PlayerAlreadyInGameException if the player is already in the game
      * @throws NullPointerException
@@ -127,8 +125,9 @@ public class Game {
      *      <li> if the game has already started </li>
      *      <li> if the game is already 4 players </li>
      *  </ul>
+     * @return {@link Player player} added
      */
-    public void addPlayer(String username) throws IllegalFlowException, PlayerAlreadyInGameException {
+    public Player addPlayer(String username) throws IllegalFlowException, PlayerAlreadyInGameException {
         if (username == null || username.length() == 0)
             throw new NullPointerException("username is null or has length 0");
 
@@ -140,7 +139,7 @@ public class Game {
                 }
 
                 otherPlayer.setConnectionState(true);
-                return;
+                return otherPlayer;
             }
         }
 
@@ -157,6 +156,7 @@ public class Game {
         player.setPersonalGoal(PersonalGoal.fromIndex(personalGoalIndexes.get(personalGoalIndex)));
         personalGoalIndex++;
         players.add(player);
+        return player;
     }
 
     /**
@@ -288,10 +288,16 @@ public class Game {
     /**
      * @param player winner of the game
      * @throws IllegalArgumentException iff player is not in this game
-     * @throws IllegalFlowException iff winner is already set
+     * @throws IllegalFlowException
+     *  <ul>
+     *      <li> winner is already set </li>
+     *      <li> game is not started </li>
+     *  </ul>
      * @see Player
      * */
     public void setWinner(Player player) throws IllegalFlowException {
+        if (!this.isStarted)
+            throw new IllegalFlowException();
         if (!this.players.contains(player))
             throw new IllegalArgumentException(player + " is not in this game" + this);
         if (this.winner.isPresent())
