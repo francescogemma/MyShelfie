@@ -18,7 +18,7 @@ public class PersonalGoal extends Goal {
         );
     }
 
-    public static PersonalGoal formIndex(int index) {
+    public static PersonalGoal fromIndex(int index) {
         if (index < 0 || index >= 12) {
             throw new IllegalArgumentException("Index must be between 0 and 11 when extracting a personal goal, got: "
                 + index);

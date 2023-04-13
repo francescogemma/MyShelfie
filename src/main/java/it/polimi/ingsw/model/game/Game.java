@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.game;
 import it.polimi.ingsw.model.bag.Bag;
 import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.goal.CommonGoal;
+import it.polimi.ingsw.model.goal.PersonalGoal;
 
 import java.util.*;
 
@@ -17,6 +18,8 @@ public class Game {
     private final Bag bag;
     private final Board board;
     private boolean isStarted;
+    private List<Integer> personalGoalIndexes;
+    private int personalGoalIndex;
 
     private int currentPlayerIndex;
 
@@ -34,6 +37,10 @@ public class Game {
         this.board = new Board();
 
         this.isStarted = false;
+
+        this.personalGoalIndexes = new ArrayList<>(Arrays.asList( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ));
+        Collections.shuffle(this.personalGoalIndexes);
+        this.personalGoalIndex = 0;
     }
 
     public Player getStartingPlayer() throws IllegalFlowException {
@@ -70,8 +77,9 @@ public class Game {
         }
 
         Player player = new Player(username);
-        // TODO: Get random (and available, i.e. not given to other players) personal goal
-        player.setPersonalGoal(null);
+
+        player.setPersonalGoal(PersonalGoal.fromIndex(personalGoalIndexes.get(personalGoalIndex)));
+        personalGoalIndex++;
         players.add(player);
     }
 
