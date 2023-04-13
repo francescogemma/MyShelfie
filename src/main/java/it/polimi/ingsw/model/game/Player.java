@@ -9,8 +9,6 @@ import it.polimi.ingsw.model.goal.PersonalGoal;
  * @author Francesco Gemma
  */
 public class Player {
-    // TODO: Add JavaDoc and appropriate testing for added features
-
     private final String username;
     private final Bookshelf bookshelf;
     private PersonalGoal personalGoal;
@@ -65,26 +63,49 @@ public class Player {
         return bookshelf;
     }
 
+    /**
+     * This method sets the personal goal to the player.
+     * @param personalGoal the personal goal to set to the player.
+     */
     public void setPersonalGoal(PersonalGoal personalGoal) {
         this.personalGoal = personalGoal;
     }
 
+    /**
+     * @return {@link Player#personalGoal} of the player.
+     */
     public PersonalGoal getPersonalGoal() {
         return this.personalGoal;
     }
 
+    /**
+     * This method sets the connection state of the player.
+     * @param isConnected the new connection state of the player.
+     */
     public void setConnectionState(boolean isConnected) {
         this.isConnected = isConnected;
     }
 
+    /**
+     * @return {@link Player#isConnected} the connection state of the player.
+     */
     public boolean isConnected() {
         return isConnected;
     }
 
+    /**
+     * This method sets one of the two common goals as achieved.
+     * @param index the index of the {@link it.polimi.ingsw.model.goal.CommonGoal CommonGoal} to set as achieved.
+     */
     public void achievedCommonGoal(int index) {
         achievedCommonGoals[index] = true;
     }
 
+    /**
+     * This method checks if the common goal at the given index has been achieved.
+     * @param index the index of the {@link it.polimi.ingsw.model.goal.CommonGoal CommonGoal} to check.
+     * @return true if the common goal at the given index has been achieved, false otherwise.
+     */
     public boolean hasAchievedCommonGoal(int index) {
         return achievedCommonGoals[index];
     }
