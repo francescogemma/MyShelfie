@@ -10,7 +10,25 @@ import it.polimi.ingsw.model.tile.TileColor;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class represents a personal goal. It extends Goal.
+ * {@see Goal}
+ *
+ * @author Francesco Gemma
+ * @author Cristiano Migali
+ */
 public class PersonalGoal extends Goal {
+    /**
+     * Constructor of the class.
+     *      It takes:
+     *      <ul>
+     *          <li> a {@link ShapeFetcher} to fetch the whole bookshelf</li>
+     *          <li> an {@link AcceptsAllFilter} because we need to fetch the whole bookshelf; </li>
+     *          <li> an {@link PersonalGoalEvaluator} with the mask and a list of points. It will give us the score. </li>
+     *      </ul>
+     * @param tilesColorMask the map containing exactly 6 pairs,
+     *                       each one containing a shelf and the tile color of that shelf.
+     */
     public PersonalGoal(Map<Shelf, TileColor> tilesColorMask) {
         super(  new ShapeFetcher(Shape.WHOLE_BOOKSHELF),
                 new AcceptsAllFilter(),
@@ -18,6 +36,14 @@ public class PersonalGoal extends Goal {
         );
     }
 
+    /**
+     * This method gives an index between 0 and 11 for every personal goal in the game,
+     * and creates a new personal goal based on that index passed as parameter.
+     * @param index an index between 0 and 11 representing the personal goal to extract
+     * @return the personal goal corresponding to the given index
+     * @throws IllegalArgumentException if the index is not between 0 and 11
+     * @throws IllegalStateException if we are trying to create a personal goal which index is not between 0 and 11
+     */
     public static PersonalGoal fromIndex(int index) {
         if (index < 0 || index >= 12) {
             throw new IllegalArgumentException("Index must be between 0 and 11 when extracting a personal goal, got: "

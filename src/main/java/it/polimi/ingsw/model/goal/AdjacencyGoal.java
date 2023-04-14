@@ -4,6 +4,10 @@ import it.polimi.ingsw.model.evaluator.AdjacencyEvaluator;
 import it.polimi.ingsw.model.fetcher.AdjacencyFetcher;
 import it.polimi.ingsw.model.filter.NumDifferentColorFilter;
 
+/**
+ * This class represents the goal of having all the tiles adjacent to each other.
+ * @author Cristiano Migali
+ */
 public class AdjacencyGoal extends Goal {
     public AdjacencyGoal() {
         super(new AdjacencyFetcher(),

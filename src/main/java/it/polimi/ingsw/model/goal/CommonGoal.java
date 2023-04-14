@@ -10,7 +10,6 @@ import java.util.Random;
  * This abstract class represents a common goal. It extends Goal.
  * <p>
  * All common goals should extend this class.
- *
  * {@see Goal}
  *
  * @author Francesco Gemma
@@ -27,7 +26,11 @@ public abstract class CommonGoal extends Goal{
         super(fetcher, filter, evaluator);
     }
 
-    // TODO: Add getTwoRandomCommonGoals
+    /**
+     * This method returns an array containing two random common goals (not repeated).
+     * @param numPlayers the number of players in the game
+     * @return an array containing two random common goals
+     */
     public static CommonGoal[] getTwoRandomCommonGoals(int numPlayers) {
         int firstIndex = new Random().nextInt(12);
         int secondIndex = new Random().nextInt(11);
@@ -38,6 +41,13 @@ public abstract class CommonGoal extends Goal{
         return new CommonGoal[]{ fromIndex(firstIndex, numPlayers), fromIndex(secondIndex, numPlayers) };
     }
 
+    /**
+     * @param index the index of the common goal.
+     * @param numPlayers the number of players in the game.
+     * @return a new common goal which type depends on the index
+     * @throws IllegalArgumentException if the index is not between 0 and 11, or if the number of players is not between 2 and 4
+     * @throws IllegalStateException if we try to create a common goal from index which is not between 0 and 11
+     */
     private static CommonGoal fromIndex(int index, int numPlayers) {
         if (index < 0 || index >= 12) {
             throw new IllegalArgumentException("Common goal index must be between 0 and 12, got: " + index);
