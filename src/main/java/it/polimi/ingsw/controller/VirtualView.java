@@ -4,6 +4,8 @@ import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 
+import java.util.Collection;
+
 public class VirtualView {
     private GameController gameController;
     private String username;
@@ -40,7 +42,7 @@ public class VirtualView {
 
     }
 
-    public void notifyGameIsOver(String winnerUsername) {
+    public void notifyGameIsOver(Collection<String> winnerUsername) {
 
     }
 

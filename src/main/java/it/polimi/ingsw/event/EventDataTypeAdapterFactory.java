@@ -11,6 +11,7 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.InsertTilesEventData;
 import it.polimi.ingsw.event.data.LoginEventData;
 import it.polimi.ingsw.event.data.MessageEventData;
+import it.polimi.ingsw.event.data.gameEvent.*;
 import it.polimi.ingsw.event.data.wrapper.SyncEventDataWrapper;
 
 import java.io.IOException;
@@ -20,9 +21,15 @@ import java.util.Map;
 // https://www.javadoc.io/static/com.google.code.gson/gson/2.8.5/com/google/gson/TypeAdapterFactory.html
 public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
     private static final Map<String, Type> EVENT_DATA_TYPES = Map.of(
-        MessageEventData.ID, MessageEventData.class,
-        LoginEventData.ID, LoginEventData.class,
-        InsertTilesEventData.ID, InsertTilesEventData.class
+        MessageEventData.ID,                MessageEventData.class,
+        LoginEventData.ID,                  LoginEventData.class,
+        InsertTilesEventData.ID,            InsertTilesEventData.class,
+        PlayerPointsChangeEventData.ID,     PlayerPointsChangeEventData.class,
+        BoardChangedEventData.ID,           BoardChangedEventData.class,
+        GameOverEventData.ID,               GameOverEventData.class,
+        CurrentPlayerChangedEventData.ID,   CurrentPlayerChangedEventData.class,
+        GameHasStartedEventData.ID,         GameHasStartedEventData.class,
+        PlayerHasDisconnectedEventData.ID, PlayerHasDisconnectedEventData.class
     );
 
     private static final Map<String, Type> WRAPPER_DATA_TYPES = Map.of(

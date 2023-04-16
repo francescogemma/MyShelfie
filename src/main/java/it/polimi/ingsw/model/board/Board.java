@@ -7,8 +7,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
+import static java.lang.Math.*;
 
 /**
  * Manager for Tile selection
@@ -19,6 +18,10 @@ class BoardSelector {
 
     BoardSelector () {
         selected = new ArrayList<>();
+    }
+
+    BoardSelector(BoardSelector other) {
+        selected = other.selected.stream().toList();
     }
 
     /**
@@ -60,7 +63,7 @@ class BoardSelector {
         List<Coordinate> res = new ArrayList<>();
         switch (selectionSize()) {
             case 0 -> {
-                assert true: "Can't call this function if sizeSelection() is equals to 0";
+                assert false: "Can't call this function if sizeSelection() is equals to 0";
             }
             case 1 -> {
                 final int r = this.selected.get(0).getRow();
@@ -125,6 +128,17 @@ class BoardSelector {
      */
     public final List<Coordinate> getSelected() {
         return new ArrayList<>(this.selected);
+    }
+
+    public Coordinate lastSelected() {
+        if (this.selected.isEmpty())
+            throw new IllegalArgumentException("List is empty");
+        return this.selected.get(selected.size() - 1);
+    }
+
+    // TODO: javadoc
+    public void forgetLastSelected() {
+        this.selected.remove(selected.size() - 1);
     }
 }
 
@@ -191,6 +205,19 @@ public class Board {
     public Board() {
         boardSelector = new BoardSelector();
         occupied = 0;
+    }
+
+    /**
+     * TODO: add javadoc
+     * */
+    public Board (Board other) {
+        this.boardSelector = new BoardSelector(other.boardSelector);
+        this.occupied = other.occupied;
+        for (int i = 0; i < tiles.length; i ++) {
+            System.arraycopy(other.tiles[i], 0, tiles[i], 0, tiles[i].length);
+        }
+
+        assert other.equals(this);
     }
 
     /**
@@ -275,7 +302,7 @@ public class Board {
                 Board.THREE_PLAYER_POSITIONS.forEach(a);
                 Board.FOUR_PLAYER_POSITIONS.forEach(a);
             }
-            case 1, 2 -> {
+            case 1, 2 ->
                 boardSelector
                         .getAvailableSelection()
                         .stream()
@@ -283,7 +310,6 @@ public class Board {
                         .filter(p -> !isEmpty(p))
                         .filter(p -> numberOfFreeSides(p) > 0)
                         .forEach(res::add);
-            }
         }
 
         return res;
@@ -450,6 +476,18 @@ public class Board {
         return t;
     }
 
+    // TODO: javadoc
+    public void forgetSelected (Coordinate c) {
+        if (!this.boardSelector.contains(c))
+            throw new IllegalArgumentException("Cooridnate is not selected");
+
+        if (!this.boardSelector.lastSelected().equals(c))
+            throw new RemoveNotLastSelectedException();
+
+        this.boardSelector.forgetLastSelected();
+    }
+
+    // TODO: javadoc
     // TODO: Allow to deselect one tile at the time
     public void forgetSelection () {
         this.boardSelector = new BoardSelector();

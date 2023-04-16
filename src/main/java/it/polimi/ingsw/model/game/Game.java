@@ -1,9 +1,17 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.event.LocalEventTransceiver;
+import it.polimi.ingsw.event.data.gameEvent.*;
 import it.polimi.ingsw.model.bag.Bag;
 import it.polimi.ingsw.model.board.Board;
+import it.polimi.ingsw.model.board.FullSelectionException;
+import it.polimi.ingsw.model.board.IllegalExtractionException;
+import it.polimi.ingsw.model.goal.AdjacencyGoal;
 import it.polimi.ingsw.model.goal.CommonGoal;
+import it.polimi.ingsw.model.goal.Goal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
+import it.polimi.ingsw.model.tile.Tile;
+import it.polimi.ingsw.utils.Coordinate;
 
 import java.util.*;
 
@@ -26,12 +34,12 @@ public class Game {
     /*
      * The list of players in the game.
      */
-    private final List<Player> players;
+    private final List<Player> players = new ArrayList<>();
 
     /*
      * The optional winner of the game.
      */
-    private Optional<Player> winner;
+    private final List<Player> winner = new ArrayList<>();
 
     /**
      * The common goals of the game.
@@ -41,12 +49,12 @@ public class Game {
     /**
      * The bag of tiles in the game.
      */
-    private final Bag bag;
+    private final Bag bag = new Bag();
 
     /**
      * The board of the game.
      */
-    private final Board board;
+    private final Board board = new Board();
 
     /**
      * Whether the game has started.
@@ -60,6 +68,8 @@ public class Game {
      * The index of the current player in the list of players.
      */
     private int currentPlayerIndex;
+
+    private LocalEventTransceiver transceiver;
 
     /**
      * Creates a new game with the given name.
@@ -75,19 +85,17 @@ public class Game {
             throw new IllegalArgumentException("String is empty");
 
         this.name = name;
-
-        this.players = new ArrayList<>();
-
-        this.winner = Optional.empty();
-
-        this.bag = new Bag();
-        this.board = new Board();
-
+        this.currentPlayerIndex = -1;
         this.isStarted = false;
 
         this.personalGoalIndexes = new ArrayList<>(Arrays.asList( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ));
         Collections.shuffle(this.personalGoalIndexes);
         this.personalGoalIndex = 0;
+    }
+
+    public void setTransceiver (LocalEventTransceiver transceiver) {
+        assert this.transceiver == null;
+        this.transceiver = transceiver;
     }
 
     /**
@@ -108,7 +116,7 @@ public class Game {
      * @return true iff the game is over, false otherwise
      */
     public boolean isOver () {
-        return winner.isPresent();
+        return winner.size() != 0;
     }
 
     /**
@@ -159,6 +167,22 @@ public class Game {
         return player;
     }
 
+    public void disconnectPlayer (String username) {
+        Player player = this.getPlayer(username);
+
+        if (!player.isConnected()) {
+            return;
+        }
+
+        player.setConnectionState(false);
+
+        if (!this.players.get(currentPlayerIndex).equals(player)) {
+            calculateNextPlayer();
+        }
+
+        this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
+    }
+
     /**
      * Starts the game by initializing the common goals and the first player index.
      *
@@ -170,10 +194,9 @@ public class Game {
         }
 
         this.currentPlayerIndex = FIRST_PLAYER_INDEX;
-
         this.commonGoals = CommonGoal.getTwoRandomCommonGoals(players.size());
-
         isStarted = true;
+        this.transceiver.broadcast(new GameHasStartedEventData());
     }
 
     /**
@@ -204,33 +227,12 @@ public class Game {
     /**
      * @return whether the game is over or not.
      */
-    public Player getWinner () throws IllegalFlowException {
+    public List<Player> getWinner () throws IllegalFlowException {
         if (!isOver()) {
             throw new IllegalFlowException("There is no winner until the game is over");
         }
 
-        return winner.get();
-    }
-
-    /**
-     * The function ends the current player's turn and moves on to the next one
-     *
-     * @throws IllegalFlowException iff the game hasn't started yet.
-     * <ul>
-     *     <li> the game hasn't started yet </li>
-     *     <li> game is over </li>
-     * </ul>
-     * */
-    public void nextTurn() throws IllegalFlowException {
-        if (!isStarted) {
-            throw new IllegalFlowException("You can't move to next turn until the game has started");
-        }
-
-        if (isOver()) {
-            throw new IllegalFlowException("You can't move to next turn when the game is over");
-        }
-
-        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+        return new ArrayList<>(winner);
     }
 
     /**
@@ -253,20 +255,13 @@ public class Game {
         return new ArrayList<>(players);
     }
 
-    /**
-     * @return The {@link Bag bag} of the current Game
-     * @see Bag
-     * */
-    public Bag getBag() {
-        return bag;
-    }
+    public void forgetLastSelection(String username, Coordinate c) throws IllegalFlowException {
+        if (isStarted) throw new IllegalFlowException("Game is not started");
+        if (isOver()) throw new IllegalFlowException("Game has ended");
+        if (!getCurrentPlayer().getUsername().equals(username)) throw new IllegalFlowException("It's not your turn");
 
-    /**
-     * @return The {@link Board board} of the current Game
-     * @see Board
-     * */
-    public Board getBoard() {
-        return board;
+        this.board.forgetSelected(c);
+        this.transceiver.broadcast(new BoardChangedEventData(board));
     }
 
     /**
@@ -284,6 +279,133 @@ public class Game {
         return players.stream().anyMatch(p -> p.getBookshelf().isFull());
     }
 
+    private Player getPlayer(String username) {
+        for (Player p: this.players) {
+            if (p.getUsername().equals(username))
+                return p;
+        }
+        throw new IllegalArgumentException("Player not in this game");
+    }
+
+    private void refillBoardIfNecessary () {
+        if (!this.board.needsRefill())
+            return;
+
+        boolean hasChanged = false;
+
+        while (bag.isEmpty()) {
+            Tile t = this.bag.getRandomTile();
+
+            try {
+                this.board.fillRandomly(t, this.players.size());
+                hasChanged = true;
+            } catch (IllegalArgumentException e) {
+                bag.forgetLastExtraction();
+                break;
+            }
+        }
+
+        if (hasChanged) {
+            this.transceiver.broadcast(new BoardChangedEventData(this.board));
+        }
+    }
+
+    private void calculateNextPlayer() {
+        assert this.players.size() >= 2 && this.players.size() <= 4;
+        assert this.isStarted;
+
+        refillBoardIfNecessary();
+
+        if (this.currentPlayerIndex != -1) {
+            if (atLeastOneBookshelfIsFull() && this.currentPlayerIndex + 1 == this.players.size()) {
+                // Game ending logic:
+                for (Player player : players) {
+                    int personalGoalPoints = player.getPersonalGoal().calculatePoints(player.getBookshelf());
+                    if (personalGoalPoints > 0) {
+                        player.addPoints(personalGoalPoints);
+
+                        this.transceiver.broadcast(new PlayerPointsChangeEventData(player, player.getPersonalGoal().getPointMasks()));
+                    }
+
+                    Goal adjacencyGoal = new AdjacencyGoal();
+                    int adjacencyGoalPoints = adjacencyGoal.calculatePoints(player.getBookshelf());
+
+                    if (adjacencyGoalPoints > 0) {
+                        player.addPoints(adjacencyGoalPoints);
+
+                        this.transceiver.broadcast(new PlayerPointsChangeEventData(player, adjacencyGoal.getPointMasks()));
+                    }
+                }
+
+                for (Player player : players) {
+                    int max = this.winner.isEmpty() ? 0 : winner.get(0).getPoints();
+
+                    if (player.getPoints() >= max) {
+                        if (player.getPoints() > max)
+                            winner.clear();
+
+                        winner.add(player);
+                    }
+                }
+
+                this.transceiver.broadcast(new GameOverEventData(this.winner));
+            } else {
+                this.refillBoardIfNecessary();
+
+                // set new turn
+                this.currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+
+                this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex).getUsername()));
+            }
+        } else {
+            this.currentPlayerIndex = 0;
+        }
+    }
+
+    /**
+     * TODO: javadoc
+     * insert tile selected
+     * */
+    public void insertTile (String username, int col) throws IllegalFlowException, IllegalExtractionException {
+        final Player player = getPlayer(username);
+
+        if (this.getCurrentPlayer().equals(player))
+            throw new IllegalFlowException();
+
+        List<Tile> t = board.getSelectableTiles();
+
+        if (t.isEmpty())
+            throw new IllegalExtractionException();
+
+        player.getBookshelf().insertTiles(t, col);
+        board.draw();
+
+        this.transceiver.broadcast(new BoardChangedEventData(board));
+
+        for (CommonGoal commonGoal: this.commonGoals) {
+            int points = commonGoal.calculatePoints(player.getBookshelf());
+            if (points > 0) {
+                player.addPoints(points);
+
+                this.transceiver.broadcast(new PlayerPointsChangeEventData(player, commonGoal.getPointMasks()));
+            }
+        }
+    }
+
+    /**
+     * TODO: javadoc
+     * select a tile from the board
+     * */
+    public void selectTile (String username, Coordinate coordinate) throws IllegalFlowException, IllegalExtractionException, FullSelectionException {
+        if (!this.isStarted)
+            throw new IllegalFlowException("Game is not started");
+        if (!this.getCurrentPlayer().getUsername().equals(username))
+            throw new IllegalFlowException("It's not your turn");
+        if (isOver())
+            throw new IllegalFlowException("Game is over");
+
+        this.board.selectTile(coordinate);
+    }
 
     /**
      * @param player winner of the game
@@ -295,13 +417,11 @@ public class Game {
      *  </ul>
      * @see Player
      * */
-    public void setWinner(Player player) throws IllegalFlowException {
+    private void setWinner(Player player) throws IllegalFlowException {
         if (!this.isStarted)
             throw new IllegalFlowException();
         if (!this.players.contains(player))
             throw new IllegalArgumentException(player + " is not in this game" + this);
-        if (this.winner.isPresent())
-            throw new IllegalFlowException("Winner is already set. CurrentWinner: [" + this.winner.get() + "]" + " passed winner: [" + player + "]");
-        winner = Optional.of(player);
+        winner.add(player);
     }
 }

@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.model.game.Game;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,7 +72,7 @@ class GameTest {
     }
 
     @Test
-    void addPlayer_nullPointer_throwNullPointerException () throws IllegalFlowException, PlayerAlreadyInGameException {
+    void addPlayer_nullPointer_throwNullPointerException () {
         Assertions.assertThrows(NullPointerException.class, () -> {
             g.addPlayer(null);
         });
@@ -89,6 +90,8 @@ class GameTest {
         g.addPlayer("Giacomo");
         g.addPlayer("Cristiano");
         g.addPlayer("Michele");
+
+        g.setTransceiver(new LocalEventTransceiver());
 
         g.startGame();
 
@@ -128,101 +131,17 @@ class GameTest {
     void getCurrentPlayer__correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException {
         g.addPlayer("Giacomo");
         g.addPlayer("Michele");
+
+        g.setTransceiver(new LocalEventTransceiver());
+
         g.startGame();
         Assertions.assertEquals("Giacomo", g.getCurrentPlayer().getUsername());
-    }
-
-    @Test
-    void getCurrentPlayer_secondHand_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException {
-        g.addPlayer("Giacomo");
-        g.addPlayer("Michele");
-        g.startGame();
-        Assertions.assertEquals("Giacomo", g.getCurrentPlayer().getUsername());
-
-        g.nextTurn();
-
-        Assertions.assertEquals("Michele", g.getCurrentPlayer().getUsername());
     }
 
     @Test
     void getCurrentPlayer_gameNotStarted_throwsIllegalFlowException () {
         Assertions.assertThrows(IllegalFlowException.class, () -> {
             g.getCurrentPlayer();
-        });
-    }
-
-    @Test
-    void getCurrentPlayer_gameIsOver_throwsIllegalFlowException () throws IllegalFlowException, PlayerAlreadyInGameException {
-        Player p;
-        g.addPlayer("Giacomo");
-        g.addPlayer("Michele");
-        p = g.getPlayers().get(0);
-
-        g.startGame();
-
-        g.setWinner(p);
-
-        Assertions.assertThrows(IllegalFlowException.class, () -> {
-            g.getCurrentPlayer();
-        });
-    }
-
-    @Test
-    void getWinner__correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException {
-        Player p = g.addPlayer("Giacomo");
-        g.addPlayer("Michele");
-
-        g.startGame();
-        g.setWinner(p);
-
-        Assertions.assertEquals(p, g.getWinner());
-    }
-
-    @Test
-    void setWinner_gameNotStarted_throwIllegalFlowException () throws IllegalFlowException, PlayerAlreadyInGameException {
-        Player p = g.addPlayer("Giacomo");
-        g.addPlayer("Michele");
-
-        Assertions.assertThrows(IllegalFlowException.class, () -> {
-            g.setWinner(p);
-        });
-    }
-
-    @Test
-    void setWinner_playerNotInGame_throwIllegalArgumentException () throws IllegalFlowException, PlayerAlreadyInGameException {
-        Player p = g.addPlayer("Giacomo");
-        g.addPlayer("Michele");
-
-        g.startGame();
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            g.setWinner(new Player("Cristiano"));
-        });
-    }
-
-    @Test
-    void setWinner_winnerAlreadySet_throwIllegalFlowException () throws IllegalFlowException, PlayerAlreadyInGameException {
-        Player p = g.addPlayer("Giacomo");
-        g.addPlayer("Michele");
-
-        g.startGame();
-
-        g.setWinner(p);
-
-        Assertions.assertThrows(IllegalFlowException.class, () -> {
-            g.setWinner(p);
-        });
-    }
-
-    @Test
-    void getWinner_gameNotOver_throw () throws IllegalFlowException, PlayerAlreadyInGameException {
-        Player p = g.addPlayer("Giacomo");
-        g.addPlayer("Michele");
-
-        g.startGame();
-
-        Assertions.assertThrows(IllegalFlowException.class, () -> {
-            g.getWinner();
         });
     }
 }
