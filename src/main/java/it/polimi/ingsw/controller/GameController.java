@@ -1,28 +1,19 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.event.LocalEventTransceiver;
-import it.polimi.ingsw.event.data.MessageEventData;
-import it.polimi.ingsw.event.data.gameEvent.BoardChangedEventData;
-import it.polimi.ingsw.event.data.gameEvent.GameOverEventData;
-import it.polimi.ingsw.event.receiver.CastEventReceiver;
+import it.polimi.ingsw.event.data.gameEvent.*;
 import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
 import it.polimi.ingsw.model.board.RemoveNotLastSelectedException;
-import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.IllegalFlowException;
-import it.polimi.ingsw.model.game.Player;
 import it.polimi.ingsw.model.game.PlayerAlreadyInGameException;
-import it.polimi.ingsw.model.goal.AdjacencyGoal;
-import it.polimi.ingsw.model.goal.Goal;
 import it.polimi.ingsw.utils.Coordinate;
 
 // events
-import it.polimi.ingsw.event.data.gameEvent.PlayerPointsChangeEventData;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class GameController {
     private final Game game;
@@ -51,6 +42,15 @@ public class GameController {
 
         GameOverEventData.castEventReceiver(transceiver).registerListener(event ->
                 clients.forEach(virtualView -> virtualView.notifyGameIsOver(event.getWinnersUsername())));
+
+        PlayerHasDisconnectedEventData.castEventReceiver(transceiver).registerListener(event ->
+                clients.forEach(virtualView -> virtualView.notifyPlayerHasDisconnected(event.getUsername())));
+
+        BoardChangedEventData.castEventReceiver(transceiver).registerListener(event ->
+                clients.forEach(virtualView -> virtualView.notifyBoardUpdate(event.getBoard())));
+
+        GameHasStartedEventData.castEventReceiver(transceiver).registerListener(event ->
+                clients.forEach(VirtualView::notifyGameHasStarted));
     }
 
     public Response join(VirtualView newClient) {
