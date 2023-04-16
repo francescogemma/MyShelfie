@@ -12,6 +12,8 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BagTest {
+    // TODO: Use test methods name conventions
+
     private Bag bag;
 
     @BeforeEach
