@@ -1,8 +1,7 @@
 package it.polimi.ingsw.networking;
 
 /**
- * Low level object that sends a string to a specific target, and
- * receives a string from that same target.
+ * Low level object that can send a string to a specific target, and receive a string.
  *
  * @author Francesco Gemma
  * @author Michele Miotti

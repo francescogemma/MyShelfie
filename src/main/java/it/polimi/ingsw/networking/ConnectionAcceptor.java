@@ -19,18 +19,11 @@ public class ConnectionAcceptor {
     }
 
     /**
-     * This method will launch two separate threads, that will continuously listen for
-     * network communications.
+     * This method will simply wait for a connection, and return a connection object to connect
+     * back to that caller
      */
-    public void start() {
+    public Connection accept() {
 
+        return null;
     }
-
-    /**
-     * Use this method to stop all threads and end all connections.
-     */
-    public void shutdown() {
-
-    }
-
 }
