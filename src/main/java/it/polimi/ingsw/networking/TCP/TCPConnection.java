@@ -9,26 +9,41 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * {@link Connection Connection} class that handles Socket communication.
+ * {@link Connection Connection} class that handles TCP communication via {@link Socket Socket}.
+ * @see Connection
+ * @see Socket
  *
  * @author Francesco Gemma
  */
 public class TCPConnection implements Connection {
-    Socket socket;
-    final DataOutputStream  out;
-    final DataInputStream in;
-    boolean disconnected;
+    private final Socket socket;
+    private final DataOutputStream  out;
+    private final DataInputStream in;
+    private boolean disconnected;
 
+    /**
+     * Creates a new {@link TCPConnection TCPConnection} object intended to be used as a client.
+     * It creates a new {@link Socket}, and it sets it to NoDelay mode for better performance.
+     * It sets also the {@link TCPConnection#out} and {@link TCPConnection#in} fields respectively
+     * to {@link Socket#getOutputStream()} and {@link Socket#getInputStream()}
+     * wrapped in a {@link DataOutputStream DataOutputStream} for easier string writing and reading.
+     * <p>
+     * It also starts a {@link Timer Timer} that sends a heartbeat message every 2.5 seconds to the other side of the connection
+     * to check if the connection is still alive.
+     *
+     * @param address address of the machine hosting the server socket
+     * @param port port of the server socket
+     */
     public TCPConnection(String address, int port) {
         disconnected = false;
 
         try {
             socket = new Socket(address, port);
 
+            socket.setTcpNoDelay(true);
+
             out = new DataOutputStream(socket.getOutputStream());
             in = new DataInputStream(socket.getInputStream());
-
-            socket.setTcpNoDelay(true);
         } catch(IOException e) {
             throw new SocketCreationExeption("error while creating socket", e);
         }
@@ -36,6 +51,18 @@ public class TCPConnection implements Connection {
         heartbeat();
     }
 
+    /**
+     * Creates a new {@link TCPConnection TCPConnection} object intended to be used server-side.
+     * It sets the {@link TCPConnection#socket} field to the given {@link Socket Socket}.
+     * It sets also the {@link TCPConnection#out} and {@link TCPConnection#in} fields respectively
+     * to {@link Socket#getOutputStream()} and {@link Socket#getInputStream()}
+     * wrapped in a {@link DataOutputStream DataOutputStream} for easier string writing and reading.
+     * <p>
+     * It also starts a {@link Timer Timer} that sends a heartbeat message every 2.5 seconds to the other side of the connection
+     * to check if the connection is still alive.
+     *
+     * @param socket socket to be used for communication
+     */
     public TCPConnection(Socket socket) {
         disconnected = false;
         this.socket = socket;
@@ -43,8 +70,6 @@ public class TCPConnection implements Connection {
         try {
             out = new DataOutputStream(this.socket.getOutputStream());
             in = new DataInputStream(this.socket.getInputStream());
-
-            this.socket.setTcpNoDelay(true);
         } catch(IOException e) {
             throw new SocketCreationExeption("error while creating socket", e);
         }
@@ -81,6 +106,10 @@ public class TCPConnection implements Connection {
         }
     }
 
+    /**
+     * Sends a heartbeat message every 2.5 seconds to the other side of the connection
+     * to check if the connection is still alive.
+     */
     private void heartbeat() {
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
