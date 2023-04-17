@@ -25,6 +25,11 @@ public class RMIConnection implements Connection {
     private RMIStringContainer stringContainer;
 
     /**
+     * How much time passes between two pings for keep-alive.
+     */
+    private static final int PERIOD = 2500;
+
+    /**
      * This is a stub for the remote string container. This object will be called in the send method,
      * as if it were local. All errors will be thrown out through the DisconnectedException.
      */
@@ -143,8 +148,13 @@ public class RMIConnection implements Connection {
         return stringContainer.getString();
     }
 
+    /**
+     * Starts a timer that pings the target, to check for connectivity.
+     */
     private void heartbeat() {
         Timer timer = new Timer();
+
+        // create a timer task that will ping the target
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
@@ -156,6 +166,8 @@ public class RMIConnection implements Connection {
                 }
             }
         };
-        timer.schedule(task, 0, 2500);
+
+        // run timer
+        timer.schedule(task, 0, PERIOD);
     }
 }
