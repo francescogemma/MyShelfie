@@ -9,22 +9,23 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.TimeUnit;
 
 /**
- * {@link Connection Connection} class that handles RMI communication.
+ * {@link Connection Connection} class that represents an RMI connection.
  *
  * @author Michele Miotti
  */
 public class RMIConnection implements Connection {
     /**
      * This object is an encapsulation of the RMI system. Every RMI-related aspect
-     * of the RMIConnection object relies on this receiver, that extends the StringRemote interface.
+     * of the RMIConnection object relies on this container, that extends the StringRemote interface.
+     * It acts as a simple container for a string. It might contain nothing.
      */
-    private StringReceiver stringReceiver;
+    private RMIStringContainer stringContainer;
 
     /**
-     * This is a stub for the remote object. This object will be called in the send method,
+     * This is a stub for the remote string container. This object will be called in the send method,
      * as if it were local. All errors will be thrown out through the DisconnectedException.
      */
-    private StringReceiver remoteObject;
+    private RMIStringContainer remoteContainer;
 
     /**
      * Used to keep track of connection state. Methods "send" and "receive" can only work if this
@@ -33,11 +34,48 @@ public class RMIConnection implements Connection {
     private boolean disconnected;
 
     /**
-     * This constructor creates a connection with the target by setting up the stringReceiver and
-     * remoteObject attributes.
+     * This constructor creates a connection with some {@link it.polimi.ingsw.networking.ConnectionAcceptor acceptor}.
+     * This acceptor will then pair this object with another {@link Connection connection}.
      *
-     * @param name will identify this object in the registry.
-     * @param targetName identifies the target object in the registry.
+     * @param name will identify this connection and the newly created server-side connection in the registry.
+     *             It will do so by appending the suffix "Client" and "Server" to this parameter.
+     */
+    public RMIConnection(String name) {
+        // start, assuming connection is working correctly
+        disconnected = false;
+
+        try {
+            // get the registry with no arguments.
+            // which means we're using the local host address.
+            Registry registry = LocateRegistry.getRegistry();
+
+            // create and export our stringContainer
+            stringContainer = new RMIStringContainer();
+            StringRemote stub = (StringRemote) UnicastRemoteObject.exportObject(
+                    stringContainer, RMIStringContainer.STANDARD_PORT
+            );
+
+            // bind it to the registry
+            registry.bind(name, stub);
+
+            // get the server object, to get another connection to pair up with.
+            NameProvidingRemote server = (NameProvidingRemote) registry.lookup("Server");
+
+            // use the information provided by the server to pair with the other connection
+            String otherConnectionName = server.getRemoteConnectionName(name);
+            remoteContainer = (RMIStringContainer) registry.lookup(otherConnectionName);
+        } catch (Exception exception) {
+            // instead of crashing the program, count this error as a disconnection.
+            disconnected = true;
+        }
+    }
+
+    /**
+     * This constructor does NOT request names to an {@link it.polimi.ingsw.networking.ConnectionAcceptor acceptor},
+     * and should only be used BY an acceptor to generate new connections, while already knowing the target's name.
+     *
+     * @param name this connection's name
+     * @param targetName the name of the target connection.
      */
     public RMIConnection(String name, String targetName) {
         // start, assuming connection is working correctly
@@ -48,13 +86,16 @@ public class RMIConnection implements Connection {
             // which means we're using the local host address.
             Registry registry = LocateRegistry.getRegistry();
 
-            // create and bind our stringReceiver to the registry.
-            stringReceiver = new StringReceiver();
-            StringReceiver stub = (StringReceiver) UnicastRemoteObject.exportObject(stringReceiver, StringReceiver.STANDARD_PORT);
+            // create and export our stringContainer
+            stringContainer = new RMIStringContainer();
+            StringRemote stub = (StringRemote) UnicastRemoteObject.exportObject(
+                    stringContainer, RMIStringContainer.STANDARD_PORT
+            );
+
+            // bind it to the registry
             registry.bind(name, stub);
 
-            // get the remote object, to be used with the send method.
-            remoteObject = (StringReceiver) registry.lookup(targetName);
+            remoteContainer = (RMIStringContainer) registry.lookup(targetName);
         } catch (Exception exception) {
             // instead of crashing the program, count this error as a disconnection.
             disconnected = true;
@@ -69,7 +110,7 @@ public class RMIConnection implements Connection {
 
         try {
             // plainly send the message to the remote object
-            remoteObject.handleMessage(string);
+            remoteContainer.handleMessage(string);
         } catch (Exception exception) {
             throw new DisconnectedException();
         }
@@ -82,7 +123,7 @@ public class RMIConnection implements Connection {
         }
 
         // keep checking if we've received a string
-        while (!stringReceiver.hasString()) {
+        while (!stringContainer.hasString()) {
             try {
                 // wait a little bit after each check
                 TimeUnit.MILLISECONDS.sleep(100);
@@ -92,6 +133,6 @@ public class RMIConnection implements Connection {
         }
 
         // once we've found it, return it
-        return stringReceiver.getString();
+        return stringContainer.getString();
     }
 }
