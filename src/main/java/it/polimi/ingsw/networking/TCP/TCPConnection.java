@@ -17,8 +17,11 @@ public class TCPConnection implements Connection {
     Socket socket;
     final DataOutputStream  out;
     final DataInputStream in;
+    boolean disconnected;
 
     public TCPConnection(String address, int port) {
+        disconnected = false;
+
         try {
             socket = new Socket(address, port);
 
@@ -27,13 +30,14 @@ public class TCPConnection implements Connection {
 
             socket.setTcpNoDelay(true);
         } catch(IOException e) {
-            throw new SocketCreationExeption("Error while creating socket", e);
+            throw new SocketCreationExeption("error while creating socket", e);
         }
 
         heartbeat();
     }
 
     public TCPConnection(Socket socket) {
+        disconnected = false;
         this.socket = socket;
 
         try {
@@ -42,7 +46,7 @@ public class TCPConnection implements Connection {
 
             this.socket.setTcpNoDelay(true);
         } catch(IOException e) {
-            throw new SocketCreationExeption("Error while creating socket", e);
+            throw new SocketCreationExeption("error while creating socket", e);
         }
 
         heartbeat();
@@ -50,13 +54,17 @@ public class TCPConnection implements Connection {
 
     @Override
     public void send(String string) throws DisconnectedException {
+        if(disconnected) {
+            throw new DisconnectedException("already disconnected");
+        }
+
         try {
             synchronized(out) {
                 out.writeUTF(string);
                 out.flush();
             }
         } catch(IOException e) {
-            throw new DisconnectedException("Error while sending", e);
+            throw new DisconnectedException("sending while disconnected", e);
         }
     }
 
@@ -69,7 +77,7 @@ public class TCPConnection implements Connection {
             }
             return read;
         } catch(IOException e) {
-            throw new DisconnectedException("Error while receiving", e);
+            throw new DisconnectedException("receiving while disconnected", e);
         }
     }
 
@@ -81,7 +89,7 @@ public class TCPConnection implements Connection {
                 try {
                     send("heartbeat");
                 } catch (DisconnectedException e) {
-                    System.out.println("disconnected");
+                    disconnected = true;
                     timer.cancel();
                 }
             }
