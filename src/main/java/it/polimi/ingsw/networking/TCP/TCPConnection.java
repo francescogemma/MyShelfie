@@ -33,8 +33,9 @@ public class TCPConnection implements Connection {
      *
      * @param address address of the machine hosting the server socket
      * @param port port of the server socket
+     * @throws SocketCreationExeption if an error occurs while creating the socket
      */
-    public TCPConnection(String address, int port) {
+    public TCPConnection(String address, int port) throws SocketCreationExeption {
         disconnected = false;
 
         try {
@@ -62,16 +63,18 @@ public class TCPConnection implements Connection {
      * to check if the connection is still alive.
      *
      * @param socket socket to be used for communication
+     * @throws SocketCreationExeption if an error occurs while setting the input/output streams of the socket
      */
-    public TCPConnection(Socket socket) {
+    public TCPConnection(Socket socket) throws SocketCreationExeption {
         disconnected = false;
+
         this.socket = socket;
 
         try {
             out = new DataOutputStream(this.socket.getOutputStream());
             in = new DataInputStream(this.socket.getInputStream());
         } catch(IOException e) {
-            throw new SocketCreationExeption("error while creating socket", e);
+            throw new SocketCreationExeption("error while setting input/output streams", e);
         }
 
         heartbeat();
