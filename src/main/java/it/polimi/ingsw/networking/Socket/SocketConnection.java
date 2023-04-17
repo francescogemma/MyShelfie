@@ -1,4 +1,7 @@
-package it.polimi.ingsw.networking;
+package it.polimi.ingsw.networking.Socket;
+
+import it.polimi.ingsw.networking.Connection;
+import it.polimi.ingsw.networking.DisconnectedException;
 
 /**
  * {@link Connection Connection} class that handles Socket communication.

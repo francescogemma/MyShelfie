@@ -1,4 +1,7 @@
-package it.polimi.ingsw.networking;
+package it.polimi.ingsw.networking.RMI;
+
+import it.polimi.ingsw.networking.Connection;
+import it.polimi.ingsw.networking.DisconnectedException;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
