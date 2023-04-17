@@ -8,14 +8,7 @@ import it.polimi.ingsw.model.goal.PersonalGoal;
  * It contains the username of the player, his {@link Player#points}, his {@link Bookshelf bookshelf} and his personal goal.
  * @author Francesco Gemma
  */
-public class Player {
-    private final String username;
-    private final Bookshelf bookshelf;
-    private PersonalGoal personalGoal;
-    private int points;
-    private transient boolean isConnected;
-    private final boolean[] achievedCommonGoals;
-
+public class Player extends PlayerView {
     /**
      * Constructor of the class.
      * Sets the name of the player, his points to 0 and creates a new {@link Bookshelf bookshelf}.
@@ -30,17 +23,18 @@ public class Player {
     }
 
     /**
-     * @return {@link Player#username}
+     * @return {@link Player#bookshelf}
      */
-    public String getUsername() {
-        return username;
+    @Override
+    public Bookshelf getBookshelf() {
+        return bookshelf;
     }
 
     /**
-     * @return {@link Player#points}
+     * @return {@link Player#personalGoal} of the player.
      */
-    public int getPoints() {
-        return points;
+    public PersonalGoal getPersonalGoal() {
+        return this.personalGoal;
     }
 
     /**
@@ -57,25 +51,11 @@ public class Player {
     }
 
     /**
-     * @return {@link Player#bookshelf}
-     */
-    public Bookshelf getBookshelf() {
-        return bookshelf;
-    }
-
-    /**
      * This method sets the personal goal to the player.
      * @param personalGoal the personal goal to set to the player.
      */
     public void setPersonalGoal(PersonalGoal personalGoal) {
         this.personalGoal = personalGoal;
-    }
-
-    /**
-     * @return {@link Player#personalGoal} of the player.
-     */
-    public PersonalGoal getPersonalGoal() {
-        return this.personalGoal;
     }
 
     /**
@@ -87,13 +67,6 @@ public class Player {
     }
 
     /**
-     * @return {@link Player#isConnected} the connection state of the player.
-     */
-    public boolean isConnected() {
-        return isConnected;
-    }
-
-    /**
      * This method sets one of the two common goals as achieved.
      * @param index the index of the {@link it.polimi.ingsw.model.goal.CommonGoal CommonGoal} to set as achieved.
      */
@@ -101,12 +74,12 @@ public class Player {
         achievedCommonGoals[index] = true;
     }
 
-    /**
-     * This method checks if the common goal at the given index has been achieved.
-     * @param index the index of the {@link it.polimi.ingsw.model.goal.CommonGoal CommonGoal} to check.
-     * @return true if the common goal at the given index has been achieved, false otherwise.
-     */
-    public boolean hasAchievedCommonGoal(int index) {
-        return achievedCommonGoals[index];
+    @Override
+    public boolean equals (Object other) {
+        if (other == this)
+            return true;
+        if (other == null || other.getClass() != this.getClass())
+            return false;
+        return this.username.equals(((Player) other).getUsername());
     }
 }

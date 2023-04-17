@@ -7,6 +7,7 @@ import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.game.Player;
+import it.polimi.ingsw.model.game.PlayerView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,10 +16,10 @@ import java.util.function.Function;
 
 public class GameOverEventData implements EventData {
 
-    private final List<Player> winners;
+    private final List<PlayerView> winners;
     public static final String ID = "GAME_OVER";
 
-    public GameOverEventData(Collection<Player> winners) {
+    public GameOverEventData(Collection<PlayerView> winners) {
         this.winners = new ArrayList<>(winners);
     }
 
@@ -37,14 +38,14 @@ public class GameOverEventData implements EventData {
         return new Responder<>(ID, transmitter, receiver, response);
     }
 
-    public List<Player> getWinners () {
+    public List<PlayerView> getWinners () {
         return new ArrayList<>(this.winners);
     }
 
     public List<String> getWinnersUsername() {
         return this.winners
                 .stream()
-                .map(Player::getUsername)
+                .map(PlayerView::getUsername)
                 .toList();
     }
 

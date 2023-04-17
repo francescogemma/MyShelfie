@@ -7,10 +7,10 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
+import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.data.EventData;
-import it.polimi.ingsw.event.data.InsertTilesEventData;
 import it.polimi.ingsw.event.data.LoginEventData;
-import it.polimi.ingsw.event.data.MessageEventData;
+import it.polimi.ingsw.event.data.clientEvent.JoinGameEventData;
 import it.polimi.ingsw.event.data.gameEvent.*;
 import it.polimi.ingsw.event.data.wrapper.SyncEventDataWrapper;
 
@@ -20,16 +20,17 @@ import java.util.Map;
 
 // https://www.javadoc.io/static/com.google.code.gson/gson/2.8.5/com/google/gson/TypeAdapterFactory.html
 public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
-    private static final Map<String, Type> EVENT_DATA_TYPES = Map.of(
-        MessageEventData.ID,                MessageEventData.class,
-        LoginEventData.ID,                  LoginEventData.class,
-        InsertTilesEventData.ID,            InsertTilesEventData.class,
-        PlayerPointsChangeEventData.ID,     PlayerPointsChangeEventData.class,
-        BoardChangedEventData.ID,           BoardChangedEventData.class,
-        GameOverEventData.ID,               GameOverEventData.class,
-        CurrentPlayerChangedEventData.ID,   CurrentPlayerChangedEventData.class,
-        GameHasStartedEventData.ID,         GameHasStartedEventData.class,
-        PlayerHasDisconnectedEventData.ID, PlayerHasDisconnectedEventData.class
+    private static final Map<String, Type> EVENT_DATA_TYPES = Map.ofEntries(
+            Map.entry(LoginEventData.ID, LoginEventData.class),
+            Map.entry(PlayerPointsChangeEventData.ID, PlayerPointsChangeEventData.class),
+            Map.entry(BoardChangedEventData.ID, BoardChangedEventData.class),
+            Map.entry(GameOverEventData.ID, GameOverEventData.class),
+            Map.entry(CurrentPlayerChangedEventData.ID, CurrentPlayerChangedEventData.class),
+            Map.entry(GameHasStartedEventData.ID, GameHasStartedEventData.class),
+            Map.entry(PlayerHasDisconnectedEventData.ID, PlayerHasDisconnectedEventData.class),
+            Map.entry(PlayerHasJoinEventData.ID, PlayerHasJoinEventData.class),
+            Map.entry(Response.ID, Response.class),
+            Map.entry(JoinGameEventData.ID, JoinGameEventData.class)
     );
 
     private static final Map<String, Type> WRAPPER_DATA_TYPES = Map.of(

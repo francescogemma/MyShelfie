@@ -1,8 +1,6 @@
 package it.polimi.ingsw.event;
 
-import it.polimi.ingsw.event.data.InsertTilesEventData;
 import it.polimi.ingsw.event.data.LoginEventData;
-import it.polimi.ingsw.event.data.MessageEventData;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
@@ -12,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/*
 public class Main {
     public static void main(String[] args) {
         MockNetworkEventTransceiver networkTransceiver = new MockNetworkEventTransceiver();
@@ -22,10 +21,21 @@ public class Main {
         Requester<MessageEventData, InsertTilesEventData> insertTiles = MessageEventData.requester(networkTransceiver,
             networkTransceiver);
 
-        System.out.println(loginOnNetwork.request(new LoginEventData("foo", "notBar")).getMessage());
-        System.out.println(insertTiles.request(new InsertTilesEventData(0, List.of(
-            Tile.getInstance(TileColor.MAGENTA, TileVersion.SECOND),
-            Tile.getInstance(TileColor.GREEN, TileVersion.THIRD)))).getMessage());
+        System.out.println(
+                loginOnNetwork.request(
+                        new LoginEventData("foo", "notBar")
+                ).getMessage()
+        );
+
+        System.out.println(
+                insertTiles.request(
+                        new InsertTilesEventData(0, List.of(
+                                Tile.getInstance(TileColor.MAGENTA, TileVersion.SECOND),
+                                Tile.getInstance(TileColor.GREEN, TileVersion.THIRD)
+                        )
+                    )
+                ).getMessage()
+            );
 
         System.out.println(loginOnNetwork.request(new LoginEventData("foo", "bar")).getMessage());
 
@@ -113,3 +123,4 @@ class Controller {
         }
     }
 }
+*/

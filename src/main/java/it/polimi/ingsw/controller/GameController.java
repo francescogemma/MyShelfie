@@ -1,5 +1,6 @@
 package it.polimi.ingsw.controller;
 
+import it.polimi.ingsw.controller.db.DBManager;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.gameEvent.*;
 import it.polimi.ingsw.model.board.FullSelectionException;
@@ -27,30 +28,18 @@ public class GameController {
 
         game.setTransceiver(this.transceiver);
 
-        PlayerPointsChangeEventData.castEventReceiver(transceiver).registerListener(event ->
-            clients.forEach(client ->
-                    client.notifyPlayerHasScoredPoints(
-                            event.getPlayer().getUsername(),
-                            event.getPlayer().getPoints(),
-                            event.getBookshelfMaskSet()
-                    )
-        ));
-
-        BoardChangedEventData.castEventReceiver(transceiver).registerListener(event ->
-            clients.forEach(virtualView -> virtualView.notifyBoardUpdate(event.getBoard()))
+        transceiver.registerListener(event ->
+                clients.forEach(
+                        virtualView -> {
+                            virtualView.getNetworkTransmitter().broadcast(event);
+                            synchronized (this) {
+                                // TODO --> don't pass game, pass a GameView
+                                if (this.game.isStarted())
+                                    DBManager.getGamesDBManager().save(game);
+                            }
+                        }
+                )
         );
-
-        GameOverEventData.castEventReceiver(transceiver).registerListener(event ->
-                clients.forEach(virtualView -> virtualView.notifyGameIsOver(event.getWinnersUsername())));
-
-        PlayerHasDisconnectedEventData.castEventReceiver(transceiver).registerListener(event ->
-                clients.forEach(virtualView -> virtualView.notifyPlayerHasDisconnected(event.getUsername())));
-
-        BoardChangedEventData.castEventReceiver(transceiver).registerListener(event ->
-                clients.forEach(virtualView -> virtualView.notifyBoardUpdate(event.getBoard())));
-
-        GameHasStartedEventData.castEventReceiver(transceiver).registerListener(event ->
-                clients.forEach(VirtualView::notifyGameHasStarted));
     }
 
     public Response join(VirtualView newClient) {
@@ -144,5 +133,9 @@ public class GameController {
 
             return new Response("You're not connected to the game", ResponseStatus.FAILURE);
         }
+    }
+
+    public String gameName () {
+        return this.game.getName();
     }
 }

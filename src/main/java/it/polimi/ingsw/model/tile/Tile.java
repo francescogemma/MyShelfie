@@ -69,4 +69,9 @@ public class Tile {
         return getInstance(TileColor.indexToTileColor(colorIndex),
             TileVersion.values()[index % TileVersion.values().length]);
     }
+
+    @Override
+    public String toString () {
+        return "[" + this.color + this.version + "]";
+    }
 }

@@ -7,20 +7,21 @@ import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.board.Board;
+import it.polimi.ingsw.model.board.BoardView;
 
 import java.util.function.Function;
 
 public class BoardChangedEventData implements EventData {
-    private final Board board;
+    private final BoardView board;
     public static final String ID = "BOARD_CHANGE";
 
-    public BoardChangedEventData(Board board) {
+    public BoardChangedEventData(BoardView board) {
         if (board == null)
             throw new NullPointerException();
         this.board = board;
     }
 
-    public Board getBoard () {
+    public BoardView getBoard () {
         return this.board;
     }
 

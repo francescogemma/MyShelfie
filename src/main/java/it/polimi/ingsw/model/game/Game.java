@@ -3,6 +3,7 @@ package it.polimi.ingsw.model.game;
 import it.polimi.ingsw.controller.db.Identifiable;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.gameEvent.*;
+import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.bag.Bag;
 import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.board.FullSelectionException;
@@ -16,11 +17,6 @@ import it.polimi.ingsw.utils.Coordinate;
 
 import java.util.*;
 
-/**
- * Class for manage game.
- * @author Giacomo Groppi
- * @author Cristiano Migali
- * */
 public class Game implements Identifiable {
     /*
      * The index of the first player in the list of players.
@@ -70,7 +66,7 @@ public class Game implements Identifiable {
      */
     private int currentPlayerIndex;
 
-    private transient LocalEventTransceiver transceiver;
+    private transient EventTransmitter transceiver;
 
     /**
      * Creates a new game with the given name.
@@ -96,6 +92,10 @@ public class Game implements Identifiable {
 
     public void setTransceiver (LocalEventTransceiver transceiver) {
         assert this.transceiver == null;
+
+        if (transceiver == null)
+            throw new NullPointerException();
+
         this.transceiver = transceiver;
     }
 
@@ -117,7 +117,7 @@ public class Game implements Identifiable {
      * @return true iff the game is over, false otherwise
      */
     public boolean isOver () {
-        return winner.size() != 0;
+        return !winner.isEmpty();
     }
 
     /**
@@ -165,6 +165,9 @@ public class Game implements Identifiable {
         player.setPersonalGoal(PersonalGoal.fromIndex(personalGoalIndexes.get(personalGoalIndex)));
         personalGoalIndex++;
         players.add(player);
+
+        this.transceiver.broadcast(new PlayerHasJoinEventData(username));
+
         return player;
     }
 
@@ -177,8 +180,9 @@ public class Game implements Identifiable {
 
         player.setConnectionState(false);
 
-        if (!this.players.get(currentPlayerIndex).equals(player)) {
+        if (this.players.get(currentPlayerIndex).equals(player)) {
             calculateNextPlayer();
+            this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex).getUsername()));
         }
 
         this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
@@ -347,7 +351,7 @@ public class Game implements Identifiable {
                     }
                 }
 
-                this.transceiver.broadcast(new GameOverEventData(this.winner));
+                this.transceiver.broadcast(new GameOverEventData(winner.stream().map(PlayerView::createView).toList()));
             } else {
                 this.refillBoardIfNecessary();
 
@@ -422,5 +426,9 @@ public class Game implements Identifiable {
         if (!this.players.contains(player))
             throw new IllegalArgumentException(player + " is not in this game" + this);
         winner.add(player);
+    }
+
+    public boolean isStarted() {
+        return this.isStarted;
     }
 }

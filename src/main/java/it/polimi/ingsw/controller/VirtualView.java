@@ -1,52 +1,31 @@
 package it.polimi.ingsw.controller;
 
-import it.polimi.ingsw.model.board.Board;
-import it.polimi.ingsw.model.bookshelf.Bookshelf;
-import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
-
-import java.util.Collection;
+import it.polimi.ingsw.event.MockNetworkEventTransceiver;
+import it.polimi.ingsw.event.data.EventData;
+import it.polimi.ingsw.event.receiver.EventReceiver;
+import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 public class VirtualView {
     private GameController gameController;
     private String username;
+    private MockNetworkEventTransceiver transceiver;
 
     public String getUsername() {
         return username;
     }
 
-    public void setGameController(GameController gameController) {
+    public EventTransmitter getNetworkTransmitter () {
+        return this.transceiver;
+    }
+
+    public EventReceiver<EventData> getNetworkReceiver () {
+        return this.transceiver;
+    }
+
+    public void setGameController(GameController gameController, MockNetworkEventTransceiver transceiver) {
         this.gameController = gameController;
-    }
 
-    public void notifyGameHasStarted() {
-
-    }
-
-    public void notifyPlayerHasJoined(String username) {
-
-    }
-
-    public void notifyPlayingPlayer(String username) {
-
-    }
-
-    public void notifyBoardUpdate(Board board) {
-
-    }
-
-    public void notifyBookshelfUpdate(String username, Bookshelf bookshelf) {
-
-    }
-
-    public void notifyPlayerHasScoredPoints(String username, int points, BookshelfMaskSet pointMasks) {
-
-    }
-
-    public void notifyGameIsOver(Collection<String> winnerUsername) {
-
-    }
-
-    public void notifyPlayerHasDisconnected(String username) {
+        this.transceiver = transceiver;
 
     }
 }

@@ -9,31 +9,31 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
-public class PlayerHasDisconnectedEventData implements EventData {
+public class PlayerHasJoinEventData implements EventData {
     private final String username;
-    public static final String ID = "PLAYER_HAS_DISCONNECTED";
+    public static final String ID = "PLAYER_HAS_JOIN";
 
-    public PlayerHasDisconnectedEventData(String username) {
+    public PlayerHasJoinEventData(String username) {
         this.username = username;
     }
 
-    public String getUsername () {
-        return this.username;
-    }
-
-    public static <T extends PlayerHasDisconnectedEventData> CastEventReceiver<T> castEventReceiver(EventReceiver<EventData> receiver) {
+    public static <T extends PlayerHasJoinEventData> CastEventReceiver<T> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }
 
-    public static <T extends EventData> Requester<PlayerHasDisconnectedEventData, T> requester(EventTransmitter transmitter,
+    public static <T extends EventData> Requester<PlayerHasJoinEventData, T> requester(EventTransmitter transmitter,
                                                                                   EventReceiver<EventData> receiver) {
         return new Requester<>(ID, transmitter, receiver);
     }
 
-    public static <T extends EventData> Responder<PlayerHasDisconnectedEventData, T> responder(EventTransmitter transmitter,
+    public static <T extends EventData> Responder<PlayerHasJoinEventData, T> responder(EventTransmitter transmitter,
                                                                                   EventReceiver<EventData> receiver,
-                                                                                  Function<PlayerHasDisconnectedEventData, T> response) {
+                                                                                  Function<PlayerHasJoinEventData, T> response) {
         return new Responder<>(ID, transmitter, receiver, response);
+    }
+
+    public String getUsername() {
+        return this.username;
     }
 
     @Override

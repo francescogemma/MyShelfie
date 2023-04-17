@@ -1,21 +1,28 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.event.LocalEventTransceiver;
-import it.polimi.ingsw.model.game.Game;
+import it.polimi.ingsw.event.data.gameEvent.PlayerHasDisconnectedEventData;
+import it.polimi.ingsw.event.data.gameEvent.PlayerHasJoinEventData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Tester for Game
  * @author Giacomo Groppi
  * */
 class GameTest {
-    private Game g;
+    private Game game;
+    private LocalEventTransceiver transceiver;
 
     @BeforeEach
     void setUp () {
-        g = new Game("testing");
+        game = new Game("testing");
+        transceiver = new LocalEventTransceiver();
+        game.setTransceiver(transceiver);
     }
 
     @Test
@@ -40,109 +47,172 @@ class GameTest {
 
     @Test
     void getStartingPlayer__correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException {
-        this.g.addPlayer("Giacomo");
-        Assertions.assertEquals("Giacomo", g.getStartingPlayer().getUsername());
+        this.game.addPlayer("Giacomo");
+        Assertions.assertEquals("Giacomo", game.getStartingPlayer().getUsername());
     }
 
     @Test
     void getStartingPlayer__throw () {
         Assertions.assertThrows(IllegalFlowException.class, () -> {
-            g.getStartingPlayer();
+            game.getStartingPlayer();
         });
     }
 
     @Test
     void getPlayers__correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException {
-        g.addPlayer("Giacomo");
-        Assertions.assertEquals(1, g.getPlayers().size());
-        Assertions.assertEquals("Giacomo", g.getPlayers().get(0).getUsername());
+        game.addPlayer("Giacomo");
+        Assertions.assertEquals(1, game.getPlayers().size());
+        Assertions.assertEquals("Giacomo", game.getPlayers().get(0).getUsername());
     }
 
     @Test
     void isOver__correctOutput () {
-        Assertions.assertFalse(g.isOver());
+        Assertions.assertFalse(game.isOver());
     }
 
     @Test
     void addPlayer__throwPlayerAlreadyInGameException() throws IllegalFlowException, PlayerAlreadyInGameException {
-        g.addPlayer("Giacomo");
+        game.addPlayer("Giacomo");
         Assertions.assertThrows(PlayerAlreadyInGameException.class, () -> {
-            g.addPlayer("Giacomo");
+            game.addPlayer("Giacomo");
         });
     }
 
     @Test
     void addPlayer_nullPointer_throwNullPointerException () {
         Assertions.assertThrows(NullPointerException.class, () -> {
-            g.addPlayer(null);
+            game.addPlayer(null);
         });
     }
 
     @Test
     void addPlayer_stringEmpty_throwNullPointerException() {
         Assertions.assertThrows(NullPointerException.class, () -> {
-            g.addPlayer("");
+            game.addPlayer("");
         });
     }
 
     @Test
     void addPlayer_gameAlreadyStarted_throwIllegalFlowException() throws IllegalFlowException, PlayerAlreadyInGameException {
-        g.addPlayer("Giacomo");
-        g.addPlayer("Cristiano");
-        g.addPlayer("Michele");
+        game.addPlayer("Giacomo");
+        game.addPlayer("Cristiano");
+        game.addPlayer("Michele");
 
-        g.setTransceiver(new LocalEventTransceiver());
-
-        g.startGame();
+        game.startGame();
 
         Assertions.assertThrows(IllegalFlowException.class, () -> {
-            g.addPlayer("Francesco");
+            game.addPlayer("Francesco");
         });
     }
 
     @Test
     void addPlayer_already4_throwIllegalFlowException() throws IllegalFlowException, PlayerAlreadyInGameException {
-        g.addPlayer("Giacomo");
-        g.addPlayer("Cristiano");
-        g.addPlayer("Michele");
-        g.addPlayer("Francesco");
+        game.addPlayer("Giacomo");
+        game.addPlayer("Cristiano");
+        game.addPlayer("Michele");
+        game.addPlayer("Francesco");
 
         Assertions.assertThrows(IllegalFlowException.class, () -> {
-            g.addPlayer("Paperino");
+            game.addPlayer("Paperino");
         });
     }
 
     @Test
     void startGame_onePlayer_throwIllegalFlowException () throws IllegalFlowException, PlayerAlreadyInGameException {
-        g.addPlayer("Giacomo");
+        game.addPlayer("Giacomo");
         Assertions.assertThrows(IllegalFlowException.class, () -> {
-            g.startGame();
+            game.startGame();
         });
     }
 
     @Test
     void startGame_0Players_throwIllegalFlowException () {
         Assertions.assertThrows(IllegalFlowException.class, () -> {
-            g.startGame();
+            game.startGame();
         });
     }
 
     @Test
     void getCurrentPlayer__correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException {
-        g.addPlayer("Giacomo");
-        g.addPlayer("Michele");
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
 
-        g.setTransceiver(new LocalEventTransceiver());
-
-        g.startGame();
-        Assertions.assertEquals("Giacomo", g.getCurrentPlayer().getUsername());
+        game.startGame();
+        Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
     }
 
     @Test
     void getCurrentPlayer_gameNotStarted_throwsIllegalFlowException () {
         Assertions.assertThrows(IllegalFlowException.class, () -> {
-            g.getCurrentPlayer();
+            game.getCurrentPlayer();
         });
+    }
+
+    @Test
+    void setTransceiver_nullPointer_throws () {
+        this.game = new Game("testing");
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            game.setTransceiver(null);
+        });
+    }
+
+    @Test
+    void addPlayer_signals_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException {
+        AtomicBoolean called = new AtomicBoolean(false);
+        AtomicReference<String> username = new AtomicReference<>("");
+
+        PlayerHasJoinEventData.castEventReceiver(transceiver).registerListener(
+                event -> {
+                    assert !called.get();
+                    called.set(true);
+                    username.set(event.getUsername());
+                }
+        );
+
+        this.game.addPlayer("Giacomo");
+
+        Assertions.assertTrue(called.get());
+        Assertions.assertEquals("Giacomo", username.get());
+
+        called.set(false);
+        this.game.addPlayer("Michele");
+        Assertions.assertEquals("Michele", username.get());
+    }
+
+    @Test
+    void addPlayer_forReconnection_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+
+        AtomicReference<String> username = new AtomicReference<>("");
+
+        PlayerHasDisconnectedEventData.castEventReceiver(transceiver).registerListener(
+                event -> {
+                    username.set(event.getUsername());
+                }
+        );
+
+        game.startGame();
+
+        game.disconnectPlayer("Giacomo");
+
+        Assertions.assertEquals("Giacomo", username.get());
+        Assertions.assertEquals("Michele", game.getCurrentPlayer().getUsername());
+    }
+
+    @Test
+    void getLastPlayer__correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        Assertions.assertThrows(IllegalFlowException.class, () -> {
+            game.getLastPlayer();
+        });
+
+        game.startGame();
+
+        Assertions.assertEquals("Cristiano", game.getLastPlayer().getUsername());
     }
 }
 

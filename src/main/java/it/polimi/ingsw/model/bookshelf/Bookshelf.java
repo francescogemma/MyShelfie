@@ -72,6 +72,14 @@ public class Bookshelf {
         }
     }
 
+    public Bookshelf(Bookshelf other) {
+        for (int r = 0; r < content.length; r ++) {
+            for (int c = 0; c < content[r].length; c ++) {
+                content[r][c] = other.content[r][c];
+            }
+        }
+    }
+
     /**
      * @param shelf where we want to know what kind of {@link TileColor color} is the {@link Tile tile} in it.
      * @return the {@link TileColor color of the tile} inside the specified shelf.
@@ -172,7 +180,7 @@ public class Bookshelf {
     public boolean equals(Object other) {
         if (other == this)
             return true;
-        if (other.getClass() != this.getClass())
+        if (other == null || other.getClass() != this.getClass())
             return false;
 
         Bookshelf b = (Bookshelf) other;
@@ -188,5 +196,17 @@ public class Bookshelf {
         }
 
         return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Tile[] tiles : content) {
+            for (Tile tile : tiles) {
+                stringBuilder.append(tile);
+            }
+            stringBuilder.append("\n");
+        }
+        return stringBuilder.toString();
     }
 }
