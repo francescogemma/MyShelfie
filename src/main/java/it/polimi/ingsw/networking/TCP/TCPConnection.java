@@ -79,10 +79,12 @@ public class TCPConnection implements Connection {
 
     @Override
     public void send(String string) throws DisconnectedException {
+        // if the connection was already broken, throw a DisconnectedException
         if(disconnected) {
             throw new DisconnectedException("already disconnected");
         }
 
+        // send the string, if an IOException is thrown, throw a DisconnectedException
         try {
             synchronized(out) {
                 out.writeUTF(string);
@@ -96,6 +98,8 @@ public class TCPConnection implements Connection {
     @Override
     public String receive() throws DisconnectedException {
         String read;
+
+        // read a string from the socket, if an IOException is thrown, throw a DisconnectedException
         try {
             synchronized(in) {
                 while((read = in.readUTF()).equals("heartbeat")) {}
@@ -111,6 +115,7 @@ public class TCPConnection implements Connection {
      * to check if the connection is still alive.
      */
     private void heartbeat() {
+        // create a new Timer and schedule a new TimerTask that sends a heartbeat message every 2.5 seconds
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -118,6 +123,7 @@ public class TCPConnection implements Connection {
                 try {
                     send("heartbeat");
                 } catch (DisconnectedException e) {
+                    // if we are disconnected, cancel the timer and set the disconnected field to true
                     disconnected = true;
                     timer.cancel();
                 }
