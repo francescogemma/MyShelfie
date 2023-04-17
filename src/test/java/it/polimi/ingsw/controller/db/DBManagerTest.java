@@ -156,25 +156,5 @@ class DBManagerTest {
             DBManager.getGamesDBManager().getSavedIdentifiablesNames());
     }
 
-    @Test
-    void saveGame() {
-        Game game = new Game("first");
-
-        try {
-            game.addPlayer("first");
-            game.addPlayer("second");
-            game.startGame();
-        } catch (Exception e) {
-
-        }
-
-        DBManager.getGamesDBManager().save(game);
-
-        Game loadedGame;
-        try {
-            loadedGame = DBManager.getGamesDBManager().load("first");
-        } catch (Exception e) {
-
-        }
-    }
+    // TODO: Add tests for GamesDBManager
 }

@@ -13,7 +13,7 @@ public class Player {
     private final Bookshelf bookshelf;
     private PersonalGoal personalGoal;
     private int points;
-    private boolean isConnected;
+    private transient boolean isConnected;
     private final boolean[] achievedCommonGoals;
 
     /**
