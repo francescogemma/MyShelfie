@@ -30,7 +30,7 @@ public class StringReceiver implements StringRemote {
      * @return the contained string.
      * @throws NullPointerException if no string is contained.
      */
-    public String getString() throws NullPointerException {
+    public String getString() {
         if (string == null) {
             throw new NullPointerException();
         }
@@ -39,5 +39,13 @@ public class StringReceiver implements StringRemote {
         string = null;
 
         return returnedString;
+    }
+
+    /**
+     * Use this to check if this object has a string, before getting it.
+     * @return true if this object contains a string.
+     */
+    public boolean hasString() {
+        return !(string == null);
     }
 }

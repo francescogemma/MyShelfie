@@ -6,6 +6,7 @@ import it.polimi.ingsw.networking.DisconnectedException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.concurrent.TimeUnit;
 
 /**
  * {@link Connection Connection} class that handles RMI communication.
@@ -80,11 +81,17 @@ public class RMIConnection implements Connection {
             throw new DisconnectedException();
         }
 
-        // ...
-        stringReceiver.getString();
+        // keep checking if we've received a string
+        while (!stringReceiver.hasString()) {
+            try {
+                // wait a little bit after each check
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException exception) {
+                System.out.println("interrupted while sleeping");
+            }
+        }
 
-        // TODO: this whole method.
-
-        return null;
+        // once we've found it, return it
+        return stringReceiver.getString();
     }
 }
