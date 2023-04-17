@@ -13,9 +13,9 @@ import it.polimi.ingsw.model.filter.NumDifferentColorFilter;
  * @author Cristiano Migali
  */
 public class FourGroupsFourTilesGoal extends CommonGoal {
-    public FourGroupsFourTilesGoal(int numPlayers) {
+    public FourGroupsFourTilesGoal() {
         super(  new AdjacencyFetcher(),
                 new NumDifferentColorFilter(1, 1),
-                new AtLeastEvaluator(numPlayers, 4, bookshelfMask -> bookshelfMask.getShelves().size() >= 4));
+                new AtLeastEvaluator(4, bookshelfMask -> bookshelfMask.getShelves().size() >= 4));
     }
 }

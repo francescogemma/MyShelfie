@@ -14,9 +14,9 @@ import it.polimi.ingsw.model.filter.NumDifferentColorFilter;
  * @author Cristiano Migali
  */
 public class TwoTwoByTwoSquaresGoal extends CommonGoal {
-    public TwoTwoByTwoSquaresGoal(int numPlayers) {
+    public TwoTwoByTwoSquaresGoal() {
         super(  new ShapeFetcher(Shape.SQUARE),
                 new NumDifferentColorFilter(1, 1),
-                new CompatibleEvaluator(numPlayers, 2, BookshelfMask.DO_NOT_INTERSECT));
+                new CompatibleEvaluator(2, BookshelfMask.DO_NOT_INTERSECT));
     }
 }

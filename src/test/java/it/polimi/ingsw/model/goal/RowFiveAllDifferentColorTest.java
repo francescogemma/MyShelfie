@@ -9,11 +9,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 class RowFiveAllDifferentColorTest {
 
     @BeforeEach
     void setUp () {
-        goal = new RowFiveAllDifferentColor(4);
+        goal = new RowFiveAllDifferentColor();
+        goal.setPointStack(List.of(2, 4, 6, 8));
     }
     private RowFiveAllDifferentColor goal;
 

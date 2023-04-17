@@ -2,6 +2,7 @@ package it.polimi.ingsw.model.goal;
 
 import it.polimi.ingsw.model.bookshelf.Shape;
 import it.polimi.ingsw.model.evaluator.AtLeastEvaluator;
+import it.polimi.ingsw.model.evaluator.CommonGoalEvaluator;
 import it.polimi.ingsw.model.evaluator.Evaluator;
 import it.polimi.ingsw.model.fetcher.Fetcher;
 import it.polimi.ingsw.model.fetcher.ShapeFetcher;
@@ -31,13 +32,11 @@ public class CornersGoal extends CommonGoal {
      *     (CORNERS shape can fit only one time in the bookshelf). </li>
      * </ul>
      *
-     * @see CommonGoal#CommonGoal(Fetcher, Filter, Evaluator)
-     *
-     * @param numPlayers the number of players in the game
+     * @see CommonGoal#CommonGoal(Fetcher, Filter, CommonGoalEvaluator)
      */
-    public CornersGoal(int numPlayers) {
+    public CornersGoal() {
         super(  new ShapeFetcher(Shape.CORNERS),
                 new NumDifferentColorFilter(1, 1),
-                new AtLeastEvaluator(numPlayers, 1));
+                new AtLeastEvaluator(1));
     }
 }

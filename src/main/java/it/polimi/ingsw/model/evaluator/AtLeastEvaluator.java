@@ -24,13 +24,12 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
 
     /**
      * Class constructor.
-     * @param playersAmount is this game's player amount (2 to 4).
      * @param targetAmount is the needed quantity of {@link BookshelfMask BookshelfMasks} to
      *                     grant a player a non-zero amount of points.
      */
-    public AtLeastEvaluator(int playersAmount, int targetAmount, Predicate<BookshelfMask> toCount) {
+    public AtLeastEvaluator(int targetAmount, Predicate<BookshelfMask> toCount) {
         // call simple constructor
-        this(playersAmount, targetAmount);
+        this(targetAmount);
 
         bookshelfMaskSet.addPredicate(toCount);
     }
@@ -38,13 +37,10 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
     /**
      * Constructor if we don't require any kind of predicate.
      * A predicate is created, and it always returns true.
-     * @param playersAmount is this game's player amount (2 to 4).
      * @param targetAmount is the needed quantity of {@link BookshelfMask BookshelfMasks} to
      *                     grant a player a non-zero amount of points.
      */
-    public AtLeastEvaluator(int playersAmount, int targetAmount) {
-        super(playersAmount);
-
+    public AtLeastEvaluator(int targetAmount) {
         bookshelfMaskSet = new BookshelfMaskSet();
         this.targetAmount = targetAmount;
     }

@@ -19,7 +19,7 @@ import it.polimi.ingsw.model.filter.Filter;
 public abstract class Goal {
     private final Fetcher fetcher;
     private final Filter filter;
-    private final Evaluator evaluator;
+    protected final Evaluator evaluator;
 
     // Set of masks used to store all the masks that satisfy the last goal computed.
     private BookshelfMaskSet pointMasks;

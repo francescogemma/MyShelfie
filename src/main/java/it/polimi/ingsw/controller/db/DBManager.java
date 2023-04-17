@@ -1,7 +1,11 @@
 package it.polimi.ingsw.controller.db;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import it.polimi.ingsw.controller.User;
+import it.polimi.ingsw.model.game.Game;
+import it.polimi.ingsw.model.goal.CommonGoal;
+import it.polimi.ingsw.model.goal.PersonalGoal;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,11 +15,10 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DBManager<T extends Identifiable> {
-    private static final Object lock = new Object();
-
     private static String ROOT_FOLDER_NAME = "db";
 
     private final String folderName;
@@ -32,23 +35,24 @@ public class DBManager<T extends Identifiable> {
         return Paths.get(ROOT_FOLDER_NAME, folderName);
     }
 
+    private static final String JSON_EXTENSION = ".json";
+
     // Used also for testing purpose
     Path getIdentifiableFilePath(String name) {
-        return Paths.get(ROOT_FOLDER_NAME, folderName, name + ".json");
+        return Paths.get(ROOT_FOLDER_NAME, folderName, name + JSON_EXTENSION);
     }
 
     private DBManager(String folderName, Type type) {
         this.folderName = folderName;
         this.type = type;
 
-        gson = new Gson();
-
-        try {
-            Files.createDirectories(getFolderPath());
-        } catch (IOException e) {
-            throw new IllegalStateException("Got: " + e + " while trying to create a db folder");
-        }
+        gson = new GsonBuilder().setPrettyPrinting()
+            .registerTypeAdapter(PersonalGoal.class, new PersonalGoalTypeAdapter())
+            .registerTypeAdapter(CommonGoal.class, new CommonGoalTypeAdapter())
+            .create();
     }
+
+    private final Object lock = new Object();
 
     public T load(String name) throws IdentifiableNotFoundException {
         synchronized (lock) {
@@ -62,23 +66,33 @@ public class DBManager<T extends Identifiable> {
                 throw new IllegalStateException("An identifiable file is actually a directory");
             }
 
-            String identifiableJSON;
-            try (Scanner identifiableFileScanner = new Scanner(identifiableFile).useDelimiter("\n")) {
-                identifiableJSON = identifiableFileScanner.next();
+            StringBuilder identifiableJSON = new StringBuilder();
+            try (Scanner identifiableFileScanner = new Scanner(identifiableFile)) {
+                while (identifiableFileScanner.hasNextLine()) {
+                    identifiableJSON.append(identifiableFileScanner.nextLine());
+                }
             } catch (FileNotFoundException e) {
-                throw new IllegalStateException("Identifiable file not found: " + e);
+                throw new IllegalStateException("Got: " + e + " while trying to read " + name + "'s data in the "
+                    + folderName + " db");
             }
 
-            return (T) gson.fromJson(identifiableJSON, type);
+            return (T) gson.fromJson(identifiableJSON.toString(), type);
         }
     }
 
     public void save(T identifiable) {
         synchronized (lock) {
-            try (FileWriter writer = new FileWriter(getIdentifiableFilePath(identifiable.getName()).toFile())) {
-                writer.write(gson.toJson(identifiable) + "\n");
+            try {
+                Files.createDirectories(getFolderPath());
             } catch (IOException e) {
-                throw new IllegalStateException("Got: " + e + " while trying to save identifiable to disk");
+                throw new IllegalStateException("Got: " + e + " while trying to create a db folder for " + folderName);
+            }
+
+            try (FileWriter writer = new FileWriter(getIdentifiableFilePath(identifiable.getName()).toFile())) {
+                writer.write(gson.toJson(identifiable));
+            } catch (IOException e) {
+                throw new IllegalStateException("Got: " + e + " while trying to save " + identifiable.getName()
+                    + "'s data in the " + folderName + " db");
             }
         }
     }
@@ -95,16 +109,25 @@ public class DBManager<T extends Identifiable> {
         }
     }
 
-    // We can't directly instantiate this object since, for testing purpose, ROOT_FOLDER_NAME must be set before.
-    private static DBManager<User> USERS_DB_MANAGER_INSTANCE = null;
+    public Set<String> getSavedIdentifiablesNames() {
+        synchronized (lock) {
+            return Optional.ofNullable(getFolderPath().toFile().list()).map(
+                    fileNames -> Arrays.stream(fileNames).map(fileName ->
+                            fileName.substring(0, fileName.length() - JSON_EXTENSION.length()))
+                            .collect(Collectors.toSet())
+                ).orElse(Set.of());
+        }
+    }
+
+    private static final DBManager<User> USERS_DB_MANAGER_INSTANCE = new DBManager<>("users", User.class);
 
     public static DBManager<User> getUsersDBManager() {
-        synchronized (lock) {
-            if (USERS_DB_MANAGER_INSTANCE == null) {
-                USERS_DB_MANAGER_INSTANCE = new DBManager<>("users", User.class);
-            }
+        return USERS_DB_MANAGER_INSTANCE;
+    }
 
-            return USERS_DB_MANAGER_INSTANCE;
-        }
+    private static final DBManager<Game> GAMES_DB_MANAGER_INSTANCE = new DBManager<>("games", Game.class);
+
+    public static DBManager<Game> getGamesDBManager() {
+        return GAMES_DB_MANAGER_INSTANCE;
     }
 }

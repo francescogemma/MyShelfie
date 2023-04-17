@@ -17,7 +17,7 @@ import java.util.Map;
  * @author Francesco Gemma
  * @author Cristiano Migali
  */
-public class PersonalGoal extends Goal {
+public class PersonalGoal extends IndexedGoal {
     /**
      * Constructor of the class.
      *      It takes:
@@ -29,7 +29,7 @@ public class PersonalGoal extends Goal {
      * @param tilesColorMask the map containing exactly 6 pairs,
      *                       each one containing a shelf and the tile color of that shelf.
      */
-    public PersonalGoal(Map<Shelf, TileColor> tilesColorMask) {
+    private PersonalGoal(Map<Shelf, TileColor> tilesColorMask) {
         super(  new ShapeFetcher(Shape.WHOLE_BOOKSHELF),
                 new AcceptsAllFilter(),
                 new PersonalGoalEvaluator(tilesColorMask, List.of(1, 2, 4, 6, 9, 12))
@@ -51,7 +51,7 @@ public class PersonalGoal extends Goal {
         }
 
         return switch (index) {
-            case 0 -> new PersonalGoal(
+            case 0 -> (PersonalGoal) new PersonalGoal(
                 Map.of(
                     Shelf.getInstance(0, 0), TileColor.MAGENTA,
                     Shelf.getInstance(0, 2), TileColor.BLUE,
@@ -60,9 +60,9 @@ public class PersonalGoal extends Goal {
                     Shelf.getInstance(3, 1), TileColor.YELLOW,
                     Shelf.getInstance(5, 2), TileColor.CYAN
                 )
-            );
+            ).index(0);
 
-            case 1 -> new PersonalGoal(
+            case 1 -> (PersonalGoal) new PersonalGoal(
                     Map.of(
                             Shelf.getInstance(1, 1), TileColor.MAGENTA,
                             Shelf.getInstance(2, 0), TileColor.GREEN,
@@ -71,9 +71,9 @@ public class PersonalGoal extends Goal {
                             Shelf.getInstance(4, 3), TileColor.CYAN,
                             Shelf.getInstance(5, 4), TileColor.BLUE
                     )
-            );
+            ).index(1);
 
-            case 2 -> new PersonalGoal(
+            case 2 -> (PersonalGoal) new PersonalGoal(
                     Map.of(
                             Shelf.getInstance(1, 0), TileColor.BLUE,
                             Shelf.getInstance(1, 3), TileColor.YELLOW,
@@ -82,9 +82,9 @@ public class PersonalGoal extends Goal {
                             Shelf.getInstance(3, 4), TileColor.CYAN,
                             Shelf.getInstance(5, 0), TileColor.WHITE
                     )
-            );
+            ).index(2);
 
-            case 3 -> new PersonalGoal(
+            case 3 -> (PersonalGoal) new PersonalGoal(
                     Map.of(
                             Shelf.getInstance(0, 4), TileColor.YELLOW,
                             Shelf.getInstance(2, 0), TileColor.CYAN,
@@ -93,9 +93,9 @@ public class PersonalGoal extends Goal {
                             Shelf.getInstance(4, 1), TileColor.WHITE,
                             Shelf.getInstance(4, 2), TileColor.GREEN
                     )
-            );
+            ).index(3);
 
-            case 4 -> new PersonalGoal(
+            case 4 -> (PersonalGoal) new PersonalGoal(
                     Map.of(
                             Shelf.getInstance(1, 1), TileColor.CYAN,
                             Shelf.getInstance(3, 1), TileColor.BLUE,
@@ -104,9 +104,9 @@ public class PersonalGoal extends Goal {
                             Shelf.getInstance(5, 0), TileColor.YELLOW,
                             Shelf.getInstance(5, 3), TileColor.GREEN
                     )
-            );
+            ).index(4);
 
-            case 5 -> new PersonalGoal(
+            case 5 -> (PersonalGoal) new PersonalGoal(
                     Map.of(
                             Shelf.getInstance(0, 2), TileColor.CYAN,
                             Shelf.getInstance(0, 4), TileColor.GREEN,
@@ -115,9 +115,9 @@ public class PersonalGoal extends Goal {
                             Shelf.getInstance(4, 3), TileColor.BLUE,
                             Shelf.getInstance(5, 0), TileColor.MAGENTA
                     )
-            );
+            ).index(5);
 
-            case 6 -> new PersonalGoal(
+            case 6 -> (PersonalGoal) new PersonalGoal(
                     Map.of(
                             Shelf.getInstance(0, 0), TileColor.GREEN,
                             Shelf.getInstance(1, 3), TileColor.BLUE,
@@ -126,9 +126,9 @@ public class PersonalGoal extends Goal {
                             Shelf.getInstance(4, 4), TileColor.YELLOW,
                             Shelf.getInstance(5, 2), TileColor.WHITE
                     )
-            );
+            ).index(6);
 
-            case 7 -> new PersonalGoal(
+            case 7 -> (PersonalGoal) new PersonalGoal(
                     Map.of(
                             Shelf.getInstance(0, 4), TileColor.BLUE,
                             Shelf.getInstance(1, 1), TileColor.GREEN,
@@ -137,9 +137,9 @@ public class PersonalGoal extends Goal {
                             Shelf.getInstance(4, 3), TileColor.WHITE,
                             Shelf.getInstance(5, 3), TileColor.YELLOW
                     )
-            );
+            ).index(7);
 
-            case 8 -> new PersonalGoal(
+            case 8 -> (PersonalGoal) new PersonalGoal(
                     Map.of(
                             Shelf.getInstance(0, 2), TileColor.YELLOW,
                             Shelf.getInstance(2, 2), TileColor.GREEN,
@@ -148,9 +148,9 @@ public class PersonalGoal extends Goal {
                             Shelf.getInstance(4, 4), TileColor.MAGENTA,
                             Shelf.getInstance(5, 0), TileColor.BLUE
                     )
-            );
+            ).index(8);
 
-            case 9 -> new PersonalGoal(
+            case 9 -> (PersonalGoal) new PersonalGoal(
                     Map.of(
                             Shelf.getInstance(0, 4), TileColor.CYAN,
                             Shelf.getInstance(1, 1), TileColor.YELLOW,
@@ -159,9 +159,9 @@ public class PersonalGoal extends Goal {
                             Shelf.getInstance(4, 1), TileColor.BLUE,
                             Shelf.getInstance(5, 3), TileColor.MAGENTA
                     )
-            );
+            ).index(9);
 
-            case 10 -> new PersonalGoal(
+            case 10 -> (PersonalGoal) new PersonalGoal(
                     Map.of(
                             Shelf.getInstance(0, 2), TileColor.MAGENTA,
                             Shelf.getInstance(1, 1), TileColor.WHITE,
@@ -170,9 +170,9 @@ public class PersonalGoal extends Goal {
                             Shelf.getInstance(4, 4), TileColor.GREEN,
                             Shelf.getInstance(5, 3), TileColor.CYAN
                     )
-            );
+            ).index(10);
 
-            case 11 -> new PersonalGoal(
+            case 11 -> (PersonalGoal) new PersonalGoal(
                     Map.of(
                             Shelf.getInstance(0, 2), TileColor.WHITE,
                             Shelf.getInstance(1, 1), TileColor.MAGENTA,
@@ -181,7 +181,7 @@ public class PersonalGoal extends Goal {
                             Shelf.getInstance(4, 4), TileColor.YELLOW,
                             Shelf.getInstance(5, 0), TileColor.GREEN
                     )
-            );
+            ).index(11);
 
             default -> throw new IllegalStateException("Unexpected index value: " + index);
         };

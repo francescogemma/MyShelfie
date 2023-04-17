@@ -2,7 +2,7 @@ package it.polimi.ingsw.model.goal;
 
 import it.polimi.ingsw.model.bookshelf.Shape;
 import it.polimi.ingsw.model.evaluator.AtLeastEvaluator;
-import it.polimi.ingsw.model.evaluator.Evaluator;
+import it.polimi.ingsw.model.evaluator.CommonGoalEvaluator;
 import it.polimi.ingsw.model.fetcher.Fetcher;
 import it.polimi.ingsw.model.fetcher.ShapeFetcher;
 import it.polimi.ingsw.model.filter.Filter;
@@ -31,15 +31,13 @@ public class ThreeColumnsGoal extends CommonGoal {
      *     <li> an {@link AtLeastEvaluator} with targetAmount equal to 3, because we need to find at least 3 columns. </li>
      * </ul>
      *
-     * @see CommonGoal#CommonGoal(Fetcher, Filter, Evaluator)
-     *
-     * @param numPlayers the number of players in the game
+     * @see CommonGoal#CommonGoal(Fetcher, Filter, CommonGoalEvaluator)
      */
-    public ThreeColumnsGoal(int numPlayers) {
+    public ThreeColumnsGoal() {
         super(
                 new ShapeFetcher(Shape.getColumn(6)),
                 new NumDifferentColorFilter(1, 3),
-                new AtLeastEvaluator(numPlayers, 3)
+                new AtLeastEvaluator(3)
         );
     }
 }

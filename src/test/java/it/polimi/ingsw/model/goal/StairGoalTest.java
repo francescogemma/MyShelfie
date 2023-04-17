@@ -8,12 +8,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 class StairGoalTest {
     StairGoal goal;
 
     @BeforeEach
     void setUp () {
-        goal = new StairGoal(4);
+        goal = new StairGoal();
+        goal.setPointStack(List.of(2, 4, 6, 8));
     }
 
     @Test

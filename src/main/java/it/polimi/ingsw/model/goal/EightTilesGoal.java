@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.goal;
 
 import it.polimi.ingsw.model.bookshelf.Shape;
+import it.polimi.ingsw.model.evaluator.CommonGoalEvaluator;
 import it.polimi.ingsw.model.evaluator.EightTilesGoalEvaluator;
 import it.polimi.ingsw.model.evaluator.Evaluator;
 import it.polimi.ingsw.model.fetcher.Fetcher;
@@ -32,15 +33,13 @@ public class EightTilesGoal extends CommonGoal {
      *     and will give us the score. </li>
      * </ul>
      *
-     * @see CommonGoal#CommonGoal(Fetcher, Filter, Evaluator)
-     *
-     * @param numPlayers the number of players in the game
+     * @see CommonGoal#CommonGoal(Fetcher, Filter, CommonGoalEvaluator)
      */
-    public EightTilesGoal(int numPlayers) {
+    public EightTilesGoal() {
         super(
                 new ShapeFetcher(Shape.WHOLE_BOOKSHELF),
                 new AcceptsAllFilter(),
-                new EightTilesGoalEvaluator(numPlayers)
+                new EightTilesGoalEvaluator()
         );
     }
 }

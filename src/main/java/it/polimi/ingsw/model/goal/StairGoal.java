@@ -1,9 +1,9 @@
 package it.polimi.ingsw.model.goal;
 
+import it.polimi.ingsw.model.evaluator.CommonGoalEvaluator;
 import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.bookshelf.*;
 import it.polimi.ingsw.model.evaluator.AtLeastEvaluator;
-import it.polimi.ingsw.model.evaluator.Evaluator;
 import it.polimi.ingsw.model.fetcher.Fetcher;
 import it.polimi.ingsw.model.fetcher.ShapeFetcher;
 import it.polimi.ingsw.model.fetcher.UnionFetcher;
@@ -44,16 +44,14 @@ public class StairGoal extends CommonGoal{
     /**
      * Constructor of the class.
      *
-     * @see CommonGoal#CommonGoal(Fetcher, Filter, Evaluator)
-     *
-     * @param numPlayers the number of players in the game
+     * @see CommonGoal#CommonGoal(Fetcher, Filter, CommonGoalEvaluator)
      * */
-    public StairGoal(int numPlayers) {
+    public StairGoal() {
         super(new UnionFetcher(List.of(
                     new ShapeFetcher(Shape.STAIR),
                     new ShapeFetcher(Shape.STAIR.verticalFlip())
                 )),
                 new NumDifferentColorFilter(1, 6),
-                new AtLeastEvaluator(numPlayers, 1, check));
+                new AtLeastEvaluator(1, check));
     }
 }

@@ -7,20 +7,24 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 class CompatibleEvaluatorTest {
     CompatibleEvaluator compatibleEvaluator;
 
     @Test
     @DisplayName("Create evaluator, do nothing, get 0 points")
     void getPoints_CorrectOutput() {
-        compatibleEvaluator = new CompatibleEvaluator(2, 4, (a, b) -> true);
+        compatibleEvaluator = new CompatibleEvaluator(4, (a, b) -> true);
+        compatibleEvaluator.setPointStack(List.of(4, 8));
         Assertions.assertEquals(0, compatibleEvaluator.getPoints());
     }
 
     @Test
     @DisplayName("Add 3 incompatible shapes, requesting a size of 2. Therefore, get 0 points.")
     void getPoints_ThreeIncompatibles_CorrectOutput() {
-        compatibleEvaluator = new CompatibleEvaluator(2, 2, (a, b) -> false);
+        compatibleEvaluator = new CompatibleEvaluator(2, (a, b) -> false);
+        compatibleEvaluator.setPointStack(List.of(4, 8));
 
         for (int i = 0; i < 3; i++) {
             compatibleEvaluator.add(new BookshelfMask(new Bookshelf()));
@@ -33,9 +37,10 @@ class CompatibleEvaluatorTest {
     @DisplayName("Add a mask, an incompatible mask, and a compatible mask. Require size = 2, get points.")
     void getPoints_BadThenGood_CorrectOutput() {
         // Condition is shelves amount is equal.
-        compatibleEvaluator = new CompatibleEvaluator(2, 2,
+        compatibleEvaluator = new CompatibleEvaluator(2,
                 (a, b) -> a.getShelves().size() == b.getShelves().size()
         );
+        compatibleEvaluator.setPointStack(List.of(4, 8));
 
         BookshelfMask bookshelfMask = new BookshelfMask(new Bookshelf());
         bookshelfMask.add(Shelf.getInstance(2, 2));
@@ -55,7 +60,8 @@ class CompatibleEvaluatorTest {
     @Test
     @DisplayName("Get a winning condition, then clear, therefore get no points.")
     void getPoints_afterClear_CorrectOutput() {
-        compatibleEvaluator = new CompatibleEvaluator(2, 2, (a, b) -> true);
+        compatibleEvaluator = new CompatibleEvaluator(2, (a, b) -> true);
+        compatibleEvaluator.setPointStack(List.of(4, 8));
 
         for (int i = 0; i < 3; i++) {
             compatibleEvaluator.add(new BookshelfMask(new Bookshelf()));
@@ -71,7 +77,8 @@ class CompatibleEvaluatorTest {
     @Test
     @DisplayName("Get a winning condition, keep requesting points.")
     void getPoints_repeat_CorrectOutput() {
-        compatibleEvaluator = new CompatibleEvaluator(3, 2, (a, b) -> true);
+        compatibleEvaluator = new CompatibleEvaluator(2, (a, b) -> true);
+        compatibleEvaluator.setPointStack(List.of(4, 6, 8));
 
         for (int i = 0; i < 3; i++) {
             compatibleEvaluator.add(new BookshelfMask(new Bookshelf()));
@@ -91,18 +98,9 @@ class CompatibleEvaluatorTest {
     @Test
     @DisplayName("Try to construct an evaluator with nonsense targetGroupSize.")
     void CompatibleEvaluator_zeroTargetGroupSize_CorrectOutput() {
-        Assertions.assertThrows(IllegalArgumentException.class, () ->
-            compatibleEvaluator = new CompatibleEvaluator(3, 0, (a, b) -> true)
-        );
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            compatibleEvaluator = new CompatibleEvaluator(0, (a, b) -> true);
+            compatibleEvaluator.setPointStack(List.of(2, 4, 6, 8));
+        });
     }
-
-    @Test
-    @DisplayName("Try to construct an evaluator with nonsense amount of players.")
-    void CompatibleEvaluator_tooManyPlayers_CorrectOutput() {
-        Assertions.assertThrows(IllegalArgumentException.class, () ->
-                compatibleEvaluator = new CompatibleEvaluator(32, 2, (a, b) -> true)
-        );
-    }
-
-
 }

@@ -26,15 +26,9 @@ public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Eval
 
     /**
      * Constructor of the class.
-     * It calls the constructor of the superclass with the given playersAmount,
-     * and sets {@link EightTilesGoalEvaluator#satisfied} to false.
-     *
-     * @see CommonGoalEvaluator#CommonGoalEvaluator(int)
-     *
-     * @param playersAmount the number of players in the game.
+     * It sets {@link EightTilesGoalEvaluator#satisfied} to false.
      */
-    public EightTilesGoalEvaluator(int playersAmount) {
-        super(playersAmount);
+    public EightTilesGoalEvaluator() {
         satisfied = false;
         pointMasks = new BookshelfMaskSet();
     }

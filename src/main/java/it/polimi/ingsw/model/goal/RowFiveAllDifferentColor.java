@@ -10,11 +10,11 @@ import it.polimi.ingsw.model.filter.NumDifferentColorFilter;
  * @author Giacomo Groppi
  * */
 public class RowFiveAllDifferentColor extends CommonGoal{
-    protected RowFiveAllDifferentColor(int numPlayer) {
+    protected RowFiveAllDifferentColor() {
         super(
                 new ShapeFetcher(Shape.getRow(5)),
                 new NumDifferentColorFilter(5, 5),
-                new AtLeastEvaluator(numPlayer, 2, bookshelfMask -> bookshelfMask.getShelves().size() >= 2)
+                new AtLeastEvaluator(2, bookshelfMask -> bookshelfMask.getShelves().size() >= 2)
         );
     }
 }

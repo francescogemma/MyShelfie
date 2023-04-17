@@ -1,5 +1,6 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.controller.db.Identifiable;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.gameEvent.*;
 import it.polimi.ingsw.model.bag.Bag;
@@ -20,7 +21,7 @@ import java.util.*;
  * @author Giacomo Groppi
  * @author Cristiano Migali
  * */
-public class Game {
+public class Game implements Identifiable {
     /*
      * The index of the first player in the list of players.
      */
@@ -61,15 +62,15 @@ public class Game {
      */
     private boolean isStarted;
 
-    private List<Integer> personalGoalIndexes;
-    private int personalGoalIndex;
+    private final transient List<Integer> personalGoalIndexes;
+    private transient int personalGoalIndex;
 
     /**
      * The index of the current player in the list of players.
      */
     private int currentPlayerIndex;
 
-    private LocalEventTransceiver transceiver;
+    private transient LocalEventTransceiver transceiver;
 
     /**
      * Creates a new game with the given name.
@@ -199,9 +200,7 @@ public class Game {
         this.transceiver.broadcast(new GameHasStartedEventData());
     }
 
-    /**
-     * @return the name of the game.
-     */
+    @Override
     public String getName() {
         return this.name;
     }

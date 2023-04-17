@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 class AtLeastEvaluatorTest {
@@ -15,7 +16,8 @@ class AtLeastEvaluatorTest {
     @Test
     @DisplayName("Insert enough masks and check correct progression of given points.")
     void getPoints_enoughMasks_correctOutput() {
-        atLeastEvaluator = new AtLeastEvaluator(4, 12);
+        atLeastEvaluator = new AtLeastEvaluator(12);
+        atLeastEvaluator.setPointStack(List.of(2, 4, 6, 8));
 
         for (int i = 0; i < 16; i++) {
             atLeastEvaluator.add(new BookshelfMask(new Bookshelf()));
@@ -32,7 +34,8 @@ class AtLeastEvaluatorTest {
     @Test
     @DisplayName("Insert not enough masks and check that no points are given.")
     void getPoints_tooFewMasks_correctOutput() {
-        atLeastEvaluator = new AtLeastEvaluator(4, 12);
+        atLeastEvaluator = new AtLeastEvaluator(12);
+        atLeastEvaluator.setPointStack(List.of(2, 4, 6, 8));
 
         for (int i = 0; i < 6; i++) {
             atLeastEvaluator.add(new BookshelfMask(new Bookshelf()));
@@ -46,7 +49,8 @@ class AtLeastEvaluatorTest {
     void AtLeastEvaluator_toCount_correctOutput() {
         // Create a predicate that says only to count empty masks
         Predicate<BookshelfMask> toCount = (mask) -> mask.getShelves().isEmpty();
-        atLeastEvaluator = new AtLeastEvaluator(4, 7, toCount);
+        atLeastEvaluator = new AtLeastEvaluator(7, toCount);
+        atLeastEvaluator.setPointStack(List.of(2, 4, 6, 8));
 
         for (int i = 0; i < 6; i++) {
             atLeastEvaluator.add(new BookshelfMask(new Bookshelf()));
@@ -62,7 +66,8 @@ class AtLeastEvaluatorTest {
     @Test
     @DisplayName("Insert more masks than needed, clear, check that no points are awarded.")
     void clear_correctOutput() {
-        atLeastEvaluator = new AtLeastEvaluator(4, 12);
+        atLeastEvaluator = new AtLeastEvaluator(12);
+        atLeastEvaluator.setPointStack(List.of(2, 4, 6, 8));
 
         for (int i = 0; i < 16; i++) {
             atLeastEvaluator.add(new BookshelfMask(new Bookshelf()));

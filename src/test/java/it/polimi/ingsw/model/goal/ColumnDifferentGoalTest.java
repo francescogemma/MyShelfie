@@ -9,12 +9,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 class ColumnDifferentGoalTest {
     ColumnDifferentGoal goal;
 
     @BeforeEach
     void setUp () {
-        goal = new ColumnDifferentGoal(4);
+        goal = new ColumnDifferentGoal();
+        goal.setPointStack(List.of(2, 4, 6, 8));
     }
 
     @Test

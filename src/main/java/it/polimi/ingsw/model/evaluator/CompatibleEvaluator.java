@@ -46,7 +46,6 @@ public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluato
 
     /**
      * Class constructor.
-     * @param playersAmount is this game's player amount (2 to 4).
      * @param targetGroupSize is the cluster size to reach in order to allow the
      *                        {@link CompatibleEvaluator#getPoints() getPoints} method to return a non-zero result.
      * @param compatible is a BiPredicate that defines the meaning of "compatibility" within elements of a set.
@@ -54,8 +53,7 @@ public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluato
      * @throws IllegalArgumentException if targetGroupsSize is less or equal than 1, in that case it makes no sense to
      *  check compatibility between a mask and itself.
      */
-    public CompatibleEvaluator(int playersAmount, int targetGroupSize, BiPredicate<BookshelfMask, BookshelfMask> compatible) {
-        super(playersAmount);
+    public CompatibleEvaluator(int targetGroupSize, BiPredicate<BookshelfMask, BookshelfMask> compatible) {
         group = new ArrayList<>();
 
         if (targetGroupSize <= 1) {

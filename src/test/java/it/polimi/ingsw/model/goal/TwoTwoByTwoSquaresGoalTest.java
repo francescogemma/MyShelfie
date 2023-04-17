@@ -9,12 +9,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 class TwoTwoByTwoSquaresGoalTest {
-    private Goal goal;
+    private CommonGoal goal;
 
     @BeforeEach
     public void setUp() {
-        goal = new TwoTwoByTwoSquaresGoal(4);
+        goal = new TwoTwoByTwoSquaresGoal();
+        goal.setPointStack(List.of(2, 4, 6, 8));
     }
 
     @Test

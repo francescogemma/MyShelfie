@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 class EightTilesGoalEvaluatorTest {
     private EightTilesGoalEvaluator evaluator;
     private BookshelfMask mask;
@@ -13,7 +15,8 @@ class EightTilesGoalEvaluatorTest {
 
     @BeforeEach
     public void setUp() {
-        evaluator = new EightTilesGoalEvaluator(4);
+        evaluator = new EightTilesGoalEvaluator();
+        evaluator.setPointStack(List.of(2, 4, 6, 8));
     }
 
     @Test

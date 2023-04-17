@@ -8,12 +8,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 class XPatternGoalTest {
     XPatternGoal goal;
 
     @BeforeEach
     void setUp () {
-        goal = new XPatternGoal(4);
+        goal = new XPatternGoal();
+        goal.setPointStack(List.of(2, 4, 6, 8));
     }
 
     @Test

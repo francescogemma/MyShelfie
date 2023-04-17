@@ -1,6 +1,8 @@
 package it.polimi.ingsw.controller.db;
 
 import it.polimi.ingsw.controller.User;
+import it.polimi.ingsw.model.game.Game;
+import it.polimi.ingsw.model.game.Player;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -8,6 +10,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
 
 class DBManagerTest {
     private static void deleteDirectoryRecursively(Path directoryPath) {
@@ -28,14 +31,21 @@ class DBManagerTest {
 
     private static final String TEST_ROOT_FOLDER_NAME = "testdb";
 
-    @BeforeAll
-    public static void setUp() {
+    @BeforeEach
+    public void setUp() {
         DBManager.setRootFolderName(TEST_ROOT_FOLDER_NAME);
     }
 
-    @AfterAll
-    public static void tearDown() {
-        deleteDirectoryRecursively(Paths.get(TEST_ROOT_FOLDER_NAME));
+    @AfterEach
+    public void tearDown() {
+        Path rootFolderPath = Paths.get(TEST_ROOT_FOLDER_NAME);
+        if (rootFolderPath.toFile().exists()) {
+            if (!rootFolderPath.toFile().isDirectory()) {
+                throw new IllegalStateException("The root db folder isn't actually a directory");
+            }
+
+            deleteDirectoryRecursively(rootFolderPath);
+        }
     }
 
     @Test
@@ -122,5 +132,49 @@ class DBManagerTest {
 
         Assertions.assertFalse(DBManager.getUsersDBManager().getIdentifiableFilePath("delete_me")
             .toFile().exists());
+    }
+
+    @Test
+    @DisplayName("Get the list of names in use")
+    void getSavedIdentifiablesNames__correctOutput() {
+        User firstUser = new User("first", "passwrd");
+        User secondUser = new User("second", "password");
+        User thirdUser = new User("third", "password");
+
+        DBManager.getUsersDBManager().save(firstUser);
+        DBManager.getUsersDBManager().save(secondUser);
+        DBManager.getUsersDBManager().save(thirdUser);
+
+        Assertions.assertEquals(Set.of("first", "second", "third"),
+            DBManager.getUsersDBManager().getSavedIdentifiablesNames());
+    }
+
+    @Test
+    @DisplayName("Get the list of names in use when the db is empty")
+    void getSavedIdentifiablesNames_emptyDB_emptySet() {
+        Assertions.assertEquals(Set.of(),
+            DBManager.getGamesDBManager().getSavedIdentifiablesNames());
+    }
+
+    @Test
+    void saveGame() {
+        Game game = new Game("first");
+
+        try {
+            game.addPlayer("first");
+            game.addPlayer("second");
+            game.startGame();
+        } catch (Exception e) {
+
+        }
+
+        DBManager.getGamesDBManager().save(game);
+
+        Game loadedGame;
+        try {
+            loadedGame = DBManager.getGamesDBManager().load("first");
+        } catch (Exception e) {
+
+        }
     }
 }
