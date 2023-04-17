@@ -3,9 +3,12 @@ package it.polimi.ingsw.networking.RMI;
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.DisconnectedException;
 
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -68,6 +71,8 @@ public class RMIConnection implements Connection {
             // instead of crashing the program, count this error as a disconnection.
             disconnected = true;
         }
+
+        heartbeat();
     }
 
     /**
@@ -100,6 +105,8 @@ public class RMIConnection implements Connection {
             // instead of crashing the program, count this error as a disconnection.
             disconnected = true;
         }
+
+        heartbeat();
     }
 
     @Override
@@ -134,5 +141,21 @@ public class RMIConnection implements Connection {
 
         // once we've found it, return it
         return stringContainer.getString();
+    }
+
+    private void heartbeat() {
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    remoteContainer.ping();
+                } catch (RemoteException exception) {
+                    disconnected = true;
+                    timer.cancel();
+                }
+            }
+        };
+        timer.schedule(task, 0, 2500);
     }
 }

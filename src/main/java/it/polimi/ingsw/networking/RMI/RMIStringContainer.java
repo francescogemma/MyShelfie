@@ -25,6 +25,9 @@ public class RMIStringContainer implements StringRemote {
     @Override
     public void handleMessage(String message) throws RemoteException { string = message; }
 
+    @Override
+    public void ping() throws RemoteException { }
+
     /**
      * This method pops off the string, emptying this object of any information.
      * @return the contained string.

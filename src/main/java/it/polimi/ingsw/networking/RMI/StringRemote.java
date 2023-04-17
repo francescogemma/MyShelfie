@@ -17,4 +17,10 @@ public interface StringRemote extends Remote {
      * @throws RemoteException will be thrown in case of network problems, or server communication issues.
      */
     void handleMessage(String message) throws RemoteException;
+
+    /**
+     * This should be used for some keep-alive implementation.
+     * @throws RemoteException will be thrown in case of network problems, or server communication issues.
+     */
+    void ping() throws RemoteException;
 }
