@@ -1,4 +1,4 @@
-package it.polimi.ingsw.event.data.gameEvent;
+package it.polimi.ingsw.event.data.game;
 
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.Responder;
@@ -18,7 +18,7 @@ public class GameIsNoLongerAvailableEventData implements EventData {
         this.gameName = gameName;
     }
 
-    public static <T extends GameIsNoLongerAvailableEventData> CastEventReceiver<T> castEventReceiver(EventReceiver<EventData> receiver) {
+    public static CastEventReceiver<GameIsNoLongerAvailableEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }
 

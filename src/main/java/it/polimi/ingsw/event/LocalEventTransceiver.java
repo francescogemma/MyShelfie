@@ -7,7 +7,7 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.*;
 
-public class LocalEventTransceiver implements EventTransmitter, EventReceiver<EventData> {
+public class LocalEventTransceiver implements EventTransceiver {
     private final List<EventListener<EventData>> listeners = new ArrayList<>();
 
     private final Object lock = new Object();

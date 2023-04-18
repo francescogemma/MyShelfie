@@ -4,13 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.receiver.EventListener;
-import it.polimi.ingsw.event.receiver.EventReceiver;
-import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MockNetworkEventTransceiver implements EventTransmitter, EventReceiver<EventData> {
+public class MockNetworkEventTransceiver implements EventTransceiver {
     private final Object lock = new Object();
     private final List<String> serializedEvents = new ArrayList<>();
     private final List<EventListener<EventData>> listeners = new ArrayList<>();

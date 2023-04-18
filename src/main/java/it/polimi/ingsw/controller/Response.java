@@ -3,7 +3,6 @@ package it.polimi.ingsw.controller;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.Responder;
 import it.polimi.ingsw.event.data.EventData;
-import it.polimi.ingsw.event.data.gameEvent.GameHasStartedEventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;

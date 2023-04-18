@@ -1,13 +1,11 @@
-package it.polimi.ingsw.event.data.clientEvent;
+package it.polimi.ingsw.event.data.client;
 
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.Responder;
 import it.polimi.ingsw.event.data.EventData;
-import it.polimi.ingsw.event.data.gameEvent.BoardChangedEventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
-import it.polimi.ingsw.model.board.BoardView;
 
 import java.util.function.Function;
 
@@ -24,7 +22,7 @@ public class JoinGameEventData implements EventData {
         return this.gameName;
     }
 
-    public static <T extends JoinGameEventData> CastEventReceiver<T> castEventReceiver(EventReceiver<EventData> receiver) {
+    public static CastEventReceiver<JoinGameEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }
 

@@ -10,8 +10,8 @@ import com.google.gson.stream.JsonWriter;
 import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.LoginEventData;
-import it.polimi.ingsw.event.data.clientEvent.*;
-import it.polimi.ingsw.event.data.gameEvent.*;
+import it.polimi.ingsw.event.data.client.*;
+import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.event.data.wrapper.SyncEventDataWrapper;
 
 import java.io.IOException;

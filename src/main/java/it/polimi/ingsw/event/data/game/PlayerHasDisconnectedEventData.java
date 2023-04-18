@@ -1,4 +1,4 @@
-package it.polimi.ingsw.event.data.gameEvent;
+package it.polimi.ingsw.event.data.game;
 
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.Responder;
@@ -21,7 +21,7 @@ public class PlayerHasDisconnectedEventData implements EventData {
         return this.username;
     }
 
-    public static <T extends PlayerHasDisconnectedEventData> CastEventReceiver<T> castEventReceiver(EventReceiver<EventData> receiver) {
+    public static CastEventReceiver<PlayerHasDisconnectedEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }
 

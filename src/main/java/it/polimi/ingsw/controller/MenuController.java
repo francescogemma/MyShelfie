@@ -1,21 +1,16 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.controller.db.IdentifiableNotFoundException;
-import it.polimi.ingsw.event.Responder;
 import it.polimi.ingsw.event.data.LoginEventData;
-import it.polimi.ingsw.event.data.clientEvent.CreateNewGameEventData;
-import it.polimi.ingsw.event.data.clientEvent.JoinGameEventData;
-import it.polimi.ingsw.event.data.clientEvent.StartGameEventData;
-import it.polimi.ingsw.event.data.gameEvent.GameHasBeenCreatedEventData;
-import it.polimi.ingsw.event.data.gameEvent.GameHasStartedEventData;
+import it.polimi.ingsw.event.data.client.CreateNewGameEventData;
+import it.polimi.ingsw.event.data.client.JoinGameEventData;
+import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.controller.db.DBManager;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.function.Consumer;
 
 public class MenuController {
     private final List<GameController> gameControllerList;
@@ -121,7 +116,9 @@ public class MenuController {
 
                 synchronized (this.gameControllerList) {
                     for (GameController gameController : gameControllerList) {
-                        gamePresent.add(gameController.gameName());
+                        if (gameController.isAvailableForJoin()) {
+                            gamePresent.add(gameController.gameName());
+                        }
                     }
                 }
 
@@ -136,7 +133,7 @@ public class MenuController {
                     if (virtualView.isInGame()) {
                         return new Response("You can't create a game if you are in a game...", ResponseStatus.FAILURE);
                     }
-                    return this.createNewGame(event.getGameName());
+                    return this.createNewGame(event.gameName());
                 });
             }
             return new Response("You are not login", ResponseStatus.FAILURE);

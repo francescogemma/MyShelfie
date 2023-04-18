@@ -1,4 +1,4 @@
-package it.polimi.ingsw.event.data.gameEvent;
+package it.polimi.ingsw.event.data.game;
 
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.Responder;
@@ -6,7 +6,6 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
-import it.polimi.ingsw.model.game.Player;
 import it.polimi.ingsw.model.game.PlayerView;
 
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ public class GameOverEventData implements EventData {
         this.winners = new ArrayList<>(winners);
     }
 
-    public static <T extends GameOverEventData> CastEventReceiver<T> castEventReceiver(EventReceiver<EventData> receiver) {
+    public static CastEventReceiver<GameOverEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }
 

@@ -1,4 +1,4 @@
-package it.polimi.ingsw.event.data.gameEvent;
+package it.polimi.ingsw.event.data.game;
 
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.Responder;
@@ -30,7 +30,7 @@ public class PlayerPointsChangeEventData implements EventData {
         return this.player;
     }
 
-    public static <T extends PlayerPointsChangeEventData> CastEventReceiver<T> castEventReceiver(EventReceiver<EventData> receiver) {
+    public static CastEventReceiver<PlayerPointsChangeEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }
 

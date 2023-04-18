@@ -1,10 +1,7 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.event.LocalEventTransceiver;
-import it.polimi.ingsw.event.data.gameEvent.BoardChangedEventData;
-import it.polimi.ingsw.event.data.gameEvent.GameHasStartedEventData;
-import it.polimi.ingsw.event.data.gameEvent.PlayerHasDisconnectedEventData;
-import it.polimi.ingsw.event.data.gameEvent.PlayerHasJoinEventData;
+import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.model.bag.Bag;
 import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.board.BoardView;
@@ -17,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -332,23 +330,46 @@ class GameTest {
     }
 
     @Test
-    void selectTile__correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException, IllegalExtractionException, FullSelectionException {
+    void selectTile_signalsEmitted_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException, IllegalExtractionException, FullSelectionException {
         AtomicBoolean call = new AtomicBoolean(false);
+        AtomicReference<BoardView> boardViewCall = new AtomicReference<>(null);
+
         game.addPlayer("Giacomo");
         game.addPlayer("Michele");
         game.addPlayer("Cristiano");
 
-        game.startGame();
-
         BoardChangedEventData.castEventReceiver(transceiver).registerListener(event -> {
             call.set(true);
+            boardViewCall.set(event.getBoard());
         });
+
+        try {
+            game.selectTile("Giacomo", new Coordinate(4, 0));
+        } catch (IllegalFlowException e) {
+
+        }
+
+        Assertions.assertFalse(call.get());
+
+        game.startGame();
+
+        call.set(false);
+        try {
+            game.selectTile("Michele", new Coordinate(4, 0));
+        } catch (IllegalFlowException e) {
+
+        }
+
+        Assertions.assertFalse(call.get());
 
         game.selectTile("Giacomo", new Coordinate(4, 0));
 
         Assertions.assertTrue(call.get());
+        Assertions.assertEquals(boardViewCall.get(), this.game.getBoard());
 
         call.set(false);
+        boardViewCall.set(null);
+
         try {
             game.selectTile("Giacomo", new Coordinate(4, 3));
             assert false: "This functions should throw IllegalExtractionException";
@@ -360,10 +381,115 @@ class GameTest {
     }
 
     @Test
-    void test () {
-        BoardView boardView = new Board().getView();
-        Board board = new Board();
-        Assertions.assertEquals(board.getView(), boardView);
+    void insertTile_signalsEmitted_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException, IllegalExtractionException, FullSelectionException {
+        AtomicBoolean call = new AtomicBoolean(false);
+        AtomicReference<BoardView> boardViewCall = new AtomicReference<>(null);
+
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        BoardChangedEventData.castEventReceiver(transceiver).registerListener(event -> {
+            call.set(true);
+            boardViewCall.set(event.getBoard());
+        });
+
+        game.startGame();
+
+        game.selectTile("Giacomo", new Coordinate(4, 0));
+        game.selectTile("Giacomo", new Coordinate(5, 0));
+
+        game.insertTile("Giacomo", 4);
+
+        Assertions.assertTrue(call.get());
+        Assertions.assertEquals(game.getBoard(), boardViewCall.get());
+    }
+
+    @Test
+    void addPlayer_signalsEmitted_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
+        transceiver.registerListener(event -> {
+            Assertions.assertEquals(PlayerHasJoinEventData.ID, event.getId());
+            Assertions.assertEquals("Giacomo", ((PlayerHasJoinEventData) event).getUsername());
+        });
+
+        game.addPlayer("Giacomo");
+    }
+
+    @Test
+    void addPlayer_playerAlreadyInGameButDisconnected_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException {
+        AtomicBoolean set = new AtomicBoolean(false);
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        transceiver.registerListener(event -> {
+            if (set.get()) {
+                Assertions.assertEquals(PlayerHasJoinEventData.ID, event.getId());
+                Assertions.assertEquals("Giacomo", ((PlayerHasJoinEventData) event).getUsername());
+            }
+        });
+
+        game.startGame();
+
+        game.disconnectPlayer("Giacomo");
+
+        set.set(true);
+        game.addPlayer("Giacomo");
+    }
+
+    @Test
+    void disconnectPlayer_singleSignalsEmitted_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
+        AtomicBoolean setPlayer = new AtomicBoolean(false);
+        AtomicBoolean setCurrent = new AtomicBoolean(false);
+
+        AtomicBoolean callPlayerHasJoinEventData = new AtomicBoolean(false);
+        AtomicBoolean callCurrentPlayerChangedEventData = new AtomicBoolean(false);
+
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        PlayerHasDisconnectedEventData.castEventReceiver(transceiver).registerListener(event -> {
+            if (setPlayer.get()) {
+                Assertions.assertEquals("Giacomo", event.getUsername());
+                callPlayerHasJoinEventData.set(true);
+            }
+        });
+
+        CurrentPlayerChangedEventData.castEventReceiver(transceiver).registerListener(event -> {
+            if (setCurrent.get()) {
+                Assertions.assertEquals("Michele", event.getUsername());
+                callCurrentPlayerChangedEventData.set(true);
+            }
+        });
+
+        game.startGame();
+
+        setCurrent.set(true);
+        game.disconnectPlayer("Giacomo");
+
+        Assertions.assertTrue(callCurrentPlayerChangedEventData.get());
+
+        game.disconnectPlayer("Giacomo");
+
+        Assertions.assertFalse(callPlayerHasJoinEventData.get());
+    }
+
+    @Test
+    void hasPlayerDisconnected_onePlayerDisconnected_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+
+        game.disconnectPlayer("Giacomo");
+
+        Assertions.assertTrue(game.hasPlayerDisconnected());
+        game.disconnectPlayer("Michele");
+        Assertions.assertTrue(game.hasPlayerDisconnected());
+
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+
+        Assertions.assertFalse(game.hasPlayerDisconnected());
     }
 }
 

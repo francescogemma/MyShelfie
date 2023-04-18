@@ -2,11 +2,11 @@ package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.controller.db.DBManager;
 import it.polimi.ingsw.event.LocalEventTransceiver;
-import it.polimi.ingsw.event.data.clientEvent.DeselectTileEventData;
-import it.polimi.ingsw.event.data.clientEvent.InsertTileEventData;
-import it.polimi.ingsw.event.data.clientEvent.SelectTileEventData;
-import it.polimi.ingsw.event.data.clientEvent.StartGameEventData;
-import it.polimi.ingsw.event.data.gameEvent.*;
+import it.polimi.ingsw.event.data.client.DeselectTileEventData;
+import it.polimi.ingsw.event.data.client.InsertTileEventData;
+import it.polimi.ingsw.event.data.client.SelectTileEventData;
+import it.polimi.ingsw.event.data.client.StartGameEventData;
+import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
 import it.polimi.ingsw.model.board.RemoveNotLastSelectedException;
@@ -57,6 +57,12 @@ public class GameController {
                 return new Response(e.toString(), ResponseStatus.FAILURE);
             }
 
+            this.clients.forEach(view ->
+                    view.getNetworkTransmitter().broadcast(
+                            new PlayerHasJoinEventData(newClient.getUsername())
+                    )
+            );
+
             clients.add(newClient);
         }
 
@@ -69,7 +75,7 @@ public class GameController {
         );
 
         DeselectTileEventData.responder(newClient.getNetworkTransmitter(), newClient.getNetworkReceiver(), event ->
-                this.deselectTile(newClient.getUsername(), event.getCoordinate())
+                this.deselectTile(newClient.getUsername(), event.coordinate())
         );
 
         return new Response("You've joined the game", ResponseStatus.SUCCESS);
@@ -153,6 +159,15 @@ public class GameController {
     public boolean contains(VirtualView virtualView) {
         synchronized (this) {
             return this.clients.contains(virtualView);
+        }
+    }
+
+    /**
+     * @return true iff game is not started or game has at least one player disconnected
+     * */
+    public boolean isAvailableForJoin () {
+        synchronized (this) {
+            return !this.game.isStarted() || this.game.hasPlayerDisconnected();
         }
     }
 

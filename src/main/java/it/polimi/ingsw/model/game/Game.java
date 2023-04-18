@@ -2,10 +2,10 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.controller.db.Identifiable;
 import it.polimi.ingsw.event.LocalEventTransceiver;
-import it.polimi.ingsw.event.data.gameEvent.*;
-import it.polimi.ingsw.event.transmitter.EventTransmitter;
+import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.model.bag.Bag;
 import it.polimi.ingsw.model.board.Board;
+import it.polimi.ingsw.model.board.BoardView;
 import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
 import it.polimi.ingsw.model.goal.AdjacencyGoal;
@@ -36,7 +36,7 @@ public class Game implements Identifiable {
     /*
      * The optional winner of the game.
      */
-    private final List<Player> winner = new ArrayList<>();
+    private final List<Player> winners = new ArrayList<>();
 
     /**
      * The common goals of the game.
@@ -66,7 +66,7 @@ public class Game implements Identifiable {
      */
     private int currentPlayerIndex;
 
-    private transient EventTransmitter transceiver;
+    private transient LocalEventTransceiver transceiver;
 
     /**
      * Creates a new game with the given name.
@@ -117,7 +117,7 @@ public class Game implements Identifiable {
      * @return true iff the game is over, false otherwise
      */
     public boolean isOver () {
-        return !winner.isEmpty();
+        return !winners.isEmpty();
     }
 
     /**
@@ -148,6 +148,7 @@ public class Game implements Identifiable {
                 }
 
                 otherPlayer.setConnectionState(true);
+                this.transceiver.broadcast(new PlayerHasJoinEventData(otherPlayer.getUsername()));
                 return otherPlayer;
             }
         }
@@ -180,9 +181,10 @@ public class Game implements Identifiable {
 
         player.setConnectionState(false);
 
-        if (this.players.get(currentPlayerIndex).equals(player)) {
-            calculateNextPlayer();
-            this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex)));
+        if (isStarted() && (this.players.get(currentPlayerIndex).equals(player))) {
+                calculateNextPlayer();
+                this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex)));
+
         }
 
         this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
@@ -230,12 +232,12 @@ public class Game implements Identifiable {
     /**
      * @return whether the game is over or not.
      */
-    public List<PlayerView> getWinner () throws IllegalFlowException {
+    public List<PlayerView> getWinners() throws IllegalFlowException {
         if (!isOver()) {
             throw new IllegalFlowException("There is no winner until the game is over");
         }
 
-        return winner.stream().map(PlayerView::getView).toList();
+        return winners.stream().map(PlayerView::getView).toList();
     }
 
     /**
@@ -259,12 +261,12 @@ public class Game implements Identifiable {
     }
 
     public void forgetLastSelection(String username, Coordinate c) throws IllegalFlowException {
-        if (isStarted) throw new IllegalFlowException("Game is not started");
+        if (isStarted()) throw new IllegalFlowException("Game is not started");
         if (isOver()) throw new IllegalFlowException("Game has ended");
         if (!getCurrentPlayer().getUsername().equals(username)) throw new IllegalFlowException("It's not your turn");
 
         this.board.forgetSelected(c);
-        this.transceiver.broadcast(new BoardChangedEventData(board));
+        this.transceiver.broadcast(new BoardChangedEventData(board.getView()));
     }
 
     /**
@@ -319,7 +321,7 @@ public class Game implements Identifiable {
         }
 
         if (hasChanged) {
-            this.transceiver.broadcast(new BoardChangedEventData(this.board));
+            this.transceiver.broadcast(new BoardChangedEventData(this.board.getView()));
         }
     }
 
@@ -351,17 +353,17 @@ public class Game implements Identifiable {
                 }
 
                 for (Player player : players) {
-                    int max = this.winner.isEmpty() ? 0 : winner.get(0).getPoints();
+                    int max = this.winners.isEmpty() ? 0 : winners.get(0).getPoints();
 
                     if (player.getPoints() >= max) {
                         if (player.getPoints() > max)
-                            winner.clear();
+                            winners.clear();
 
-                        winner.add(player);
+                        winners.add(player);
                     }
                 }
 
-                this.transceiver.broadcast(new GameOverEventData(winner.stream().map(PlayerView::createView).toList()));
+                this.transceiver.broadcast(new GameOverEventData(winners.stream().map(PlayerView::createView).toList()));
             } else {
                 this.refillBoardIfNecessary();
 
@@ -400,7 +402,7 @@ public class Game implements Identifiable {
         if (this.getCurrentPlayer().equals(player))
             throw new IllegalFlowException();
 
-        List<Tile> t = board.getSelectableTiles();
+        List<Tile> t = board.getSelectedTiles();
 
         if (t.isEmpty())
             throw new IllegalExtractionException();
@@ -408,7 +410,7 @@ public class Game implements Identifiable {
         player.getBookshelf().insertTiles(t, col);
         board.draw();
 
-        this.transceiver.broadcast(new BoardChangedEventData(board));
+        this.transceiver.broadcast(new BoardChangedEventData(board.getView()));
 
         for (CommonGoal commonGoal: this.commonGoals) {
             int points = commonGoal.calculatePoints(player.getBookshelf());
@@ -436,7 +438,19 @@ public class Game implements Identifiable {
         this.transceiver.broadcast(new BoardChangedEventData(board.getView()));
     }
 
+    public BoardView getBoard () {
+        return board.getView();
+    }
+
     public boolean isStarted() {
         return this.isStarted;
+    }
+
+    public boolean hasPlayerDisconnected () {
+        for (Player player: this.players) {
+            if (!player.isConnected())
+                return true;
+        }
+        return false;
     }
 }

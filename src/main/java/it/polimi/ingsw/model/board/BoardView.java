@@ -213,7 +213,7 @@ public class BoardView {
 
     @Override
     public String toString () {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder().append("\n");
         for (Tile[] tile : this.tiles) {
             for (Tile value : tile) {
                 if (value == null) {

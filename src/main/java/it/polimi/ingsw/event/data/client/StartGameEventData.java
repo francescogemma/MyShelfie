@@ -1,4 +1,4 @@
-package it.polimi.ingsw.event.data.clientEvent;
+package it.polimi.ingsw.event.data.client;
 
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.Responder;
@@ -9,30 +9,21 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
-public class InsertTileEventData implements EventData {
-    public static final String ID = "INSERT_TILE";
-    private final int column;
+public class StartGameEventData implements EventData {
+    public static final String ID = "START_GAME";
 
-    public InsertTileEventData(int column) {
-        this.column = column;
-    }
-
-    public int getColumn () {
-        return this.column;
-    }
-
-    public static <T extends InsertTileEventData> CastEventReceiver<T> castEventReceiver(EventReceiver<EventData> receiver) {
+    public static CastEventReceiver<StartGameEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }
 
-    public static <T extends EventData> Requester<InsertTileEventData, T> requester(EventTransmitter transmitter,
+    public static <T extends EventData> Requester<StartGameEventData, T> requester(EventTransmitter transmitter,
                                                                                   EventReceiver<EventData> receiver) {
         return new Requester<>(ID, transmitter, receiver);
     }
 
-    public static <T extends EventData> Responder<InsertTileEventData, T> responder(EventTransmitter transmitter,
+    public static <T extends EventData> Responder<StartGameEventData, T> responder(EventTransmitter transmitter,
                                                                                   EventReceiver<EventData> receiver,
-                                                                                  Function<InsertTileEventData, T> response) {
+                                                                                  Function<StartGameEventData, T> response) {
         return new Responder<>(ID, transmitter, receiver, response);
     }
 

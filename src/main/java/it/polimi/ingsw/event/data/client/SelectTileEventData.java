@@ -1,4 +1,4 @@
-package it.polimi.ingsw.event.data.clientEvent;
+package it.polimi.ingsw.event.data.client;
 
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.Responder;
@@ -10,11 +10,11 @@ import it.polimi.ingsw.utils.Coordinate;
 
 import java.util.function.Function;
 
-public class DeselectTileEventData implements EventData {
-    public static final String ID = "DESELECT_TILE";
+public class SelectTileEventData implements EventData {
+    public static final String ID = "SELECT_TILE";
     private final Coordinate coordinate;
 
-    public DeselectTileEventData(Coordinate coordinate) {
+    public SelectTileEventData(Coordinate coordinate) {
         this.coordinate = coordinate;
     }
 
@@ -22,18 +22,18 @@ public class DeselectTileEventData implements EventData {
         return this.coordinate;
     }
 
-    public static <T extends DeselectTileEventData> CastEventReceiver<T> castEventReceiver(EventReceiver<EventData> receiver) {
+    public static CastEventReceiver<SelectTileEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }
 
-    public static <T extends EventData> Requester<DeselectTileEventData, T> requester(EventTransmitter transmitter,
+    public static <T extends EventData> Requester<SelectTileEventData, T> requester(EventTransmitter transmitter,
                                                                                   EventReceiver<EventData> receiver) {
         return new Requester<>(ID, transmitter, receiver);
     }
 
-    public static <T extends EventData> Responder<DeselectTileEventData, T> responder(EventTransmitter transmitter,
+    public static <T extends EventData> Responder<SelectTileEventData, T> responder(EventTransmitter transmitter,
                                                                                   EventReceiver<EventData> receiver,
-                                                                                  Function<DeselectTileEventData, T> response) {
+                                                                                  Function<SelectTileEventData, T> response) {
         return new Responder<>(ID, transmitter, receiver, response);
     }
 
