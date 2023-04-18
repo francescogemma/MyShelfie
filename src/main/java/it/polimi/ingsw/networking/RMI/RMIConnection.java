@@ -1,6 +1,7 @@
 package it.polimi.ingsw.networking.RMI;
 
 import it.polimi.ingsw.networking.Connection;
+import it.polimi.ingsw.networking.ConnectionException;
 import it.polimi.ingsw.networking.DisconnectedException;
 
 import java.rmi.RemoteException;
@@ -71,8 +72,7 @@ public class RMIConnection implements Connection {
             remoteContainer = (RMIStringContainer) registry.lookup(connectionName + "SERVER");
 
         } catch (Exception exception) {
-            // instead of crashing the program, count this error as a disconnection.
-            disconnected = true;
+            throw new ConnectionException();
         }
 
         heartbeat();
