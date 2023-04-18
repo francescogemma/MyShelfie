@@ -9,6 +9,8 @@ import it.polimi.ingsw.model.goal.PersonalGoal;
  * @author Francesco Gemma
  */
 public class Player extends PlayerView {
+    private PersonalGoal personalGoal;
+
     /**
      * Constructor of the class.
      * Sets the name of the player, his points to 0 and creates a new {@link Bookshelf bookshelf}.

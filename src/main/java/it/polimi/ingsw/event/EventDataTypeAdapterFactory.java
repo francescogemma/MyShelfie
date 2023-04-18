@@ -10,9 +10,7 @@ import com.google.gson.stream.JsonWriter;
 import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.LoginEventData;
-import it.polimi.ingsw.event.data.clientEvent.CreateNewGameEventData;
-import it.polimi.ingsw.event.data.clientEvent.JoinGameEventData;
-import it.polimi.ingsw.event.data.clientEvent.StartGameEventData;
+import it.polimi.ingsw.event.data.clientEvent.*;
 import it.polimi.ingsw.event.data.gameEvent.*;
 import it.polimi.ingsw.event.data.wrapper.SyncEventDataWrapper;
 
@@ -35,7 +33,10 @@ public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
             Map.entry(JoinGameEventData.ID, JoinGameEventData.class),
             Map.entry(GameIsNoLongerAvailableEventData.ID, GameIsNoLongerAvailableEventData.class),
             Map.entry(StartGameEventData.ID, StartGameEventData.class),
-            Map.entry(CreateNewGameEventData.ID, CreateNewGameEventData.class)
+            Map.entry(CreateNewGameEventData.ID, CreateNewGameEventData.class),
+            Map.entry(InsertTileEventData.ID, InsertTileEventData.class),
+            Map.entry(SelectTileEventData.ID, SelectTileEventData.class),
+            Map.entry(DeselectTileEventData.ID, DeselectTileEventData.class)
     );
 
     private static final Map<String, Type> WRAPPER_DATA_TYPES = Map.of(

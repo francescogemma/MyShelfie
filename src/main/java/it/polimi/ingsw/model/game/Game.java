@@ -182,7 +182,7 @@ public class Game implements Identifiable {
 
         if (this.players.get(currentPlayerIndex).equals(player)) {
             calculateNextPlayer();
-            this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex).getUsername()));
+            this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex)));
         }
 
         this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
@@ -382,10 +382,11 @@ public class Game implements Identifiable {
                 // set new turn
                 this.currentPlayerIndex = index;
 
-                this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex).getUsername()));
+                this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex).getView()));
             }
         } else {
             this.currentPlayerIndex = 0;
+            this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex).getView()));
         }
     }
 
@@ -432,24 +433,7 @@ public class Game implements Identifiable {
             throw new IllegalFlowException("Game is over");
 
         this.board.selectTile(coordinate);
-    }
-
-    /**
-     * @param player winner of the game
-     * @throws IllegalArgumentException iff player is not in this game
-     * @throws IllegalFlowException
-     *  <ul>
-     *      <li> winner is already set </li>
-     *      <li> game is not started </li>
-     *  </ul>
-     * @see Player
-     * */
-    private void setWinner(Player player) throws IllegalFlowException {
-        if (!this.isStarted)
-            throw new IllegalFlowException();
-        if (!this.players.contains(player))
-            throw new IllegalArgumentException(player + " is not in this game" + this);
-        winner.add(player);
+        this.transceiver.broadcast(new BoardChangedEventData(board.getView()));
     }
 
     public boolean isStarted() {

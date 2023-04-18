@@ -11,7 +11,6 @@ import java.awt.print.Book;
 public class PlayerView {
     protected String username;
     protected Bookshelf bookshelf;
-    protected PersonalGoal personalGoal;
     protected int points;
     protected boolean isConnected;
     protected boolean[] achievedCommonGoals;
@@ -25,9 +24,6 @@ public class PlayerView {
 
         this.points = other.points;
         this.isConnected = other.isConnected;
-
-        // we should not have a getter for PersonalGoal
-        //this.personalGoal = other.personalGoal.clone();
 
         this.achievedCommonGoals = new boolean[2];
         System.arraycopy(other.achievedCommonGoals, 0, this.achievedCommonGoals, 0, 2);

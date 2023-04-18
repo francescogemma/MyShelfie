@@ -2,6 +2,9 @@ package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.controller.db.DBManager;
 import it.polimi.ingsw.event.LocalEventTransceiver;
+import it.polimi.ingsw.event.data.clientEvent.DeselectTileEventData;
+import it.polimi.ingsw.event.data.clientEvent.InsertTileEventData;
+import it.polimi.ingsw.event.data.clientEvent.SelectTileEventData;
 import it.polimi.ingsw.event.data.clientEvent.StartGameEventData;
 import it.polimi.ingsw.event.data.gameEvent.*;
 import it.polimi.ingsw.model.board.FullSelectionException;
@@ -20,14 +23,13 @@ import java.util.List;
 public class GameController {
     private final Game game;
     private final List<VirtualView> clients;
-    private final LocalEventTransceiver transceiver;
 
     public GameController(Game game) {
         this.game = game;
         this.clients = new ArrayList<>();
-        this.transceiver = new LocalEventTransceiver();
 
-        game.setTransceiver(this.transceiver);
+        final LocalEventTransceiver transceiver = new LocalEventTransceiver();
+        game.setTransceiver(transceiver);
 
         transceiver.registerListener(event ->
                 clients.forEach(
@@ -58,17 +60,25 @@ public class GameController {
             clients.add(newClient);
         }
 
-        StartGameEventData.responder(newClient.getNetworkTransmitter(), newClient.getNetworkReceiver(), event -> {
-            return this.startGame(newClient);
-        });
+        StartGameEventData.responder(newClient.getNetworkTransmitter(), newClient.getNetworkReceiver(), event -> this.startGame(newClient));
+        InsertTileEventData.responder(newClient.getNetworkTransmitter(), newClient.getNetworkReceiver(), event ->
+                this.insertSelectedTilesInBookshelf(newClient, event.getColumn())
+        );
+        SelectTileEventData.responder(newClient.getNetworkTransmitter(), newClient.getNetworkReceiver(), event ->
+                this.selectTile(newClient, event.getCoordinate())
+        );
+
+        DeselectTileEventData.responder(newClient.getNetworkTransmitter(), newClient.getNetworkReceiver(), event ->
+                this.deselectTile(newClient.getUsername(), event.getCoordinate())
+        );
 
         return new Response("You've joined the game", ResponseStatus.SUCCESS);
     }
 
-    public Response selectTile(String username, Coordinate coordinate) {
+    private Response selectTile(VirtualView view, Coordinate coordinate) {
         synchronized (this) {
             try {
-                this.game.selectTile(username, coordinate);
+                this.game.selectTile(view.getUsername(), coordinate);
             } catch (IllegalExtractionException | FullSelectionException | IllegalFlowException e) {
                 return new Response(e.toString(), ResponseStatus.FAILURE);
             }
@@ -77,7 +87,7 @@ public class GameController {
         }
     }
 
-    public Response deselectTile(String username, Coordinate coordinate) {
+    private Response deselectTile(String username, Coordinate coordinate) {
         synchronized (this) {
             try {
                 this.game.forgetLastSelection(username, coordinate);
@@ -89,10 +99,10 @@ public class GameController {
         }
     }
 
-    public Response insertSelectedTilesInBookshelf(String username, int column) {
+    private Response insertSelectedTilesInBookshelf(VirtualView view, int column) {
         synchronized (this) {
             try {
-                this.game.insertTile(username, column);
+                this.game.insertTile(view.getUsername(), column);
                 return new Response("Ok!", ResponseStatus.SUCCESS);
             } catch (IllegalExtractionException | IllegalFlowException e) {
                 return new Response(e.getMessage(), ResponseStatus.FAILURE);
