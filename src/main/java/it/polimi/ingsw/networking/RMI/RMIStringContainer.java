@@ -10,7 +10,7 @@ public class RMIStringContainer implements StringRemote {
     /**
      * Received message will be stored here.
      */
-    String string;
+    private String string;
 
     /**
      * Object constructor that simply sets the string to null.

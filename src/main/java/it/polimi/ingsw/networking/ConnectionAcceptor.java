@@ -17,26 +17,12 @@ public class ConnectionAcceptor implements NameProvidingRemote {
      * This constructor needs both ports, because this particular object will be used
      * server-side. These ports will listen for communications from {@link Connection connections}.
      *
-     * @param TCPPort is the port used to listen for Socket communications.
-     * @param RMIPort is the port used to listen for RMI communications.
      */
-    public ConnectionAcceptor(int TCPPort, int RMIPort) {
-        this.TCPPort = TCPPort;
-        this.RMIPort = RMIPort;
+    public ConnectionAcceptor() {
 
         // whatever is contained in RMIConnection is as good as "null".
         cacheValid = false;
     }
-
-    /**
-     * Port used for TCP connection.
-     */
-    private final int TCPPort;
-
-    /**
-     * Port used for RMI connection.
-     */
-    private final int RMIPort;
 
     /**
      * Indicates the index of the most recent RMI connection couple's name.
@@ -78,13 +64,15 @@ public class ConnectionAcceptor implements NameProvidingRemote {
     @Override
     public String getNewCoupleName() throws RemoteException {
         // increment index and decorate it.
+        System.out.println("Giving the following name to requester: " + (lastRMIConnectionIndex + 1));
         return "CONNECTION" + ++lastRMIConnectionIndex;
     }
 
     @Override
     public void createRemoteConnection(String name) throws RemoteException {
         // override the current stashed RMIConnection
-        this.RMIConnection = new RMIConnection(null, RMIPort, name);
+        System.out.println("Storing a new connection named " + name + "SERVER");
+        this.RMIConnection = new RMIConnection(1098, 1099, name);
         cacheValid = true;
     }
 }
