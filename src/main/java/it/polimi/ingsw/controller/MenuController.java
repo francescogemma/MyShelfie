@@ -3,7 +3,9 @@ package it.polimi.ingsw.controller;
 import it.polimi.ingsw.controller.db.IdentifiableNotFoundException;
 import it.polimi.ingsw.event.Responder;
 import it.polimi.ingsw.event.data.LoginEventData;
+import it.polimi.ingsw.event.data.clientEvent.CreateNewGameEventData;
 import it.polimi.ingsw.event.data.clientEvent.JoinGameEventData;
+import it.polimi.ingsw.event.data.clientEvent.StartGameEventData;
 import it.polimi.ingsw.event.data.gameEvent.GameHasBeenCreatedEventData;
 import it.polimi.ingsw.event.data.gameEvent.GameHasStartedEventData;
 import it.polimi.ingsw.model.game.Game;
@@ -12,6 +14,7 @@ import it.polimi.ingsw.controller.db.DBManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 public class MenuController {
@@ -126,16 +129,15 @@ public class MenuController {
 
                 // TODO we need to set here the new connection from client to server
                 JoinGameEventData.responder(virtualView.getNetworkTransmitter(), virtualView.getNetworkReceiver(), event -> {
-                    Optional<GameController> gameController = this.getGameController(event.getGameName());
-
-                    if (gameController.isPresent()) {
-                        return gameController.get().join(virtualView);
-                    } else {
-                        return new Response("Ciao", ResponseStatus.FAILURE);
-                    }
+                    return this.joinGame(virtualView, event.getGameName());
                 });
 
-                return new Response("You are login", ResponseStatus.SUCCESS);
+                CreateNewGameEventData.responder(virtualView.getNetworkTransmitter(), virtualView.getNetworkReceiver(), event -> {
+                    if (virtualView.isInGame()) {
+                        return new Response("You can't create a game if you are in a game...", ResponseStatus.FAILURE);
+                    }
+                    return this.createNewGame(event.getGameName());
+                });
             }
             return new Response("You are not login", ResponseStatus.FAILURE);
         });
@@ -164,10 +166,19 @@ public class MenuController {
     }
 
     public Response joinGame(VirtualView virtualView, String gameName) {
+        if (virtualView.isInGame()) {
+            return new Response("You are already in a game", ResponseStatus.FAILURE);
+        }
+
         synchronized (gameControllerList) {
             for (GameController gameController: this.gameControllerList) {
                 if (gameController.gameName().equals(gameName)) {
-                    return gameController.join(virtualView);
+
+                    Response response = gameController.join(virtualView);
+
+                    if (response.isOk()) {
+                        virtualView.setGameController(gameController);
+                    }
                 }
             }
         }

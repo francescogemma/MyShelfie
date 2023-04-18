@@ -2,6 +2,7 @@ package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.controller.db.DBManager;
 import it.polimi.ingsw.event.LocalEventTransceiver;
+import it.polimi.ingsw.event.data.clientEvent.StartGameEventData;
 import it.polimi.ingsw.event.data.gameEvent.*;
 import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
@@ -55,9 +56,13 @@ public class GameController {
             }
 
             clients.add(newClient);
-
-            return new Response("You've joined the game", ResponseStatus.SUCCESS);
         }
+
+        StartGameEventData.responder(newClient.getNetworkTransmitter(), newClient.getNetworkReceiver(), event -> {
+            return this.startGame(newClient);
+        });
+
+        return new Response("You've joined the game", ResponseStatus.SUCCESS);
     }
 
     public Response selectTile(String username, Coordinate coordinate) {
@@ -95,10 +100,10 @@ public class GameController {
         }
     }
 
-    public Response startGame(String username) {
+    private Response startGame(VirtualView view) {
         synchronized (this) {
             try {
-                if (!username.equals(game.getStartingPlayer().getUsername())) {
+                if (!view.getUsername().equals(game.getStartingPlayer().getUsername())) {
                     return new Response("Only the starting player: " + game.getStartingPlayer().getUsername() +
                         " can start the game", ResponseStatus.FAILURE);
                 }
@@ -132,6 +137,12 @@ public class GameController {
             }
 
             return new Response("You're not connected to the game", ResponseStatus.FAILURE);
+        }
+    }
+
+    public boolean contains(VirtualView virtualView) {
+        synchronized (this) {
+            return this.clients.contains(virtualView);
         }
     }
 

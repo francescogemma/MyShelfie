@@ -28,6 +28,10 @@ public class Response implements EventData {
         return status;
     }
 
+    public boolean isOk () {
+        return status == ResponseStatus.SUCCESS;
+    }
+
     public static <T extends Response> CastEventReceiver<T> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }

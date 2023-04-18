@@ -6,10 +6,8 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
-import it.polimi.ingsw.model.game.PlayerView;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 

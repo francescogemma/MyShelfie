@@ -291,6 +291,5 @@ class GameTest {
 
         Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
     }
-
 }
 
