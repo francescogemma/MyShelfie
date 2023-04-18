@@ -13,11 +13,6 @@ public class RMIStringContainer implements StringRemote {
     String string;
 
     /**
-     * We'll use the same port number through all RMI objects.
-     */
-    public static int STANDARD_PORT = 9080;
-
-    /**
      * Object constructor that simply sets the string to null.
      */
     public RMIStringContainer() { string = null; }

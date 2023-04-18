@@ -45,33 +45,31 @@ public class RMIConnection implements Connection {
      * This constructor creates a connection with some {@link it.polimi.ingsw.networking.ConnectionAcceptor acceptor}.
      * This acceptor will then pair this object with another {@link Connection connection}.
      *
-     * @param name will identify this connection and the newly created server-side connection in the registry.
-     *             It will do so by appending the suffix "Client" and "Server" to this parameter.
+     * @param port is the port that will be used for RMI (9080 suggested)
      */
-    public RMIConnection(String name) {
+    public RMIConnection(String address, int port) {
         // start, assuming connection is working correctly
         disconnected = false;
 
         try {
-            // get the registry with no arguments.
-            // which means we're using the local host address.
-            Registry registry = LocateRegistry.getRegistry();
-
             // create and export our stringContainer
             stringContainer = new RMIStringContainer();
             StringRemote stub = (StringRemote) UnicastRemoteObject.exportObject(
-                    stringContainer, RMIStringContainer.STANDARD_PORT
+                    stringContainer, port
             );
 
-            // bind it to the registry
-            registry.bind(name, stub);
-
-            // get the server object, to get another connection to pair up with.
+            // get the server object, and ask to reserve a new name for the couple.
+            Registry registry = LocateRegistry.getRegistry(address);
             NameProvidingRemote server = (NameProvidingRemote) registry.lookup("Server");
+            String connectionName = server.getNewCoupleName();
 
-            // use the information provided by the server to pair with the other connection
-            String otherConnectionName = server.getRemoteConnectionName(name);
-            remoteContainer = (RMIStringContainer) registry.lookup(otherConnectionName);
+            // bind self to the registry, and tell the server to create its own connection.
+            registry.bind(connectionName + "CLIENT", stub);
+            server.createRemoteConnection(connectionName + "SERVER");
+
+            // get the newly created server-side object.
+            remoteContainer = (RMIStringContainer) registry.lookup(connectionName + "SERVER");
+
         } catch (Exception exception) {
             // instead of crashing the program, count this error as a disconnection.
             disconnected = true;
@@ -83,29 +81,27 @@ public class RMIConnection implements Connection {
     /**
      * This constructor does NOT request names to an {@link it.polimi.ingsw.networking.ConnectionAcceptor acceptor},
      * and should only be used BY an acceptor to generate new connections, while already knowing the target's name.
+     * This method should NOT be called client-side.
      *
-     * @param name this connection's name
-     * @param targetName the name of the target connection.
+     * @param connectionName the name of the connection pair.
      */
-    public RMIConnection(String name, String targetName) {
+    public RMIConnection(String address, int port, String connectionName) {
         // start, assuming connection is working correctly
         disconnected = false;
 
         try {
-            // get the registry with no arguments.
-            // which means we're using the local host address.
-            Registry registry = LocateRegistry.getRegistry();
-
             // create and export our stringContainer
             stringContainer = new RMIStringContainer();
             StringRemote stub = (StringRemote) UnicastRemoteObject.exportObject(
-                    stringContainer, RMIStringContainer.STANDARD_PORT
+                    stringContainer, port
             );
 
-            // bind it to the registry
-            registry.bind(name, stub);
+            // bind it to the registry, assuming this method is called server side.
+            Registry registry = LocateRegistry.getRegistry(address);
+            registry.bind(connectionName + "SERVER", stub);
 
-            remoteContainer = (RMIStringContainer) registry.lookup(targetName);
+            // we assume the client object is created BEFORE the server object.
+            remoteContainer = (RMIStringContainer) registry.lookup(connectionName + "CLIENT");
         } catch (Exception exception) {
             // instead of crashing the program, count this error as a disconnection.
             disconnected = true;
