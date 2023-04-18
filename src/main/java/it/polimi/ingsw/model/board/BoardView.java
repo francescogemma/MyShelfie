@@ -210,4 +210,20 @@ public class BoardView {
     public BoardView getView () {
         return new BoardView(this);
     }
+
+    @Override
+    public String toString () {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Tile[] tile : this.tiles) {
+            for (Tile value : tile) {
+                if (value == null) {
+                    stringBuilder.append("[ ]");
+                } else {
+                    stringBuilder.append(value.getColor().color("[#]"));
+                }
+            }
+            stringBuilder.append("\n");
+        }
+        return stringBuilder.toString();
+    }
 }

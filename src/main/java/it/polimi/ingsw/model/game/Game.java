@@ -194,13 +194,13 @@ public class Game implements Identifiable {
      * @throws IllegalFlowException if there are less than two players.
      */
     public void startGame() throws IllegalFlowException {
-        if (players.size() < 2) {
+        if (players.size() < 2)
             throw new IllegalFlowException("You need at least two players in order to start the game");
-        }
 
+        this.isStarted = true;
+        this.refillBoardIfNecessary();
         this.currentPlayerIndex = FIRST_PLAYER_INDEX;
         this.commonGoals = CommonGoal.getTwoRandomCommonGoals(players.size());
-        isStarted = true;
         this.transceiver.broadcast(new GameHasStartedEventData());
     }
 
@@ -230,12 +230,12 @@ public class Game implements Identifiable {
     /**
      * @return whether the game is over or not.
      */
-    public List<Player> getWinner () throws IllegalFlowException {
+    public List<PlayerView> getWinner () throws IllegalFlowException {
         if (!isOver()) {
             throw new IllegalFlowException("There is no winner until the game is over");
         }
 
-        return new ArrayList<>(winner);
+        return winner.stream().map(PlayerView::getView).toList();
     }
 
     /**
@@ -306,7 +306,7 @@ public class Game implements Identifiable {
 
         boolean hasChanged = false;
 
-        while (bag.isEmpty()) {
+        while (!bag.isEmpty()) {
             Tile t = this.bag.getRandomTile();
 
             try {

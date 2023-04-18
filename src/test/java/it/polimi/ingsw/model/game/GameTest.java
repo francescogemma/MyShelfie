@@ -1,8 +1,17 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.event.LocalEventTransceiver;
+import it.polimi.ingsw.event.data.gameEvent.BoardChangedEventData;
+import it.polimi.ingsw.event.data.gameEvent.GameHasStartedEventData;
 import it.polimi.ingsw.event.data.gameEvent.PlayerHasDisconnectedEventData;
 import it.polimi.ingsw.event.data.gameEvent.PlayerHasJoinEventData;
+import it.polimi.ingsw.model.bag.Bag;
+import it.polimi.ingsw.model.board.Board;
+import it.polimi.ingsw.model.board.BoardView;
+import it.polimi.ingsw.model.board.FullSelectionException;
+import it.polimi.ingsw.model.board.IllegalExtractionException;
+import it.polimi.ingsw.model.tile.Tile;
+import it.polimi.ingsw.utils.Coordinate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +26,21 @@ import java.util.concurrent.atomic.AtomicReference;
 class GameTest {
     private Game game;
     private LocalEventTransceiver transceiver;
+
+    private Board getBoardFull (int numberOfPlayers) {
+        Bag bag = new Bag();
+        Board board = new Board();
+
+        while (!bag.isEmpty()) {
+            Tile t = bag.getRandomTile();
+            try {
+                board.fillRandomly(t, numberOfPlayers);
+            } catch (Exception e) {
+                break;
+            }
+        }
+        return board;
+    }
 
     @BeforeEach
     void setUp () {
@@ -290,6 +314,56 @@ class GameTest {
         game.disconnectPlayer("Michele");
 
         Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
+    }
+
+    @Test
+    void startGame_signals_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException {
+        AtomicBoolean call = new AtomicBoolean(false);
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+
+        GameHasStartedEventData.castEventReceiver(transceiver).registerListener(event -> {
+            call.set(true);
+        });
+
+        game.startGame();
+
+        Assertions.assertTrue(call.get());
+    }
+
+    @Test
+    void selectTile__correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException, IllegalExtractionException, FullSelectionException {
+        AtomicBoolean call = new AtomicBoolean(false);
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        game.startGame();
+
+        BoardChangedEventData.castEventReceiver(transceiver).registerListener(event -> {
+            call.set(true);
+        });
+
+        game.selectTile("Giacomo", new Coordinate(4, 0));
+
+        Assertions.assertTrue(call.get());
+
+        call.set(false);
+        try {
+            game.selectTile("Giacomo", new Coordinate(4, 3));
+            assert false: "This functions should throw IllegalExtractionException";
+        } catch (IllegalExtractionException e) {
+
+        }
+
+        Assertions.assertFalse(call.get());
+    }
+
+    @Test
+    void test () {
+        BoardView boardView = new Board().getView();
+        Board board = new Board();
+        Assertions.assertEquals(board.getView(), boardView);
     }
 }
 

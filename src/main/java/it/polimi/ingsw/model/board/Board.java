@@ -4,10 +4,6 @@ import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.utils.Coordinate;
 
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
-import static java.lang.Math.*;
 
 /**
  * Board manager
@@ -206,5 +202,14 @@ public class Board extends BoardView {
             result.append("\n");
         }
         return result.toString();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == this)
+            return true;
+        if (other == null || other.getClass() != this.getClass())
+            return false;
+        return super.equals(other);
     }
 }
