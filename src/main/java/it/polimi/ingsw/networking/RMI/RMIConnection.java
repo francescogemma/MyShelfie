@@ -49,6 +49,8 @@ public class RMIConnection implements Connection {
         // start, assuming connection is working correctly
         disconnected = false;
 
+        System.out.println("Starting RMIConnection by calling server!");
+
         try {
             // create and export our stringContainer
             stringContainer = new RMIStringContainer();
@@ -61,14 +63,21 @@ public class RMIConnection implements Connection {
             NameProvidingRemote server = (NameProvidingRemote) serverRegistry.lookup("SERVER");
             String connectionName = server.getNewCoupleName();
 
+            System.out.println("Found a name for me: " + connectionName + "CLIENT.");
+
             // bind self to the registry, and tell the server to create its own connection.
             Registry clientRegistry = LocateRegistry.createRegistry(clientPort);
             clientRegistry.bind(connectionName + "CLIENT", stub);
             server.createRemoteConnection(connectionName);
 
+            System.out.println("Just told the server to create a new connection on its side.");
+
+
             // get the newly created server-side object.
-            System.out.println("Looking up on server registry: \"" + connectionName + "SERVER\"");
+            System.out.println("Looking up on server registry: \"" + connectionName + "SERVER\".");
             remoteContainer = (StringRemote) serverRegistry.lookup(connectionName + "SERVER");
+
+            System.out.println("Found it.");
 
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -88,6 +97,8 @@ public class RMIConnection implements Connection {
         // start, assuming connection is working correctly
         disconnected = false;
 
+        System.out.println("Starting RMIConnection with target \"" + connectionName + "SERVER\"!");
+
         try {
             // create and export our stringContainer
             stringContainer = new RMIStringContainer();
@@ -103,13 +114,12 @@ public class RMIConnection implements Connection {
             Registry clientRegistry = LocateRegistry.getRegistry(clientPort);
 
             // we assume the client object is created BEFORE the server object.
-            remoteContainer = (RMIStringContainer) clientRegistry.lookup(connectionName + "CLIENT");
+            remoteContainer = (StringRemote) clientRegistry.lookup(connectionName + "CLIENT");
         } catch (Exception exception) {
-            // instead of crashing the program, count this error as a disconnection.
-            disconnected = true;
+            exception.printStackTrace();
         }
 
-        heartbeat();
+        // we're NOT starting heartbeat here. we'll start it once the connectionAcceptor user calls "accept".
     }
 
     @Override
@@ -149,7 +159,7 @@ public class RMIConnection implements Connection {
     /**
      * Starts a timer that pings the target, to check for connectivity.
      */
-    private void heartbeat() {
+    public void heartbeat() {
         Timer timer = new Timer();
 
         // create a timer task that will ping the target
@@ -159,6 +169,7 @@ public class RMIConnection implements Connection {
                 try {
                     remoteContainer.ping();
                 } catch (RemoteException exception) {
+                    System.out.println("Heartbeat failed!");
                     disconnected = true;
                     timer.cancel();
                 }

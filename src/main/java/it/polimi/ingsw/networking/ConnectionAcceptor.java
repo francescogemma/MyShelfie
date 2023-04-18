@@ -54,6 +54,7 @@ public class ConnectionAcceptor implements NameProvidingRemote {
             }
         }
 
+        RMIConnection.heartbeat();
         cacheValid = false;
 
         // this is technically rep exposure, but the cacheValid bool
@@ -71,7 +72,7 @@ public class ConnectionAcceptor implements NameProvidingRemote {
     @Override
     public void createRemoteConnection(String name) throws RemoteException {
         // override the current stashed RMIConnection
-        System.out.println("Storing a new connection named " + name + "SERVER");
+        System.out.println("Storing a new connection named " + name + "SERVER.");
         this.RMIConnection = new RMIConnection(1098, 1099, name);
         cacheValid = true;
     }
