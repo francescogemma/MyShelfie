@@ -72,7 +72,7 @@ public class RMIConnection implements Connection {
             remoteContainer = (RMIStringContainer) registry.lookup(connectionName + "SERVER");
 
         } catch (Exception exception) {
-            throw new ConnectionException();
+            throw new ConnectionException("please check if server has started.");
         }
 
         heartbeat();
