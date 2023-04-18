@@ -215,7 +215,7 @@ public class Game implements Identifiable {
      * @throws IllegalFlowException if the game is not started or if the game is over.
      * @return the current player of the game.
      */
-    public Player getCurrentPlayer() throws IllegalFlowException {
+    public PlayerView getCurrentPlayer() throws IllegalFlowException {
         if (!isStarted) {
             throw new IllegalFlowException("There is no current player until you start the game");
         }
@@ -224,7 +224,7 @@ public class Game implements Identifiable {
             throw new IllegalFlowException("There is no current player when the game is over");
         }
 
-        return players.get(currentPlayerIndex);
+        return players.get(currentPlayerIndex).getView();
     }
 
     /**
@@ -288,6 +288,16 @@ public class Game implements Identifiable {
                 return p;
         }
         throw new IllegalArgumentException("Player not in this game");
+    }
+
+    private int getNextPlayerOnline (int currentPlayerIndex) throws NoPlayerConnectedException {
+        for (int i = 1; i < this.players.size(); i++) {
+            final int index = (currentPlayerIndex + i) % this.players.size();
+            if (this.players.get(index).isConnected) {
+                return index;
+            }
+        }
+        throw new NoPlayerConnectedException();
     }
 
     private void refillBoardIfNecessary () {
@@ -355,8 +365,22 @@ public class Game implements Identifiable {
             } else {
                 this.refillBoardIfNecessary();
 
+                int index;
+
+                try {
+                    index = getNextPlayerOnline(this.currentPlayerIndex);
+                } catch (NoPlayerConnectedException e) {
+                    // there is no players connected
+                    index = (currentPlayerIndex + 1) % players.size();
+                }
+
+                if (players.get(index).equals(players.get(currentPlayerIndex))) {
+                    // there is only one player conected
+                    index = (currentPlayerIndex + 1) % players.size();
+                }
+
                 // set new turn
-                this.currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+                this.currentPlayerIndex = index;
 
                 this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex).getUsername()));
             }

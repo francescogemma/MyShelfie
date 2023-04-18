@@ -214,5 +214,83 @@ class GameTest {
 
         Assertions.assertEquals("Cristiano", game.getLastPlayer().getUsername());
     }
+
+    @Test
+    void disconnectPlayer__correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Francesco");
+        game.addPlayer("Cristiano");
+        game.addPlayer("Michele");
+
+
+        game.startGame();
+
+        Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
+
+
+        game.disconnectPlayer("Giacomo");
+
+        Assertions.assertEquals("Francesco", game.getCurrentPlayer().getUsername());
+    }
+
+    @Test
+    void disconnectPlayer_twoPlayerDisconnected_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Francesco");
+        game.addPlayer("Cristiano");
+        game.addPlayer("Michele");
+
+
+        game.startGame();
+
+        Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
+
+
+        game.disconnectPlayer("Giacomo");
+        game.disconnectPlayer("Francesco");
+
+        Assertions.assertEquals("Cristiano", game.getCurrentPlayer().getUsername());
+    }
+
+    @Test
+    void disconnectPlayer_threePlayerDisconnected_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Francesco");
+        game.addPlayer("Cristiano");
+        game.addPlayer("Michele");
+
+
+        game.startGame();
+
+        Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
+
+
+        game.disconnectPlayer("Giacomo");
+        game.disconnectPlayer("Francesco");
+        game.disconnectPlayer("Cristiano");
+
+        Assertions.assertEquals("Michele", game.getCurrentPlayer().getUsername());
+    }
+
+    @Test
+    void disconnectPlayer_fourPlayerDisconnected_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Francesco");
+        game.addPlayer("Cristiano");
+        game.addPlayer("Michele");
+
+
+        game.startGame();
+
+        Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
+
+        game.disconnectPlayer("Giacomo");
+        game.disconnectPlayer("Francesco");
+        game.disconnectPlayer("Cristiano");
+        game.disconnectPlayer("Michele");
+
+        Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
+    }
+
 }
 
