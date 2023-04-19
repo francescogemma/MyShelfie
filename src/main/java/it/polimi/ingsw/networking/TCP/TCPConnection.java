@@ -1,7 +1,6 @@
 package it.polimi.ingsw.networking.TCP;
 
 import it.polimi.ingsw.networking.Connection;
-import it.polimi.ingsw.networking.ConnectionException;
 import it.polimi.ingsw.networking.DisconnectedException;
 
 import java.io.*;
@@ -156,6 +155,17 @@ public class TCPConnection implements Connection {
     private void reader() {
         Thread reader = new Thread(() -> {
             while(true) {
+                synchronized(lock) {
+                    if(disconnected) {
+                        try {
+                            socket.close();
+                        } catch(IOException e) {
+                            // TODO: handle exception when closing socket
+                        }
+                        return;
+                    }
+                }
+
                 String read;
                 try {
                     socket.setSoTimeout(5000);
@@ -171,10 +181,16 @@ public class TCPConnection implements Connection {
                         disconnected = true;
                         lock.notifyAll();
                     }
-                    break;
                 }
             }
         });
         reader.start();
+    }
+
+    public void disconnect() {
+        synchronized(lock) {
+            disconnected = true;
+            lock.notifyAll();
+        }
     }
 }
