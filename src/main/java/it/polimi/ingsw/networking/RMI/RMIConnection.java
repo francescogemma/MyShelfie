@@ -157,7 +157,7 @@ public class RMIConnection implements Connection {
                 try {
                     remoteContainer.ping();
                 } catch (RemoteException exception) {
-                    System.out.println("Heartbeat failed!");
+                    System.out.println("Heartbeat failed! Next time send or receive is invoked, exception will be thrown!");
                     disconnected = true;
                     timer.cancel();
                 }

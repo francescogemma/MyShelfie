@@ -25,12 +25,14 @@ public class Server {
             System.out.println("Server started.");
 
             // from here on, we can use the serverAcceptor.
-            Connection myServer = serverAcceptor.accept();
-            System.out.println("Accepted.");
+            while (true) {
+                Connection serverSideConnection = serverAcceptor.accept();
 
-            myServer.send("Hello client! I'm the server!");
+                System.out.println("Accepted.");
+                System.out.println("Response: \"" + serverSideConnection.receive() + "\"");
 
-            System.out.println("Response: \"" + myServer.receive() + "\"");
+                serverSideConnection.send("Hello there! I'm the server!");
+            }
 
         } catch (Exception exception) {
             exception.printStackTrace();
