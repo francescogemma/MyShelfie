@@ -61,7 +61,7 @@ public class MenuController {
     /**
      * We remove virtualView from notAuthenticated and place in authenticated
      * */
-    public boolean authenticate (VirtualView virtualView, String username, String password) {
+    private boolean authenticate (VirtualView virtualView, String username, String password) {
         User user = this.getUser(username, password);
 
         if (user.passwordMatches(password)) {
@@ -125,9 +125,9 @@ public class MenuController {
                 virtualView.getNetworkTransmitter().broadcast(new GameHasBeenCreatedEventData(gamePresent));
 
                 // TODO we need to set here the new connection from client to server
-                JoinGameEventData.responder(virtualView.getNetworkTransmitter(), virtualView.getNetworkReceiver(), event -> {
-                    return this.joinGame(virtualView, event.getGameName());
-                });
+                JoinGameEventData.responder(virtualView.getNetworkTransmitter(), virtualView.getNetworkReceiver(), event ->
+                    this.joinGame(virtualView, event.getGameName())
+                );
 
                 CreateNewGameEventData.responder(virtualView.getNetworkTransmitter(), virtualView.getNetworkReceiver(), event -> {
                     if (virtualView.isInGame()) {
@@ -140,7 +140,7 @@ public class MenuController {
         });
     }
 
-    public Response createNewGame(String gameName) {
+    private Response createNewGame(String gameName) {
         Game game = new Game(gameName);
         GameController controller = new GameController(game);
 
@@ -162,7 +162,7 @@ public class MenuController {
         return new Response("Game : [" + gameName + "] has been created", ResponseStatus.SUCCESS);
     }
 
-    public Response joinGame(VirtualView virtualView, String gameName) {
+    private Response joinGame(VirtualView virtualView, String gameName) {
         if (virtualView.isInGame()) {
             return new Response("You are already in a game", ResponseStatus.FAILURE);
         }

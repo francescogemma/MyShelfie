@@ -399,13 +399,13 @@ public class Game implements Identifiable {
     public void insertTile (String username, int col) throws IllegalFlowException, IllegalExtractionException {
         final Player player = getPlayer(username);
 
-        if (this.getCurrentPlayer().equals(player))
+        if (!this.players.get(currentPlayerIndex).equals(player))
             throw new IllegalFlowException();
 
         List<Tile> t = board.getSelectedTiles();
 
         if (t.isEmpty())
-            throw new IllegalExtractionException();
+            throw new IllegalExtractionException("You have select 0 tiles");
 
         player.getBookshelf().insertTiles(t, col);
         board.draw();
@@ -420,6 +420,8 @@ public class Game implements Identifiable {
                 this.transceiver.broadcast(new PlayerPointsChangeEventData(player, commonGoal.getPointMasks()));
             }
         }
+
+        this.calculateNextPlayer();
     }
 
     /**
@@ -429,10 +431,10 @@ public class Game implements Identifiable {
     public void selectTile (String username, Coordinate coordinate) throws IllegalFlowException, IllegalExtractionException, FullSelectionException {
         if (!this.isStarted)
             throw new IllegalFlowException("Game is not started");
-        if (!this.getCurrentPlayer().getUsername().equals(username))
-            throw new IllegalFlowException("It's not your turn");
         if (isOver())
             throw new IllegalFlowException("Game is over");
+        if (!this.getCurrentPlayer().getUsername().equals(username))
+            throw new IllegalFlowException("It's not your turn");
 
         this.board.selectTile(coordinate);
         this.transceiver.broadcast(new BoardChangedEventData(board.getView()));

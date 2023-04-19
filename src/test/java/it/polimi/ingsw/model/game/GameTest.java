@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -396,8 +395,16 @@ class GameTest {
 
         game.startGame();
 
+        Assertions.assertThrows(IllegalExtractionException.class, () -> {
+            game.insertTile("Giacomo", 0);
+        });
+
         game.selectTile("Giacomo", new Coordinate(4, 0));
         game.selectTile("Giacomo", new Coordinate(5, 0));
+
+        Assertions.assertThrows(IllegalFlowException.class, () -> {
+            game.insertTile("Michele", 0);
+        });
 
         game.insertTile("Giacomo", 4);
 
@@ -490,6 +497,237 @@ class GameTest {
         game.addPlayer("Michele");
 
         Assertions.assertFalse(game.hasPlayerDisconnected());
+    }
+
+    @Test
+    void isOver_signalsEmittedLastPlayerCompleteBookshelf_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException, IllegalExtractionException, FullSelectionException {
+        final String usernameUser1 = "Giacomo";
+        final String usernameUser2 = "Michele";
+
+        game.addPlayer(usernameUser1);
+        game.addPlayer(usernameUser2);
+
+        game.startGame();
+
+        game.selectTile(usernameUser1, new Coordinate(4, 0));
+        game.insertTile(usernameUser1, 0);
+
+        game.selectTile(usernameUser2, new Coordinate(3, 1));
+        game.selectTile(usernameUser2, new Coordinate(4, 1));
+        game.selectTile(usernameUser2, new Coordinate(5, 1));
+
+        game.insertTile(usernameUser2, 0);
+
+        game.selectTile(usernameUser1, new Coordinate(2, 2));
+        game.insertTile(usernameUser1, 0);
+
+        game.selectTile(usernameUser2, new Coordinate(3, 2));
+        game.selectTile(usernameUser2, new Coordinate(4, 2));
+        game.selectTile(usernameUser2, new Coordinate(5, 2));
+        game.insertTile(usernameUser2, 0);
+
+        game.selectTile(usernameUser1, new Coordinate(7, 3));
+        game.insertTile(usernameUser1, 0);
+
+        game.selectTile(usernameUser2, new Coordinate(6, 3));
+        game.selectTile(usernameUser2, new Coordinate(5, 3));
+        game.selectTile(usernameUser2, new Coordinate(4, 3));
+        game.insertTile(usernameUser2, 1);
+
+        game.selectTile(usernameUser1, new Coordinate(1, 4));
+        game.insertTile(usernameUser1, 0);
+
+        game.selectTile(usernameUser2, new Coordinate(1, 3));
+        game.selectTile(usernameUser2, new Coordinate(2, 3));
+        game.selectTile(usernameUser2, new Coordinate(3, 3));
+        game.insertTile(usernameUser2, 1);
+
+        game.selectTile(usernameUser1, new Coordinate(3, 7));
+        game.insertTile(usernameUser1, 0);
+
+        game.selectTile(usernameUser2, new Coordinate(2, 4));
+        game.selectTile(usernameUser2, new Coordinate(3, 4));
+        game.selectTile(usernameUser2, new Coordinate(4, 4));
+        game.insertTile(usernameUser2, 2);
+
+        game.selectTile(usernameUser1, new Coordinate(4, 7));
+        game.insertTile(usernameUser1, 0);
+
+        game.selectTile(usernameUser2, new Coordinate(2, 5));
+        game.selectTile(usernameUser2, new Coordinate(3, 5));
+        game.selectTile(usernameUser2, new Coordinate(4, 5));
+        game.insertTile(usernameUser2, 2);
+
+        game.selectTile(usernameUser1, new Coordinate(3, 6));
+        game.selectTile(usernameUser1, new Coordinate(4, 6));
+        game.insertTile(usernameUser1, 1);
+
+        game.selectTile(usernameUser2, new Coordinate(5, 6));
+        game.selectTile(usernameUser2, new Coordinate(5, 5));
+        game.selectTile(usernameUser2, new Coordinate(5, 4));
+        game.insertTile(usernameUser2, 3);
+
+        game.selectTile(usernameUser1, new Coordinate(6, 4));
+        game.selectTile(usernameUser1, new Coordinate(6, 5));
+        game.insertTile(usernameUser1, 2);
+
+        game.selectTile(usernameUser2, new Coordinate(7, 4));
+        game.selectTile(usernameUser2, new Coordinate(7, 5));
+        game.insertTile(usernameUser2, 3);
+
+        game.selectTile(usernameUser1, new Coordinate(4, 0));
+        game.insertTile(usernameUser1, 1);
+
+        game.selectTile(usernameUser2, new Coordinate(3, 1));
+        game.selectTile(usernameUser2, new Coordinate(4, 1));
+        game.selectTile(usernameUser2, new Coordinate(5, 1));
+
+        game.insertTile(usernameUser2, 4);
+
+        game.selectTile(usernameUser1, new Coordinate(2, 2));
+        game.insertTile(usernameUser1, 3);
+
+        game.selectTile(usernameUser2, new Coordinate(3, 2));
+        game.selectTile(usernameUser2, new Coordinate(4, 2));
+        game.selectTile(usernameUser2, new Coordinate(5, 2));
+        game.insertTile(usernameUser2, 4);
+
+        game.selectTile(usernameUser1, new Coordinate(7, 3));
+        game.insertTile(usernameUser1, 3);
+
+        AtomicBoolean call = new AtomicBoolean(false);
+        GameOverEventData.castEventReceiver(transceiver).registerListener(event -> {
+            call.set(true);
+            // we can't test the winner name because it depends on the tile in the board.
+        });
+
+        game.selectTile(usernameUser2, new Coordinate(6, 3));
+        game.insertTile(usernameUser2, 3);
+
+        Assertions.assertTrue(call.get());
+        Assertions.assertTrue(game.isOver());
+    }
+
+    @Test
+    void isOver_signalsEmittedFirstPlayerCompleteBookshelf_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException, IllegalExtractionException, FullSelectionException {
+        final String usernameUser1 = "Giacomo";
+        final String usernameUser2 = "Michele";
+
+        game.addPlayer(usernameUser2);
+        game.addPlayer(usernameUser1);
+
+        game.startGame();
+
+        game.disconnectPlayer(usernameUser2);
+
+        game.selectTile(usernameUser1, new Coordinate(4, 0));
+        game.insertTile(usernameUser1, 0);
+
+        game.addPlayer(usernameUser2);
+
+        game.selectTile(usernameUser2, new Coordinate(3, 1));
+        game.selectTile(usernameUser2, new Coordinate(4, 1));
+        game.selectTile(usernameUser2, new Coordinate(5, 1));
+        game.insertTile(usernameUser2, 0);
+
+        game.selectTile(usernameUser1, new Coordinate(2, 2));
+        game.insertTile(usernameUser1, 0);
+
+        game.selectTile(usernameUser2, new Coordinate(3, 2));
+        game.selectTile(usernameUser2, new Coordinate(4, 2));
+        game.selectTile(usernameUser2, new Coordinate(5, 2));
+        game.insertTile(usernameUser2, 0);
+
+        game.selectTile(usernameUser1, new Coordinate(7, 3));
+        game.insertTile(usernameUser1, 0);
+
+        game.selectTile(usernameUser2, new Coordinate(6, 3));
+        game.selectTile(usernameUser2, new Coordinate(5, 3));
+        game.selectTile(usernameUser2, new Coordinate(4, 3));
+        game.insertTile(usernameUser2, 1);
+
+        game.selectTile(usernameUser1, new Coordinate(1, 4));
+        game.insertTile(usernameUser1, 0);
+
+        game.selectTile(usernameUser2, new Coordinate(1, 3));
+        game.selectTile(usernameUser2, new Coordinate(2, 3));
+        game.selectTile(usernameUser2, new Coordinate(3, 3));
+        game.insertTile(usernameUser2, 1);
+
+        game.selectTile(usernameUser1, new Coordinate(3, 7));
+        game.insertTile(usernameUser1, 0);
+
+        game.selectTile(usernameUser2, new Coordinate(2, 4));
+        game.selectTile(usernameUser2, new Coordinate(3, 4));
+        game.selectTile(usernameUser2, new Coordinate(4, 4));
+        game.insertTile(usernameUser2, 2);
+
+        game.selectTile(usernameUser1, new Coordinate(4, 7));
+        game.insertTile(usernameUser1, 0);
+
+        game.selectTile(usernameUser2, new Coordinate(2, 5));
+        game.selectTile(usernameUser2, new Coordinate(3, 5));
+        game.selectTile(usernameUser2, new Coordinate(4, 5));
+        game.insertTile(usernameUser2, 2);
+
+        game.selectTile(usernameUser1, new Coordinate(3, 6));
+        game.selectTile(usernameUser1, new Coordinate(4, 6));
+        game.insertTile(usernameUser1, 1);
+
+        game.selectTile(usernameUser2, new Coordinate(5, 6));
+        game.selectTile(usernameUser2, new Coordinate(5, 5));
+        game.selectTile(usernameUser2, new Coordinate(5, 4));
+        game.insertTile(usernameUser2, 3);
+
+        game.selectTile(usernameUser1, new Coordinate(6, 4));
+        game.selectTile(usernameUser1, new Coordinate(6, 5));
+        game.insertTile(usernameUser1, 2);
+
+        game.selectTile(usernameUser2, new Coordinate(7, 4));
+        game.selectTile(usernameUser2, new Coordinate(7, 5));
+        game.insertTile(usernameUser2, 3);
+
+        game.selectTile(usernameUser1, new Coordinate(4, 0));
+        game.insertTile(usernameUser1, 1);
+
+        game.selectTile(usernameUser2, new Coordinate(3, 1));
+        game.selectTile(usernameUser2, new Coordinate(4, 1));
+        game.selectTile(usernameUser2, new Coordinate(5, 1));
+
+        game.insertTile(usernameUser2, 4);
+
+        game.selectTile(usernameUser1, new Coordinate(2, 2));
+        game.insertTile(usernameUser1, 3);
+
+        game.selectTile(usernameUser2, new Coordinate(3, 2));
+        game.selectTile(usernameUser2, new Coordinate(4, 2));
+        game.selectTile(usernameUser2, new Coordinate(5, 2));
+        game.insertTile(usernameUser2, 4);
+
+        game.selectTile(usernameUser1, new Coordinate(7, 3));
+        game.insertTile(usernameUser1, 3);
+
+        AtomicBoolean call = new AtomicBoolean(false);
+        GameOverEventData.castEventReceiver(transceiver).registerListener(event -> {
+            call.set(true);
+            // we can't test the winner name because it depends on the tile in the board.
+
+        });
+
+        game.selectTile(usernameUser2, new Coordinate(6, 3));
+        game.insertTile(usernameUser2, 3);
+
+        Assertions.assertFalse(game.isOver());
+
+        game.selectTile(usernameUser1, new Coordinate(4, 7));
+        game.insertTile(usernameUser1, 3);
+
+        Assertions.assertTrue(call.get());
+        Assertions.assertTrue(game.isOver());
+
+        Assertions.assertThrows(IllegalFlowException.class, () -> {
+            game.selectTile(usernameUser1, new Coordinate(0, 0));
+        });
     }
 }
 

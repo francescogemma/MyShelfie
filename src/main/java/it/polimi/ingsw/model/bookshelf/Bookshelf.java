@@ -169,8 +169,10 @@ public class Bookshelf {
      * */
     public boolean isFull () {
         for (int i = 0; i < Bookshelf.COLUMNS; i++) {
-            if (this.getTileColorAt(Shelf.getInstance(0, i)) == TileColor.EMPTY)
+            TileColor tile = getTileColorAt(Shelf.getInstance(0, i));
+            if (tile.equals(TileColor.EMPTY)){
                 return false;
+            }
         }
 
         return true;
