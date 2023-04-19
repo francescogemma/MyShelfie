@@ -1,5 +1,7 @@
 package it.polimi.ingsw.networking.RMI;
 
+import it.polimi.ingsw.networking.ConnectionException;
+
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -27,5 +29,5 @@ public interface NameProvidingRemote extends Remote {
      *
      * @param name is the name of the connection couple, without any suffix.
      */
-    void createRemoteConnection(String name) throws RemoteException;
+    void createRemoteConnection(String name) throws RemoteException, ConnectionException;
 }

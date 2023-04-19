@@ -70,7 +70,7 @@ public class ConnectionAcceptor implements NameProvidingRemote {
     }
 
     @Override
-    public void createRemoteConnection(String name) throws RemoteException {
+    public void createRemoteConnection(String name) throws RemoteException, ConnectionException {
         // override the current stashed RMIConnection
         System.out.println("Storing a new connection named " + name + "SERVER.");
         this.RMIConnection = new RMIConnection(1099, name);
