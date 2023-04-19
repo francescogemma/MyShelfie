@@ -1,12 +1,13 @@
 package it.polimi.ingsw.networking.RMI;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
 /**
  * Simple object to encapsulate all RMI-related behaviour. The handleMessage method is invoked remotely, and
  * some other object needs to use the getString and hasString methods to recover the message.
  */
-public class RMIStringContainer implements StringRemote {
+public class RMIStringContainer extends UnicastRemoteObject implements StringRemote {
     /**
      * Received message will be stored here.
      */
@@ -15,7 +16,10 @@ public class RMIStringContainer implements StringRemote {
     /**
      * Object constructor that simply sets the string to null.
      */
-    public RMIStringContainer() { string = null; }
+    public RMIStringContainer() throws RemoteException {
+        super();
+        string = null;
+    }
 
     @Override
     public void handleMessage(String message) throws RemoteException { string = message; }
