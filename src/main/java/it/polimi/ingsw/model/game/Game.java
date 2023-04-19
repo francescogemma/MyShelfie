@@ -182,9 +182,13 @@ public class Game implements Identifiable {
         player.setConnectionState(false);
 
         if (isStarted() && (this.players.get(currentPlayerIndex).equals(player))) {
+            try {
                 calculateNextPlayer();
-                this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex)));
+            } catch (IllegalFlowException e) {
+                throw new RuntimeException();
+            }
 
+            this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex)));
         }
 
         this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
@@ -325,69 +329,65 @@ public class Game implements Identifiable {
         }
     }
 
-    private void calculateNextPlayer() {
+    private void calculateNextPlayer() throws IllegalFlowException {
         assert this.players.size() >= 2 && this.players.size() <= 4;
         assert this.isStarted;
+        assert currentPlayerIndex >=  0 && currentPlayerIndex < players.size();
 
         refillBoardIfNecessary();
 
-        if (this.currentPlayerIndex != -1) {
-            if (atLeastOneBookshelfIsFull() && this.currentPlayerIndex + 1 == this.players.size()) {
-                // Game ending logic:
-                for (Player player : players) {
-                    int personalGoalPoints = player.getPersonalGoal().calculatePoints(player.getBookshelf());
-                    if (personalGoalPoints > 0) {
-                        player.addPoints(personalGoalPoints);
+        if (atLeastOneBookshelfIsFull() && this.currentPlayerIndex + 1 == this.players.size()) {
+            // Game ending logic:
+            for (Player player : players) {
+                int personalGoalPoints = player.getPersonalGoal().calculatePoints(player.getBookshelf());
+                if (personalGoalPoints > 0) {
+                    player.addPoints(personalGoalPoints);
 
-                        this.transceiver.broadcast(new PlayerPointsChangeEventData(player, player.getPersonalGoal().getPointMasks()));
-                    }
-
-                    Goal adjacencyGoal = new AdjacencyGoal();
-                    int adjacencyGoalPoints = adjacencyGoal.calculatePoints(player.getBookshelf());
-
-                    if (adjacencyGoalPoints > 0) {
-                        player.addPoints(adjacencyGoalPoints);
-
-                        this.transceiver.broadcast(new PlayerPointsChangeEventData(player, adjacencyGoal.getPointMasks()));
-                    }
+                    this.transceiver.broadcast(new PlayerPointsChangeEventData(player, player.getPersonalGoal().getPointMasks()));
                 }
 
-                for (Player player : players) {
-                    int max = this.winners.isEmpty() ? 0 : winners.get(0).getPoints();
+                Goal adjacencyGoal = new AdjacencyGoal();
+                int adjacencyGoalPoints = adjacencyGoal.calculatePoints(player.getBookshelf());
 
-                    if (player.getPoints() >= max) {
-                        if (player.getPoints() > max)
-                            winners.clear();
+                if (adjacencyGoalPoints > 0) {
+                    player.addPoints(adjacencyGoalPoints);
 
-                        winners.add(player);
-                    }
+                    this.transceiver.broadcast(new PlayerPointsChangeEventData(player, adjacencyGoal.getPointMasks()));
                 }
-
-                this.transceiver.broadcast(new GameOverEventData(winners.stream().map(PlayerView::createView).toList()));
-            } else {
-                this.refillBoardIfNecessary();
-
-                int index;
-
-                try {
-                    index = getNextPlayerOnline(this.currentPlayerIndex);
-                } catch (NoPlayerConnectedException e) {
-                    // there is no players connected
-                    index = (currentPlayerIndex + 1) % players.size();
-                }
-
-                if (players.get(index).equals(players.get(currentPlayerIndex))) {
-                    // there is only one player conected
-                    index = (currentPlayerIndex + 1) % players.size();
-                }
-
-                // set new turn
-                this.currentPlayerIndex = index;
-
-                this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex).getView()));
             }
+
+            for (Player player : players) {
+                int max = this.winners.isEmpty() ? 0 : winners.get(0).getPoints();
+
+                if (player.getPoints() >= max) {
+                    if (player.getPoints() > max)
+                        winners.clear();
+
+                    winners.add(player);
+                }
+            }
+
+            this.transceiver.broadcast(new GameOverEventData(this.getWinners()));
         } else {
-            this.currentPlayerIndex = 0;
+            this.refillBoardIfNecessary();
+
+            int index;
+
+            try {
+                index = getNextPlayerOnline(this.currentPlayerIndex);
+            } catch (NoPlayerConnectedException e) {
+                // there is no players connected
+                index = (currentPlayerIndex + 1) % players.size();
+            }
+
+            if (players.get(index).equals(players.get(currentPlayerIndex))) {
+                // there is only one player conected
+                index = (currentPlayerIndex + 1) % players.size();
+            }
+
+            // set new turn
+            this.currentPlayerIndex = index;
+
             this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex).getView()));
         }
     }
