@@ -7,28 +7,28 @@ import it.polimi.ingsw.networking.DisconnectedException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 /**
  * {@link Connection Connection} class that represents one side of an RMI pair of connections.
  *
  * @author Michele Miotti
  */
-public class RMIConnection implements Connection {
+public class RMIConnection extends UnicastRemoteObject implements Connection, StringRemote {
     /**
-     * This object is an encapsulation of the RMI system. Every RMI-related aspect
-     * of the RMIConnection object relies on this container, that extends the StringRemote interface.
-     * It acts as a simple container for a queue of strings. It might contain an empty queue.
+     * Queue of all received messages so far.
      */
-    private final RMIStringContainer stringContainer;
+    private final Queue<String> messages = new LinkedList<>();
 
     /**
-     * This is a stub for the remote string container. This object will be called in the send method,
+     * This is a stub for the other connection. This object will be called in the send method,
      * as if it were local. All errors will be thrown out through the DisconnectedException.
      */
-    private final StringRemote remoteContainer;
+    private final StringRemote otherConnection;
 
     /**
      * How much time passes between two keep-alive pings, expressed in milliseconds.
@@ -65,22 +65,19 @@ public class RMIConnection implements Connection {
      * @param port is the port used by {@link it.polimi.ingsw.networking.ConnectionAcceptor the server} for RMI communication.
      * @throws ConnectionException will be thrown if a failure occurs in the process of creating a new Connection.
      */
-    public RMIConnection(String address, int port) throws ConnectionException {
+    public RMIConnection(String address, int port) throws ConnectionException, RemoteException {
         try {
             // get the server object, and ask to reserve a new name for the couple.
             registry = LocateRegistry.getRegistry(address, port);
             server = (NameProvidingRemote) registry.lookup("SERVER");
             name = server.getNewCoupleName();
 
-            // create and export our stringContainer
-            stringContainer = new RMIStringContainer();
-
-            // bind it to the registry, and tell the server to create its own connection.
-            registry.bind(name + "CLIENT", stringContainer);
+            // bind this to registry, and tell the server to create its own connection.
+            registry.bind(name + "CLIENT", this);
             server.createRemoteConnection(name);
 
             // get the newly created server-side object.
-            remoteContainer = (StringRemote) registry.lookup(name + "SERVER");
+            otherConnection = (StringRemote) registry.lookup(name + "SERVER");
 
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -100,19 +97,17 @@ public class RMIConnection implements Connection {
      * @param connectionName is the name of the Connection pair that needs to be completed with the server-side connection.
      * @throws ConnectionException will be thrown if a failure occurs in the process of creating a new Connection.
      */
-    public RMIConnection(int port, String connectionName) throws ConnectionException {
+    public RMIConnection(int port, String connectionName) throws ConnectionException, RemoteException {
         try {
-            // create and export our stringContainer
-            stringContainer = new RMIStringContainer();
+            registry = LocateRegistry.getRegistry(port);
+            server = (NameProvidingRemote) registry.lookup("SERVER");
             name = connectionName;
 
-            // bind it to the registry, assuming this method is called server side.
-            registry = LocateRegistry.getRegistry(port);
-            registry.bind(name + "SERVER", stringContainer);
-            server = (NameProvidingRemote) registry.lookup("SERVER");
+            // bind this to registry, assuming this method is called server side.
+            registry.bind(name + "SERVER", this);
 
             // we assume the client object is created BEFORE the server object.
-            remoteContainer = (StringRemote) registry.lookup(name + "CLIENT");
+            otherConnection = (StringRemote) registry.lookup(name + "CLIENT");
 
         } catch (Exception exception) {
             throw new ConnectionException();
@@ -127,37 +122,40 @@ public class RMIConnection implements Connection {
 
         try {
             // plainly send the message to the remote object
-            remoteContainer.handleMessage(string);
+            otherConnection.handleMessage(string);
         } catch (Exception exception) {
             throw new DisconnectedException();
         }
     }
 
     @Override
-    public String receive() throws DisconnectedException {
+    public synchronized String receive() throws DisconnectedException {
         if (disconnected) {
             throw new DisconnectedException();
         }
 
         // keep checking if we've received a string
-        // TODO: producer consumer pattern here + sync; might need a common object between connection and container
-        while (!stringContainer.hasString()) {
+        while (messages.isEmpty()) {
             try {
-                // wait a little bit after each check
-                TimeUnit.MILLISECONDS.sleep(100);
+                wait();
             } catch (InterruptedException exception) {
                 exception.printStackTrace();
             }
         }
 
-        // once we've found it, return it
-        return stringContainer.getString();
+        // get the next item from the queue
+        String result = messages.poll();
+        notifyAll();
+
+        return result;
     }
 
     @Override
     public void disconnect() {
         try {
             disconnected = true;
+            notifyAll();
+
             registry.unbind(name + "CLIENT");
             registry.unbind(name + "SERVER");
         } catch (Exception exception) {
@@ -176,9 +174,11 @@ public class RMIConnection implements Connection {
             @Override
             public void run() {
                 try {
-                    remoteContainer.ping();
+                    otherConnection.ping();
                 } catch (RemoteException exception) {
                     disconnected = true;
+                    notifyAll();
+
                     timer.cancel();
                 }
             }
@@ -187,4 +187,10 @@ public class RMIConnection implements Connection {
         // run timer
         timer.schedule(task, 0, PERIOD);
     }
+
+    @Override
+    public synchronized void handleMessage(String message) throws RemoteException { messages.add(message); }
+
+    @Override
+    public void ping() throws RemoteException { }
 }
