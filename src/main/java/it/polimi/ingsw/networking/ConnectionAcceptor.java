@@ -87,9 +87,9 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements NameProvi
     }
 
     @Override
-    public void createRemoteConnection(String name) throws RemoteException, ConnectionException {
+    public void createRemoteConnection(String coupleName) throws RemoteException, ConnectionException {
         // override the current stashed RMIConnection
-        this.RMIConnection = new RMIConnection(1099, name);
+        this.RMIConnection = new RMIConnection(1099, coupleName);
         cacheValid = true;
     }
 }

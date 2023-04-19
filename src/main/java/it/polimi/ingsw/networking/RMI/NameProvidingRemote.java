@@ -27,9 +27,9 @@ public interface NameProvidingRemote extends Remote {
      * Method used to tell the server to create a new connection remotely, that will be paired with
      * the client-side connection
      *
-     * @param name is the name of the connection couple, without any suffix.
+     * @param coupleName is the name of the connection couple, without any suffix.
      * @throws RemoteException will be thrown in case of network problems, or server communication issues.
      * @throws ConnectionException will be thrown if a failure occurs in the process of creating a new Connection.
      */
-    void createRemoteConnection(String name) throws RemoteException, ConnectionException;
+    void createRemoteConnection(String coupleName) throws RemoteException, ConnectionException;
 }

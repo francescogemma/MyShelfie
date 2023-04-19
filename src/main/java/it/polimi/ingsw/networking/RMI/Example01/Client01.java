@@ -2,6 +2,8 @@ package it.polimi.ingsw.networking.RMI.Example01;
 
 import it.polimi.ingsw.networking.RMI.RMIConnection;
 
+import java.util.concurrent.TimeUnit;
+
 public class Client01 {
     public static void main( String[] args ) {
         try {
@@ -12,6 +14,10 @@ public class Client01 {
             myClient.send("Hello! I'm Client 1!");
             myClient.send("Hello again! I'm Client 1!");
             System.out.println("Received: \"" + myClient.receive());
+
+            TimeUnit.SECONDS.sleep(10);
+            myClient.disconnect();
+            System.out.println("Intentionally disconnected.");
 
         } catch (Exception exception) {
             exception.printStackTrace();

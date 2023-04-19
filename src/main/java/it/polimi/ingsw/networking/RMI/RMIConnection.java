@@ -42,6 +42,21 @@ public class RMIConnection implements Connection {
     private boolean disconnected = false;
 
     /**
+     * Server's registry.
+     */
+    private final Registry registry;
+
+    /**
+     * The name of the connection pair.
+     */
+    private final String name;
+
+    /**
+     * The stub for the server object.
+     */
+    private final NameProvidingRemote server;
+
+    /**
      * This constructor creates a connection with some {@link it.polimi.ingsw.networking.ConnectionAcceptor acceptor}.
      * This acceptor will then pair this object with another {@link Connection connection}.
      * This constructor should be used client-side.
@@ -53,21 +68,22 @@ public class RMIConnection implements Connection {
     public RMIConnection(String address, int port) throws ConnectionException {
         try {
             // get the server object, and ask to reserve a new name for the couple.
-            Registry registry = LocateRegistry.getRegistry(address, port);
-            NameProvidingRemote server = (NameProvidingRemote) registry.lookup("SERVER");
-            String connectionName = server.getNewCoupleName();
+            registry = LocateRegistry.getRegistry(address, port);
+            server = (NameProvidingRemote) registry.lookup("SERVER");
+            name = server.getNewCoupleName();
 
             // create and export our stringContainer
             stringContainer = new RMIStringContainer();
 
-            // bind self to the registry, and tell the server to create its own connection.
-            registry.bind(connectionName + "CLIENT", stringContainer);
-            server.createRemoteConnection(connectionName);
+            // bind it to the registry, and tell the server to create its own connection.
+            registry.bind(name + "CLIENT", stringContainer);
+            server.createRemoteConnection(name);
 
             // get the newly created server-side object.
-            remoteContainer = (StringRemote) registry.lookup(connectionName + "SERVER");
+            remoteContainer = (StringRemote) registry.lookup(name + "SERVER");
 
         } catch (Exception exception) {
+            exception.printStackTrace();
             throw new ConnectionException();
         }
 
@@ -88,13 +104,15 @@ public class RMIConnection implements Connection {
         try {
             // create and export our stringContainer
             stringContainer = new RMIStringContainer();
+            name = connectionName;
 
             // bind it to the registry, assuming this method is called server side.
-            Registry registry = LocateRegistry.getRegistry(port);
-            registry.bind(connectionName + "SERVER", stringContainer);
+            registry = LocateRegistry.getRegistry(port);
+            registry.bind(name + "SERVER", stringContainer);
+            server = (NameProvidingRemote) registry.lookup("SERVER");
 
             // we assume the client object is created BEFORE the server object.
-            remoteContainer = (StringRemote) registry.lookup(connectionName + "CLIENT");
+            remoteContainer = (StringRemote) registry.lookup(name + "CLIENT");
 
         } catch (Exception exception) {
             throw new ConnectionException();
@@ -121,8 +139,8 @@ public class RMIConnection implements Connection {
             throw new DisconnectedException();
         }
 
-        // keep checking if we've received a string // TODO: producer consumer pattern here + sync
-        // might need a common object between connection and container
+        // keep checking if we've received a string
+        // TODO: producer consumer pattern here + sync; might need a common object between connection and container
         while (!stringContainer.hasString()) {
             try {
                 // wait a little bit after each check
@@ -138,7 +156,13 @@ public class RMIConnection implements Connection {
 
     @Override
     public void disconnect() {
-        // TODO: this method.
+        try {
+            disconnected = true;
+            registry.unbind(name + "CLIENT");
+            registry.unbind(name + "SERVER");
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     /**
