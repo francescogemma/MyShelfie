@@ -16,6 +16,7 @@ public class Server {
     public Server() { }
     public static void main( String[] args ) {
         try {
+            // TODO: acceptor must be cleaner to construct
             // create and export our acceptor
             ConnectionAcceptor serverAcceptor = new ConnectionAcceptor();
             NameProvidingRemote stub = (NameProvidingRemote) UnicastRemoteObject.exportObject(

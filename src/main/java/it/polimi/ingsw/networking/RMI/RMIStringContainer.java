@@ -7,10 +7,13 @@ import java.rmi.server.UnicastRemoteObject;
  * Simple object to encapsulate all RMI-related behaviour. The handleMessage method is invoked remotely, and
  * some other object needs to use the getString and hasString methods to recover the message.
  */
+
+// TODO: make everything thread safe
 public class RMIStringContainer extends UnicastRemoteObject implements StringRemote {
     /**
      * Received message will be stored here.
      */
+    // TODO: send, send -> put on queue
     private String string;
 
     /**

@@ -27,7 +27,7 @@ public class ConnectionAcceptor implements NameProvidingRemote {
     /**
      * Indicates the index of the most recent RMI connection couple's name.
      */
-    private int lastRMIConnectionIndex;
+    private static int lastRMIConnectionIndex;
 
     /**
      * Last cached RMIConnection, received through the createRemoteConnection method.
@@ -47,15 +47,17 @@ public class ConnectionAcceptor implements NameProvidingRemote {
         // keep checking if we've received a string
         while (!cacheValid) {
             try {
+
                 // wait a little bit after each check
                 TimeUnit.MILLISECONDS.sleep(100);
+                // TODO: don't sleep but wait
             } catch (InterruptedException exception) {
-                System.out.println("interrupted while sleeping");
+                exception.printStackTrace();
             }
         }
 
         RMIConnection.heartbeat();
-        cacheValid = false;
+        cacheValid = false; // TODO: producer consumer pattern
 
         // this is technically rep exposure, but the cacheValid bool
         // should keep things stable. feel free to suggest better solutions.
@@ -63,16 +65,14 @@ public class ConnectionAcceptor implements NameProvidingRemote {
     }
 
     @Override
-    public String getNewCoupleName() throws RemoteException {
+    public String getNewCoupleName() throws RemoteException { // TODO: static lock here
         // increment index and decorate it.
-        System.out.println("Giving the following name to requester: " + (lastRMIConnectionIndex + 1));
         return "CONNECTION" + ++lastRMIConnectionIndex;
     }
 
     @Override
     public void createRemoteConnection(String name) throws RemoteException, ConnectionException {
         // override the current stashed RMIConnection
-        System.out.println("Storing a new connection named " + name + "SERVER.");
         this.RMIConnection = new RMIConnection(1099, name);
         cacheValid = true;
     }

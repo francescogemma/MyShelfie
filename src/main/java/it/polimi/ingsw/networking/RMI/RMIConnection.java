@@ -46,18 +46,16 @@ public class RMIConnection implements Connection {
      * This acceptor will then pair this object with another {@link Connection connection}.
      */
     public RMIConnection(int port) throws ConnectionException {
+        // TODO: make it work out of localhost
+
         // start, assuming connection is working correctly
         disconnected = false;
-
-        System.out.println("Starting RMIConnection by calling server!");
 
         try {
             // get the server object, and ask to reserve a new name for the couple.
             Registry registry = LocateRegistry.getRegistry(port);
             NameProvidingRemote server = (NameProvidingRemote) registry.lookup("SERVER");
             String connectionName = server.getNewCoupleName();
-
-            System.out.println("Found a name for me: " + connectionName + "CLIENT.");
 
             // create and export our stringContainer
             stringContainer = new RMIStringContainer();
@@ -66,13 +64,8 @@ public class RMIConnection implements Connection {
             registry.bind(connectionName + "CLIENT", stringContainer);
             server.createRemoteConnection(connectionName);
 
-            System.out.println("Just told the server to create a new connection on its side.");
-
             // get the newly created server-side object.
-            System.out.println("Looking up on server registry: \"" + connectionName + "SERVER\".");
             remoteContainer = (StringRemote) registry.lookup(connectionName + "SERVER");
-
-            System.out.println("Found it.");
 
         } catch (Exception exception) {
             throw new ConnectionException();
@@ -91,8 +84,6 @@ public class RMIConnection implements Connection {
     public RMIConnection(int port, String connectionName) throws ConnectionException {
         // start, assuming connection is working correctly
         disconnected = false;
-
-        System.out.println("Starting RMIConnection with target \"" + connectionName + "SERVER\"!");
 
         try {
             // create and export our stringContainer
@@ -131,13 +122,14 @@ public class RMIConnection implements Connection {
             throw new DisconnectedException();
         }
 
-        // keep checking if we've received a string
+        // keep checking if we've received a string // TODO: producer consumer pattern here + sync
+        // might need a common object between connection and container
         while (!stringContainer.hasString()) {
             try {
                 // wait a little bit after each check
                 TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException exception) {
-                System.out.println("interrupted while sleeping");
+                exception.printStackTrace();
             }
         }
 
@@ -158,7 +150,6 @@ public class RMIConnection implements Connection {
                 try {
                     remoteContainer.ping();
                 } catch (RemoteException exception) {
-                    System.out.println("Heartbeat failed! Next time send or receive is invoked, exception will be thrown!");
                     disconnected = true;
                     timer.cancel();
                 }
