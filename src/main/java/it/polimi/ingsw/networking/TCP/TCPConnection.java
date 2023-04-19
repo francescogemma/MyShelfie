@@ -123,6 +123,7 @@ public class TCPConnection implements Connection {
                 } catch(InterruptedException e) {
                     throw new DisconnectedException("interrupted while waiting for a message", e);
                 }
+                // if the connection was broken while waiting, we are notified, throw a DisconnectedException
                 if(disconnected) {
                     throw new DisconnectedException("disconnected while waiting for a message");
                 }
@@ -134,11 +135,10 @@ public class TCPConnection implements Connection {
     }
 
     /**
-     * Sends a heartbeat message every 2.5 seconds to the other side of the connection
+     * Crate a timer that sends a heartbeat message every 2.5 seconds to the other side of the connection
      * to check if the connection is still alive.
      */
     private void heartbeat() {
-        // create a new Timer and schedule a new TimerTask that sends a heartbeat message every 2.5 seconds
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -152,6 +152,16 @@ public class TCPConnection implements Connection {
         }, 0, 2500);
     }
 
+    /**
+     * Creates a new thread that continuously reads messages from the socket.
+     * If the message received is not a heartbeat, it is added to the {@link TCPConnection#receivedMessages receivedMessages} stack
+     * and the {@link TCPConnection#receive()} method will be able to read it.
+     * <p>
+     * If the message received is a heartbeat, it is simply discarded,
+     * but if we don't receive any message for 5 seconds, the connection is considered broken.
+     * <p>
+     * This method will also close the socket if a disconnection is detected.
+     */
     private void reader() {
         Thread reader = new Thread(() -> {
             while(true) {
@@ -171,12 +181,20 @@ public class TCPConnection implements Connection {
                     socket.setSoTimeout(5000);
                     read = in.readUTF();
                     if(!read.equals("heartbeat")) {
+                        /*
+                         * the received message is not a heartbeat, add it to the receivedMessages stack to be able to read it.
+                         * we notify the receive() method that it the stack is not empty anymore, and it can read the message
+                         */
                         synchronized(lock) {
                             receivedMessages.push(read);
                             lock.notifyAll();
                         }
                     }
                 } catch(Exception e) {
+                    /*
+                     * if an exception is thrown, the connection is considered broken, we set the disconnected field to true,
+                     * and we notify the receive() method that it can throw a DisconnectedException
+                     */
                     synchronized(lock) {
                         disconnected = true;
                         lock.notifyAll();
