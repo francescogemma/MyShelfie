@@ -141,6 +141,10 @@ public class RMIConnection extends UnicastRemoteObject implements Connection, St
             } catch (InterruptedException exception) {
                 exception.printStackTrace();
             }
+
+            if (disconnected) {
+                throw new DisconnectedException();
+            }
         }
 
         // get the next item from the queue
