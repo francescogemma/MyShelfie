@@ -7,7 +7,9 @@ public class Client02 {
         try {
             RMIConnection myClient = new RMIConnection(1099);
 
+            // sending two messages without accepting immediately
             myClient.send("Hello! I'm Client 2!");
+            myClient.send("Hello again! I'm Client 2!");
             System.out.println("Received: \"" + myClient.receive());
 
         } catch (Exception exception) {

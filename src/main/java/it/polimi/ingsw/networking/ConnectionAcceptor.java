@@ -4,21 +4,32 @@ import it.polimi.ingsw.networking.RMI.NameProvidingRemote;
 import it.polimi.ingsw.networking.RMI.RMIConnection;
 
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.concurrent.TimeUnit;
 
 /**
  * This object will keep waiting for {@link Connection connections} to send data.
  * New {@link Connection connections} will then be created to communicate back.
  *
- * @author ...
+ * @author Francesco Gemma
+ * @author Michele Miotti
  */
-public class ConnectionAcceptor implements NameProvidingRemote {
+public class ConnectionAcceptor extends UnicastRemoteObject implements NameProvidingRemote {
     /**
      * This constructor needs both ports, because this particular object will be used
      * server-side. These ports will listen for communications from {@link Connection connections}.
      *
      */
-    public ConnectionAcceptor() {
+    public ConnectionAcceptor() throws RemoteException, ConnectionException {
+        try {
+            // export to server's localhost
+            Registry registry = LocateRegistry.createRegistry(1099);
+            registry.bind("SERVER", this);
+        } catch (Exception exception) {
+            throw new ConnectionException();
+        }
 
         // whatever is contained in RMIConnection is as good as "null".
         cacheValid = false;

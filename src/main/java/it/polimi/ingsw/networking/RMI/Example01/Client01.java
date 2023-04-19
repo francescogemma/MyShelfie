@@ -7,11 +7,13 @@ public class Client01 {
         try {
             RMIConnection myClient = new RMIConnection(1099);
 
+            // sending two messages without accepting immediately
             myClient.send("Hello! I'm Client 1!");
+            myClient.send("Hello again! I'm Client 1!");
             System.out.println("Received: \"" + myClient.receive());
 
         } catch (Exception exception) {
-            System.out.println("Connection lost!");
+            exception.printStackTrace();
         }
     }
 }

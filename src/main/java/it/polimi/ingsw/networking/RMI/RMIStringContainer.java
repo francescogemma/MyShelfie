@@ -2,6 +2,9 @@ package it.polimi.ingsw.networking.RMI;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
+import java.util.Queue;
 
 /**
  * Simple object to encapsulate all RMI-related behaviour. The handleMessage method is invoked remotely, and
@@ -11,21 +14,19 @@ import java.rmi.server.UnicastRemoteObject;
 // TODO: make everything thread safe
 public class RMIStringContainer extends UnicastRemoteObject implements StringRemote {
     /**
-     * Received message will be stored here.
+     * Received messages will be stored here.
      */
-    // TODO: send, send -> put on queue
-    private String string;
+    private final Queue<String> messages = new LinkedList<>();
 
     /**
-     * Object constructor that simply sets the string to null.
+     * Object constructor.
      */
     public RMIStringContainer() throws RemoteException {
         super();
-        string = null;
     }
 
     @Override
-    public void handleMessage(String message) throws RemoteException { string = message; }
+    public void handleMessage(String message) throws RemoteException { messages.add(message); }
 
     @Override
     public void ping() throws RemoteException { }
@@ -36,14 +37,11 @@ public class RMIStringContainer extends UnicastRemoteObject implements StringRem
      * @throws NullPointerException if no string is contained.
      */
     public String getString() {
-        if (string == null) {
-            throw new NullPointerException();
+        if (messages.isEmpty()) {
+            throw new NoSuchElementException();
         }
-        // clear the string attribute before returning
-        String returnedString = string;
-        string = null;
-
-        return returnedString;
+        // return the next message in queue
+        return messages.poll();
     }
 
     /**
@@ -51,6 +49,6 @@ public class RMIStringContainer extends UnicastRemoteObject implements StringRem
      * @return true if this object contains a string.
      */
     public boolean hasString() {
-        return !(string == null);
+        return !(messages.isEmpty());
     }
 }
