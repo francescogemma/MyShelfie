@@ -8,11 +8,15 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
+/**
+ * This example should clarify the steps required to initiate a connectionAcceptor, and how its
+ * methods work in relation to the creation of new connections, and how to handle them in general.
+ */
 public class Server {
     public Server() { }
     public static void main( String[] args ) {
         try {
-            // create and export our stringContainer
+            // create and export our acceptor
             ConnectionAcceptor serverAcceptor = new ConnectionAcceptor();
             NameProvidingRemote stub = (NameProvidingRemote) UnicastRemoteObject.exportObject(
                     serverAcceptor, 1099
