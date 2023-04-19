@@ -31,5 +31,5 @@ public interface NameProvidingRemote extends Remote {
      * @throws RemoteException will be thrown in case of network problems, or server communication issues.
      * @throws ConnectionException will be thrown if a failure occurs in the process of creating a new Connection.
      */
-    void createRemoteConnection(String coupleName) throws RemoteException, ConnectionException;
+    void createRemoteConnection(String coupleName) throws RemoteException, ConnectionException, InterruptedException;
 }
