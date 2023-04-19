@@ -21,9 +21,7 @@ public class RMIStringContainer extends UnicastRemoteObject implements StringRem
     /**
      * Object constructor.
      */
-    public RMIStringContainer() throws RemoteException {
-        super();
-    }
+    public RMIStringContainer() throws RemoteException { super(); }
 
     @Override
     public void handleMessage(String message) throws RemoteException { messages.add(message); }
@@ -32,9 +30,9 @@ public class RMIStringContainer extends UnicastRemoteObject implements StringRem
     public void ping() throws RemoteException { }
 
     /**
-     * This method pops off the string, emptying this object of any information.
-     * @return the contained string.
-     * @throws NullPointerException if no string is contained.
+     * This method polls the string from the queue.
+     * @return the next string in queue.
+     * @throws NullPointerException if no string is left.
      */
     public String getString() {
         if (messages.isEmpty()) {
@@ -45,8 +43,8 @@ public class RMIStringContainer extends UnicastRemoteObject implements StringRem
     }
 
     /**
-     * Use this to check if this object has a string, before getting it.
-     * @return true if this object contains a string.
+     * Use this to check if this object has any strings, before polling it.
+     * @return true if this object contains one or more strings.
      */
     public boolean hasString() {
         return !(messages.isEmpty());

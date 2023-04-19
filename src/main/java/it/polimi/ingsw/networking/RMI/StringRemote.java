@@ -1,25 +1,25 @@
 package it.polimi.ingsw.networking.RMI;
 
-import it.polimi.ingsw.networking.ConnectionAcceptor;
-
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
- * This interface is needed to declare remote methods. Both the {@link ConnectionAcceptor ConnectionAcceptor} and
- * the {@link RMIConnection RMIConnection} objects will need to implement this interface in order to work correctly.
+ * This interface is needed to declare remote methods. {@link RMIConnection RMIConnection} should implement this.
+ * Classes that implement this interface can receive strings and be pinged.
  *
  * @author Michele Miotti
  */
 public interface StringRemote extends Remote {
     /**
      * This should be the only remote method we need: a simple "acceptor" method to receive a string.
+     *
+     * @param message is the string that will be received and stored.
      * @throws RemoteException will be thrown in case of network problems, or server communication issues.
      */
     void handleMessage(String message) throws RemoteException;
 
     /**
-     * This should be used for some keep-alive implementation.
+     * This should be used for some sort of RMI keep-alive implementation. The method itself should do nothing.
      * @throws RemoteException will be thrown in case of network problems, or server communication issues.
      */
     void ping() throws RemoteException;

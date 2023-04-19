@@ -12,7 +12,7 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 /**
- * {@link Connection Connection} class that represents an RMI connection.
+ * {@link Connection Connection} class that represents one side of an RMI pair of connections.
  *
  * @author Michele Miotti
  */
@@ -20,14 +20,9 @@ public class RMIConnection implements Connection {
     /**
      * This object is an encapsulation of the RMI system. Every RMI-related aspect
      * of the RMIConnection object relies on this container, that extends the StringRemote interface.
-     * It acts as a simple container for a string. It might contain nothing.
+     * It acts as a simple container for a queue of strings. It might contain an empty queue.
      */
     private final RMIStringContainer stringContainer;
-
-    /**
-     * How much time passes between two pings for keep-alive.
-     */
-    private static final int PERIOD = 2500;
 
     /**
      * This is a stub for the remote string container. This object will be called in the send method,
@@ -36,24 +31,29 @@ public class RMIConnection implements Connection {
     private final StringRemote remoteContainer;
 
     /**
+     * How much time passes between two keep-alive pings, expressed in milliseconds.
+     */
+    private static final int PERIOD = 2500;
+
+    /**
      * Used to keep track of connection state. Methods "send" and "receive" can only work if this
      * boolean is false.
      */
-    private boolean disconnected;
+    private boolean disconnected = false;
 
     /**
      * This constructor creates a connection with some {@link it.polimi.ingsw.networking.ConnectionAcceptor acceptor}.
      * This acceptor will then pair this object with another {@link Connection connection}.
+     * This constructor should be used client-side.
+     *
+     * @param address is the address of the server's host.
+     * @param port is the port used by {@link it.polimi.ingsw.networking.ConnectionAcceptor the server} for RMI communication.
+     * @throws ConnectionException will be thrown if a failure occurs in the process of creating a new Connection.
      */
-    public RMIConnection(int port) throws ConnectionException {
-        // TODO: make it work out of localhost
-
-        // start, assuming connection is working correctly
-        disconnected = false;
-
+    public RMIConnection(String address, int port) throws ConnectionException {
         try {
             // get the server object, and ask to reserve a new name for the couple.
-            Registry registry = LocateRegistry.getRegistry(port);
+            Registry registry = LocateRegistry.getRegistry(address, port);
             NameProvidingRemote server = (NameProvidingRemote) registry.lookup("SERVER");
             String connectionName = server.getNewCoupleName();
 
@@ -71,20 +71,20 @@ public class RMIConnection implements Connection {
             throw new ConnectionException();
         }
 
+        // since the other object has already been created, we can start heartbeat here.
         heartbeat();
     }
 
     /**
      * This constructor does NOT request names to an {@link it.polimi.ingsw.networking.ConnectionAcceptor acceptor},
      * and should only be used BY an acceptor to generate new connections, while already knowing the target's name.
-     * This method should NOT be called client-side.
+     * This method should be called server-side.
      *
-     * @param connectionName the name of the connection pair.
+     * @param port is the port used by {@link it.polimi.ingsw.networking.ConnectionAcceptor the server} for RMI communication.
+     * @param connectionName is the name of the Connection pair that needs to be completed with the server-side connection.
+     * @throws ConnectionException will be thrown if a failure occurs in the process of creating a new Connection.
      */
     public RMIConnection(int port, String connectionName) throws ConnectionException {
-        // start, assuming connection is working correctly
-        disconnected = false;
-
         try {
             // create and export our stringContainer
             stringContainer = new RMIStringContainer();
@@ -95,11 +95,10 @@ public class RMIConnection implements Connection {
 
             // we assume the client object is created BEFORE the server object.
             remoteContainer = (StringRemote) registry.lookup(connectionName + "CLIENT");
+
         } catch (Exception exception) {
             throw new ConnectionException();
         }
-
-        // we're NOT starting heartbeat here. we'll start it once the connectionAcceptor user calls "accept".
     }
 
     @Override
@@ -135,6 +134,11 @@ public class RMIConnection implements Connection {
 
         // once we've found it, return it
         return stringContainer.getString();
+    }
+
+    @Override
+    public void disconnect() {
+        // TODO: this method.
     }
 
     /**

@@ -19,13 +19,18 @@ import java.util.concurrent.TimeUnit;
 public class ConnectionAcceptor extends UnicastRemoteObject implements NameProvidingRemote {
     /**
      * This constructor needs both ports, because this particular object will be used
-     * server-side. These ports will listen for communications from {@link Connection connections}.
+     * server-side, so both TCP and RMI must be supported.
+     * These ports will listen for communications from {@link Connection connections}.
      *
+     * @param TCPPort the port that TCP will listen through.
+     * @param RMIPort the port that RMI will listen through.
+     * @throws RemoteException will be thrown in case of network problems, or server communication issues.
+     * @throws ConnectionException will be thrown if a failure occurs in the process of creating a new Connection.
      */
-    public ConnectionAcceptor() throws RemoteException, ConnectionException {
+    public ConnectionAcceptor(int TCPPort, int RMIPort) throws RemoteException, ConnectionException {
         try {
             // export to server's localhost
-            Registry registry = LocateRegistry.createRegistry(1099);
+            Registry registry = LocateRegistry.createRegistry(RMIPort);
             registry.bind("SERVER", this);
         } catch (Exception exception) {
             throw new ConnectionException();
@@ -78,7 +83,7 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements NameProvi
     @Override
     public String getNewCoupleName() throws RemoteException { // TODO: static lock here
         // increment index and decorate it.
-        return "CONNECTION" + ++lastRMIConnectionIndex;
+        return "CONN" + ++lastRMIConnectionIndex;
     }
 
     @Override
