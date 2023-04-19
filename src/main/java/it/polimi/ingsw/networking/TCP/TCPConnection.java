@@ -205,6 +205,12 @@ public class TCPConnection implements Connection {
         reader.start();
     }
 
+    /*
+     * Sets the disconnected field to true and notifies an eventual
+     * receive() method waiting for a message, that the connection will be closed, so it can throw a DisconnectedException.
+     * The reader() method will then close the socket.
+     */
+    @Override
     public void disconnect() {
         synchronized(lock) {
             disconnected = true;

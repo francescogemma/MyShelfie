@@ -1,5 +1,6 @@
 package it.polimi.ingsw.networking.TCP.Example01;
 
+import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.networking.TCP.SocketCreationException;
 import it.polimi.ingsw.networking.TCP.TCPConnection;
@@ -10,7 +11,7 @@ public class Client {
     public static void main(String[] args) {
         final String ADDRESS = "localhost";
         final int PORT = 1234;
-        TCPConnection connection;
+        Connection connection;
         Scanner scanner = new Scanner(System.in);
 
         try {

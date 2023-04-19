@@ -32,11 +32,12 @@ class TCPConnectionTest {
     @DisplayName("test basic usage")
     void connection_basicUsage_correctOutput() {
         Thread client = new Thread(() -> {
-            Connection connection = null;
+            Connection connection;
             try {
                 connection = new TCPConnection(HOST, PORT);
                 connection.send("hello");
                 Assertions.assertEquals("world", connection.receive());
+                connection.disconnect();
             } catch (Exception e) {
                 Assertions.fail();
             }
