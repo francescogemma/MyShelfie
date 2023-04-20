@@ -42,19 +42,10 @@ public class RMIConnection extends UnicastRemoteObject implements Connection, St
     private boolean disconnected = false;
 
     /**
-     * Server's registry.
+     * Lock needed to protect portions of object state that need to be modified by threads, such as
+     * the "disconnected" boolean, or the messages queue.
      */
-    private final Registry registry;
-
-    /**
-     * The name of the connection pair.
-     */
-    private final String name;
-
-    /**
-     * The stub for the server object.
-     */
-    private final NameProvidingRemote server;
+    private final Object lock = new Object();
 
     /**
      * This constructor creates a connection with some {@link it.polimi.ingsw.networking.ConnectionAcceptor acceptor}.
@@ -64,51 +55,47 @@ public class RMIConnection extends UnicastRemoteObject implements Connection, St
      * @param address is the address of the server's host.
      * @param port is the port used by {@link it.polimi.ingsw.networking.ConnectionAcceptor the server} for RMI communication.
      * @throws ConnectionException will be thrown if a failure occurs in the process of creating a new Connection.
+     * @throws RemoteException will be thrown in case of network problems, or server communication issues.
      */
-
     public RMIConnection(String address, int port) throws ConnectionException, RemoteException {
         try {
             // get the server object, and ask to reserve a new name for the couple.
-            registry = LocateRegistry.getRegistry(address, port);
-            server = (NameProvidingRemote) registry.lookup("SERVER");
-            name = server.getNewCoupleName();
+            Registry registry = LocateRegistry.getRegistry(address, port);
+            NameProvidingRemote server = (NameProvidingRemote) registry.lookup("SERVER");
+            String name = server.getNewCoupleName();
 
             // bind this to registry, and tell the server to create its own connection.
             registry.bind(name + "CLIENT", this);
-            server.createRemoteConnection(name);
+            server.createRemoteConnection(port, name);
 
             // get the newly created server-side object.
             otherConnection = (StringRemote) registry.lookup(name + "SERVER");
 
         } catch (Exception exception) {
-            exception.printStackTrace();
             throw new ConnectionException();
         }
 
-        // since the other object has already been created, we can start heartbeat here.
         heartbeat();
     }
 
     /**
      * This constructor does NOT request names to an {@link it.polimi.ingsw.networking.ConnectionAcceptor acceptor},
-     * and should only be used BY an acceptor to generate new connections, while already knowing the target's name.
+     * and should only be constructed BY an acceptor to generate new connections, while already knowing the target's name.
      * This method should be called server-side.
      *
      * @param port is the port used by {@link it.polimi.ingsw.networking.ConnectionAcceptor the server} for RMI communication.
      * @param connectionName is the name of the Connection pair that needs to be completed with the server-side connection.
      * @throws ConnectionException will be thrown if a failure occurs in the process of creating a new Connection.
+     * @throws RemoteException will be thrown in case of network problems, or server communication issues.
      */
     public RMIConnection(int port, String connectionName) throws ConnectionException, RemoteException {
         try {
-            registry = LocateRegistry.getRegistry(port);
-            server = (NameProvidingRemote) registry.lookup("SERVER");
-            name = connectionName;
-
             // bind this to registry, assuming this method is called server side.
-            registry.bind(name + "SERVER", this);
+            Registry registry = LocateRegistry.getRegistry(port);
+            registry.bind(connectionName + "SERVER", this);
 
-            // we assume the client object is created BEFORE the server object.
-            otherConnection = (StringRemote) registry.lookup(name + "CLIENT");
+            // get the client-side connection.
+            otherConnection = (StringRemote) registry.lookup(connectionName + "CLIENT");
 
         } catch (Exception exception) {
             throw new ConnectionException();
@@ -119,82 +106,81 @@ public class RMIConnection extends UnicastRemoteObject implements Connection, St
 
     @Override
     public void send(String string) throws DisconnectedException {
-        if (disconnected) {
-            throw new DisconnectedException();
-        }
-
-        try {
-            // plainly send the message to the remote object
-            otherConnection.handleMessage(string);
-        } catch (Exception exception) {
-            throw new DisconnectedException();
-        }
-    }
-
-    @Override
-    public synchronized String receive() throws DisconnectedException {
-        if (disconnected) {
-            throw new DisconnectedException();
-        }
-
-        // keep checking if we've received a string
-        while (messages.isEmpty()) {
-            try {
-                wait();
-            } catch (InterruptedException exception) {
-                exception.printStackTrace();
+        synchronized (lock) {
+            if (disconnected) {
+                // we can't send messages if we're disconnected.
+                throw new DisconnectedException();
             }
 
-            if (disconnected) {
+            try {
+                // simply send the message to the remote object.
+                otherConnection.handleMessage(string);
+            } catch (Exception exception) {
                 throw new DisconnectedException();
             }
         }
-
-        // get the next item from the queue
-        String result = messages.poll();
-        notifyAll();
-
-        return result;
     }
 
-    private static final Object disconnectLock = new Object();
+    @Override
+    public String receive() throws DisconnectedException {
+        synchronized (lock) {
+            if (disconnected) {
+                // we can't receive messages if we're disconnected.
+                throw new DisconnectedException();
+            }
+            // keep checking if we've received a string.
+            while (messages.isEmpty()) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException exception) {
+                    exception.printStackTrace();
+                }
+
+                if (disconnected) {
+                    // we can't receive messages if we're disconnected.
+                    throw new DisconnectedException();
+                }
+            }
+            // return the next item from the queue.
+            return messages.poll();
+        }
+    }
 
     @Override
-    public synchronized void disconnect() {
-        try {
+    public void disconnect() {
+        synchronized (lock) {
             disconnected = true;
-            notifyAll();
-        } catch (Exception exception) {
-            exception.printStackTrace();
+            lock.notifyAll();
         }
     }
 
     /**
      * Starts a timer that pings the target, to check for connectivity.
      */
-    public void heartbeat() {
+    private void heartbeat() {
         Timer timer = new Timer();
 
-        // create a timer task that will ping the target
+        // create a timer task to ping the target
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                if (disconnected) {
-                    timer.cancel();
-                }
-                try {
-                    if (!otherConnection.ping()) {
-                        disconnected = true;
+                synchronized (lock) {
+                    // cancel timer if already disconnected
+                    if (disconnected) {
                         timer.cancel();
                     }
-
-                } catch (RemoteException exception) {
-                    synchronized (disconnectLock) {
+                    try {
+                        // disconnect if ping object is disconnected
+                        if (!otherConnection.ping()) {
+                            disconnected = true;
+                            timer.cancel();
+                        }
+                    } catch (RemoteException exception) {
+                        // disconnect if ping fails
                         disconnected = true;
+                        lock.notifyAll();
+                        timer.cancel();
                     }
-                    notifyAll();
-
-                    timer.cancel();
                 }
             }
         };
@@ -204,13 +190,15 @@ public class RMIConnection extends UnicastRemoteObject implements Connection, St
     }
 
     @Override
-    public synchronized void handleMessage(String message) throws RemoteException {
-        messages.add(message);
-        notifyAll();
+    public void handleMessage(String message) throws RemoteException {
+        synchronized (lock) {
+            messages.add(message);
+            lock.notifyAll();
+        }
     }
 
     @Override
     public boolean ping() throws RemoteException {
-        return !disconnected;
+        synchronized (lock) { return !disconnected; }
     }
 }

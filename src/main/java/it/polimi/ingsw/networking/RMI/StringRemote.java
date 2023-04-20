@@ -11,15 +11,15 @@ import java.rmi.RemoteException;
  */
 public interface StringRemote extends Remote {
     /**
-     * This should be the only remote method we need: a simple "acceptor" method to receive a string.
-     *
+     * A simple "acceptor" method to receive a string.
      * @param message is the string that will be received and stored.
      * @throws RemoteException will be thrown in case of network problems, or server communication issues.
      */
     void handleMessage(String message) throws RemoteException;
 
     /**
-     * This should be used for some sort of RMI keep-alive implementation. The method itself should do nothing.
+     * This should be used for an RMI keep-alive implementation.
+     * @return true if the pinged object is connected.
      * @throws RemoteException will be thrown in case of network problems, or server communication issues.
      */
     boolean ping() throws RemoteException;

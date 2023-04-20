@@ -1,4 +1,4 @@
-package it.polimi.ingsw.networking.Example01;
+package it.polimi.ingsw.networking.example01;
 
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.ConnectionAcceptor;
@@ -9,7 +9,7 @@ public class Server {
     public Server() { }
     public static void main( String[] args ) {
         try {
-            // create and export our acceptor
+            // create and export our acceptor.
             System.out.println("Starting server...");
             ConnectionAcceptor serverAcceptor = new ConnectionAcceptor(1234, 1099);
             System.out.println("Server started.");
@@ -22,16 +22,13 @@ public class Server {
 
                 System.out.println("Waiting 2 seconds before starting to receive...");
                 TimeUnit.SECONDS.sleep(2);
-                
+
+                // wait for two messages using the connection created by the accept method.
                 System.out.println("Response 1: \"" + serverSideConnection.receive() + "\"");
                 System.out.println("Response 2: \"" + serverSideConnection.receive() + "\"");
 
+                // use the same connection to send back a message.
                 serverSideConnection.send("Hello there! I'm the server!");
-
-                System.out.println("Waiting 10 seconds before trying to send to a disconnected agent...");
-                TimeUnit.SECONDS.sleep(10);
-
-                serverSideConnection.send("Hello! Trying to contact a disconnected agent.");
             }
         } catch (Exception exception) {
             exception.printStackTrace();

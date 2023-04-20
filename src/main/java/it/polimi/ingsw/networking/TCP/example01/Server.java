@@ -1,4 +1,4 @@
-package it.polimi.ingsw.networking.TCP.Example01;
+package it.polimi.ingsw.networking.TCP.example01;
 
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.DisconnectedException;
