@@ -5,7 +5,8 @@ import it.polimi.ingsw.networking.DisconnectedException;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -23,7 +24,7 @@ public class TCPConnection implements Connection {
     private final DataInputStream in;
     private boolean disconnected;
     private final Object lock = new Object();
-    private final Stack<String> receivedMessages;
+    private final Deque<String> receivedMessages;
 
     /**
      * Creates a new {@link TCPConnection TCPConnection} object intended to be used as a client.
@@ -41,7 +42,7 @@ public class TCPConnection implements Connection {
      */
     public TCPConnection(String address, int port) throws SocketCreationException {
         disconnected = false;
-        receivedMessages = new Stack<>();
+        receivedMessages = new ArrayDeque<>();
 
         try {
             socket = new Socket(address, port);
@@ -74,7 +75,7 @@ public class TCPConnection implements Connection {
      */
     public TCPConnection(Socket socket) throws SocketCreationException {
         disconnected = false;
-        receivedMessages = new Stack<>();
+        receivedMessages = new ArrayDeque<>();
 
         this.socket = socket;
 
@@ -130,7 +131,7 @@ public class TCPConnection implements Connection {
             }
 
             // return the first message in the receivedMessages stack
-            return receivedMessages.pop();
+            return receivedMessages.poll();
         }
     }
 
@@ -186,7 +187,7 @@ public class TCPConnection implements Connection {
                          * we notify the receive() method that it the stack is not empty anymore, and it can read the message
                          */
                         synchronized(lock) {
-                            receivedMessages.push(read);
+                            receivedMessages.add(read);
                             lock.notifyAll();
                         }
                     }
