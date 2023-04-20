@@ -2,7 +2,9 @@ package it.polimi.ingsw.networking;
 
 import it.polimi.ingsw.networking.RMI.NameProvidingRemote;
 import it.polimi.ingsw.networking.RMI.RMIConnection;
+import it.polimi.ingsw.networking.TCP.TCPConnection;
 
+import java.net.ServerSocket;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -29,15 +31,24 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements NameProvi
     public ConnectionAcceptor(int TCPPort, int RMIPort) throws RemoteException, ConnectionException {
         try {
             // export to server's localhost
-            Registry registry = LocateRegistry.createRegistry(RMIPort);
+            Registry registry = LocateRegistry.createRegistry(RMIPort); // TODO: search before creating by using static variables
             registry.bind("SERVER", this);
         } catch (Exception exception) {
             throw new ConnectionException();
         }
 
+        try {
+            serverSocket = new ServerSocket(TCPPort);
+        } catch (Exception exception) {
+            throw new ConnectionException();
+        }
+
         // whatever is contained in RMIConnection is as good as "null".
-        cacheValid = false;
+        rmiCacheValid = false;
+        tcpCacheValid = false;
     }
+
+    private final ServerSocket serverSocket;
 
     /**
      * Lock used to handle multiple threads requesting names concurrently.
@@ -56,52 +67,73 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements NameProvi
     /**
      * Last cached RMIConnection, received through the createRemoteConnection method.
      */
-    private RMIConnection RMIConnection;
+    private RMIConnection rmiConnection;
+    private TCPConnection tcpConnection; // TODO: change all other occurrences of UPPER characters
 
     /**
      * Whenever this bool is false, the content of "RMIConnection" is treated as if it were "null".
      */
-    private boolean cacheValid;
+    private boolean rmiCacheValid;
+    private boolean tcpCacheValid;
+
+    private static final Object acceptLock = new Object();
 
     /**
      * This method will simply wait for a connection, and return a connection object to connect
      * back to that caller
      */
-    public synchronized Connection accept() {
-        // make all threads wait for a new connection
-        while (!cacheValid) {
+    public Connection accept() {
+        Thread tcpThread = new Thread(() -> {
             try {
-                wait();
-            } catch (InterruptedException interruptedException) {
-                interruptedException.printStackTrace();
+                tcpConnection = new TCPConnection(serverSocket.accept());
+                tcpCacheValid = true;
+                synchronized (acceptLock) { acceptLock.notifyAll(); }
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
-        }
-        // invalidate cache and notify all producers
-        cacheValid = false;
-        notifyAll();
+        });
+        tcpThread.start();
 
-        // this is technically rep exposure, but the cacheValid bool
-        // should keep things stable. feel free to suggest better solutions.
-        RMIConnection.heartbeat();
-        return RMIConnection;
+        synchronized (acceptLock) {
+            // make all threads wait for a new connection
+            while (!rmiCacheValid && !tcpCacheValid) {
+                try {
+                    acceptLock.wait();
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
+                }
+            }
+
+            if (rmiCacheValid) {
+                rmiCacheValid = false;
+                acceptLock.notifyAll();
+                return rmiConnection;
+            }
+
+            tcpCacheValid = false;
+            acceptLock.notifyAll();
+            return tcpConnection;
+        }
     }
 
     @Override
-    public synchronized void createRemoteConnection(String coupleName) throws RemoteException, ConnectionException {
-        // make all threads wait for the cache to be empty
-        while (cacheValid) {
-            try {
-                wait();
-            } catch (InterruptedException interruptedException) {
-                interruptedException.printStackTrace();
+    public void createRemoteConnection(String coupleName) throws RemoteException, ConnectionException {
+        synchronized (acceptLock) {
+            // make all threads wait for the cache to be empty
+            while (rmiCacheValid) {
+                try {
+                    acceptLock.wait();
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
+                }
             }
-        }
-        // override the current stashed RMIConnection
-        this.RMIConnection = new RMIConnection(1099, coupleName);
+            // override the current stashed RMIConnection
+            this.rmiConnection = new RMIConnection(1099, coupleName);
 
-        // validate cache and notify all consumers
-        cacheValid = true;
-        notifyAll();
+            // validate cache and notify all consumers
+            rmiCacheValid = true;
+            acceptLock.notifyAll();
+        }
     }
 
     @Override

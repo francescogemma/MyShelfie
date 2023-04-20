@@ -65,6 +65,7 @@ public class RMIConnection extends UnicastRemoteObject implements Connection, St
      * @param port is the port used by {@link it.polimi.ingsw.networking.ConnectionAcceptor the server} for RMI communication.
      * @throws ConnectionException will be thrown if a failure occurs in the process of creating a new Connection.
      */
+
     public RMIConnection(String address, int port) throws ConnectionException, RemoteException {
         try {
             // get the server object, and ask to reserve a new name for the couple.
@@ -112,6 +113,8 @@ public class RMIConnection extends UnicastRemoteObject implements Connection, St
         } catch (Exception exception) {
             throw new ConnectionException();
         }
+
+        heartbeat();
     }
 
     @Override
@@ -154,14 +157,13 @@ public class RMIConnection extends UnicastRemoteObject implements Connection, St
         return result;
     }
 
+    private static final Object disconnectLock = new Object();
+
     @Override
-    public void disconnect() {
+    public synchronized void disconnect() {
         try {
             disconnected = true;
             notifyAll();
-
-            registry.unbind(name + "CLIENT");
-            registry.unbind(name + "SERVER");
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -177,10 +179,19 @@ public class RMIConnection extends UnicastRemoteObject implements Connection, St
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
+                if (disconnected) {
+                    timer.cancel();
+                }
                 try {
-                    otherConnection.ping();
+                    if (!otherConnection.ping()) {
+                        disconnected = true;
+                        timer.cancel();
+                    }
+
                 } catch (RemoteException exception) {
-                    disconnected = true;
+                    synchronized (disconnectLock) {
+                        disconnected = true;
+                    }
                     notifyAll();
 
                     timer.cancel();
@@ -193,8 +204,13 @@ public class RMIConnection extends UnicastRemoteObject implements Connection, St
     }
 
     @Override
-    public synchronized void handleMessage(String message) throws RemoteException { messages.add(message); }
+    public synchronized void handleMessage(String message) throws RemoteException {
+        messages.add(message);
+        notifyAll();
+    }
 
     @Override
-    public void ping() throws RemoteException { }
+    public boolean ping() throws RemoteException {
+        return !disconnected;
+    }
 }

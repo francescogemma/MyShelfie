@@ -1,4 +1,4 @@
-package it.polimi.ingsw.networking.RMI.Example01;
+package it.polimi.ingsw.networking.Example01;
 
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.ConnectionAcceptor;
@@ -11,7 +11,7 @@ public class Server {
         try {
             // create and export our acceptor
             System.out.println("Starting server...");
-            ConnectionAcceptor serverAcceptor = new ConnectionAcceptor(9080, 1099);
+            ConnectionAcceptor serverAcceptor = new ConnectionAcceptor(1234, 1099);
             System.out.println("Server started.");
 
             // from here on, we can use the serverAcceptor.
@@ -20,13 +20,18 @@ public class Server {
                 Connection serverSideConnection = serverAcceptor.accept();
                 System.out.println("Accepted.");
 
-                System.out.println("Waiting 10 seconds before starting to receive...");
-                TimeUnit.SECONDS.sleep(10);
+                System.out.println("Waiting 2 seconds before starting to receive...");
+                TimeUnit.SECONDS.sleep(2);
                 
                 System.out.println("Response 1: \"" + serverSideConnection.receive() + "\"");
                 System.out.println("Response 2: \"" + serverSideConnection.receive() + "\"");
 
                 serverSideConnection.send("Hello there! I'm the server!");
+
+                System.out.println("Waiting 10 seconds before trying to send to a disconnected agent...");
+                TimeUnit.SECONDS.sleep(10);
+
+                serverSideConnection.send("Hello! Trying to contact a disconnected agent.");
             }
         } catch (Exception exception) {
             exception.printStackTrace();

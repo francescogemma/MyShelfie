@@ -22,5 +22,5 @@ public interface StringRemote extends Remote {
      * This should be used for some sort of RMI keep-alive implementation. The method itself should do nothing.
      * @throws RemoteException will be thrown in case of network problems, or server communication issues.
      */
-    void ping() throws RemoteException;
+    boolean ping() throws RemoteException;
 }
