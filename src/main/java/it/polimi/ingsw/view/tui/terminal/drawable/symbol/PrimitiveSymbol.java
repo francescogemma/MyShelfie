@@ -83,6 +83,8 @@ public enum PrimitiveSymbol implements Symbol {
     LEFT_PARENTHESIS("("),
     RIGHT_PARENTHESIS(")"),
     EXCLAMATION_MARK("!"),
+    POINT("."),
+    APOSTROPHE("'"),
     EMPTY(" ");
 
     private final String symbol;

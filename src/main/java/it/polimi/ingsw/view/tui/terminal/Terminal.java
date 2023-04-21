@@ -34,16 +34,21 @@ public abstract class Terminal {
     public static final String RIGHT_ARROW = "\033[C";
     public static final String LEFT_ARROW = "\033[D";
 
+    public static final Set<String> NUMBERS = Set.of(
+        "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+    );
+
     public static final Set<String> TEXT = Set.of(
         "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q",
-        "r", "s", "t", "u", "v", "w", "x", "y", "z", "-", "_", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+        "r", "s", "t", "u", "v", "w", "x", "y", "z", "-", "_",
         "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
-        "V", "W", "X", "Y", "Z"
+        "V", "W", "X", "Y", "Z", "."
     );
 
     private static final Set<String> ALLOWED_INPUT_KEYS = new HashSet<>();
 
     static {
+        ALLOWED_INPUT_KEYS.addAll(NUMBERS);
         ALLOWED_INPUT_KEYS.addAll(TEXT);
         ALLOWED_INPUT_KEYS.addAll(Set.of(
             UP_ARROW, DOWN_ARROW, RIGHT_ARROW, LEFT_ARROW,
@@ -104,6 +109,8 @@ public abstract class Terminal {
     public abstract int read() throws IOException;
 
     public AppLayoutData start(App app) throws TerminalException {
+        app.setLock(drawingLock);
+
         synchronized (startLock) {
             enableRawMode();
 
@@ -158,6 +165,7 @@ public abstract class Terminal {
                             Optional<AppLayout> nextAppLayout = app.getNextAppLayout();
                             if (nextAppLayout.isEmpty()) {
                                 hasToDraw = false;
+                                drawingLock.notifyAll();
                                 return;
                             }
 

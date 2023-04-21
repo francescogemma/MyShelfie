@@ -73,4 +73,10 @@ public class App {
 
         return Optional.ofNullable(currentAppLayout);
     }
+
+    public void setLock(Object lock) {
+        for (AppLayout appLayout : appLayouts.values()) {
+            appLayout.setLock(lock);
+        }
+    }
 }

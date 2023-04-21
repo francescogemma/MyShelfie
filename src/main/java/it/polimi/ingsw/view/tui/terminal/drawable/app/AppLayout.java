@@ -63,4 +63,14 @@ public abstract class AppLayout extends FixedLayoutDrawable<FullyResizableDrawab
     public void setAppDataProvider(AppDataProvider appDataProvider) {
         this.appDataProvider = appDataProvider;
     }
+
+    private Object lock;
+
+    void setLock(Object lock) {
+        this.lock = lock;
+    }
+
+    protected Object getLock() {
+        return lock;
+    }
 }

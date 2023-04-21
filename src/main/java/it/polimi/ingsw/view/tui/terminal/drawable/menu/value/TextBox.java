@@ -65,7 +65,7 @@ public class TextBox extends ValueDrawable<String> {
 
     @Override
     public boolean handleInput(String key) {
-        if (Terminal.TEXT.contains(key)) {
+        if (Terminal.TEXT.contains(key) || Terminal.NUMBERS.contains(key)) {
             text.insert(cursorPosition, key);
             cursorPosition++;
 
