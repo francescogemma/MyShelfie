@@ -1,13 +1,12 @@
-package it.polimi.ingsw.networking.TCP.example01;
+package it.polimi.ingsw.networking.example01;
 
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.DisconnectedException;
-import it.polimi.ingsw.networking.TCP.SocketCreationException;
 import it.polimi.ingsw.networking.TCP.TCPConnection;
 
 import java.util.Scanner;
 
-public class Client {
+public class ClientSocketScanner {
     public static void main(String[] args) {
         final String ADDRESS = "localhost";
         final int PORT = 1234;
@@ -16,15 +15,17 @@ public class Client {
 
         try {
             connection = new TCPConnection(ADDRESS, PORT);
-        } catch (SocketCreationException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
 
         try {
-            System.out.println(connection.receive());
+            System.out.println("received: " + connection.receive());
             System.out.print("Insert a string to send to the server: ");
             connection.send(scanner.nextLine());
         } catch (DisconnectedException e) {
+            e.printStackTrace();
             System.out.println("disconnected");
         }
 

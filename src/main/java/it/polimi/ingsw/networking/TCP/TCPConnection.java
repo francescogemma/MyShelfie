@@ -2,9 +2,11 @@ package it.polimi.ingsw.networking.TCP;
 
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.DisconnectedException;
+import it.polimi.ingsw.networking.ServerNotFoundException;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Timer;
@@ -39,8 +41,9 @@ public class TCPConnection implements Connection {
      * @param address address of the machine hosting the server socket
      * @param port port of the server socket
      * @throws SocketCreationException if an error occurs while creating the socket
+     * @throws ServerNotFoundException if the server ip is not found
      */
-    public TCPConnection(String address, int port) throws SocketCreationException {
+    public TCPConnection(String address, int port) throws SocketCreationException, ServerNotFoundException {
         disconnected = false;
         receivedMessages = new ArrayDeque<>();
 
@@ -52,6 +55,8 @@ public class TCPConnection implements Connection {
 
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
+        } catch(UnknownHostException e) {
+            throw new ServerNotFoundException("unknown host", e);
         } catch(IOException e) {
             throw new SocketCreationException("error while creating socket", e);
         }
