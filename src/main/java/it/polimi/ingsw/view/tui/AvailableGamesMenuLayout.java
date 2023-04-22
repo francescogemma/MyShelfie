@@ -25,7 +25,6 @@ public class AvailableGamesMenuLayout extends AppLayout {
     ).center().crop().fixSize(new DrawableSize(3, 25));
     private final Drawable noAvailableGamesTextBox = new TextBox().text("There aren't available games!")
         .unfocusable().center();
-
     static class JoinableGameDrawable extends FixedLayoutDrawable<Drawable> {
         private final TextBox textBox = new TextBox();
         private final Button button = new Button("Join");
@@ -37,17 +36,16 @@ public class AvailableGamesMenuLayout extends AppLayout {
             ).fixSize(new DrawableSize(5, 80)).addBorderBox());
         }
     }
-
     private final RecyclerDrawable<JoinableGameDrawable, String> recyclerGamesList = new RecyclerDrawable<>(Orientation.VERTICAL,
         JoinableGameDrawable::new);
     private final AlternativeDrawable alternative = new AlternativeDrawable(noAvailableGamesTextBox, recyclerGamesList.center()
                 .scrollable());
-
     private final ValueMenuEntry<String> gameNameEntry = new ValueMenuEntry<>("New game's name", new TextBox());
     private final Button createNewGameButton = new Button("Create new game");
     private final Button backToLoginButton = new Button("Back to login");
 
     private List<String> availableGames = new ArrayList<>();
+    private String selectedGameName;
 
     public AvailableGamesMenuLayout() {
         setLayout(new OrientedLayout(Orientation.VERTICAL,
@@ -63,7 +61,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
         ).center().crop());
 
         setData(new AppLayoutData(Map.of(
-
+            "selectedgame", () -> selectedGameName
         )));
 
         backToLoginButton.onpress(() -> switchAppLayout(LoginMenuLayout.NAME));
@@ -81,6 +79,10 @@ public class AvailableGamesMenuLayout extends AppLayout {
             if (availableGames.size() > 0) {
                 recyclerGamesList.populate(availableGames, (joinableGameDrawable, name) -> {
                     joinableGameDrawable.textBox.text(name);
+                    joinableGameDrawable.button.onpress(() -> {
+                        selectedGameName = name;
+                        switchAppLayout(LobbyLayout.NAME);
+                    });
                 });
 
                 alternative.second();

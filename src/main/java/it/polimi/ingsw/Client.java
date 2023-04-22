@@ -4,10 +4,7 @@ import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.event.MockNetworkEventTransceiver;
 import it.polimi.ingsw.event.data.LoginEventData;
-import it.polimi.ingsw.view.tui.AvailableGamesMenuLayout;
-import it.polimi.ingsw.view.tui.ConnectionMenuLayout;
-import it.polimi.ingsw.view.tui.InitialMenuLayout;
-import it.polimi.ingsw.view.tui.LoginMenuLayout;
+import it.polimi.ingsw.view.tui.*;
 import it.polimi.ingsw.view.tui.terminal.Terminal;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.App;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
@@ -38,7 +35,7 @@ public class Client {
             System.out.println("GUI not yet implemented! I'm going to blow up! 3... 2... 1... BOOM!");
         } else {
             terminal.start(new App(data, ConnectionMenuLayout::new, LoginMenuLayout::new,
-                AvailableGamesMenuLayout::new));
+                AvailableGamesMenuLayout::new, LobbyLayout::new));
         }
 
         transceiver.disconnect();

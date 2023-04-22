@@ -29,5 +29,9 @@ public class OrientedLayoutElement {
 
     public void setWeight(int weight) {
         this.weight = weight;
+
+        if (weight == 0) {
+            drawable.unfocus();
+        }
     }
 }

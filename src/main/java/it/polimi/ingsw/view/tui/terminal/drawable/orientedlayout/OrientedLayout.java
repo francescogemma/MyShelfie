@@ -108,6 +108,12 @@ public class OrientedLayout extends Drawable {
 
         size = DrawableSize.craftSizeByOrientation(orientation, elementsOriginParallelComponent
             .get(elementsOriginParallelComponent.size() - 1) - 1, maxPerpendicularSizeComponent);
+
+        // If the focused element became unfocused we switch to the next one
+        if (elementOnFocusIndex != -1 && elements.get(elementOnFocusIndex).getDrawable().getFocusedCoordinate()
+            .isEmpty()) {
+            focus(Coordinate.origin());
+        }
     }
 
     @Override
@@ -170,13 +176,8 @@ public class OrientedLayout extends Drawable {
     }
 
     private boolean focusNextElement(int direction) {
-        if (elementOnFocusIndex == -1 || elements.get(elementOnFocusIndex).getDrawable().getFocusedCoordinate().isEmpty()) {
-
-            throw new IllegalStateException("An oriented layout can handle input only when it has at least one focusable" +
-                " element and is on focus");
-        }
-
-        return focusNextElement(direction, elements.get(elementOnFocusIndex).getDrawable().getFocusedCoordinate().get());
+        return focusNextElement(direction, elements.get(elementOnFocusIndex).getDrawable().getFocusedCoordinate()
+            .orElse(Coordinate.origin()));
     }
 
     @Override
@@ -258,14 +259,10 @@ public class OrientedLayout extends Drawable {
 
     @Override
     public void unfocus() {
-        if (elementOnFocusIndex == -1 || elements.get(elementOnFocusIndex).getDrawable()
-            .getFocusedCoordinate().isEmpty()) {
-            throw new IllegalStateException("You can't unfocus an oriented layout which hasn't any element in focus");
+        if (elementOnFocusIndex != -1) {
+            elements.get(elementOnFocusIndex).getDrawable().unfocus();
+            elementOnFocusIndex = -1;
         }
-
-        elements.get(elementOnFocusIndex).getDrawable().unfocus();
-
-        elementOnFocusIndex = -1;
     }
 
     @Override
