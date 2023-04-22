@@ -19,7 +19,7 @@ public class OrientedLayout extends Drawable {
 
     public OrientedLayout(Orientation orientation, OrientedLayoutElement... elements) {
         this.orientation = orientation;
-        this.elements = Arrays.asList(elements);
+        this.elements = new ArrayList<>(Arrays.asList(elements));
         elementsOriginParallelComponent = new ArrayList<>(elements.length + 1);
         for (int i = 0; i < elements.length + 1; i++) {
             elementsOriginParallelComponent.add(0);
@@ -288,5 +288,6 @@ public class OrientedLayout extends Drawable {
 
     public void addElement(OrientedLayoutElement element) {
         elements.add(element);
+        elementsOriginParallelComponent.add(0);
     }
 }

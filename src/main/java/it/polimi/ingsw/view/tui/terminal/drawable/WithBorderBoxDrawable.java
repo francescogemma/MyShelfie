@@ -11,7 +11,7 @@ public class WithBorderBoxDrawable extends Drawable {
 
     private boolean onFocus = false;
 
-    private static Color color = Color.RED;
+    private static Color color = Color.FOCUS;
 
     public WithBorderBoxDrawable(Drawable toAddBorderBox) {
         this.toAddBorderBox = toAddBorderBox;

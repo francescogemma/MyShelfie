@@ -75,7 +75,8 @@ public class AvailableGamesMenuLayout extends AppLayout {
             usernameTextBox.text(appDataProvider.getString(LoginMenuLayout.NAME, "username"));
 
             // Populating availableGames with mock data.
-            availableGames = List.of( "game1", "game2", "game3", "game4", "game5" );
+            availableGames = List.of(    "game1", "game2", "game3", "game4", "game5", "game6", "game7",
+                                         "game8", "game9", "game10", "game11", "game12" );
 
             if (availableGames.size() > 0) {
                 recyclerGamesList.populate(availableGames, (joinableGameDrawable, name) -> {
@@ -83,6 +84,8 @@ public class AvailableGamesMenuLayout extends AppLayout {
                 });
 
                 alternative.second();
+            } else {
+                alternative.first();
             }
         }
     }
