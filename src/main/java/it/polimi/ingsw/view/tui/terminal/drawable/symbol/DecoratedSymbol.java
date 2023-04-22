@@ -57,26 +57,32 @@ public class DecoratedSymbol implements Symbol {
         return primitiveSymbol;
     }
 
+    @Override
     public DecoratedSymbol colorForeground(Color color) {
         return DecoratedSymbol.getInstance(primitiveSymbol, decorations, color.colorForeground());
     }
 
+    @Override
     public DecoratedSymbol colorBackground(Color color) {
         return DecoratedSymbol.getInstance(primitiveSymbol, decorations, color.colorBackground());
     }
 
+    @Override
     public DecoratedSymbol bold() {
         return DecoratedSymbol.getInstance(primitiveSymbol, decorations, List.of(1));
     }
 
+    @Override
     public DecoratedSymbol italic() {
         return DecoratedSymbol.getInstance(primitiveSymbol, decorations, List.of(3));
     }
 
+    @Override
     public DecoratedSymbol underline() {
         return DecoratedSymbol.getInstance(primitiveSymbol, decorations, List.of(4));
     }
 
+    @Override
     public DecoratedSymbol strikethrough() {
         return DecoratedSymbol.getInstance(primitiveSymbol, decorations, List.of(9));
     }

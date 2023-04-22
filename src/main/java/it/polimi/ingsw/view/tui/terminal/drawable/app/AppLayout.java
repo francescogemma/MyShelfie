@@ -73,4 +73,14 @@ public abstract class AppLayout extends FixedLayoutDrawable<FullyResizableDrawab
     protected Object getLock() {
         return lock;
     }
+
+    private boolean isCurrentLayout = false;
+
+    public void setIsCurrentLayout(boolean isCurrentLayout) {
+        this.isCurrentLayout = isCurrentLayout;
+    }
+
+    protected boolean isCurrentLayout() {
+        return isCurrentLayout;
+    }
 }

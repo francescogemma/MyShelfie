@@ -8,6 +8,10 @@ public abstract class FixedLayoutDrawable<T extends Drawable> extends Drawable {
     private Drawable layout;
 
     protected void setLayout(T layout) {
+        if (this.layout != null) {
+            throw new IllegalStateException("You can set the layout of a fixed layout drawable only once");
+        }
+
         this.layout = layout;
     }
 

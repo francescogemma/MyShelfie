@@ -15,6 +15,9 @@ public class MockNetworkEventTransceiver implements EventTransceiver {
 
     private final Gson gson;
 
+
+    private boolean disconnect = false;
+
     public MockNetworkEventTransceiver() {
         gson = new GsonBuilder().registerTypeAdapterFactory(new EventDataTypeAdapterFactory()).create();
 
@@ -25,6 +28,10 @@ public class MockNetworkEventTransceiver implements EventTransceiver {
                         try {
                             lock.wait();
                         } catch (InterruptedException e) { }
+
+                        if (disconnect) {
+                            return;
+                        }
                     }
 
                     List<String> serializedEventsCopy = new ArrayList<>(serializedEvents);
@@ -53,8 +60,14 @@ public class MockNetworkEventTransceiver implements EventTransceiver {
     public void broadcast(EventData data) {
         synchronized (lock) {
             serializedEvents.add(gson.toJson(data, EventData.class));
-            System.out.println(serializedEvents.get(serializedEvents.size() - 1));
 
+            lock.notifyAll();
+        }
+    }
+
+    public void disconnect() {
+        synchronized (lock) {
+            disconnect = true;
             lock.notifyAll();
         }
     }

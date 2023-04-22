@@ -53,10 +53,12 @@ public class App {
     public Optional<AppLayout> getNextAppLayout() {
         if (currentAppLayout == null) {
             currentAppLayout = startAppLayout;
+            currentAppLayout.setIsCurrentLayout(true);
             currentAppLayout.setup(START_NAME);
         } else {
             Optional<String> nextAppLayoutName = currentAppLayout.nextAppLayoutName();
             if (nextAppLayoutName.isPresent()) {
+                currentAppLayout.setIsCurrentLayout(false);
                 if (nextAppLayoutName.get().equals(EXIT_NAME)) {
                     currentAppLayout = null;
                 } else {
@@ -66,6 +68,7 @@ public class App {
 
                     AppLayout oldAppLayout = currentAppLayout;
                     currentAppLayout = appLayouts.get(nextAppLayoutName.get());
+                    currentAppLayout.setIsCurrentLayout(true);
                     currentAppLayout.setup(oldAppLayout.getName());
                 }
             }

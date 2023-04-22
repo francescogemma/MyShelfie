@@ -1,6 +1,5 @@
 package it.polimi.ingsw.view.tui;
 
-import it.polimi.ingsw.Client;
 import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.MockNetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
@@ -8,7 +7,6 @@ import it.polimi.ingsw.event.data.LoginEventData;
 import it.polimi.ingsw.view.tui.terminal.drawable.DrawableSize;
 import it.polimi.ingsw.view.tui.terminal.drawable.Fill;
 import it.polimi.ingsw.view.tui.terminal.drawable.Orientation;
-import it.polimi.ingsw.view.tui.terminal.drawable.app.App;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
 import it.polimi.ingsw.view.tui.terminal.drawable.menu.Button;
@@ -35,14 +33,14 @@ public class LoginMenuLayout extends AppLayout {
     private final TextBox popUpTextBox = new TextBox().unfocusable();
 
     private final TwoLayersDrawable twoLayers = new TwoLayersDrawable(new OrientedLayout(Orientation.VERTICAL,
-            usernameEntry.center().weight(33),
-            passwordEntry.center().weight(33),
+            usernameEntry.center().weight(1),
+            passwordEntry.center().weight(1),
             new OrientedLayout(Orientation.HORIZONTAL,
-                new Fill(PrimitiveSymbol.EMPTY).weight(25),
-                loginButton.center().weight(25),
-                exitButton.center().weight(25),
-                new Fill(PrimitiveSymbol.EMPTY).weight(25)
-            ).weight(34)
+                new Fill(PrimitiveSymbol.EMPTY).weight(1),
+                loginButton.center().weight(1),
+                exitButton.center().weight(1),
+                new Fill(PrimitiveSymbol.EMPTY).weight(1)
+            ).weight(1)
         ).center().scrollable().alignUpLeft().crop(),
 
         popUpTextBox.center().crop().fixSize(new DrawableSize(5, 30))
@@ -85,21 +83,13 @@ public class LoginMenuLayout extends AppLayout {
         exitButton.onpress(this::mustExit);
     }
 
-    private String connectionType;
-    private String serverIp;
-    private int serverPort;
-
-    private MockNetworkEventTransceiver transceiver;
+    private MockNetworkEventTransceiver  transceiver;
 
     @Override
     public void setup(String previousLayoutName) {
-        if (previousLayoutName.equals(App.START_NAME)) {
-            connectionType = appDataProvider.getString(App.START_NAME, "connection");
-            serverIp = appDataProvider.getString(App.START_NAME, "ipaddress");
-            serverPort = appDataProvider.getInt(App.START_NAME, "port");
-
-            // Getting the transceiver
-            transceiver = Client.getTransceiver();
+        if (previousLayoutName.equals(ConnectionMenuLayout.NAME)) {
+            transceiver = (MockNetworkEventTransceiver)
+                appDataProvider.get(ConnectionMenuLayout.NAME, "transceiver");
         }
     }
 

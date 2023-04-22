@@ -18,15 +18,6 @@ public class OrientedLayout extends Drawable {
     private int elementOnFocusIndex = -1;
 
     public OrientedLayout(Orientation orientation, OrientedLayoutElement... elements) {
-        int totalWeight = 0;
-        for (OrientedLayoutElement element : elements) {
-            totalWeight += element.getWeight();
-        }
-
-        if (totalWeight != 100) {
-            throw new IllegalArgumentException("Layout elements weights must add up to 100");
-        }
-
         this.orientation = orientation;
         this.elements = Arrays.asList(elements);
         elementsOriginParallelComponent = new ArrayList<>(elements.length + 1);
@@ -48,9 +39,42 @@ public class OrientedLayout extends Drawable {
          * The first element always starts at (1, 1), hence the origin parallel component is 1 (whatever the orientation).
          */
         elementsOriginParallelComponent.set(0, 1);
-        for (int i = 0; i < elements.size(); i++) {
+
+        int totalWeight = 0;
+        for (OrientedLayoutElement element : elements) {
+            totalWeight += element.getWeight();
+        }
+        int actualLastElementParallelSizeComponent = 0;
+        if (totalWeight != 0 && elements.get(elements.size() - 1).getWeight() > 0) {
+            int desiredLastElementParallelSizeComponent = remainingParallelSizeComponent *
+                elements.get(elements.size() - 1).getWeight() / totalWeight;
+
+            elements.get(elements.size() - 1).getDrawable().askForSize(DrawableSize.craftSizeByOrientation(orientation,
+                desiredLastElementParallelSizeComponent,
+                desiredSize.getPerpendicularSizeComponent(orientation)));
+
+            actualLastElementParallelSizeComponent = elements.get(elements.size() - 1).getDrawable()
+                .getSize().getParallelSizeComponent(orientation);
+
+            maxPerpendicularSizeComponent = elements.get(elements.size() - 1).getDrawable()
+                .getSize().getPerpendicularSizeComponent(orientation);
+        }
+
+        remainingParallelSizeComponent -= actualLastElementParallelSizeComponent;
+        if (remainingParallelSizeComponent < 0) {
+            remainingParallelSizeComponent = 0;
+        }
+
+        for (int i = 0; i < elements.size() - 1; i++) {
+            if (elements.get(i).getWeight() == 0) {
+                elementsOriginParallelComponent.set(i + 1, elementsOriginParallelComponent.get(i));
+
+                continue;
+            }
+
             int remainingWeight = 0;
-            for (int j = i; j < elements.size(); j++) {
+            // We do not consider the last element since we have already assigned its size.
+            for (int j = i; j < elements.size() - 1; j++) {
                 remainingWeight += elements.get(j).getWeight();
             }
 
@@ -79,6 +103,8 @@ public class OrientedLayout extends Drawable {
             elementsOriginParallelComponent.set(i + 1, elementsOriginParallelComponent.get(i) +
                 actualSize.getParallelSizeComponent(orientation));
         }
+        elementsOriginParallelComponent.set(elements.size(), elementsOriginParallelComponent.get(elements.size() - 1) +
+            actualLastElementParallelSizeComponent);
 
         size = DrawableSize.craftSizeByOrientation(orientation, elementsOriginParallelComponent
             .get(elementsOriginParallelComponent.size() - 1) - 1, maxPerpendicularSizeComponent);
@@ -112,7 +138,8 @@ public class OrientedLayout extends Drawable {
     }
 
     private boolean focusElement(int elementToFocusIndex, Coordinate desiredCoordinate) {
-        if (elementToFocusIndex < 0 || elementToFocusIndex >= elements.size()) {
+        if (elementToFocusIndex < 0 || elementToFocusIndex >= elements.size()
+            || elements.get(elementToFocusIndex).getWeight() == 0) {
             return false;
         }
 
@@ -154,6 +181,10 @@ public class OrientedLayout extends Drawable {
 
     @Override
     public boolean handleInput(String key) {
+        if (elementOnFocusIndex == -1) {
+            return false;
+        }
+
         if (elements.get(elementOnFocusIndex).getDrawable().handleInput(key)) {
             return true;
         }
@@ -249,5 +280,13 @@ public class OrientedLayout extends Drawable {
                     elementsOriginParallelComponent.get(elementOnFocusIndex) - 1,
                 coordinate.getPerpendicularComponent(orientation)
         ));
+    }
+
+    public List<OrientedLayoutElement> getElements() {
+        return new ArrayList<>(elements);
+    }
+
+    public void addElement(OrientedLayoutElement element) {
+        elements.add(element);
     }
 }

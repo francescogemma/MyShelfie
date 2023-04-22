@@ -3,6 +3,8 @@ package it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class FullyResizableOrientedLayout extends FullyResizableDrawable {
@@ -43,5 +45,13 @@ public class FullyResizableOrientedLayout extends FullyResizableDrawable {
     @Override
     public Optional<Coordinate> getFocusedCoordinate() {
         return layout.getFocusedCoordinate();
+    }
+
+    public List<FullyResizableOrientedLayout> getElements() {
+        return new ArrayList<>((List) layout.getElements());
+    }
+
+    public void addElement(FullyResizableOrientedLayoutElement element) {
+        layout.addElement(element);
     }
 }

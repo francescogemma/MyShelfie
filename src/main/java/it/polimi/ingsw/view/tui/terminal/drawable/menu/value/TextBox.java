@@ -4,6 +4,7 @@ import it.polimi.ingsw.view.tui.terminal.Terminal;
 import it.polimi.ingsw.view.tui.terminal.drawable.Coordinate;
 import it.polimi.ingsw.view.tui.terminal.drawable.DrawableSize;
 import it.polimi.ingsw.view.tui.terminal.drawable.OutOfDrawableException;
+import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Color;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.PrimitiveSymbol;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
@@ -21,6 +22,8 @@ public class TextBox extends ValueDrawable<String> {
     private boolean onFocus = false;
 
     private boolean textHidden = false;
+
+    private Color color = Color.WHITE;
 
     private void calculateSize() {
         size = new DrawableSize(1, text.length());
@@ -44,7 +47,8 @@ public class TextBox extends ValueDrawable<String> {
 
         return PrimitiveSymbol.fromString(String.valueOf(textHidden && coordinate.getColumn() < text.length()
                 ? "*" : text.charAt(coordinate.getColumn() - 1)))
-            .highlightBackground(showCursor && onFocus && coordinate.getColumn() - 1 == cursorPosition);
+            .highlightBackground(showCursor && onFocus && coordinate.getColumn() - 1 == cursorPosition)
+            .colorForeground(color);
     }
 
     private boolean moveCursor(int direction) {
@@ -65,6 +69,10 @@ public class TextBox extends ValueDrawable<String> {
 
     @Override
     public boolean handleInput(String key) {
+        if (!showCursor) {
+            return false;
+        }
+
         if (Terminal.TEXT.contains(key) || Terminal.NUMBERS.contains(key)) {
             text.insert(cursorPosition, key);
             cursorPosition++;
@@ -145,6 +153,12 @@ public class TextBox extends ValueDrawable<String> {
 
     public TextBox hideText() {
         textHidden = true;
+
+        return this;
+    }
+
+    public TextBox color(Color color) {
+        this.color = color;
 
         return this;
     }

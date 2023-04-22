@@ -108,26 +108,32 @@ public enum PrimitiveSymbol implements Symbol {
         throw new IllegalArgumentException("There is no primitive symbol corresponding to: " + s);
     }
 
+    @Override
     public DecoratedSymbol colorForeground(Color color) {
         return DecoratedSymbol.getInstance(this, color.colorForeground());
     }
 
+    @Override
     public DecoratedSymbol colorBackground(Color color) {
         return DecoratedSymbol.getInstance(this, color.colorBackground());
     }
 
+    @Override
     public DecoratedSymbol bold() {
         return DecoratedSymbol.getInstance(this, List.of(1));
     }
 
+    @Override
     public DecoratedSymbol italic() {
         return DecoratedSymbol.getInstance(this, List.of(3));
     }
 
+    @Override
     public DecoratedSymbol underline() {
         return DecoratedSymbol.getInstance(this, List.of(4));
     }
 
+    @Override
     public DecoratedSymbol strikethrough() {
         return DecoratedSymbol.getInstance(this, List.of(9));
     }

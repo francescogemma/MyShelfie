@@ -7,8 +7,8 @@ public class OrientedLayoutElement {
     private int weight;
 
     private static void assertWeightIsValid(int weight) {
-        if (weight < 1 || weight > 100) {
-            throw new IllegalArgumentException("Layout element weight must be between 1 and 100, got: " + weight);
+        if (weight < 0) {
+            throw new IllegalArgumentException("Layout element weight must be non-negative, got: " + weight);
         }
     }
 
@@ -23,13 +23,11 @@ public class OrientedLayoutElement {
         return weight;
     }
 
-    public void setWeight(int weight) {
-        assertWeightIsValid(weight);
-
-        this.weight = weight;
-    }
-
     public Drawable getDrawable() {
         return drawable;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
     }
 }
