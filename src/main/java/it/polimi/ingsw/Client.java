@@ -35,7 +35,7 @@ public class Client {
             System.out.println("GUI not yet implemented! I'm going to blow up! 3... 2... 1... BOOM!");
         } else {
             terminal.start(new App(data, ConnectionMenuLayout::new, LoginMenuLayout::new,
-                AvailableGamesMenuLayout::new, LobbyLayout::new));
+                AvailableGamesMenuLayout::new, LobbyLayout::new, GameLayout::new));
         }
 
         transceiver.disconnect();

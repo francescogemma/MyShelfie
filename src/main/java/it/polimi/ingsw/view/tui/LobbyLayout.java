@@ -55,6 +55,8 @@ public class LobbyLayout extends AppLayout {
             )
         ));
 
+        startButton.onpress(() -> switchAppLayout(GameLayout.NAME));
+
         backButton.onpress(() -> switchAppLayout(AvailableGamesMenuLayout.NAME));
     }
 
