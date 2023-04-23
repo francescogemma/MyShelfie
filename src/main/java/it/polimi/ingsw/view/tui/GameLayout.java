@@ -1,7 +1,9 @@
 package it.polimi.ingsw.view.tui;
 
+import it.polimi.ingsw.view.tui.terminal.drawable.Orientation;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
+import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayout;
 
 import java.util.Map;
 
@@ -9,9 +11,14 @@ public class GameLayout extends AppLayout {
     public static final String NAME = "GAME";
 
     private final BoardDrawable boardDrawable = new BoardDrawable();
+    private final BookshelfDrawable bookshelfDrawable = new BookshelfDrawable();
 
     public GameLayout() {
-        setLayout(boardDrawable.center().scrollable().alignUpLeft().crop());
+        setLayout(new OrientedLayout(Orientation.HORIZONTAL,
+                boardDrawable.center().scrollable().weight(7),
+                bookshelfDrawable.center().weight(3)
+            ).center().crop()
+        );
 
         setData(new AppLayoutData(
             Map.of()

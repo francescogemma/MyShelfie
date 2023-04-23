@@ -32,7 +32,7 @@ public class TileDrawable extends Drawable {
     private boolean selected = false;
     private boolean selectable;
 
-    private Color getColor() {
+    public static Color tileColorToColor(TileColor tileColor) {
         return switch (tileColor) {
             case GREEN -> Color.GREEN;
             case MAGENTA -> Color.MAGENTA;
@@ -74,7 +74,7 @@ public class TileDrawable extends Drawable {
                 primitiveSymbol.highlight(selected ? Color.SELECTED : Color.FOCUS,
                     selected || onFocus))
                 .orElse(tileColor == TileColor.EMPTY ? PrimitiveSymbol.EMPTY :
-                    PrimitiveSymbol.EMPTY.colorBackground(getColor()));
+                    PrimitiveSymbol.EMPTY.colorBackground(tileColorToColor(tileColor)));
     }
 
     @Override

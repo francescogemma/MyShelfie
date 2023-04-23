@@ -9,6 +9,8 @@ public enum PrimitiveSymbol implements Symbol {
     LOWER_RIGHT_BOX_BORDER("┘"),
     VERTICAL_BOX_BORDER("│"),
     HORIZONTAL_BOX_BORDER("─"),
+    T_RIGHT("├"),
+    T_LEFT("┤"),
     STAR("*"),
     PLUS("+"),
     HASHTAG("#"),

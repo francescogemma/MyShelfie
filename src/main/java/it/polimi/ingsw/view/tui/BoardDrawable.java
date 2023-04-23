@@ -43,8 +43,8 @@ public class BoardDrawable extends FixedLayoutDrawable<OrientedLayout> {
 
     @Override
     public void askForSize(DrawableSize desiredSize) {
-        int lines = -1;
-        int columns = -1;
+        int lines;
+        int columns;
 
         if (desiredSize.getLines() < Board.BOARD_ROWS * TileDrawable.MEDIUM_SIDE ||
             desiredSize.getColumns() < Board.COLUMN_BOARDS * TileDrawable.MEDIUM_SIDE) {
