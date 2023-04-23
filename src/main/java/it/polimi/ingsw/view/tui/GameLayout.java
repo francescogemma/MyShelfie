@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.tui;
 
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
+import it.polimi.ingsw.model.goal.PersonalGoal;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.tile.TileVersion;
@@ -20,6 +21,7 @@ import java.util.Map;
 public class GameLayout extends AppLayout {
     public static final String NAME = "GAME";
 
+    private final PersonalGoalDrawable personalGoalDrawable = new PersonalGoalDrawable();
     private final BoardDrawable boardDrawable = new BoardDrawable();
     private final TextBox playerNameTextBox = new TextBox().unfocusable();
     private final BookshelfDrawable bookshelfDrawable = new BookshelfDrawable();
@@ -31,7 +33,7 @@ public class GameLayout extends AppLayout {
                 new OrientedLayout(Orientation.VERTICAL,
                     new TextBox().text("Ciao\nProva\nProva\nFrasemoltolunga\nciao\nProva").center().weight(1),
                     new TextBox().text("Ciao\nProva\nProva\nFrasemoltolunga\nciao\nProva").center().weight(1),
-                    new TextBox().text("Ciao\nProva\nProva\nFrasemoltolunga\nciao\nProva").center().weight(1)
+                    personalGoalDrawable.center().weight(1)
                 ).weight(2),
                 boardDrawable.center().scrollable().weight(3),
                 new OrientedLayout(Orientation.VERTICAL,
@@ -281,6 +283,8 @@ public class GameLayout extends AppLayout {
 
             selectedBookshelfIndex = 0;
             updateBookshelfMenu();
+
+            personalGoalDrawable.populate(PersonalGoal.fromIndex(0).getTilesColorMask());
         }
     }
 

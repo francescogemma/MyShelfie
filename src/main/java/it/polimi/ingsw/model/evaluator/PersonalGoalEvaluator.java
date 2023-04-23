@@ -93,4 +93,9 @@ public class PersonalGoalEvaluator implements Evaluator {
     public BookshelfMaskSet getPointMasks() {
         return pointMasks;
     }
+
+    // TODO: Add JavaDoc
+    public Map<Shelf, TileColor> getTilesColorMask() {
+        return personalGoal;
+    }
 }

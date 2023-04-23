@@ -186,4 +186,9 @@ public class PersonalGoal extends IndexedGoal {
             default -> throw new IllegalStateException("Unexpected index value: " + index);
         };
     }
+
+    // TODO: Add JavaDoc
+    public Map<Shelf, TileColor> getTilesColorMask() {
+        return ((PersonalGoalEvaluator) evaluator).getTilesColorMask();
+    }
 }
