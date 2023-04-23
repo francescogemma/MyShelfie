@@ -1,6 +1,7 @@
 package it.polimi.ingsw.networking.TCP;
 
 import it.polimi.ingsw.networking.Connection;
+import it.polimi.ingsw.networking.ServerNotFoundException;
 import org.junit.jupiter.api.*;
 
 import java.net.ServerSocket;
@@ -37,6 +38,21 @@ class TCPConnectionTest {
 
         Thread client = new Thread(() -> {
             Connection connection;
+
+            /*
+             * assertions used to check all the cases in which the constructor throw a ServerNotFoundException.
+             * They can be slow due to timeouts.
+             * ------------------------------------------------------------------------------------------------------
+             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection(null, PORT));
+             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection("localhost", 70000));
+             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection("192.168.1.1", 70000));
+             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection("192.168.1.1", PORT));
+             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection(HOST, 55555));
+             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection("192.168.1.1", 55555));
+             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection("192.", PORT));
+             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection("192.", 55555));
+             */
+
             try {
                 connection = new TCPConnection(HOST, PORT);
                 connection.send("hello");

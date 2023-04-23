@@ -5,8 +5,7 @@ import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.networking.ServerNotFoundException;
 
 import java.io.*;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Timer;
@@ -48,15 +47,22 @@ public class TCPConnection implements Connection {
         receivedMessages = new ArrayDeque<>();
 
         try {
-            socket = new Socket(address, port);
+            socket = new Socket();
+            socket.connect(new java.net.InetSocketAddress(address, port), 5000);
 
             socket.setTcpNoDelay(true);
             socket.setSoTimeout(5000);
 
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
+        } catch(IllegalArgumentException e) {
+            throw new ServerNotFoundException("found null address or invalid port", e);
         } catch(UnknownHostException e) {
-            throw new ServerNotFoundException("unknown host", e);
+            throw new ServerNotFoundException("unknown host: " + address, e);
+        } catch(SocketTimeoutException e) {
+            throw new ServerNotFoundException("server: " + address + " not found listening on port: " + port + " (timeout expired)", e);
+        } catch(ConnectException e) {
+            throw new ServerNotFoundException("server: " + address + " not found listening on port: " + port, e);
         } catch(IOException e) {
             throw new SocketCreationException("error while creating socket", e);
         }

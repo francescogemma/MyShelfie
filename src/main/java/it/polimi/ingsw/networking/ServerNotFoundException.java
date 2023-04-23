@@ -1,8 +1,13 @@
 package it.polimi.ingsw.networking;
 
 /**
- * This exception is thrown when a {@link Connection} is attempted to be created
- * but the server is not found.
+ * This exception should be thrown in a client-side {@link Connection} constructor when:
+ * <ul>
+ *     <li> there are not any servers listening on the port </li>
+ *     <li> the port specified is not in a valid range </li>
+ *     <li> the are servers listening on the port, but the ip is incorrect </li>
+ *     <li> the ip address specified is not a valid ip address </li>
+ * </ul>
  *
  * @see ConnectionException
  */
