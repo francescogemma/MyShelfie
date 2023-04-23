@@ -25,8 +25,44 @@ public class TextBox extends ValueDrawable<String> {
 
     private Color color = Color.WHITE;
 
+    private String getLineOfText(int line) {
+        int start = 0;
+
+        int countNewLines = 1;
+        while (countNewLines < line) {
+            start++;
+            if (text.charAt(start - 1) == '\n') {
+                countNewLines++;
+            }
+        }
+
+        int end = start;
+        for (; end < text.length(); end++) {
+            if (text.charAt(end) == '\n') {
+                break;
+            }
+        }
+
+        return text.substring(start, end);
+    }
+
     private void calculateSize() {
-        size = new DrawableSize(1, text.length());
+        int lines = 1;
+        int columns = 1;
+
+        int column = 1;
+        for (int i = 0; i < text.length(); i++) {
+            columns = Math.max(columns, column);
+
+            if (text.charAt(i) == '\n') {
+                lines++;
+                column = 1;
+            } else {
+                column++;
+            }
+        }
+
+        size = new DrawableSize(lines, columns);
     }
 
     public TextBox() {
@@ -45,8 +81,23 @@ public class TextBox extends ValueDrawable<String> {
             throw new OutOfDrawableException(size, coordinate);
         }
 
-        return PrimitiveSymbol.fromString(String.valueOf(textHidden && coordinate.getColumn() < text.length()
-                ? "*" : text.charAt(coordinate.getColumn() - 1)))
+        PrimitiveSymbol primitiveSymbol;
+        if (textHidden) {
+            if (coordinate.getColumn() < getLineOfText(coordinate.getLine()).length()) {
+                primitiveSymbol = PrimitiveSymbol.STAR;
+            } else {
+                primitiveSymbol = PrimitiveSymbol.EMPTY;
+            }
+        } else {
+            if (coordinate.getColumn() - 1 < getLineOfText(coordinate.getLine()).length()) {
+                primitiveSymbol = PrimitiveSymbol.fromString(String.valueOf(getLineOfText(coordinate.getLine())
+                    .charAt(coordinate.getColumn() - 1)));
+            } else {
+                primitiveSymbol = PrimitiveSymbol.EMPTY;
+            }
+        }
+
+        return primitiveSymbol
             .highlightBackground(showCursor && onFocus && coordinate.getColumn() - 1 == cursorPosition)
             .colorForeground(color);
     }
@@ -132,7 +183,12 @@ public class TextBox extends ValueDrawable<String> {
     }
 
     public TextBox text(String text) {
-        this.text = new StringBuilder(text + " ");
+        this.text = new StringBuilder(text.replaceAll("\n", " \n") + " ");
+
+        if (text.contains("\n")) {
+            focusable = false;
+        }
+
         calculateSize();
 
         return this;
