@@ -59,6 +59,14 @@ public class TileDrawable extends Drawable {
         size = new DrawableSize(LARGE_SIDE, LARGE_SIDE);
     }
 
+    private Symbol getContent() {
+        if (selected) {
+            return PrimitiveSymbol.HASHTAG.colorForeground(Color.BLACK);
+        }
+
+        return PrimitiveSymbol.EMPTY;
+    }
+
     @Override
     public Symbol getSymbolAt(Coordinate coordinate) {
         if (!size.isInside(coordinate)) {
@@ -66,15 +74,13 @@ public class TileDrawable extends Drawable {
         }
 
         if (fillTile) {
-            return PrimitiveSymbol.EMPTY;
+            return getContent();
         }
 
         return WithBorderBoxDrawable.addBorder(coordinate, size)
-            .map(primitiveSymbol ->
-                primitiveSymbol.highlight(selected ? Color.SELECTED : Color.FOCUS,
-                    selected || onFocus))
-                .orElse(tileColor == TileColor.EMPTY ? PrimitiveSymbol.EMPTY :
-                    PrimitiveSymbol.EMPTY.colorBackground(tileColorToColor(tileColor)));
+            .map(primitiveSymbol -> primitiveSymbol.highlight(Color.FOCUS, onFocus))
+                .orElse(tileColor == TileColor.EMPTY ? getContent() :
+                    getContent().colorBackground(tileColorToColor(tileColor)));
     }
 
     @Override

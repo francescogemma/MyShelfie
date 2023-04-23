@@ -22,6 +22,8 @@ public class ScrollableDrawable extends Drawable {
     private int firstVisibleLine;
     private int firstVisibleColumn;
 
+    private Coordinate lastFocusedCoordinate = Coordinate.origin();
+
     public ScrollableDrawable(AlignedDrawable toMakeScrollable) {
         this.toMakeScrollable = toMakeScrollable;
     }
@@ -67,8 +69,8 @@ public class ScrollableDrawable extends Drawable {
             visibleColumns = size.getColumns() - 3;
         }
 
-        focusedLine = 1;
-        focusedColumn = 1;
+        focusedLine = lastFocusedCoordinate.getLine();
+        focusedColumn = lastFocusedCoordinate.getColumn();
 
         firstVisibleLine = 1;
         firstVisibleColumn = 1;
@@ -76,6 +78,8 @@ public class ScrollableDrawable extends Drawable {
         toMakeScrollable.getFocusedCoordinate().ifPresent(coordinate -> {
             focusedLine = coordinate.getLine();
             focusedColumn = coordinate.getColumn();
+
+            lastFocusedCoordinate = coordinate;
         });
 
         if (needsVerticalScrolling) {
@@ -185,7 +189,10 @@ public class ScrollableDrawable extends Drawable {
 
     @Override
     public boolean focus(Coordinate desiredCoordinate) {
-        return toMakeScrollable.focus(Coordinate.origin());
+        return toMakeScrollable.focus(new Coordinate(
+            desiredCoordinate.getLine() + firstVisibleLine - 1,
+            desiredCoordinate.getColumn() + firstVisibleColumn - 1
+        ));
     }
 
     @Override

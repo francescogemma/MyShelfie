@@ -11,9 +11,9 @@ public enum Color {
     MAGENTA(List.of(35), List.of(45)),
     CYAN(List.of(36), List.of(46)),
     WHITE(List.of(37), List.of(47)),
-    GREY(236),
-    FOCUS(172),
-    SELECTED(57);
+    GREY(236);
+
+    public static final Color FOCUS = RED;
 
     private static List<Integer> craftForegroundDecorationsFromId(int id) {
         return List.of(38, 5, id);
