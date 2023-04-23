@@ -12,7 +12,7 @@ import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayoutElement;
 
 public class BookshelfDrawable extends FixedLayoutDrawable<OrientedLayout> {
-    private boolean focusable = true;
+    private boolean focusable = false;
 
     private final OrientedLayout layout;
 

@@ -178,8 +178,8 @@ public class OrientedLayout extends Drawable {
     private boolean focusNextElement(int direction) {
         return focusNextElement(direction, elements.get(elementOnFocusIndex).getDrawable().getFocusedCoordinate()
             .map(coordinate -> Coordinate.craftCoordinateByOrientation(orientation,
-                (direction == 1 || elementOnFocusIndex == 0) ? 1 : elements.get(elementOnFocusIndex - 1)
-                    .getDrawable().getSize().getParallelSizeComponent(orientation),
+                (direction == 1 || elementOnFocusIndex == 0) ? 1 : Math.max(elements.get(elementOnFocusIndex - 1)
+                    .getDrawable().getSize().getParallelSizeComponent(orientation), 1),
                 coordinate.getPerpendicularComponent(orientation)
             ))
             .orElse(Coordinate.origin()));
