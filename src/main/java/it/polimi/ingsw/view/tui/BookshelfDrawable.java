@@ -1,6 +1,9 @@
 package it.polimi.ingsw.view.tui;
 
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
+import it.polimi.ingsw.model.bookshelf.BookshelfMask;
+import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
+import it.polimi.ingsw.model.bookshelf.Shelf;
 import it.polimi.ingsw.view.tui.terminal.drawable.Coordinate;
 import it.polimi.ingsw.view.tui.terminal.drawable.DrawableSize;
 import it.polimi.ingsw.view.tui.terminal.drawable.FixedLayoutDrawable;
@@ -58,6 +61,58 @@ public class BookshelfDrawable extends FixedLayoutDrawable<OrientedLayout> {
         if (!focusable) {
             layout.unfocus();
         }
+
+        return this;
+    }
+
+    public BookshelfColumnDrawable getColumn(int column) {
+        if (!Bookshelf.isColumnInsideTheBookshelf(column)) {
+            throw new IllegalArgumentException("Trying to get column: " + column +
+                " for bookshelf drawable");
+        }
+
+        return ((BookshelfColumnDrawable) layout.getElements().get(column)
+                .getDrawable());
+    }
+
+    public BookshelfDrawable populate(Bookshelf bookshelf) {
+        for (int column = 0; column < Bookshelf.COLUMNS; column++) {
+            BookshelfColumnDrawable columnDrawable = getColumn(column);
+
+            for (int row = 0; row < Bookshelf.ROWS; row++) {
+                columnDrawable.color(row, bookshelf.getTileColorAt(Shelf.getInstance(row, column)));
+                columnDrawable.mask(row, 0);
+                columnDrawable.masked(false);
+            }
+        }
+
+        return this;
+    }
+
+    public BookshelfDrawable mask(BookshelfMaskSet bookshelfMaskSet) {
+        if (bookshelfMaskSet.getBookshelfMasks().isEmpty()) {
+            throw new IllegalArgumentException("You can't mask a bookshelf with an empty bookshelf mask set");
+        }
+
+        BookshelfMask firstMask = bookshelfMaskSet.getBookshelfMasks().get(0);
+        for (int column = 0; column < Bookshelf.COLUMNS; column++) {
+            BookshelfColumnDrawable columnDrawable = getColumn(column);
+
+            for (int row = 0; row < Bookshelf.ROWS; row++) {
+                columnDrawable.color(row, firstMask.getTileColorAt(Shelf.getInstance(row, column)));
+                columnDrawable.masked(true);
+            }
+        }
+
+        int count = 1;
+        for (BookshelfMask mask : bookshelfMaskSet.getBookshelfMasks()) {
+            for (Shelf shelf : mask.getShelves()) {
+                getColumn(shelf.getColumn()).mask(shelf.getRow(), count);
+            }
+            count++;
+        }
+
+        focusable = false;
 
         return this;
     }

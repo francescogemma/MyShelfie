@@ -168,6 +168,14 @@ public enum PrimitiveSymbol implements Symbol {
         return colorForeground(Color.GREY);
     }
 
+    public Symbol blur(boolean toBlur) {
+        if (toBlur) {
+            return blur();
+        }
+
+        return this;
+    }
+
     @Override
     public PrimitiveSymbol getPrimitiveSymbol() {
         return this;
