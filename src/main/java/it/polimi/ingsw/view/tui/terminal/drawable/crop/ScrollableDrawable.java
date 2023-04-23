@@ -105,61 +105,35 @@ public class ScrollableDrawable extends Drawable {
 
     private Symbol getSymbolAtAfterDrawingHorizontalBar(Coordinate coordinate, int startLine) {
         if (needsVerticalScrolling) {
-            if (coordinate.getLine() == startLine && coordinate.getColumn() == 1) {
-                return PrimitiveSymbol.UPPER_LEFT_BOX_BORDER;
-            }
+            return WithBorderBoxDrawable.addBorder(new Coordinate(
+                coordinate.getLine() - startLine + 1,
+                coordinate.getColumn()), new DrawableSize(size.getLines() - startLine + 1, 3))
+                .map(Symbol.class::cast)
+                .orElseGet(() -> {
+                    int verticalBarLength = visibleLines * (size.getLines() - 2 - startLine + 1) /
+                        toMakeScrollable.getSize().getLines();
 
-            if (coordinate.getLine() == startLine && coordinate.getColumn() == 3) {
-                return PrimitiveSymbol.UPPER_RIGHT_BOX_BORDER;
-            }
+                    int verticalBarStart = focusedLine * (size.getLines() - 2 - startLine + 1 - verticalBarLength + 1)
+                        / toMakeScrollable.getSize().getLines();
 
-            if (coordinate.getLine() == size.getLines() && coordinate.getColumn() == 1) {
-                return PrimitiveSymbol.LOWER_LEFT_BOX_BORDER;
-            }
+                    if (verticalBarStart < 1) {
+                        verticalBarStart = 1;
+                    }
 
-            if (coordinate.getLine() == size.getLines() && coordinate.getColumn() == 3) {
-                return PrimitiveSymbol.LOWER_RIGHT_BOX_BORDER;
-            }
+                    if (coordinate.getColumn() == 2) {
+                        if (coordinate.getLine() - startLine >= verticalBarStart && coordinate.getLine() - startLine <
+                            verticalBarStart + verticalBarLength) {
+                            return PrimitiveSymbol.VERTICAL_BOX_BORDER;
+                        } else {
+                            return PrimitiveSymbol.EMPTY;
+                        }
+                    }
 
-            if (coordinate.getColumn() == 1) {
-                return PrimitiveSymbol.VERTICAL_BOX_BORDER;
-            }
-
-            if (coordinate.getColumn() == 3) {
-                return PrimitiveSymbol.VERTICAL_BOX_BORDER;
-            }
-
-            if (coordinate.getLine() == startLine && coordinate.getColumn() == 2) {
-                return PrimitiveSymbol.HORIZONTAL_BOX_BORDER;
-            }
-
-            if (coordinate.getLine() == size.getLines() && coordinate.getColumn() == 2) {
-                return PrimitiveSymbol.HORIZONTAL_BOX_BORDER;
-            }
-
-            int verticalBarLength = visibleLines * (size.getLines() - 2 - startLine + 1) / toMakeScrollable.getSize()
-                .getLines();
-
-            int verticalBarStart = focusedLine * (size.getLines() - 2 - startLine + 1 - verticalBarLength + 1)
-                / toMakeScrollable.getSize().getLines();
-
-            if (verticalBarStart < 1) {
-                verticalBarStart = 1;
-            }
-
-            if (coordinate.getColumn() == 2) {
-                if (coordinate.getLine() - startLine >= verticalBarStart && coordinate.getLine() - startLine < verticalBarStart +
-                    verticalBarLength) {
-                    return PrimitiveSymbol.VERTICAL_BOX_BORDER;
-                } else {
-                    return PrimitiveSymbol.EMPTY;
-                }
-            }
-
-            return toMakeScrollable.getSymbolAt(new Coordinate(
-               coordinate.getLine() - startLine + firstVisibleLine,
-                coordinate.getColumn() - 4 + firstVisibleColumn
-            ));
+                    return toMakeScrollable.getSymbolAt(new Coordinate(
+                       coordinate.getLine() - startLine + firstVisibleLine,
+                        coordinate.getColumn() - 4 + firstVisibleColumn
+                    ));
+                });
         }
 
         return toMakeScrollable.getSymbolAt(new Coordinate(
@@ -175,57 +149,30 @@ public class ScrollableDrawable extends Drawable {
         }
 
         if (needsHorizontalScrolling) {
-            if (coordinate.getLine() == 1 && coordinate.getColumn() == 1) {
-                return PrimitiveSymbol.UPPER_LEFT_BOX_BORDER;
-            }
+            return WithBorderBoxDrawable.addBorder(coordinate, new DrawableSize(3, size.getColumns()))
+                .map(Symbol.class::cast)
+                .orElseGet(() -> {
+                    int horizontalBarLength = visibleColumns * (size.getColumns() - 2) /
+                        toMakeScrollable.getSize().getColumns();
 
-            if (coordinate.getLine() == 1 && coordinate.getColumn() == size.getColumns()) {
-                return PrimitiveSymbol.UPPER_RIGHT_BOX_BORDER;
-            }
+                    int horizontalBarStart = focusedColumn * (size.getColumns() - 2 - horizontalBarLength + 1)
+                        / toMakeScrollable.getSize().getColumns();
 
-            if (coordinate.getLine() == 3 && coordinate.getColumn() == 1) {
-                return PrimitiveSymbol.LOWER_LEFT_BOX_BORDER;
-            }
+                    if (horizontalBarStart < 1) {
+                        horizontalBarStart  = 1;
+                    }
 
-            if (coordinate.getLine() == 3 && coordinate.getColumn() == size.getColumns()) {
-                return PrimitiveSymbol.LOWER_RIGHT_BOX_BORDER;
-            }
+                    if (coordinate.getLine() == 2) {
+                        if (coordinate.getColumn() - 1 >= horizontalBarStart && coordinate.getColumn() - 1
+                            < horizontalBarStart + horizontalBarLength) {
+                            return PrimitiveSymbol.HORIZONTAL_BOX_BORDER;
+                        } else {
+                            return PrimitiveSymbol.EMPTY;
+                        }
+                    }
 
-            if (coordinate.getLine() == 1) {
-                return PrimitiveSymbol.HORIZONTAL_BOX_BORDER;
-            }
-
-            if (coordinate.getLine() == 3) {
-                return PrimitiveSymbol.HORIZONTAL_BOX_BORDER;
-            }
-
-            if (coordinate.getLine() == 2 && coordinate.getColumn() == 1) {
-                return PrimitiveSymbol.VERTICAL_BOX_BORDER;
-            }
-
-            if (coordinate.getLine() == 2 && coordinate.getColumn() == size.getColumns()) {
-                return PrimitiveSymbol.VERTICAL_BOX_BORDER;
-            }
-
-            int horizontalBarLength = visibleColumns * (size.getColumns() - 2) / toMakeScrollable.getSize().getColumns();
-
-            int horizontalBarStart = focusedColumn * (size.getColumns() - 2 - horizontalBarLength + 1)
-                / toMakeScrollable.getSize().getColumns();
-
-            if (horizontalBarStart < 1) {
-                horizontalBarStart  = 1;
-            }
-
-            if (coordinate.getLine() == 2) {
-                if (coordinate.getColumn() - 1 >= horizontalBarStart && coordinate.getColumn() - 1 < horizontalBarStart +
-                    horizontalBarLength) {
-                    return PrimitiveSymbol.HORIZONTAL_BOX_BORDER;
-                } else {
-                    return PrimitiveSymbol.EMPTY;
-                }
-            }
-
-            return getSymbolAtAfterDrawingHorizontalBar(coordinate, 4);
+                    return getSymbolAtAfterDrawingHorizontalBar(coordinate, 4);
+                });
         }
 
         return getSymbolAtAfterDrawingHorizontalBar(coordinate, 1);
