@@ -13,16 +13,16 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 import java.util.Map;
 import java.util.Optional;
 
-public class PersonalGoalDrawable extends Drawable {
+public class GoalDrawable extends Drawable {
     private Map<Shelf, TileColor> tilesColorMask = Map.of();
 
-    public PersonalGoalDrawable() {
+    public GoalDrawable() {
         size = new DrawableSize(Bookshelf.ROWS + 3, Bookshelf.COLUMNS + 3);
     }
 
     @Override
     public void askForSize(DrawableSize desiredSize) {
-        // Personal goal drawables have fixed size.
+        // Goal drawables have fixed size.
     }
 
     @Override
@@ -77,7 +77,7 @@ public class PersonalGoalDrawable extends Drawable {
 
     @Override
     public void unfocus() {
-        // Personal goal drawables can't be focused
+        // Goal drawables can't be focused
     }
 
     @Override
@@ -85,7 +85,7 @@ public class PersonalGoalDrawable extends Drawable {
         return Optional.empty();
     }
 
-    public PersonalGoalDrawable populate(Map<Shelf, TileColor> tilesColorMask) {
+    public GoalDrawable populate(Map<Shelf, TileColor> tilesColorMask) {
         this.tilesColorMask = tilesColorMask;
 
         return this;
