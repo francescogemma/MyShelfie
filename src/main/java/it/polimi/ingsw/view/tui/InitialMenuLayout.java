@@ -1,17 +1,34 @@
 package it.polimi.ingsw.view.tui;
 
+import it.polimi.ingsw.view.tui.terminal.drawable.AlternativeDrawable;
 import it.polimi.ingsw.view.tui.terminal.drawable.Orientation;
+import it.polimi.ingsw.view.tui.terminal.drawable.app.App;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
 import it.polimi.ingsw.view.tui.terminal.drawable.menu.Button;
 import it.polimi.ingsw.view.tui.terminal.drawable.menu.value.Options;
+import it.polimi.ingsw.view.tui.terminal.drawable.menu.value.TextBox;
 import it.polimi.ingsw.view.tui.terminal.drawable.menu.value.ValueMenuEntry;
 import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayout;
+import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Color;
 
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class InitialMenuLayout extends AppLayout {
     public static final String NAME = "INITIAL_MENU";
+
+    private final TextBox splashTextBox = new TextBox().text(
+"""
+ ┌─┐  ┌─┐            ____   ┌─┐            ┌─┐   __   _          
+ │  ╲╱  │ ┌─┐ ┌─┐   ╱ ___│  │ └───┐   ___  │ │  ╱ _│ (_)   ___   
+ │ │╲╱│ │ │ │ │ │   ╲___ ╲  │ ┌─┐ │  ╱ _ ╲ │ │ │ │_  │ │  ╱ _ ╲  
+ │ │  │ │ │ └─┘ │    ___) │ │ │ │ │ │  __╱ │ │ │  _│ │ │ │  __╱  
+ └─┘  └─┘  ╲__, │   │____╱  └─┘ └─┘  ╲___│ └─┘ └─┘   └─┘  ╲___│  
+           │___╱                                                                                 
+"""
+    ).hideCursor().color(Color.YELLOW).bold();
 
     private final ValueMenuEntry<String> interfaceEntry = new ValueMenuEntry<>("Interface type",
         new Options("TUI", "GUI"));
@@ -19,12 +36,16 @@ public class InitialMenuLayout extends AppLayout {
         new Options("TCP", "RMI"));
     private final Button nextButton = new Button("Next");
 
+    private final AlternativeDrawable alternativeDrawable = new AlternativeDrawable(
+            splashTextBox.center(),
+            new OrientedLayout(Orientation.VERTICAL,
+                interfaceEntry.center().weight(1),
+                connectionEntry.center().weight(1),
+                nextButton.center().weight(1)
+            ).center().scrollable());
+
     public InitialMenuLayout() {
-        setLayout(new OrientedLayout(Orientation.VERTICAL,
-            interfaceEntry.center().weight(1),
-            connectionEntry.center().weight(1),
-            nextButton.center().weight(1)
-        ).center().scrollable().alignUpLeft().crop());
+        setLayout(alternativeDrawable.alignUpLeft().crop());
 
         setData(new AppLayoutData(
             Map.of(
@@ -38,7 +59,16 @@ public class InitialMenuLayout extends AppLayout {
 
     @Override
     public void setup(String previousLayoutName) {
-        // There is only one layout.
+        if (previousLayoutName.equals(App.START_NAME)) {
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (getLock()) {
+                        alternativeDrawable.second();
+                    }
+                }
+            }, 1000);
+        }
     }
 
     @Override

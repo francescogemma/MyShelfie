@@ -17,7 +17,8 @@ public class AlternativeDrawable extends Drawable {
 
     @Override
     public void askForSize(DrawableSize desiredSize) {
-        drawables[currentDrawableIndex].askForSize(desiredSize);
+        drawables[0].askForSize(desiredSize);
+        drawables[1].askForSize(desiredSize);
 
         size = drawables[currentDrawableIndex].getSize();
     }

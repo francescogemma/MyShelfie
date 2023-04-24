@@ -12,6 +12,8 @@ public enum PrimitiveSymbol implements Symbol {
     T_RIGHT("├"),
     T_LEFT("┤"),
     CROSS("┼"),
+    MAIN_DIAGONAL("╲"),
+    SECONDARY_DIAGONAL("╱"),
     STAR("*"),
     PLUS("+"),
     HASHTAG("#"),

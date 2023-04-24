@@ -28,6 +28,8 @@ public class TextBox extends ValueDrawable<String> {
 
     private boolean acceptsNewLinesAndSpaces = false;
 
+    private boolean bold = false;
+
     private String getLineOfText(int line) {
         int start = 0;
 
@@ -106,7 +108,13 @@ public class TextBox extends ValueDrawable<String> {
             return primitiveSymbol.highlightBackground().colorForeground(Color.BLACK);
         }
 
-        return primitiveSymbol.colorForeground(color);
+        Symbol symbol = primitiveSymbol.colorForeground(color);
+
+        if (bold) {
+            return symbol.bold();
+        }
+
+        return symbol;
     }
 
     @Override
@@ -308,6 +316,12 @@ public class TextBox extends ValueDrawable<String> {
 
     public TextBox acceptsNewLinesAndSpaces() {
         acceptsNewLinesAndSpaces = true;
+
+        return this;
+    }
+
+    public TextBox bold() {
+        bold = true;
 
         return this;
     }
