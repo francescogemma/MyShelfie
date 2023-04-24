@@ -16,7 +16,7 @@ public class LobbyLayout extends AppLayout {
     public static final String NAME = "LOBBY";
 
     private final TextBox gameTextBox = new TextBox().unfocusable();
-    static class PlayerDrawable extends FixedLayoutDrawable<Drawable> {
+    private static class PlayerDrawable extends FixedLayoutDrawable<Drawable> {
         private final TextBox textBox = new TextBox().hideCursor();
 
         public PlayerDrawable() {

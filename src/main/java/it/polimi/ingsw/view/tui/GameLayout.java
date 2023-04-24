@@ -6,14 +6,13 @@ import it.polimi.ingsw.model.goal.PersonalGoal;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.tile.TileVersion;
-import it.polimi.ingsw.view.tui.terminal.drawable.DrawableSize;
-import it.polimi.ingsw.view.tui.terminal.drawable.Fill;
-import it.polimi.ingsw.view.tui.terminal.drawable.Orientation;
+import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
 import it.polimi.ingsw.view.tui.terminal.drawable.menu.Button;
 import it.polimi.ingsw.view.tui.terminal.drawable.menu.value.TextBox;
 import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayout;
+import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Color;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.PrimitiveSymbol;
 
 import java.util.ArrayList;
@@ -54,6 +53,38 @@ public class GameLayout extends AppLayout {
     private final BookshelfDrawable bookshelfDrawable = new BookshelfDrawable();
     private final Button nextBookshelfButton = new Button(">");
     private final Button previousBookshelfButton = new Button("<");
+    private final TextBox gameNameTextBox = new TextBox().unfocusable();
+    private static class PlayerDisplay {
+        public PlayerDisplay(String name, int points, int position, boolean isPlayer) {
+            this.name = name;
+            this.points = points;
+            this.position = position;
+            this.isPlayer = isPlayer;
+        }
+
+        private String name;
+        private int points;
+        private int position;
+        private boolean isPlayer;
+    }
+
+    private static class PlayerDisplayDrawable extends FixedLayoutDrawable<Drawable> {
+        private final TextBox positionTextBox = new TextBox().unfocusable();
+        private final TextBox playerNameTextBox = new TextBox().hideCursor();
+        private final TextBox playerPointsTextBox = new TextBox().hideCursor();
+
+        public PlayerDisplayDrawable() {
+            setLayout(new OrientedLayout(Orientation.HORIZONTAL,
+                positionTextBox.center().weight(1),
+                playerNameTextBox.center().weight(1),
+                playerPointsTextBox.center().weight(1)).center().crop()
+                .fixSize(new DrawableSize(5, 40)).addBorderBox()
+            );
+        }
+    }
+
+    private final RecyclerDrawable<PlayerDisplayDrawable, PlayerDisplay> playerDisplayRecyclerDrawable =
+        new RecyclerDrawable<>(Orientation.VERTICAL, PlayerDisplayDrawable::new);
 
     private final static int GOALS_TEXT_BOX_LINES = 10;
     private final static int GOALS_TEXT_BOX_COLUMNS = 30;
@@ -67,7 +98,7 @@ public class GameLayout extends AppLayout {
                             firstCommonGoalDrawable.center().weight(1),
                             firstCommonGoalDescriptionTextBox.center()
                                 .crop().fixSize(new DrawableSize(GOALS_TEXT_BOX_LINES, GOALS_TEXT_BOX_COLUMNS))
-                                .weight(2)).weight(4),
+                                .weight(3)).weight(4),
                         firstCommonGoalPointsTextBox.center().weight(1)
                     ).addBorderBox().weight(1),
                     new OrientedLayout(Orientation.VERTICAL,
@@ -76,7 +107,7 @@ public class GameLayout extends AppLayout {
                             secondCommonGoalDrawable.center().weight(1),
                             secondCommonGoalDescriptionTextBox.center()
                                 .crop().fixSize(new DrawableSize(GOALS_TEXT_BOX_LINES, GOALS_TEXT_BOX_COLUMNS))
-                                .weight(2)).weight(4),
+                                .weight(3)).weight(4),
                         secondCommonGoalPointsTextBox.center().weight(1)
                     ).addBorderBox().weight(1),
                     new OrientedLayout(Orientation.VERTICAL,
@@ -85,7 +116,7 @@ public class GameLayout extends AppLayout {
                             personalGoalDrawable.center().weight(1),
                             personalGoalPointsTextBox.center()
                                 .crop().fixSize(new DrawableSize(GOALS_TEXT_BOX_LINES, GOALS_TEXT_BOX_COLUMNS))
-                                .weight(2)).weight(4)
+                                .weight(3)).weight(4)
                     ).addBorderBox().weight(1),
                     new OrientedLayout(Orientation.VERTICAL,
                         new TextBox().text("Final goal").unfocusable().center().weight(1),
@@ -94,14 +125,20 @@ public class GameLayout extends AppLayout {
                 ).alignUpLeft().scrollable().weight(3),
                 boardDrawable.center().scrollable().weight(2),
                 new OrientedLayout(Orientation.VERTICAL,
-                    playerNameTextBox.center().weight(1),
-                    new OrientedLayout(Orientation.HORIZONTAL,
-                        new Fill(PrimitiveSymbol.EMPTY).weight(1),
-                        previousBookshelfButton.center().weight(2),
-                        bookshelfDrawable.center().weight(12),
-                        nextBookshelfButton.center().weight(2),
-                        new Fill(PrimitiveSymbol.EMPTY).weight(1)
-                    ).center().weight(12)
+                    new Fill(PrimitiveSymbol.EMPTY).weight(1),
+                    gameNameTextBox.center().weight(2),
+                    new Fill(PrimitiveSymbol.EMPTY).weight(1),
+                    playerDisplayRecyclerDrawable.center().scrollable().weight(12),
+                    new OrientedLayout(Orientation.VERTICAL,
+                        playerNameTextBox.center().weight(1),
+                        new OrientedLayout(Orientation.HORIZONTAL,
+                            new Fill(PrimitiveSymbol.EMPTY).weight(1),
+                            previousBookshelfButton.center().weight(2),
+                            bookshelfDrawable.center().weight(12),
+                            nextBookshelfButton.center().weight(2),
+                            new Fill(PrimitiveSymbol.EMPTY).weight(1)
+                        ).weight(12)
+                    ).center().addBorderBox().weight(20)
                 ).weight(2)
             ).center().crop()
         );
@@ -128,7 +165,8 @@ public class GameLayout extends AppLayout {
         nextBookshelfButton.focusable(selectedBookshelfIndex < bookshelves.size() - 1);
         bookshelfDrawable.focusable(selectedBookshelfIndex == playerIndex);
         bookshelfDrawable.populate(bookshelves.get(selectedBookshelfIndex));
-        playerNameTextBox.text(players.get(selectedBookshelfIndex));
+        playerNameTextBox.text(players.get(selectedBookshelfIndex).name)
+            .color(selectedBookshelfIndex == playerIndex ? Color.FOCUS : Color.WHITE);
     }
 
     private void populateGoalsMenu() {
@@ -148,12 +186,19 @@ public class GameLayout extends AppLayout {
     private int selectedBookshelfIndex;
 
     // Populate these data through the transceiver
-    private List<String> players = List.of("bar", "tizio", "foo", "caio");
+    private List<PlayerDisplay> players = List.of(
+        new PlayerDisplay("tizio", 8, 1, false),
+        new PlayerDisplay("bar", 5, 2, false),
+        new PlayerDisplay("foo", 3, 3, true),
+        new PlayerDisplay("caio", 2, 4, false)
+    );
+
     private int playerIndex = 2;
     private List<Bookshelf> bookshelves = new ArrayList<>();
     private PersonalGoal personalGoal = PersonalGoal.fromIndex(0);
-    private CommonGoal[] commonGoals = new CommonGoal[]{CommonGoal.fromIndex(0, 4),
+    private CommonGoal[] commonGoals = new CommonGoal[]{CommonGoal.fromIndex(4, 4),
         CommonGoal.fromIndex(1, 4)};
+    private String gameName = "ourgame";
 
     @Override
     public void setup(String previousLayoutName) {
@@ -360,6 +405,13 @@ public class GameLayout extends AppLayout {
 
             populateBookshelfMenu();
             populateGoalsMenu();
+            playerDisplayRecyclerDrawable.populate(players, ((playerDisplayDrawable, playerDisplay) -> {
+                playerDisplayDrawable.positionTextBox.text("# " + String.valueOf(playerDisplay.position) + " ");
+                playerDisplayDrawable.playerNameTextBox.text(playerDisplay.name + " ")
+                    .color(playerDisplay.isPlayer ? Color.FOCUS : Color.WHITE);
+                playerDisplayDrawable.playerPointsTextBox.text("Points: " + playerDisplay.points);
+            }));
+            gameNameTextBox.text("Game: " + gameName);
         }
     }
 

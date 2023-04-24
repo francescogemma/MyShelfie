@@ -23,8 +23,8 @@ public class FourGroupsFourTilesGoal extends CommonGoal {
         super(  new AdjacencyFetcher(),
                 new NumDifferentColorFilter(1, 1),
                 new AtLeastEvaluator(4, bookshelfMask -> bookshelfMask.getShelves().size() >= 4),
-                "Four groups each containing\n at least 4 tiles of the same type.\n " +
-                        "The tiles of one group\n can be different from\n those of another group.",
+                "Four groups\neach containing at least\n4 tiles of the same type.\n" +
+                        "The tiles of one group\ncan be different from\nthose of another group.",
                 Map.ofEntries(
                         entry(Shelf.getInstance(0, 0), TileColor.BLUE),
                         entry(Shelf.getInstance(0, 1), TileColor.BLUE),

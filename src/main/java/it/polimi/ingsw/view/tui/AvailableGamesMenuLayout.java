@@ -25,7 +25,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
     ).center().crop().fixSize(new DrawableSize(3, 25));
     private final Drawable noAvailableGamesTextBox = new TextBox().text("There aren't available games!")
         .unfocusable().center();
-    static class JoinableGameDrawable extends FixedLayoutDrawable<Drawable> {
+    private static class JoinableGameDrawable extends FixedLayoutDrawable<Drawable> {
         private final TextBox textBox = new TextBox();
         private final Button button = new Button("Join");
 
