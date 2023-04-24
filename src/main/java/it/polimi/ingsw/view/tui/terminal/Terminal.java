@@ -53,7 +53,7 @@ public abstract class Terminal {
         ALLOWED_INPUT_KEYS.addAll(Set.of(
             UP_ARROW, DOWN_ARROW, RIGHT_ARROW, LEFT_ARROW,
                 "\t", "\r",
-                "\b"
+                "\b", " "
         ));
     }
 

@@ -13,7 +13,8 @@ import java.util.Optional;
 public class TextBox extends ValueDrawable<String> {
     private StringBuilder text;
 
-    private int cursorPosition = 0;
+    private int cursorColumn = 0;
+    private int cursorLine = 0;
 
     private boolean showCursor = true;
 
@@ -24,6 +25,8 @@ public class TextBox extends ValueDrawable<String> {
     private boolean textHidden = false;
 
     private Color color = Color.WHITE;
+
+    private boolean acceptsNewLinesAndSpaces = false;
 
     private String getLineOfText(int line) {
         int start = 0;
@@ -97,25 +100,13 @@ public class TextBox extends ValueDrawable<String> {
             }
         }
 
-        return primitiveSymbol
-            .highlightBackground(showCursor && onFocus && coordinate.getColumn() - 1 == cursorPosition)
-            .colorForeground(color);
-    }
+        if (showCursor && onFocus && coordinate.getColumn() - 1 == cursorColumn &&
+            coordinate.getLine() - 1 == cursorLine) {
 
-    private boolean moveCursor(int direction) {
-        if (direction != -1 && direction != 1) {
-            throw new IllegalArgumentException("Direction must be 1 or -1 when moving the cursor, got: " + direction);
+            return primitiveSymbol.highlightBackground().colorForeground(Color.BLACK);
         }
 
-        int nextCursorPosition = cursorPosition + direction;
-
-        if (nextCursorPosition < 0 || nextCursorPosition >= text.length()) {
-            return false;
-        }
-
-        cursorPosition = nextCursorPosition;
-
-        return true;
+        return primitiveSymbol.colorForeground(color);
     }
 
     @Override
@@ -124,32 +115,115 @@ public class TextBox extends ValueDrawable<String> {
             return false;
         }
 
-        if (Terminal.TEXT.contains(key) || Terminal.NUMBERS.contains(key)) {
-            text.insert(cursorPosition, key);
-            cursorPosition++;
+        int start = 0;
+        for (int line = 0; line < cursorLine; line++) {
+            start += getLineOfText(line + 1).length() + 1;
+        }
+
+        if (Terminal.TEXT.contains(key) || Terminal.NUMBERS.contains(key)
+            || (acceptsNewLinesAndSpaces && key.equals(" "))) {
+            text.insert(start + cursorColumn, key);
+            cursorColumn++;
 
             calculateSize();
+
             return true;
         }
 
         if (key.equals("\b")) {
-            if (cursorPosition == 0) {
-                return false;
-            }
+            if (cursorColumn == 0) {
+                if (cursorLine == 0) {
+                    return false;
+                }
 
-            text.deleteCharAt(cursorPosition - 1);
-            cursorPosition--;
+                text.replace(start - 2, start, "");
+
+                cursorLine--;
+                cursorColumn = getLineOfText(cursorLine + 1).length() - 1;
+            } else {
+                text.deleteCharAt(start + cursorColumn - 1);
+                cursorColumn--;
+            }
 
             calculateSize();
 
             return true;
         }
 
-        return switch (key) {
-            case Terminal.LEFT_ARROW -> moveCursor(-1);
-            case Terminal.RIGHT_ARROW -> moveCursor(1);
-            default -> false;
-        };
+        if (acceptsNewLinesAndSpaces && key.equals("\r")) {
+            text.insert(start + cursorColumn, " \n");
+            cursorLine++;
+            cursorColumn = 0;
+
+            calculateSize();
+
+            return true;
+        }
+
+        switch (key) {
+            case Terminal.RIGHT_ARROW -> {
+                if (cursorColumn == getLineOfText(cursorLine + 1).length() - 1) {
+                    if (cursorLine == size.getLines() - 1) {
+                        return false;
+                    }
+
+                    cursorLine++;
+                    cursorColumn = 0;
+                } else {
+                    cursorColumn++;
+                }
+
+                calculateSize();
+
+                return true;
+            }
+            case Terminal.LEFT_ARROW -> {
+                if (cursorColumn == 0) {
+                    if (cursorLine == 0) {
+                        return false;
+                    }
+
+                    cursorLine--;
+                    cursorColumn = getLineOfText(cursorLine + 1).length() - 1;
+                } else {
+                    cursorColumn--;
+                }
+
+                calculateSize();
+
+                return true;
+            }
+            case Terminal.UP_ARROW -> {
+                if (cursorLine == 0) {
+                    return false;
+                }
+
+                cursorLine--;
+                if (cursorColumn >= getLineOfText(cursorLine + 1).length()) {
+                    cursorColumn = getLineOfText(cursorLine + 1).length() - 1;
+                }
+
+                calculateSize();
+
+                return true;
+            }
+            case Terminal.DOWN_ARROW -> {
+                if (cursorLine == size.getLines() - 1) {
+                    return false;
+                }
+
+                cursorLine++;
+                if (cursorColumn >= getLineOfText(cursorLine + 1).length()) {
+                    cursorColumn = getLineOfText(cursorLine + 1).length() - 1;
+                }
+
+                calculateSize();
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -160,8 +234,16 @@ public class TextBox extends ValueDrawable<String> {
 
         onFocus = true;
 
-        if (desiredCoordinate.getColumn() < text.length()) {
-            cursorPosition = desiredCoordinate.getColumn();
+        cursorLine = desiredCoordinate.getLine() - 1;
+
+        if (cursorLine >= size.getLines()) {
+            cursorLine = size.getLines() - 1;
+        }
+
+        if (desiredCoordinate.getColumn() <= getLineOfText(cursorLine + 1).length()) {
+            cursorColumn = desiredCoordinate.getColumn() - 1;
+        } else {
+            cursorColumn = getLineOfText(cursorLine + 1).length() - 1;
         }
 
         return true;
@@ -174,20 +256,16 @@ public class TextBox extends ValueDrawable<String> {
 
     @Override
     public Optional<Coordinate> getFocusedCoordinate() {
-        return onFocus ? Optional.of(new Coordinate(1, cursorPosition + 1)) : Optional.empty();
+        return onFocus ? Optional.of(new Coordinate(1, cursorColumn + 1)) : Optional.empty();
     }
 
     @Override
     public String getValue() {
-        return text.toString().strip();
+        return getLineOfText(1).strip();
     }
 
     public TextBox text(String text) {
         this.text = new StringBuilder(text.replaceAll("\n", " \n") + " ");
-
-        if (text.contains("\n")) {
-            focusable = false;
-        }
 
         calculateSize();
 
@@ -196,7 +274,7 @@ public class TextBox extends ValueDrawable<String> {
 
     public TextBox hideCursor() {
         showCursor = false;
-        cursorPosition = 0;
+        cursorColumn = 0;
 
         return this;
     }
@@ -215,6 +293,12 @@ public class TextBox extends ValueDrawable<String> {
 
     public TextBox color(Color color) {
         this.color = color;
+
+        return this;
+    }
+
+    public TextBox acceptsNewLinesAndSpaces() {
+        acceptsNewLinesAndSpaces = true;
 
         return this;
     }

@@ -32,7 +32,8 @@ public class GameLayout extends AppLayout {
         setLayout(new OrientedLayout(Orientation.HORIZONTAL,
                 new OrientedLayout(Orientation.VERTICAL,
                     new TextBox().text("Ciao\nProva\nProva\nFrasemoltolunga\nciao\nProva").center().weight(1),
-                    new TextBox().text("Ciao\nProva\nProva\nFrasemoltolunga\nciao\nProva").center().weight(1),
+                    new TextBox().text("Ciao\nProva\nProva\nFrasemoltolunga\nciao\nProva")
+                        .acceptsNewLinesAndSpaces().center().weight(1),
                     personalGoalDrawable.center().weight(1)
                 ).weight(2),
                 boardDrawable.center().scrollable().weight(3),
