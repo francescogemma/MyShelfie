@@ -1,11 +1,14 @@
 package it.polimi.ingsw.model.goal;
 
+import it.polimi.ingsw.model.bookshelf.Shelf;
 import it.polimi.ingsw.model.evaluator.CommonGoalEvaluator;
 import it.polimi.ingsw.model.evaluator.Evaluator;
 import it.polimi.ingsw.model.fetcher.Fetcher;
 import it.polimi.ingsw.model.filter.Filter;
+import it.polimi.ingsw.model.tile.TileColor;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -17,15 +20,23 @@ import java.util.Random;
  * @author Francesco Gemma
  */
 public abstract class CommonGoal extends IndexedGoal {
+    private final String description;
+    private final Map<Shelf, TileColor> display;
+
     /**
-     * Constructor of the class. It simply calls the constructor of the superclass {@link Goal}.
+     * Constructor of the class. It simply calls the constructor of the superclass {@link Goal},
+     * and sets the description of the goal and an example of it to display.
      *
      * @param fetcher the {@link Fetcher} type used to fetch the shape of the goal;
      * @param filter the {@link Filter} type used for the goal;
      * @param evaluator the {@link Evaluator} type used to evaluate the goal.
+     * @param description the description of the goal.
+     * @param display an example of the goal completed.
      */
-    protected CommonGoal(Fetcher fetcher, Filter filter, CommonGoalEvaluator evaluator) {
+    protected CommonGoal(Fetcher fetcher, Filter filter, CommonGoalEvaluator evaluator, String description, Map<Shelf, TileColor> display) {
         super(fetcher, filter, evaluator);
+        this.description = description;
+        this.display = display;
     }
 
     /**
@@ -94,5 +105,13 @@ public abstract class CommonGoal extends IndexedGoal {
 
     public void setPointStack(List<Integer> pointStack) {
         ((CommonGoalEvaluator) evaluator).setPointStack(pointStack);
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Map<Shelf, TileColor> getDisplay() {
+        return display;
     }
 }
