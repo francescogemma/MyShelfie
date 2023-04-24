@@ -26,10 +26,10 @@ import java.util.stream.Stream;
 public class GameLayout extends AppLayout {
     public static final String NAME = "GAME";
 
-    private final TextBox firstCommonGoalDescriptionTextBox = new TextBox().unfocusable();
+    private final TextBox firstCommonGoalDescriptionTextBox = new TextBox().hideCursor();
     private final GoalDrawable firstCommonGoalDrawable = new GoalDrawable();
     private final TextBox firstCommonGoalPointsTextBox = new TextBox().unfocusable();
-    private final TextBox secondCommonGoalDescriptionTextBox = new TextBox().unfocusable();
+    private final TextBox secondCommonGoalDescriptionTextBox = new TextBox().hideCursor();
     private final GoalDrawable secondCommonGoalDrawable = new GoalDrawable();
     private final TextBox secondCommonGoalPointsTextBox = new TextBox().unfocusable();
     private final GoalDrawable personalGoalDrawable = new GoalDrawable();
@@ -44,11 +44,11 @@ public class GameLayout extends AppLayout {
                         Stream.of(1, 2, 4, 6, 9, 12)
                             .map(String::valueOf)
                             .collect(Collectors.joining(PrimitiveSymbol.VERTICAL_BOX_BORDER.asString())))
-        .unfocusable();
+        .hideCursor();
     private final TextBox adjacencyGoalTextBox = new TextBox()
         .text("Points from adjacent tiles in the bookshelf:\n3 adjacent tiles -> 2 points\n" +
             "4 adjacent tiles -> 3 points\n5 adjacent tiles -> 5 points\n6+ adjacent tiles -> 8 points")
-        .unfocusable();
+        .hideCursor();
     private final BoardDrawable boardDrawable = new BoardDrawable();
     private final TextBox playerNameTextBox = new TextBox().unfocusable();
     private final BookshelfDrawable bookshelfDrawable = new BookshelfDrawable();
@@ -62,7 +62,7 @@ public class GameLayout extends AppLayout {
         setLayout(new OrientedLayout(Orientation.HORIZONTAL,
                 new OrientedLayout(Orientation.VERTICAL,
                     new OrientedLayout(Orientation.VERTICAL,
-                        new TextBox().text("First common goal").hideCursor().center().weight(1),
+                        new TextBox().text("First common goal").unfocusable().center().weight(1),
                         new OrientedLayout(Orientation.HORIZONTAL,
                             firstCommonGoalDrawable.center().weight(1),
                             firstCommonGoalDescriptionTextBox.center()
@@ -71,7 +71,7 @@ public class GameLayout extends AppLayout {
                         firstCommonGoalPointsTextBox.center().weight(1)
                     ).addBorderBox().weight(1),
                     new OrientedLayout(Orientation.VERTICAL,
-                        new TextBox().text("Second common goal").hideCursor().center().weight(1),
+                        new TextBox().text("Second common goal").unfocusable().center().weight(1),
                         new OrientedLayout(Orientation.HORIZONTAL,
                             secondCommonGoalDrawable.center().weight(1),
                             secondCommonGoalDescriptionTextBox.center()
@@ -80,7 +80,7 @@ public class GameLayout extends AppLayout {
                         secondCommonGoalPointsTextBox.center().weight(1)
                     ).addBorderBox().weight(1),
                     new OrientedLayout(Orientation.VERTICAL,
-                        new TextBox().text("Personal goal").hideCursor().center().weight(1),
+                        new TextBox().text("Personal goal").unfocusable().center().weight(1),
                         new OrientedLayout(Orientation.HORIZONTAL,
                             personalGoalDrawable.center().weight(1),
                             personalGoalPointsTextBox.center()
@@ -88,7 +88,7 @@ public class GameLayout extends AppLayout {
                                 .weight(2)).weight(4)
                     ).addBorderBox().weight(1),
                     new OrientedLayout(Orientation.VERTICAL,
-                        new TextBox().text("Final goal").hideCursor().center().weight(1),
+                        new TextBox().text("Final goal").unfocusable().center().weight(1),
                         adjacencyGoalTextBox.center().weight(4)
                     ).addBorderBox().weight(1)
                 ).alignUpLeft().scrollable().weight(3),

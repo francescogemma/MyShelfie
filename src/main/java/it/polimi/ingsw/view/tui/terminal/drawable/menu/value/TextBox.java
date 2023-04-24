@@ -256,7 +256,15 @@ public class TextBox extends ValueDrawable<String> {
 
     @Override
     public Optional<Coordinate> getFocusedCoordinate() {
-        return onFocus ? Optional.of(new Coordinate(1, cursorColumn + 1)) : Optional.empty();
+        if (onFocus) {
+            if (showCursor) {
+                return Optional.of(new Coordinate(1, cursorColumn + 1));
+            }
+
+            return Optional.of(getCenter());
+        }
+
+        return Optional.empty();
     }
 
     @Override
@@ -274,6 +282,7 @@ public class TextBox extends ValueDrawable<String> {
 
     public TextBox hideCursor() {
         showCursor = false;
+        cursorLine = 0;
         cursorColumn = 0;
 
         return this;
