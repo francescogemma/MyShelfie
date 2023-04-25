@@ -12,7 +12,6 @@ public class TwoLayersDrawable extends FullyResizableDrawable {
     private final FullyResizableDrawable background;
     private final FullyResizableDrawable foreground;
 
-    private boolean backgroundBlurred = false;
     private boolean foregroundToShow = false;
     private boolean onFocus = false;
 
@@ -36,10 +35,6 @@ public class TwoLayersDrawable extends FullyResizableDrawable {
 
             if (symbol == PrimitiveSymbol.EMPTY) {
                 symbol = background.getSymbolAt(coordinate);
-
-                if (backgroundBlurred) {
-                    symbol = symbol.getPrimitiveSymbol().blur();
-                }
             }
 
             return symbol;
@@ -53,11 +48,9 @@ public class TwoLayersDrawable extends FullyResizableDrawable {
         if (foregroundToShow) {
             boolean handled = foreground.handleInput(key);
 
-            if (!handled && !backgroundBlurred) {
+            if (!handled) {
                 return background.handleInput(key);
             }
-
-            return handled;
         }
 
         return background.handleInput(key);
@@ -98,9 +91,8 @@ public class TwoLayersDrawable extends FullyResizableDrawable {
         return background.getFocusedCoordinate();
     }
 
-    public TwoLayersDrawable showForeground(boolean blurBackground) {
+    public TwoLayersDrawable showForeground() {
         foregroundToShow = true;
-        backgroundBlurred = blurBackground;
 
         if (onFocus) {
             background.unfocus();
@@ -113,7 +105,6 @@ public class TwoLayersDrawable extends FullyResizableDrawable {
 
     public TwoLayersDrawable hideForeground() {
         foregroundToShow = false;
-        backgroundBlurred = false;
 
         if (onFocus) {
             foreground.unfocus();

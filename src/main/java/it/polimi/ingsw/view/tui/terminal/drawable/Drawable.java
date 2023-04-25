@@ -45,4 +45,8 @@ public abstract class Drawable {
     public WithBorderBoxDrawable addBorderBox() {
         return new WithBorderBoxDrawable(this);
     }
+
+    public BlurrableDrawable blurrable() {
+        return new BlurrableDrawable(this);
+    }
 }

@@ -4,6 +4,7 @@ import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.MockNetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.LoginEventData;
+import it.polimi.ingsw.view.tui.terminal.drawable.BlurrableDrawable;
 import it.polimi.ingsw.view.tui.terminal.drawable.DrawableSize;
 import it.polimi.ingsw.view.tui.terminal.drawable.Fill;
 import it.polimi.ingsw.view.tui.terminal.drawable.Orientation;
@@ -29,10 +30,7 @@ public class LoginMenuLayout extends AppLayout {
         new TextBox().hideText());
     private final Button loginButton = new Button("Login");
     private final Button exitButton = new Button("Exit");
-
-    private final TextBox popUpTextBox = new TextBox().unfocusable();
-
-    private final TwoLayersDrawable twoLayers = new TwoLayersDrawable(new OrientedLayout(Orientation.VERTICAL,
+    private final BlurrableDrawable blurrableBackground = new OrientedLayout(Orientation.VERTICAL,
             usernameEntry.center().weight(1),
             passwordEntry.center().weight(1),
             new OrientedLayout(Orientation.HORIZONTAL,
@@ -41,8 +39,11 @@ public class LoginMenuLayout extends AppLayout {
                 exitButton.center().weight(1),
                 new Fill(PrimitiveSymbol.EMPTY).weight(1)
             ).weight(1)
-        ).center().scrollable().alignUpLeft().crop(),
+        ).center().scrollable().blurrable();
 
+    private final TextBox popUpTextBox = new TextBox().unfocusable();
+
+    private final TwoLayersDrawable twoLayers = new TwoLayersDrawable(blurrableBackground.alignUpLeft().crop(),
         popUpTextBox.center().crop().fixSize(new DrawableSize(5, 30))
             .addBorderBox().center().crop()
     );
@@ -68,12 +69,14 @@ public class LoginMenuLayout extends AppLayout {
             } else {
                 popUpTextBox.text(response.getMessage());
 
-                twoLayers.showForeground(true);
+                blurrableBackground.blur(true);
+                twoLayers.showForeground();
 
                 new Timer().schedule(new TimerTask() {
                     @Override
                     public void run() {
                         synchronized (getLock()) {
+                            blurrableBackground.blur(false);
                             twoLayers.hideForeground();
                         }
                     }
