@@ -18,8 +18,9 @@ public record DeselectTileEventData(Coordinate coordinate) implements EventData 
     }
 
     public static <T extends EventData> Requester<DeselectTileEventData, T> requester(EventTransmitter transmitter,
-                                                                                      EventReceiver<EventData> receiver) {
-        return new Requester<>(ID, transmitter, receiver);
+                                                                                      EventReceiver<EventData> receiver,
+                                                                                      Object responsesLock) {
+        return new Requester<>(ID, transmitter, receiver, responsesLock);
     }
 
     public static <T extends EventData> Responder<DeselectTileEventData, T> responder(EventTransmitter transmitter,

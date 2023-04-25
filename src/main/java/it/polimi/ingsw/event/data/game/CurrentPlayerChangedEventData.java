@@ -27,8 +27,9 @@ public class CurrentPlayerChangedEventData implements EventData {
     }
 
     public static <T extends EventData> Requester<CurrentPlayerChangedEventData, T> requester(EventTransmitter transmitter,
-                                                                                  EventReceiver<EventData> receiver) {
-        return new Requester<>(ID, transmitter, receiver);
+                                                                                  EventReceiver<EventData> receiver,
+                                                                                              Object responsesLock) {
+        return new Requester<>(ID, transmitter, receiver, responsesLock);
     }
 
     public static <T extends EventData> Responder<CurrentPlayerChangedEventData, T> responder(EventTransmitter transmitter,

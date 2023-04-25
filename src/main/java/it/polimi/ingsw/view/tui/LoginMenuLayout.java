@@ -60,7 +60,7 @@ public class LoginMenuLayout extends AppLayout {
         ));
 
         loginButton.onpress(() -> {
-            Requester<Response, LoginEventData> loginRequester = Response.requester(transceiver, transceiver);
+            Requester<Response, LoginEventData> loginRequester = Response.requester(transceiver, transceiver, getLock());
 
             Response response = loginRequester
                 .request(new LoginEventData(usernameEntry.getValue(), passwordEntry.getValue()));

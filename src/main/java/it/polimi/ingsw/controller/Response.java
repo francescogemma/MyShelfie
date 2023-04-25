@@ -21,8 +21,9 @@ public record Response(String message, ResponseStatus status) implements EventDa
     }
 
     public static <T extends EventData> Requester<Response, T> requester(EventTransmitter transmitter,
-                                                                         EventReceiver<EventData> receiver) {
-        return new Requester<>(ID, transmitter, receiver);
+                                                                         EventReceiver<EventData> receiver,
+                                                                         Object responsesLock) {
+        return new Requester<>(ID, transmitter, receiver, responsesLock);
     }
 
     public static <T extends EventData> Responder<Response, T> responder(EventTransmitter transmitter,

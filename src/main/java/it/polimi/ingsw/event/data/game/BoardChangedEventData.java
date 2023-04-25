@@ -29,8 +29,9 @@ public class BoardChangedEventData implements EventData {
     }
 
     public static <T extends EventData> Requester<BoardChangedEventData, T> requester(EventTransmitter transmitter,
-                                                                                      EventReceiver<EventData> receiver) {
-        return new Requester<>(ID, transmitter, receiver);
+                                                                                      EventReceiver<EventData> receiver,
+                                                                                      Object responsesLock) {
+        return new Requester<>(ID, transmitter, receiver, responsesLock);
     }
 
     public static <T extends EventData> Responder<BoardChangedEventData, T> responder(EventTransmitter transmitter,

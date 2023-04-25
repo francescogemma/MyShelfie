@@ -77,7 +77,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
 
         createNewGameButton.onpress(() -> {
             Requester<Response, CreateNewGameEventData> createGameRequester = Response.requester(transceiver,
-                transceiver);
+                        transceiver, getLock());
 
             Response response = createGameRequester.request(new CreateNewGameEventData(gameNameEntry.getValue()));
         });

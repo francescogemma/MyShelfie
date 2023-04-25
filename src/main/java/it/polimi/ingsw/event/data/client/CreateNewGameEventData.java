@@ -17,8 +17,9 @@ public record CreateNewGameEventData(String gameName) implements EventData {
     }
 
     public static <T extends EventData> Requester<CreateNewGameEventData, T> requester(EventTransmitter transmitter,
-                                                                                       EventReceiver<EventData> receiver) {
-        return new Requester<>(ID, transmitter, receiver);
+                                                                                       EventReceiver<EventData> receiver,
+                                                                                       Object responsesLock) {
+        return new Requester<>(ID, transmitter, receiver, responsesLock);
     }
 
     public static <T extends EventData> Responder<CreateNewGameEventData, T> responder(EventTransmitter transmitter,

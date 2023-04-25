@@ -22,8 +22,9 @@ public class PlayerHasJoinEventData implements EventData {
     }
 
     public static <T extends EventData> Requester<PlayerHasJoinEventData, T> requester(EventTransmitter transmitter,
-                                                                                  EventReceiver<EventData> receiver) {
-        return new Requester<>(ID, transmitter, receiver);
+                                                                                       EventReceiver<EventData> receiver,
+                                                                                       Object responsesLock) {
+        return new Requester<>(ID, transmitter, receiver, responsesLock);
     }
 
     public static <T extends EventData> Responder<PlayerHasJoinEventData, T> responder(EventTransmitter transmitter,

@@ -26,8 +26,9 @@ public class InsertTileEventData implements EventData {
     }
 
     public static <T extends EventData> Requester<InsertTileEventData, T> requester(EventTransmitter transmitter,
-                                                                                  EventReceiver<EventData> receiver) {
-        return new Requester<>(ID, transmitter, receiver);
+                                                                                  EventReceiver<EventData> receiver,
+                                                                                    Object responsesLock) {
+        return new Requester<>(ID, transmitter, receiver, responsesLock);
     }
 
     public static <T extends EventData> Responder<InsertTileEventData, T> responder(EventTransmitter transmitter,

@@ -17,11 +17,11 @@ public class Requester<R extends EventData, S extends EventData> {
     private static final Object nextRequestCountLock = new Object();
     private static int nextRequestCount = 0;
 
-    private final Object responsesLock = new Object();
+    private final Object responsesLock;
     private final Set<Integer> waitingFor = new HashSet<>();
     private final Map<Integer, R> responses = new HashMap<>();
 
-    public Requester(String responseEventId, EventTransmitter transmitter, EventReceiver<EventData> receiver) {
+    public Requester(String responseEventId, EventTransmitter transmitter, EventReceiver<EventData> receiver, Object responsesLock) {
         this.transmitter = transmitter;
 
         new CastEventReceiver<SyncEventDataWrapper<R>>(SyncEventDataWrapper.WRAPPER_ID + "_" + responseEventId,
@@ -35,6 +35,7 @@ public class Requester<R extends EventData, S extends EventData> {
                     }
                 }
         });
+        this.responsesLock = responsesLock;
     }
 
     public R request(S data) {

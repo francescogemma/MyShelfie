@@ -35,8 +35,9 @@ public class PlayerPointsChangeEventData implements EventData {
     }
 
     public static <T extends EventData> Requester<PlayerPointsChangeEventData, T> requester(EventTransmitter transmitter,
-                                                                                 EventReceiver<EventData> receiver) {
-        return new Requester<>(ID, transmitter, receiver);
+                                                                                 EventReceiver<EventData> receiver,
+                                                                                            Object responsesLock) {
+        return new Requester<>(ID, transmitter, receiver, responsesLock);
     }
 
     public static <T extends EventData> Responder<PlayerPointsChangeEventData, T> responder(EventTransmitter transmitter,

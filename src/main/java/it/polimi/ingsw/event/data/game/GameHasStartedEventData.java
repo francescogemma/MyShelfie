@@ -17,8 +17,9 @@ public class GameHasStartedEventData implements EventData {
     }
 
     public static <T extends EventData> Requester<GameHasStartedEventData, T> requester(EventTransmitter transmitter,
-                                                                                              EventReceiver<EventData> receiver) {
-        return new Requester<>(ID, transmitter, receiver);
+                                                                                              EventReceiver<EventData> receiver,
+                                                                                              Object responsesLock) {
+        return new Requester<>(ID, transmitter, receiver, responsesLock);
     }
 
     public static <T extends EventData> Responder<GameHasStartedEventData, T> responder(EventTransmitter transmitter,
