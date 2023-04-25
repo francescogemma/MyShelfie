@@ -50,7 +50,7 @@ public class GameController {
     }
 
     private void broadcastForEachView (EventData data) {
-        this.clients.forEach((client -> client.getKey().broadcast(data)));
+        this.clients.forEach(client -> client.getKey().broadcast(data));
     }
 
     public Response join(EventTransmitter newClient, String username) {
@@ -63,6 +63,10 @@ public class GameController {
                 game.addPlayer(username);
             } catch (IllegalFlowException | PlayerAlreadyInGameException e) {
                 return new Response(e.toString(), ResponseStatus.FAILURE);
+            }
+
+            for (Pair<EventTransmitter, String> player: this.clients) {
+                newClient.broadcast(new PlayerHasJoinEventData(player.getValue()));
             }
 
             clients.add(Pair.of(newClient, username));
