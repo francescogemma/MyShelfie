@@ -15,14 +15,8 @@ import java.util.function.Function;
 
 public class GameHasStartedEventData implements EventData {
     public static final String ID = "GAME_HAS_STARTED";
-    private final List<Integer> commonGoal;
 
-    public GameHasStartedEventData(List<Integer> commonGoal) {
-        this.commonGoal = new ArrayList<>(commonGoal);
-    }
-
-    public List<Integer> getCommonGoal () {
-        return new ArrayList<>(commonGoal);
+    public GameHasStartedEventData() {
     }
 
     public static CastEventReceiver<GameHasStartedEventData> castEventReceiver(EventReceiver<EventData> receiver) {

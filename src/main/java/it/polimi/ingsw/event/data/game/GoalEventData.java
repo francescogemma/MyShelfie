@@ -7,20 +7,28 @@ import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
-public class PersonalGoalEventData implements EventData {
+public class GoalEventData implements EventData {
     private final int personalGoal;
+    private final List<Integer> commonGoal;
 
-    public PersonalGoalEventData(int personalGoal) {
+    public GoalEventData(int personalGoal, List<Integer> commonGoal) {
         this.personalGoal = personalGoal;
+        this.commonGoal = new ArrayList<>(commonGoal);
     }
 
     public int getPersonalGoal () {
         return this.personalGoal;
     }
 
-    public static final String ID = "PERSONAL_GOAL";
+    public List<Integer> getCommonGoal () {
+        return new ArrayList<>(commonGoal);
+    }
+
+    public static final String ID = "GOAL";
 
     public static CastEventReceiver<GameHasStartedEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);

@@ -213,7 +213,7 @@ public class Game implements Identifiable {
         this.refillBoardIfNecessary();
         this.currentPlayerIndex = FIRST_PLAYER_INDEX;
         this.commonGoals = CommonGoal.getTwoRandomCommonGoals(players.size());
-        this.transceiver.broadcast(new GameHasStartedEventData(this.personalGoalIndexes));
+        this.transceiver.broadcast(new GameHasStartedEventData());
     }
 
     public int getPersonalGoalIndex (String username) {

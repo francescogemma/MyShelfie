@@ -5,11 +5,13 @@ import it.polimi.ingsw.event.EventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.LoginEventData;
 import it.polimi.ingsw.event.data.client.*;
+import it.polimi.ingsw.event.data.game.GoalEventData;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Pair;
 
+import java.util.List;
 import java.util.Optional;
 
 public class VirtualView implements EventTransmitter{
@@ -35,7 +37,17 @@ public class VirtualView implements EventTransmitter{
         JoinGameEventData.responder(transceiver, transceiver,       event -> joinGame(event.getGameName()));
         CreateNewGameEventData.responder(transceiver, transceiver,  event -> createNewGame(event.gameName()));
 
+        JoinStartedGameEventData.castEventReceiver(transceiver).registerListener(event -> this.sendGoal());
         PlayerHasJoinMenu.castEventReceiver(transceiver).registerListener(event -> this.playerHasJoinMenu());
+    }
+
+    private void sendGoal () {
+        if (this.isInGame()) {
+            final int personalGoal = this.gameController.getPersonalGoal(this.username);
+            final List<Integer> commonGoal = this.gameController.getCommonGoal();
+
+            transceiver.broadcast(new GoalEventData(personalGoal, commonGoal));
+        }
     }
 
     private void playerHasJoinMenu () {

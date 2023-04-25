@@ -3,6 +3,7 @@ package it.polimi.ingsw.controller;
 import it.polimi.ingsw.controller.db.DBManager;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
+import it.polimi.ingsw.event.data.client.JoinStartedGameEventData;
 import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.board.FullSelectionException;
@@ -11,6 +12,7 @@ import it.polimi.ingsw.model.board.RemoveNotLastSelectedException;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.IllegalFlowException;
 import it.polimi.ingsw.model.game.PlayerAlreadyInGameException;
+import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Pair;
 
@@ -41,6 +43,14 @@ public class GameController {
                         }
                 )
         );
+    }
+
+    public int getPersonalGoal(String username) {
+        return this.game.getPersonalGoalIndex(username);
+    }
+
+    public List<Integer> getCommonGoal () {
+        return Arrays.asList(this.game.getCommonGoals()).stream().map(CommonGoal::getIndex).toList();
     }
 
     private void broadcastForEachView (EventData data) {
@@ -123,11 +133,6 @@ public class GameController {
                 game.startGame();
             } catch (IllegalFlowException e) {
                 return new Response(e.getMessage(), ResponseStatus.FAILURE);
-            }
-
-            for (Pair<EventTransmitter, String> client: clients) {
-                final int index = game.getPersonalGoalIndex(client.getValue());
-                client.getKey().broadcast(new PersonalGoalEventData(index));
             }
 
             return new Response("The game has started", ResponseStatus.SUCCESS);
