@@ -1,5 +1,10 @@
 package it.polimi.ingsw.view.tui;
 
+import it.polimi.ingsw.controller.Response;
+import it.polimi.ingsw.event.NetworkEventTransceiver;
+import it.polimi.ingsw.event.Requester;
+import it.polimi.ingsw.event.data.client.JoinGameEventData;
+import it.polimi.ingsw.event.data.game.PlayerHasJoinEventData;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
@@ -9,6 +14,7 @@ import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayoutElement;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.PrimitiveSymbol;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -60,30 +66,48 @@ public class LobbyLayout extends AppLayout {
         backButton.onpress(() -> switchAppLayout(AvailableGamesMenuLayout.NAME));
     }
 
+    private List<String> playerNames;
+    private String gameName;
+    private NetworkEventTransceiver transceiver;
+    private Requester<Response, JoinGameEventData> joinGameRequester;
+
     @Override
     public void setup(String previousLayoutName) {
         if (previousLayoutName.equals(AvailableGamesMenuLayout.NAME)) {
-            gameTextBox.text(appDataProvider
-                .getString(AvailableGamesMenuLayout.NAME, "selectedgame"));
+            playerNames = new ArrayList<>();
 
-            // Populating players data with mock data
-            List<String> players = List.of("mario", "foo", "luca", "gianni");
+            gameName = appDataProvider.getString(AvailableGamesMenuLayout.NAME, "selectedgame");
 
-            recyclerPlayersList.populate(players);
+            gameTextBox.text(gameName);
 
-            boolean isOwner = true;
+            transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
+                "transceiver");
 
-            if (isOwner) {
-                startButtonLayoutElement.setWeight(1);
+            joinGameRequester = Response.requester(transceiver, transceiver, getLock());
 
-                if (players.size() > 2) {
-                    startButton.focusable(true);
-                } else {
-                    startButton.focusable(false);
+            PlayerHasJoinEventData.castEventReceiver(transceiver).registerListener(data -> {
+                synchronized (getLock()) {
+                    playerNames.add(data.getUsername());
+
+                    recyclerPlayersList.populate(playerNames);
+
+                    boolean isOwner = true;
+
+                    if (isOwner) {
+                        startButtonLayoutElement.setWeight(1);
+
+                        if (playerNames.size() >= 2) {
+                            startButton.focusable(true);
+                        } else {
+                            startButton.focusable(false);
+                        }
+                    } else {
+                        startButtonLayoutElement.setWeight(0);
+                    }
                 }
-            } else {
-                startButtonLayoutElement.setWeight(0);
-            }
+            });
+
+            Response response = joinGameRequester.request(new JoinGameEventData(gameName));
         }
     }
 

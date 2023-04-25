@@ -60,8 +60,6 @@ public class LoginMenuLayout extends AppLayout {
         ));
 
         loginButton.onpress(() -> {
-            Requester<Response, LoginEventData> loginRequester = Response.requester(transceiver, transceiver, getLock());
-
             Response response = loginRequester
                 .request(new LoginEventData(usernameEntry.getValue(), passwordEntry.getValue()));
 
@@ -88,12 +86,15 @@ public class LoginMenuLayout extends AppLayout {
     }
 
     private NetworkEventTransceiver  transceiver;
+    private Requester<Response, LoginEventData> loginRequester;
 
     @Override
     public void setup(String previousLayoutName) {
         if (previousLayoutName.equals(ConnectionMenuLayout.NAME)) {
             transceiver = (NetworkEventTransceiver)
                 appDataProvider.get(ConnectionMenuLayout.NAME, "transceiver");
+
+            loginRequester = Response.requester(transceiver, transceiver, getLock());
         }
     }
 

@@ -55,7 +55,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
     private final Button createNewGameButton = new Button("Create new game");
     private final Button backToLoginButton = new Button("Back to login");
 
-    private List<String> availableGames = new ArrayList<>();
+    private List<String> availableGames;
     private String selectedGameName;
 
     public AvailableGamesMenuLayout() {
@@ -76,9 +76,6 @@ public class AvailableGamesMenuLayout extends AppLayout {
         )));
 
         createNewGameButton.onpress(() -> {
-            Requester<Response, CreateNewGameEventData> createGameRequester = Response.requester(transceiver,
-                        transceiver, getLock());
-
             Response response = createGameRequester.request(new CreateNewGameEventData(gameNameEntry.getValue()));
         });
 
@@ -86,14 +83,19 @@ public class AvailableGamesMenuLayout extends AppLayout {
     }
 
     private NetworkEventTransceiver transceiver;
+    private Requester<Response, CreateNewGameEventData> createGameRequester;
 
     @Override
     public void setup(String previousLayoutName) {
         if (previousLayoutName.equals(LoginMenuLayout.NAME)) {
+            availableGames = new ArrayList<>();
+
             usernameTextBox.text(appDataProvider.getString(LoginMenuLayout.NAME, "username"));
 
             transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
                 "transceiver");
+
+            createGameRequester = Response.requester(transceiver, transceiver, getLock());
 
             GameHasBeenCreatedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 synchronized (getLock()) {
