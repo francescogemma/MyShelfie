@@ -1,14 +1,16 @@
 package it.polimi.ingsw.view.tui;
 
+import it.polimi.ingsw.controller.Response;
+import it.polimi.ingsw.event.NetworkEventTransceiver;
+import it.polimi.ingsw.event.Requester;
+import it.polimi.ingsw.event.data.client.JoinStartedGameEventData;
+import it.polimi.ingsw.event.data.client.StartGameEventData;
+import it.polimi.ingsw.event.data.game.GameHasStartedEventData;
+import it.polimi.ingsw.event.data.game.GoalEventData;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
-import it.polimi.ingsw.model.bookshelf.BookshelfMask;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
-import it.polimi.ingsw.model.bookshelf.Shelf;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
-import it.polimi.ingsw.model.tile.Tile;
-import it.polimi.ingsw.model.tile.TileColor;
-import it.polimi.ingsw.model.tile.TileVersion;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
@@ -187,10 +189,10 @@ public class GameLayout extends AppLayout {
     private void populateBookshelfMenu() {
         previousBookshelfButton.focusable(selectedBookshelfIndex > 0);
         nextBookshelfButton.focusable(selectedBookshelfIndex < bookshelves.size() - 1);
-        bookshelfDrawable.focusable(selectedBookshelfIndex == playerIndex);
+        bookshelfDrawable.focusable(selectedBookshelfIndex == clientPlayerIndex);
         bookshelfDrawable.populate(bookshelves.get(selectedBookshelfIndex));
         playerNameTextBox.text(playerNames.get(selectedBookshelfIndex))
-            .color(selectedBookshelfIndex == playerIndex ? Color.FOCUS : Color.WHITE);
+            .color(selectedBookshelfIndex == clientPlayerIndex ? Color.FOCUS : Color.WHITE);
     }
 
     private void populateGoalsMenu() {
@@ -254,15 +256,23 @@ public class GameLayout extends AppLayout {
     private int selectedBookshelfIndex;
 
     // Populate these data through the transceiver
+    private List<String> playerNames;
+    private List<Integer> playerPoints;
+    private int clientPlayerIndex;
+    private List<Bookshelf> bookshelves;
+    private PersonalGoal personalGoal = null;
+    private CommonGoal[] commonGoals = null;
+    private String gameName;
 
-    private List<String> playerNames = List.of("tizio", "bar", "foo", "caio");
-    private List<Integer> playerPoints = List.of( 8, 5, 5, 2 );
-    private int playerIndex = 2;
-    private List<Bookshelf> bookshelves = new ArrayList<>();
-    private PersonalGoal personalGoal = PersonalGoal.fromIndex(0);
-    private CommonGoal[] commonGoals = new CommonGoal[]{CommonGoal.fromIndex(4, 4),
-        CommonGoal.fromIndex(1, 4)};
-    private String gameName = "ourgame";
+    private int playerNameToIndex(String name) {
+        for (int i = 0; i < playerNames.size(); i++) {
+            if (playerNames.get(i).equals(name)) {
+                return i;
+            }
+        }
+
+        throw new IllegalArgumentException("There is no player named " + name);
+    }
 
     private List<PlayerDisplay> craftPlayerDisplayList(boolean blurred, int playerToExcludeFromBlurIndex) {
         List<PlayerDisplay> playerDisplays = new ArrayList<>();
@@ -275,7 +285,7 @@ public class GameLayout extends AppLayout {
             }
 
             playerDisplays.add(j, new PlayerDisplay(playerNames.get(i), playerPoints.get(i),j + 1,
-                i == playerIndex, i != playerToExcludeFromBlurIndex && blurred));
+                i == clientPlayerIndex, i != playerToExcludeFromBlurIndex && blurred));
 
             for (j++; j < playerDisplays.size(); j++) {
                 if (playerDisplays.get(i).points < playerPoints.get(i)) {
@@ -287,240 +297,49 @@ public class GameLayout extends AppLayout {
         return playerDisplays;
     }
 
+    private NetworkEventTransceiver transceiver;
+
     @Override
     public void setup(String previousLayoutName) {
         if (previousLayoutName.equals(LobbyLayout.NAME)) {
-            boardDrawable.getNonFillTileDrawables().forEach(tileDrawable -> {
-                tileDrawable.onselect((row, column) ->
-                    boardDrawable.getTileDrawableAt(row, column).selected(true))
-                    .ondeselect((row, column) ->
-                        boardDrawable.getTileDrawableAt(row, column).selected(false));
-            });
-
-            Bookshelf firstBookshelf = new Bookshelf();
-            firstBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.BLUE, TileVersion.FIRST)
-            ), 0);
-            firstBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.WHITE, TileVersion.FIRST),
-                Tile.getInstance(TileColor.YELLOW, TileVersion.FIRST),
-                Tile.getInstance(TileColor.YELLOW, TileVersion.FIRST)
-            ), 0);
-            firstBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.CYAN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 1);
-            firstBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 1);
-            firstBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 2);
-            firstBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 3);
-            firstBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 3);
-            firstBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 4);
-            firstBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 4);
-
-            Bookshelf secondBookshelf = new Bookshelf();
-            secondBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 0);
-            secondBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 0);
-            secondBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 1);
-            secondBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 1);
-            secondBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 2);
-            secondBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 2);
-            secondBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 3);
-            secondBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 4);
-            secondBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 4);
-
-            Bookshelf thirdBookshelf = new Bookshelf();
-            thirdBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 0);
-            thirdBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 0);
-            thirdBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 1);
-            thirdBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 1);
-            thirdBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 2);
-            thirdBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 2);
-            thirdBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 3);
-            thirdBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 3);
-            thirdBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 4);
-
-            Bookshelf fourthBookshelf = new Bookshelf();
-            fourthBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 0);
-            fourthBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 0);
-            fourthBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 1);
-            fourthBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 2);
-            fourthBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 2);
-            fourthBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 3);
-            fourthBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 3);
-            fourthBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 4);
-            fourthBookshelf.insertTiles(List.of(
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST),
-                Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)
-            ), 4);
-
-            bookshelves.add(firstBookshelf);
-            bookshelves.add(secondBookshelf);
-            bookshelves.add(thirdBookshelf);
-            bookshelves.add(fourthBookshelf);
-
             selectedBookshelfIndex = 0;
+            playerNames = (List<String>) appDataProvider.get(LobbyLayout.NAME, "playernames");
+            playerPoints = new ArrayList<>(playerNames.size());
+            bookshelves = new ArrayList<>(playerNames.size());
+            for (int i = 0; i < playerNames.size(); i++) {
+                playerPoints.add(0);
+                bookshelves.add(new Bookshelf());
 
-            populateBookshelfMenu();
-            populateGoalsMenu();
-            playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
+                if (playerNames.get(i).equals(appDataProvider.get(LoginMenuLayout.NAME, "username"))) {
+                    clientPlayerIndex = i;
+                }
+            }
+
+            gameName = appDataProvider.getString(AvailableGamesMenuLayout.NAME, "selectedgame");
+
             gameNameTextBox.text("Game: " + gameName);
 
-            BookshelfMaskSet set = new BookshelfMaskSet();
+            transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME, "transceiver");
 
-            BookshelfMask firstMask = new BookshelfMask(bookshelves.get(3));
+            populateBookshelfMenu();
+            playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
 
-            firstMask.add(Shelf.getInstance(0, 0));
-            firstMask.add(Shelf.getInstance(1, 0));
-            firstMask.add(Shelf.getInstance(0, 1));
+            GoalEventData.castEventReceiver(transceiver).registerListener(data -> {
+                synchronized (getLock()) {
+                    commonGoals = new CommonGoal[2];
 
-            BookshelfMask secondMask = new BookshelfMask(bookshelves.get(3));
+                    // TODO: Disconnected and then reconnected player finds always full points stack
+                    // Remember to re add type adapters to network event transceiver.
+                    commonGoals[0] = CommonGoal.fromIndex(data.getCommonGoal().get(0), playerNames.size());
+                    commonGoals[1] = CommonGoal.fromIndex(data.getCommonGoal().get(1), playerNames.size());
+                    personalGoal = PersonalGoal.fromIndex(data.getPersonalGoal());
 
-            secondMask.add(Shelf.getInstance(5, 0));
-            secondMask.add(Shelf.getInstance(5, 1));
-            secondMask.add(Shelf.getInstance(5, 2));
 
-            set.add(firstMask);
-            set.add(secondMask);
-
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    synchronized (getLock()) {
-                        displayCommonGoalCompleted(3, false,
-                            set);
-                    }
+                    populateGoalsMenu();
                 }
-            }, 5000);
+            });
+
+            transceiver.broadcast(new JoinStartedGameEventData());
         }
     }
 

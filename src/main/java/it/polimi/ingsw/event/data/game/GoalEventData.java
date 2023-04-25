@@ -30,19 +30,19 @@ public class GoalEventData implements EventData {
 
     public static final String ID = "GOAL";
 
-    public static CastEventReceiver<GameHasStartedEventData> castEventReceiver(EventReceiver<EventData> receiver) {
+    public static CastEventReceiver<GoalEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }
 
-    public static <T extends EventData> Requester<GameHasStartedEventData, T> requester(EventTransmitter transmitter,
+    public static <T extends EventData> Requester<GoalEventData, T> requester(EventTransmitter transmitter,
                                                                                   EventReceiver<EventData> receiver,
                                                                                   Object responsesLock) {
         return new Requester<>(ID, transmitter, receiver, responsesLock);
     }
 
-    public static <T extends EventData> Responder<GameHasStartedEventData, T> responder(EventTransmitter transmitter,
+    public static <T extends EventData> Responder<GoalEventData, T> responder(EventTransmitter transmitter,
                                                                                   EventReceiver<EventData> receiver,
-                                                                                  Function<GameHasStartedEventData, T> response) {
+                                                                                  Function<GoalEventData, T> response) {
         return new Responder<>(ID, transmitter, receiver, response);
     }
 

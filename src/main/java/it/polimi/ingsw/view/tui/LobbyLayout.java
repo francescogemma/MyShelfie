@@ -4,6 +4,8 @@ import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.client.JoinGameEventData;
+import it.polimi.ingsw.event.data.client.StartGameEventData;
+import it.polimi.ingsw.event.data.game.GameHasStartedEventData;
 import it.polimi.ingsw.event.data.game.PlayerHasJoinEventData;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
@@ -57,11 +59,13 @@ public class LobbyLayout extends AppLayout {
 
         setData(new AppLayoutData(
             Map.of(
-
+                "playernames", () -> playerNames
             )
         ));
 
-        startButton.onpress(() -> switchAppLayout(GameLayout.NAME));
+        startButton.onpress(() -> {
+            startGameRequester.request(new StartGameEventData());
+        });
 
         backButton.onpress(() -> switchAppLayout(AvailableGamesMenuLayout.NAME));
     }
@@ -70,6 +74,7 @@ public class LobbyLayout extends AppLayout {
     private String gameName;
     private NetworkEventTransceiver transceiver;
     private Requester<Response, JoinGameEventData> joinGameRequester;
+    private Requester<Response, StartGameEventData> startGameRequester;
 
     @Override
     public void setup(String previousLayoutName) {
@@ -84,6 +89,7 @@ public class LobbyLayout extends AppLayout {
                 "transceiver");
 
             joinGameRequester = Response.requester(transceiver, transceiver, getLock());
+            startGameRequester = Response.requester(transceiver, transceiver, getLock());
 
             PlayerHasJoinEventData.castEventReceiver(transceiver).registerListener(data -> {
                 synchronized (getLock()) {
@@ -104,6 +110,12 @@ public class LobbyLayout extends AppLayout {
                     } else {
                         startButtonLayoutElement.setWeight(0);
                     }
+                }
+            });
+
+            GameHasStartedEventData.castEventReceiver(transceiver).registerListener(data -> {
+                synchronized (getLock()) {
+                    switchAppLayout(GameLayout.NAME);
                 }
             });
 
