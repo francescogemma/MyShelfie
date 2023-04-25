@@ -1,5 +1,10 @@
 package it.polimi.ingsw.view.tui;
 
+import it.polimi.ingsw.controller.Response;
+import it.polimi.ingsw.event.NetworkEventTransceiver;
+import it.polimi.ingsw.event.Requester;
+import it.polimi.ingsw.event.data.client.CreateNewGameEventData;
+import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
@@ -70,25 +75,39 @@ public class AvailableGamesMenuLayout extends AppLayout {
             "selectedgame", () -> selectedGameName
         )));
 
+        createNewGameButton.onpress(() -> {
+            Requester<Response, CreateNewGameEventData> createGameRequester = Response.requester(transceiver,
+                transceiver);
+
+            Response response = createGameRequester.request(new CreateNewGameEventData(gameNameEntry.getValue()));
+        });
+
         backToLoginButton.onpress(() -> switchAppLayout(LoginMenuLayout.NAME));
     }
+
+    private NetworkEventTransceiver transceiver;
 
     @Override
     public void setup(String previousLayoutName) {
         if (previousLayoutName.equals(LoginMenuLayout.NAME)) {
             usernameTextBox.text(appDataProvider.getString(LoginMenuLayout.NAME, "username"));
 
-            // Populating availableGames with mock data.
-            availableGames = List.of(    "game1", "game2", "game3", "game4", "game5", "game6", "game7",
-                                         "game8", "game9", "game10", "game11", "game12" );
+            transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
+                "transceiver");
 
-            if (availableGames.size() > 0) {
-                recyclerGamesList.populate(availableGames);
+            GameHasBeenCreatedEventData.castEventReceiver(transceiver).registerListener(data -> {
+                synchronized (getLock()) {
+                    availableGames.addAll(data.getNames());
 
-                alternative.second();
-            } else {
-                alternative.first();
-            }
+                    if (availableGames.size() > 0) {
+                        recyclerGamesList.populate(availableGames);
+
+                        alternative.second();
+                    } else {
+                        alternative.first();
+                    }
+                }
+            });
         }
     }
 
