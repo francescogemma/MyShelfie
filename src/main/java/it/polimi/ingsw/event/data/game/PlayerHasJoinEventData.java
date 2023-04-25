@@ -14,7 +14,6 @@ public class PlayerHasJoinEventData implements EventData {
     public static final String ID = "PLAYER_HAS_JOIN";
 
     public PlayerHasJoinEventData(String username) {
-        System.out.println("Player has join: name: " + username);
         this.username = username;
     }
 

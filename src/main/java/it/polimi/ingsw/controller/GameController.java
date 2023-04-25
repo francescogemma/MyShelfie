@@ -59,19 +59,18 @@ public class GameController {
         }
 
         synchronized (this) {
+            clients.add(Pair.of(newClient, username));
+
             try {
                 game.addPlayer(username);
             } catch (IllegalFlowException | PlayerAlreadyInGameException e) {
+                clients.remove(clients.size() - 1);
                 return new Response(e.toString(), ResponseStatus.FAILURE);
             }
 
-            for (Pair<EventTransmitter, String> player: this.clients) {
-                newClient.broadcast(new PlayerHasJoinEventData(player.getValue()));
+            for (int i = 0; i < clients.size() - 1; i++) {
+                newClient.broadcast(new PlayerHasJoinEventData(clients.get(i).getValue()));
             }
-
-            clients.add(Pair.of(newClient, username));
-
-            this.broadcastForEachView(new PlayerHasJoinEventData(username));
         }
 
         return new Response("You've joined the game", ResponseStatus.SUCCESS);
