@@ -1,5 +1,7 @@
 package it.polimi.ingsw.networking.TCP;
 
+import it.polimi.ingsw.networking.BadHostException;
+import it.polimi.ingsw.networking.BadPortException;
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.ServerNotFoundException;
 import org.junit.jupiter.api.*;
@@ -40,17 +42,20 @@ class TCPConnectionTest {
             Connection connection;
 
             /*
-             * assertions used to check all the cases in which the constructor throw a ServerNotFoundException.
-             * They can be slow due to timeouts.
+             * assertions used to check all the cases in which the constructor throw a ServerNotFoundException
+             * (BadHostException / BadPortException). They can be slow due to timeouts.
              * ------------------------------------------------------------------------------------------------------
-             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection(null, PORT));
-             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection("localhost", 70000));
-             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection("192.168.1.1", 70000));
-             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection("192.168.1.1", PORT));
-             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection(HOST, 55555));
-             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection("192.168.1.1", 55555));
-             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection("192.", PORT));
-             * Assertions.assertThrows(ServerNotFoundException.class, () -> new TCPConnection("192.", 55555));
+             * Assertions.assertThrows(BadHostException.class, () -> new TCPConnection(null, PORT));
+             * Assertions.assertThrows(BadPortException.class, () -> new TCPConnection(null, 70000));
+             * Assertions.assertThrows(BadPortException.class, () -> new TCPConnection("localhost", 70000));
+             * Assertions.assertThrows(BadPortException.class, () -> new TCPConnection("192.168.1.1", 70000));
+             * Assertions.assertThrows(BadPortException.class, () -> new TCPConnection("localhost", 80));
+             * Assertions.assertThrows(BadPortException.class, () -> new TCPConnection("192.168.1.1", 80));
+             * Assertions.assertThrows(BadHostException.class, () -> new TCPConnection("192.168.1.1", PORT));
+             * Assertions.assertThrows(BadPortException.class, () -> new TCPConnection(HOST, 5555));
+             * Assertions.assertThrows(BadHostException.class, () -> new TCPConnection("192.168.1.1", 5555));
+             * Assertions.assertThrows(BadHostException.class, () -> new TCPConnection("192.", PORT));
+             * Assertions.assertThrows(BadHostException.class, () -> new TCPConnection("192.", 5555));
              */
 
             try {

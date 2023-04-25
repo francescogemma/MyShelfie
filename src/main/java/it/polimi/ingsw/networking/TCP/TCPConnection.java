@@ -1,8 +1,6 @@
 package it.polimi.ingsw.networking.TCP;
 
-import it.polimi.ingsw.networking.Connection;
-import it.polimi.ingsw.networking.DisconnectedException;
-import it.polimi.ingsw.networking.ServerNotFoundException;
+import it.polimi.ingsw.networking.*;
 
 import java.io.*;
 import java.net.*;
@@ -43,12 +41,16 @@ public class TCPConnection implements Connection {
      * @throws ServerNotFoundException if the server ip is not found
      */
     public TCPConnection(String address, int port) throws SocketCreationException, ServerNotFoundException {
+        if(port < 1024 || port > 49151) {
+            throw new BadPortException("port " + port + " out of range [1024, 49151]");
+        }
+
         disconnected = false;
         receivedMessages = new ArrayDeque<>();
 
         try {
             socket = new Socket();
-            socket.connect(new java.net.InetSocketAddress(address, port), 5000);
+            socket.connect(new java.net.InetSocketAddress(address, port), 2000);
 
             socket.setTcpNoDelay(true);
             socket.setSoTimeout(5000);
@@ -56,13 +58,13 @@ public class TCPConnection implements Connection {
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
         } catch(IllegalArgumentException e) {
-            throw new ServerNotFoundException("found null address or invalid port", e);
+            throw new BadHostException("address is null", e);
         } catch(UnknownHostException e) {
-            throw new ServerNotFoundException("unknown host: " + address, e);
+            throw new BadHostException("unknown host: " + address, e);
         } catch(SocketTimeoutException e) {
-            throw new ServerNotFoundException("server: " + address + " not found listening on port: " + port + " (timeout expired)", e);
+            throw new BadHostException("server: " + address + " not found listening on port: " + port + " (timeout expired)", e);
         } catch(ConnectException e) {
-            throw new ServerNotFoundException("server: " + address + " not found listening on port: " + port, e);
+            throw new BadPortException("server: " + address + " not found listening on port: " + port, e);
         } catch(IOException e) {
             throw new SocketCreationException("error while creating socket", e);
         }

@@ -8,6 +8,8 @@ package it.polimi.ingsw.networking;
  *     <li> the are servers listening on the port, but the ip is incorrect </li>
  *     <li> the ip address specified is not a valid ip address </li>
  * </ul>
+ * It should not be thrown directly, but it should be extended by
+ * {@link BadHostException} or {@link BadPortException}.
  *
  * @see ConnectionException
  */
