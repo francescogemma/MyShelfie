@@ -1,6 +1,7 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.controller.db.IdentifiableNotFoundException;
+import it.polimi.ingsw.event.EventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
@@ -112,20 +113,22 @@ public class MenuController {
         }
     }
 
-    public Response authenticated(EventTransmitter view, String username, String password) {
-        if (this.authenticate(view, username, password)) {
-            List<String> gamePresent = new ArrayList<>();
+    public void playerHasJoinMenu (EventTransceiver transceiver) {
+        List<String> gamePresent = new ArrayList<>();
 
-            synchronized (this.gameControllerList) {
-                for (GameController gameController : gameControllerList) {
-                    if (gameController.isAvailableForJoin()) {
-                        gamePresent.add(gameController.gameName());
-                    }
+        synchronized (this.gameControllerList) {
+            for (GameController gameController : gameControllerList) {
+                if (gameController.isAvailableForJoin()) {
+                    gamePresent.add(gameController.gameName());
                 }
             }
+        }
 
-            view.broadcast(new GameHasBeenCreatedEventData(gamePresent));
+        transceiver.broadcast(new GameHasBeenCreatedEventData(gamePresent));
+    }
 
+    public Response authenticated(EventTransmitter view, String username, String password) {
+        if (this.authenticate(view, username, password)) {
             return new Response("You are log in", ResponseStatus.SUCCESS);
         } else {
             return new Response("You are not login", ResponseStatus.FAILURE);

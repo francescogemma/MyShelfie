@@ -50,9 +50,7 @@ public class GameController {
     }
 
     private void broadcastForEachView (EventData data) {
-        this.clients.forEach((client -> {
-            client.getKey().broadcast(data);
-        }));
+        this.clients.forEach((client -> client.getKey().broadcast(data)));
     }
 
     public Response join(EventTransmitter newClient, String username) {
