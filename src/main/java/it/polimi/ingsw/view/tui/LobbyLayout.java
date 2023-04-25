@@ -107,7 +107,7 @@ public class LobbyLayout extends AppLayout {
                 }
             });
 
-            Response response = joinGameRequester.request(new JoinGameEventData(gameName));
+            displayServerResponse(joinGameRequester.request(new JoinGameEventData(gameName)));
         }
     }
 
