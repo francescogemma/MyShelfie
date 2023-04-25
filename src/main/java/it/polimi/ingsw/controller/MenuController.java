@@ -53,6 +53,8 @@ public class MenuController {
             user = userDBManager.load(username);
         } catch (IdentifiableNotFoundException e) {
             user = new User(username, password);
+            userDBManager.save(user);
+            System.out.println("Created new user: " + user.getName());
         }
 
         return user;
@@ -72,6 +74,8 @@ public class MenuController {
             synchronized (authenticated) {
                 authenticated.add(transmitter);
             }
+            System.out.println(user.getName() + " authenticated correctly");
+
             return true;
         } else {
             return false;

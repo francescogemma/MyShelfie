@@ -1,7 +1,7 @@
 package it.polimi.ingsw.view.tui;
 
 import it.polimi.ingsw.controller.Response;
-import it.polimi.ingsw.event.MockNetworkEventTransceiver;
+import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.LoginEventData;
 import it.polimi.ingsw.view.tui.terminal.drawable.BlurrableDrawable;
@@ -87,12 +87,12 @@ public class LoginMenuLayout extends AppLayout {
         exitButton.onpress(this::mustExit);
     }
 
-    private MockNetworkEventTransceiver  transceiver;
+    private NetworkEventTransceiver  transceiver;
 
     @Override
     public void setup(String previousLayoutName) {
         if (previousLayoutName.equals(ConnectionMenuLayout.NAME)) {
-            transceiver = (MockNetworkEventTransceiver)
+            transceiver = (NetworkEventTransceiver)
                 appDataProvider.get(ConnectionMenuLayout.NAME, "transceiver");
         }
     }
