@@ -21,6 +21,10 @@ public class BlurrableDrawable extends Drawable {
 
     @Override
     public Symbol getSymbolAt(Coordinate coordinate) {
+        if (!size.isInside(coordinate)) {
+            throw new OutOfDrawableException(size, coordinate);
+        }
+
         if (blurred) {
             return toBlur.getSymbolAt(coordinate).getPrimitiveSymbol().blur();
         }

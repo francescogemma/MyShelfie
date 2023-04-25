@@ -1,13 +1,20 @@
 package it.polimi.ingsw.view.tui.terminal.drawable.app;
 
+import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.view.tui.terminal.drawable.Coordinate;
 import it.polimi.ingsw.view.tui.terminal.drawable.FixedLayoutDrawable;
 import it.polimi.ingsw.view.tui.terminal.drawable.FullyResizableDrawable;
+import it.polimi.ingsw.view.tui.terminal.drawable.ServerResponseDrawable;
 
 import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public abstract class AppLayout extends FixedLayoutDrawable<FullyResizableDrawable> {
     private String nextName = null;
+    private ServerResponseDrawable serverResponseDrawable;
+
+    private Timer timer = null;
 
     @Override
     public boolean handleInput(String key) {
@@ -17,6 +24,12 @@ public abstract class AppLayout extends FixedLayoutDrawable<FullyResizableDrawab
         }
 
         return true;
+    }
+
+    @Override
+    protected void setLayout(FullyResizableDrawable layout) {
+        serverResponseDrawable = new ServerResponseDrawable(layout);
+        super.setLayout(serverResponseDrawable);
     }
 
     protected void mustExit() {
@@ -82,5 +95,26 @@ public abstract class AppLayout extends FixedLayoutDrawable<FullyResizableDrawab
 
     protected boolean isCurrentLayout() {
         return isCurrentLayout;
+    }
+
+    protected void displayServerResponse(Response response) {
+        serverResponseDrawable.showResponse(response);
+
+        if (timer != null) {
+            timer.cancel();
+        }
+
+        timer = new Timer();
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (getLock()) {
+                    serverResponseDrawable.hideResponse();
+
+                    timer = null;
+                }
+            }
+        }, 500);
     }
 }

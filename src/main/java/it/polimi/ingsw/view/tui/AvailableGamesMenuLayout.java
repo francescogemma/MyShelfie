@@ -76,7 +76,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
         )));
 
         createNewGameButton.onpress(() -> {
-            Response response = createGameRequester.request(new CreateNewGameEventData(gameNameEntry.getValue()));
+            displayServerResponse(createGameRequester.request(new CreateNewGameEventData(gameNameEntry.getValue())));
         });
 
         backToLoginButton.onpress(() -> switchAppLayout(LoginMenuLayout.NAME));

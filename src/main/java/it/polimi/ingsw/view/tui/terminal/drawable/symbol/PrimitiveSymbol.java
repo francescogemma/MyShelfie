@@ -90,6 +90,8 @@ public enum PrimitiveSymbol implements Symbol {
     EXCLAMATION_MARK("!"),
     POINT("."),
     APOSTROPHE("'"),
+    OPEN_SQUARE_BRACKET("["),
+    CLOSED_SQUARE_BRACKET("]"),
     EMPTY(" ");
 
     private final String symbol;

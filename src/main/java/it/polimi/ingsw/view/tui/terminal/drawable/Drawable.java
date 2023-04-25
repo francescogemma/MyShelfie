@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.tui.terminal.drawable;
 
 import it.polimi.ingsw.view.tui.terminal.drawable.align.CenteredDrawable;
+import it.polimi.ingsw.view.tui.terminal.drawable.align.DownRightAlignedDrawable;
 import it.polimi.ingsw.view.tui.terminal.drawable.align.UpLeftAlignedDrawable;
 import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayoutElement;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
@@ -41,6 +42,8 @@ public abstract class Drawable {
     public UpLeftAlignedDrawable alignUpLeft() {
         return new UpLeftAlignedDrawable(this);
     }
+
+    public DownRightAlignedDrawable alignDownRight() { return new DownRightAlignedDrawable(this); }
 
     public WithBorderBoxDrawable addBorderBox() {
         return new WithBorderBoxDrawable(this);
