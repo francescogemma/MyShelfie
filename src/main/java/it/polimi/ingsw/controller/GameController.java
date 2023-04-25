@@ -65,9 +65,9 @@ public class GameController {
                 return new Response(e.toString(), ResponseStatus.FAILURE);
             }
 
-            this.broadcastForEachView(new PlayerHasJoinEventData(username));
-
             clients.add(Pair.of(newClient, username));
+
+            this.broadcastForEachView(new PlayerHasJoinEventData(username));
         }
 
         return new Response("You've joined the game", ResponseStatus.SUCCESS);
