@@ -1,31 +1,11 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.controller.Response;
-import it.polimi.ingsw.controller.ResponseStatus;
-import it.polimi.ingsw.event.MockNetworkEventTransceiver;
-import it.polimi.ingsw.event.data.LoginEventData;
 import it.polimi.ingsw.view.tui.*;
 import it.polimi.ingsw.view.tui.terminal.Terminal;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.App;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
 
 public class Client {
-    private static final MockNetworkEventTransceiver transceiver = new MockNetworkEventTransceiver();
-
-    public static MockNetworkEventTransceiver getTransceiver() {
-        return transceiver;
-    }
-
-    static {
-        LoginEventData.responder(transceiver, transceiver, data -> {
-            if (data.getUsername().equals("foo") && data.getPassword().equals("bar")) {
-                return new Response("You're now logged in!", ResponseStatus.SUCCESS);
-            }
-
-            return new Response("Bad credentials!", ResponseStatus.FAILURE);
-        });
-    }
-
     public static void main(String[] args) {
         Terminal terminal = Terminal.getInstance();
 
@@ -37,7 +17,5 @@ public class Client {
             terminal.start(new App(data, ConnectionMenuLayout::new, LoginMenuLayout::new,
                 AvailableGamesMenuLayout::new, LobbyLayout::new, GameLayout::new));
         }
-
-        transceiver.disconnect();
     }
 }

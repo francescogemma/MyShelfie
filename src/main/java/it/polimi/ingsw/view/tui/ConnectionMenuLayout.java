@@ -1,7 +1,8 @@
 package it.polimi.ingsw.view.tui;
 
-import it.polimi.ingsw.Client;
-import it.polimi.ingsw.event.MockNetworkEventTransceiver;
+import it.polimi.ingsw.event.NetworkEventTransceiver;
+import it.polimi.ingsw.networking.Connection;
+import it.polimi.ingsw.networking.TCP.TCPConnection;
 import it.polimi.ingsw.view.tui.terminal.drawable.Orientation;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.App;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
@@ -18,12 +19,12 @@ public class ConnectionMenuLayout extends AppLayout {
     public static final String NAME = "CONNECTION_MENU";
 
     private final ValueMenuEntry<String> ipAddressEntry = new ValueMenuEntry<>("Server IP",
-        new TextBox().text("192.168.1.1"));
+        new TextBox().text("10.0.0.2"));
     private final ValueMenuEntry<Integer> portEntry = new ValueMenuEntry<>("Server port",
         new IntTextBox().integer(8080));
     private final Button nextButton = new Button("Next");
 
-    private MockNetworkEventTransceiver transceiver;
+    private NetworkEventTransceiver transceiver;
 
     public ConnectionMenuLayout() {
         setLayout(new OrientedLayout(Orientation.VERTICAL,
@@ -41,8 +42,20 @@ public class ConnectionMenuLayout extends AppLayout {
         ));
 
         nextButton.onpress(() -> {
-            // Getting the transceiver
-            transceiver = Client.getTransceiver();
+            String ipAddress = ipAddressEntry.getValue();
+            int port = portEntry.getValue();
+
+            Connection connection;
+
+            try {
+                connection = new TCPConnection(ipAddress, port);
+            } catch (Exception e) {
+
+                System.exit(1);
+                return;
+            }
+
+            transceiver = new NetworkEventTransceiver(connection);
 
             switchAppLayout(LoginMenuLayout.NAME);
         });
