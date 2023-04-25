@@ -43,13 +43,14 @@ public class LoginMenuLayout extends AppLayout {
 
     private final TextBox popUpTextBox = new TextBox().unfocusable();
 
-    private final TwoLayersDrawable twoLayers = new TwoLayersDrawable(blurrableBackground.alignUpLeft().crop(),
+    private final TwoLayersDrawable twoLayers = new TwoLayersDrawable(
+        blurrableBackground,
         popUpTextBox.center().crop().fixSize(new DrawableSize(5, 30))
-            .addBorderBox().center().crop()
+            .addBorderBox().center()
     );
 
     public LoginMenuLayout() {
-        setLayout(twoLayers);
+        setLayout(twoLayers.alignUpLeft().crop());
 
         setData(new AppLayoutData(
             Map.of(

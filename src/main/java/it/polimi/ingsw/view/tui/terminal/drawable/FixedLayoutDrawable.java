@@ -5,7 +5,7 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 import java.util.Optional;
 
 public abstract class FixedLayoutDrawable<T extends Drawable> extends Drawable {
-    private Drawable layout;
+    private T layout;
 
     protected void setLayout(T layout) {
         if (this.layout != null) {
@@ -13,6 +13,10 @@ public abstract class FixedLayoutDrawable<T extends Drawable> extends Drawable {
         }
 
         this.layout = layout;
+    }
+
+    public T getLayout() {
+        return layout;
     }
 
     @Override

@@ -1,6 +1,9 @@
 package it.polimi.ingsw.view.tui;
 
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
+import it.polimi.ingsw.model.bookshelf.BookshelfMask;
+import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
+import it.polimi.ingsw.model.bookshelf.Shelf;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
 import it.polimi.ingsw.model.tile.Tile;
@@ -14,11 +17,9 @@ import it.polimi.ingsw.view.tui.terminal.drawable.menu.value.TextBox;
 import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Color;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.PrimitiveSymbol;
+import it.polimi.ingsw.view.tui.terminal.drawable.twolayers.TwoLayersDrawable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,9 +29,27 @@ public class GameLayout extends AppLayout {
     private final TextBox firstCommonGoalDescriptionTextBox = new TextBox().hideCursor();
     private final GoalDrawable firstCommonGoalDrawable = new GoalDrawable();
     private final TextBox firstCommonGoalPointsTextBox = new TextBox().unfocusable();
+    private final BlurrableDrawable blurrableFirstCommonGoal = new OrientedLayout(Orientation.VERTICAL,
+                        new TextBox().text("First common goal").unfocusable().center().weight(1),
+                        new OrientedLayout(Orientation.HORIZONTAL,
+                            firstCommonGoalDrawable.center().weight(1),
+                            firstCommonGoalDescriptionTextBox.center()
+                                .crop().fixSize(new DrawableSize(GOALS_TEXT_BOX_LINES, GOALS_TEXT_BOX_COLUMNS))
+                                .weight(3)).weight(4),
+                        firstCommonGoalPointsTextBox.center().weight(1)
+                    ).addBorderBox().blurrable();
     private final TextBox secondCommonGoalDescriptionTextBox = new TextBox().hideCursor();
     private final GoalDrawable secondCommonGoalDrawable = new GoalDrawable();
     private final TextBox secondCommonGoalPointsTextBox = new TextBox().unfocusable();
+    private final BlurrableDrawable blurrableSecondCommonGoal = new OrientedLayout(Orientation.VERTICAL,
+                        new TextBox().text("Second common goal").unfocusable().center().weight(1),
+                        new OrientedLayout(Orientation.HORIZONTAL,
+                            secondCommonGoalDrawable.center().weight(1),
+                            secondCommonGoalDescriptionTextBox.center()
+                                .crop().fixSize(new DrawableSize(GOALS_TEXT_BOX_LINES, GOALS_TEXT_BOX_COLUMNS))
+                                .weight(3)).weight(4),
+                        secondCommonGoalPointsTextBox.center().weight(1)
+                    ).addBorderBox().blurrable();
     private final GoalDrawable personalGoalDrawable = new GoalDrawable();
     private final TextBox personalGoalPointsTextBox = new TextBox()
         .text(Stream.of(1, 2, 3, 4, 5, 6)
@@ -44,31 +63,55 @@ public class GameLayout extends AppLayout {
                             .map(String::valueOf)
                             .collect(Collectors.joining(PrimitiveSymbol.VERTICAL_BOX_BORDER.asString())))
         .hideCursor();
+    private final BlurrableDrawable blurrablePersonalGoal = new OrientedLayout(Orientation.VERTICAL,
+                        new TextBox().text("Personal goal").unfocusable().center().weight(1),
+                        new OrientedLayout(Orientation.HORIZONTAL,
+                            personalGoalDrawable.center().weight(1),
+                            personalGoalPointsTextBox.center()
+                                .crop().fixSize(new DrawableSize(GOALS_TEXT_BOX_LINES, GOALS_TEXT_BOX_COLUMNS))
+                                .weight(3)).weight(4)
+                    ).addBorderBox().blurrable();
     private final TextBox adjacencyGoalTextBox = new TextBox()
         .text("Points from adjacent tiles in the bookshelf:\n3 adjacent tiles -> 2 points\n" +
             "4 adjacent tiles -> 3 points\n5 adjacent tiles -> 5 points\n6+ adjacent tiles -> 8 points")
         .hideCursor();
+
+    private final BlurrableDrawable blurrableAdjacencyGoal = new OrientedLayout(Orientation.VERTICAL,
+                        new TextBox().text("Final goal").unfocusable().center().weight(1),
+                        adjacencyGoalTextBox.center().weight(4)
+                    ).addBorderBox().blurrable();
+
     private final BoardDrawable boardDrawable = new BoardDrawable();
+    private final BlurrableDrawable blurrableBoard = boardDrawable.center().scrollable().blurrable();
+    private final TextBox completedCommonGoalPopUpTextBox = new TextBox().hideCursor();
+    private final TwoLayersDrawable twoLayersBoard = new TwoLayersDrawable(
+        blurrableBoard,
+        completedCommonGoalPopUpTextBox.center().crop()
+            .fixSize(new DrawableSize(10, 25)).addBorderBox().center()
+    );
     private final TextBox playerNameTextBox = new TextBox().unfocusable();
     private final BookshelfDrawable bookshelfDrawable = new BookshelfDrawable();
     private final Button nextBookshelfButton = new Button(">");
     private final Button previousBookshelfButton = new Button("<");
     private final TextBox gameNameTextBox = new TextBox().unfocusable();
     private static class PlayerDisplay {
-        public PlayerDisplay(String name, int points, int position, boolean isPlayer) {
+        public PlayerDisplay(String name, int points, int position, boolean isPlayer,
+                             boolean blurred) {
             this.name = name;
             this.points = points;
             this.position = position;
             this.isPlayer = isPlayer;
+            this.blurred = blurred;
         }
 
         private String name;
         private int points;
         private int position;
         private boolean isPlayer;
+        private boolean blurred;
     }
 
-    private static class PlayerDisplayDrawable extends FixedLayoutDrawable<Drawable> {
+    private static class PlayerDisplayDrawable extends FixedLayoutDrawable<BlurrableDrawable> {
         private final TextBox positionTextBox = new TextBox().unfocusable();
         private final TextBox playerNameTextBox = new TextBox().hideCursor();
         private final TextBox playerPointsTextBox = new TextBox().hideCursor();
@@ -78,13 +121,20 @@ public class GameLayout extends AppLayout {
                 positionTextBox.center().weight(1),
                 playerNameTextBox.center().weight(1),
                 playerPointsTextBox.center().weight(1)).center().crop()
-                .fixSize(new DrawableSize(5, 40)).addBorderBox()
+                .fixSize(new DrawableSize(5, 40)).addBorderBox().blurrable()
             );
         }
     }
 
     private final RecyclerDrawable<PlayerDisplayDrawable, PlayerDisplay> playerDisplayRecyclerDrawable =
-        new RecyclerDrawable<>(Orientation.VERTICAL, PlayerDisplayDrawable::new);
+        new RecyclerDrawable<>(Orientation.VERTICAL, PlayerDisplayDrawable::new,
+            (playerDisplayDrawable, playerDisplay) -> {
+                playerDisplayDrawable.positionTextBox.text("# " + String.valueOf(playerDisplay.position) + " ");
+                playerDisplayDrawable.playerNameTextBox.text(playerDisplay.name + " ")
+                    .color(playerDisplay.isPlayer ? Color.FOCUS : Color.WHITE);
+                playerDisplayDrawable.playerPointsTextBox.text("Points: " + playerDisplay.points);
+                playerDisplayDrawable.getLayout().blur(playerDisplay.blurred);
+            });
 
     private final static int GOALS_TEXT_BOX_LINES = 10;
     private final static int GOALS_TEXT_BOX_COLUMNS = 30;
@@ -92,38 +142,12 @@ public class GameLayout extends AppLayout {
     public GameLayout() {
         setLayout(new OrientedLayout(Orientation.HORIZONTAL,
                 new OrientedLayout(Orientation.VERTICAL,
-                    new OrientedLayout(Orientation.VERTICAL,
-                        new TextBox().text("First common goal").unfocusable().center().weight(1),
-                        new OrientedLayout(Orientation.HORIZONTAL,
-                            firstCommonGoalDrawable.center().weight(1),
-                            firstCommonGoalDescriptionTextBox.center()
-                                .crop().fixSize(new DrawableSize(GOALS_TEXT_BOX_LINES, GOALS_TEXT_BOX_COLUMNS))
-                                .weight(3)).weight(4),
-                        firstCommonGoalPointsTextBox.center().weight(1)
-                    ).addBorderBox().weight(1),
-                    new OrientedLayout(Orientation.VERTICAL,
-                        new TextBox().text("Second common goal").unfocusable().center().weight(1),
-                        new OrientedLayout(Orientation.HORIZONTAL,
-                            secondCommonGoalDrawable.center().weight(1),
-                            secondCommonGoalDescriptionTextBox.center()
-                                .crop().fixSize(new DrawableSize(GOALS_TEXT_BOX_LINES, GOALS_TEXT_BOX_COLUMNS))
-                                .weight(3)).weight(4),
-                        secondCommonGoalPointsTextBox.center().weight(1)
-                    ).addBorderBox().weight(1),
-                    new OrientedLayout(Orientation.VERTICAL,
-                        new TextBox().text("Personal goal").unfocusable().center().weight(1),
-                        new OrientedLayout(Orientation.HORIZONTAL,
-                            personalGoalDrawable.center().weight(1),
-                            personalGoalPointsTextBox.center()
-                                .crop().fixSize(new DrawableSize(GOALS_TEXT_BOX_LINES, GOALS_TEXT_BOX_COLUMNS))
-                                .weight(3)).weight(4)
-                    ).addBorderBox().weight(1),
-                    new OrientedLayout(Orientation.VERTICAL,
-                        new TextBox().text("Final goal").unfocusable().center().weight(1),
-                        adjacencyGoalTextBox.center().weight(4)
-                    ).addBorderBox().weight(1)
+                    blurrableFirstCommonGoal.weight(1),
+                    blurrableSecondCommonGoal.weight(1),
+                    blurrablePersonalGoal.weight(1),
+                    blurrableAdjacencyGoal.weight(1)
                 ).alignUpLeft().scrollable().weight(3),
-                boardDrawable.center().scrollable().weight(2),
+                twoLayersBoard.weight(2),
                 new OrientedLayout(Orientation.VERTICAL,
                     new Fill(PrimitiveSymbol.EMPTY).weight(1),
                     gameNameTextBox.center().weight(2),
@@ -165,7 +189,7 @@ public class GameLayout extends AppLayout {
         nextBookshelfButton.focusable(selectedBookshelfIndex < bookshelves.size() - 1);
         bookshelfDrawable.focusable(selectedBookshelfIndex == playerIndex);
         bookshelfDrawable.populate(bookshelves.get(selectedBookshelfIndex));
-        playerNameTextBox.text(players.get(selectedBookshelfIndex).name)
+        playerNameTextBox.text(playerNames.get(selectedBookshelfIndex))
             .color(selectedBookshelfIndex == playerIndex ? Color.FOCUS : Color.WHITE);
     }
 
@@ -183,22 +207,85 @@ public class GameLayout extends AppLayout {
         personalGoalDrawable.populate(personalGoal.getTilesColorMask());
     }
 
+    private void displayCommonGoalCompleted(int playerIndex, boolean completedFirstCommonGoal,
+                                            BookshelfMaskSet bookshelfMaskSet) {
+        if (completedFirstCommonGoal) {
+            blurrableSecondCommonGoal.blur(true);
+        } else {
+            blurrableFirstCommonGoal.blur(true);
+        }
+
+        blurrablePersonalGoal.blur(true);
+        blurrableAdjacencyGoal.blur(true);
+
+        completedCommonGoalPopUpTextBox.text(playerNames.get(playerIndex) + " completed the\n" +
+            (completedFirstCommonGoal ? "first" : "second") + " common goal");
+        blurrableBoard.blur(true);
+        twoLayersBoard.showForeground();
+
+        playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(true, playerIndex));
+
+        playerNameTextBox.text(playerNames.get(playerIndex));
+
+        selectedBookshelfIndex = playerIndex;
+
+        previousBookshelfButton.focusable(false);
+        bookshelfDrawable.mask(bookshelfMaskSet);
+        nextBookshelfButton.focusable(false);
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (getLock()) {
+                    blurrableFirstCommonGoal.blur(false);
+                    blurrableSecondCommonGoal.blur(false);
+                    blurrablePersonalGoal.blur(false);
+                    blurrableAdjacencyGoal.blur(false);
+                    blurrableBoard.blur(false);
+                    twoLayersBoard.hideForeground();
+                    playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
+
+                    populateBookshelfMenu();
+                }
+            }
+        }, 10000);
+    }
+
     private int selectedBookshelfIndex;
 
     // Populate these data through the transceiver
-    private List<PlayerDisplay> players = List.of(
-        new PlayerDisplay("tizio", 8, 1, false),
-        new PlayerDisplay("bar", 5, 2, false),
-        new PlayerDisplay("foo", 3, 3, true),
-        new PlayerDisplay("caio", 2, 4, false)
-    );
 
+    private List<String> playerNames = List.of("tizio", "bar", "foo", "caio");
+    private List<Integer> playerPoints = List.of( 8, 5, 5, 2 );
     private int playerIndex = 2;
     private List<Bookshelf> bookshelves = new ArrayList<>();
     private PersonalGoal personalGoal = PersonalGoal.fromIndex(0);
     private CommonGoal[] commonGoals = new CommonGoal[]{CommonGoal.fromIndex(4, 4),
         CommonGoal.fromIndex(1, 4)};
     private String gameName = "ourgame";
+
+    private List<PlayerDisplay> craftPlayerDisplayList(boolean blurred, int playerToExcludeFromBlurIndex) {
+        List<PlayerDisplay> playerDisplays = new ArrayList<>();
+
+        for (int i = 0; i < playerNames.size(); i++) {
+            int j = 0;
+            while (j < playerDisplays.size() && playerDisplays.get(j).points >
+                    playerPoints.get(i)) {
+                j++;
+            }
+
+            playerDisplays.add(j, new PlayerDisplay(playerNames.get(i), playerPoints.get(i),j + 1,
+                i == playerIndex, i != playerToExcludeFromBlurIndex && blurred));
+
+            for (j++; j < playerDisplays.size(); j++) {
+                if (playerDisplays.get(i).points < playerPoints.get(i)) {
+                    playerDisplays.get(i).position++;
+                }
+            }
+        }
+
+        return playerDisplays;
+    }
 
     @Override
     public void setup(String previousLayoutName) {
@@ -405,13 +492,35 @@ public class GameLayout extends AppLayout {
 
             populateBookshelfMenu();
             populateGoalsMenu();
-            playerDisplayRecyclerDrawable.populate(players, ((playerDisplayDrawable, playerDisplay) -> {
-                playerDisplayDrawable.positionTextBox.text("# " + String.valueOf(playerDisplay.position) + " ");
-                playerDisplayDrawable.playerNameTextBox.text(playerDisplay.name + " ")
-                    .color(playerDisplay.isPlayer ? Color.FOCUS : Color.WHITE);
-                playerDisplayDrawable.playerPointsTextBox.text("Points: " + playerDisplay.points);
-            }));
+            playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
             gameNameTextBox.text("Game: " + gameName);
+
+            BookshelfMaskSet set = new BookshelfMaskSet();
+
+            BookshelfMask firstMask = new BookshelfMask(bookshelves.get(3));
+
+            firstMask.add(Shelf.getInstance(0, 0));
+            firstMask.add(Shelf.getInstance(1, 0));
+            firstMask.add(Shelf.getInstance(0, 1));
+
+            BookshelfMask secondMask = new BookshelfMask(bookshelves.get(3));
+
+            secondMask.add(Shelf.getInstance(5, 0));
+            secondMask.add(Shelf.getInstance(5, 1));
+            secondMask.add(Shelf.getInstance(5, 2));
+
+            set.add(firstMask);
+            set.add(secondMask);
+
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (getLock()) {
+                        displayCommonGoalCompleted(3, false,
+                            set);
+                    }
+                }
+            }, 5000);
         }
     }
 

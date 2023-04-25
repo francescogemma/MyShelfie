@@ -1,31 +1,35 @@
 package it.polimi.ingsw.view.tui.terminal.drawable.twolayers;
 
 import it.polimi.ingsw.view.tui.terminal.drawable.Coordinate;
+import it.polimi.ingsw.view.tui.terminal.drawable.Drawable;
 import it.polimi.ingsw.view.tui.terminal.drawable.DrawableSize;
-import it.polimi.ingsw.view.tui.terminal.drawable.FullyResizableDrawable;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.PrimitiveSymbol;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
 import java.util.Optional;
 
-public class TwoLayersDrawable extends FullyResizableDrawable {
-    private final FullyResizableDrawable background;
-    private final FullyResizableDrawable foreground;
+public class TwoLayersDrawable extends Drawable {
+    private final Drawable background;
+    private final Drawable foreground;
 
     private boolean foregroundToShow = false;
     private boolean onFocus = false;
 
-    public TwoLayersDrawable(FullyResizableDrawable background, FullyResizableDrawable foreground) {
+    public TwoLayersDrawable(Drawable background, Drawable foreground) {
         this.background = background;
         this.foreground = foreground;
     }
 
     @Override
     public void askForSize(DrawableSize desiredSize) {
-        super.askForSize(desiredSize);
-
         background.askForSize(desiredSize);
         foreground.askForSize(desiredSize);
+
+        if (foregroundToShow) {
+            size = foreground.getSize();
+        } else {
+            size = background.getSize();
+        }
     }
 
     @Override

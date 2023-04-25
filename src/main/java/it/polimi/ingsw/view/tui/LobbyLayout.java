@@ -29,7 +29,7 @@ public class LobbyLayout extends AppLayout {
         }
     }
     private final RecyclerDrawable<PlayerDrawable, String> recyclerPlayersList = new RecyclerDrawable<>(Orientation.VERTICAL,
-        PlayerDrawable::new);
+        PlayerDrawable::new, (playerDrawable, player) -> playerDrawable.textBox.text(player));
     private final Button startButton = new Button("Start game");
     private final OrientedLayoutElement startButtonLayoutElement = startButton.center().weight(1);
     private final Button backButton = new Button("Back");
@@ -69,7 +69,7 @@ public class LobbyLayout extends AppLayout {
             // Populating players data with mock data
             List<String> players = List.of("mario", "foo", "luca", "gianni");
 
-            recyclerPlayersList.populate(players, ((playerDrawable, player) -> playerDrawable.textBox.text(player)));
+            recyclerPlayersList.populate(players);
 
             boolean isOwner = true;
 

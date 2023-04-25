@@ -11,11 +11,14 @@ import java.util.function.Supplier;
 
 public class RecyclerDrawable<D extends Drawable, T> extends Drawable {
     private final Supplier<D> drawableFactory;
+    private final BiConsumer<D, T> fillDrawable;
     private static final int INITIAL_DRAWABLES = 10;
     private final OrientedLayout layout;
 
-    public RecyclerDrawable(Orientation orientation, Supplier<D> drawableFactory) {
+    public RecyclerDrawable(Orientation orientation, Supplier<D> drawableFactory,
+                            BiConsumer<D, T> fillDrawable) {
         this.drawableFactory = drawableFactory;
+        this.fillDrawable = fillDrawable;
 
         OrientedLayoutElement[] initialElements = new OrientedLayoutElement[INITIAL_DRAWABLES];
 
@@ -61,7 +64,7 @@ public class RecyclerDrawable<D extends Drawable, T> extends Drawable {
         return layout.getFocusedCoordinate();
     }
 
-    public RecyclerDrawable populate(List<T> contents, BiConsumer<D, T> fillDrawable) {
+    public RecyclerDrawable<D, T> populate(List<T> contents) {
         for (int i = 0; i < contents.size(); i++) {
             if (i >= layout.getElements().size()) {
                 layout.addElement(drawableFactory.get().weight(0));

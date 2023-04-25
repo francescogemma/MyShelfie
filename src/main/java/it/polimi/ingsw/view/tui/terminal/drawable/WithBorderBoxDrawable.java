@@ -9,7 +9,7 @@ import java.util.Optional;
 public class WithBorderBoxDrawable extends Drawable {
     private final Drawable toAddBorderBox;
 
-    private boolean onFocus = false;
+    private boolean onFocus;
 
     public WithBorderBoxDrawable(Drawable toAddBorderBox) {
         this.toAddBorderBox = toAddBorderBox;
@@ -26,6 +26,8 @@ public class WithBorderBoxDrawable extends Drawable {
             toAddBorderBox.getSize().getLines() + 2,
             toAddBorderBox.getSize().getColumns() + 2
         );
+
+        onFocus = toAddBorderBox.getFocusedCoordinate().isPresent();
     }
 
     public static Optional<PrimitiveSymbol> addBorder(Coordinate coordinate, DrawableSize size) {
@@ -78,21 +80,13 @@ public class WithBorderBoxDrawable extends Drawable {
 
     @Override
     public boolean focus(Coordinate desiredCoordinate) {
-        if (toAddBorderBox.focus(desiredCoordinate.changeOrigin(
+        return toAddBorderBox.focus(desiredCoordinate.changeOrigin(
             new Coordinate(Math.min(2, desiredCoordinate.getLine()), Math.min(2, desiredCoordinate.getColumn()))
-        ))) {
-            onFocus = true;
-
-            return true;
-        }
-
-        return false;
+        ));
     }
 
     @Override
     public void unfocus() {
-        onFocus = false;
-
         toAddBorderBox.unfocus();
     }
 

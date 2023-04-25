@@ -37,7 +37,13 @@ public class AvailableGamesMenuLayout extends AppLayout {
         }
     }
     private final RecyclerDrawable<JoinableGameDrawable, String> recyclerGamesList = new RecyclerDrawable<>(Orientation.VERTICAL,
-        JoinableGameDrawable::new);
+        JoinableGameDrawable::new, (joinableGameDrawable, name) -> {
+                    joinableGameDrawable.textBox.text(name);
+                    joinableGameDrawable.button.onpress(() -> {
+                        selectedGameName = name;
+                        switchAppLayout(LobbyLayout.NAME);
+                    });
+                });
     private final AlternativeDrawable alternative = new AlternativeDrawable(noAvailableGamesTextBox, recyclerGamesList.center()
                 .scrollable());
     private final ValueMenuEntry<String> gameNameEntry = new ValueMenuEntry<>("New game's name", new TextBox());
@@ -77,13 +83,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
                                          "game8", "game9", "game10", "game11", "game12" );
 
             if (availableGames.size() > 0) {
-                recyclerGamesList.populate(availableGames, (joinableGameDrawable, name) -> {
-                    joinableGameDrawable.textBox.text(name);
-                    joinableGameDrawable.button.onpress(() -> {
-                        selectedGameName = name;
-                        switchAppLayout(LobbyLayout.NAME);
-                    });
-                });
+                recyclerGamesList.populate(availableGames);
 
                 alternative.second();
             } else {
