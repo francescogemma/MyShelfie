@@ -4,6 +4,7 @@ import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.client.CreateNewGameEventData;
+import it.polimi.ingsw.event.data.client.PlayerHasJoinMenu;
 import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
@@ -110,6 +111,8 @@ public class AvailableGamesMenuLayout extends AppLayout {
                     }
                 }
             });
+
+            transceiver.broadcast(new PlayerHasJoinMenu());
         }
     }
 
