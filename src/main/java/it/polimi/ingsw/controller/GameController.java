@@ -1,13 +1,8 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.controller.db.DBManager;
-import it.polimi.ingsw.event.EventTransceiver;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
-import it.polimi.ingsw.event.data.client.DeselectTileEventData;
-import it.polimi.ingsw.event.data.client.InsertTileEventData;
-import it.polimi.ingsw.event.data.client.SelectTileEventData;
-import it.polimi.ingsw.event.data.client.StartGameEventData;
 import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.board.FullSelectionException;
@@ -21,7 +16,6 @@ import it.polimi.ingsw.utils.Pair;
 
 // events
 
-import java.beans.Transient;
 import java.util.*;
 
 public class GameController {
@@ -119,7 +113,7 @@ public class GameController {
             try {
                 if (!game.canStartGame(username)) {
                     return new Response("Only the starting player: " + game.getStartingPlayer().getUsername() +
-                        " can start the game", ResponseStatus.FAILURE);
+                            " can start the game", ResponseStatus.FAILURE);
                 }
             } catch (IllegalFlowException e) {
                 return new Response(e.getMessage(), ResponseStatus.FAILURE);
@@ -129,6 +123,11 @@ public class GameController {
                 game.startGame();
             } catch (IllegalFlowException e) {
                 return new Response(e.getMessage(), ResponseStatus.FAILURE);
+            }
+
+            for (Pair<EventTransmitter, String> client: clients) {
+                final int index = game.getPersonalGoalIndex(client.getValue());
+                client.getKey().broadcast(new PersonalGoalEventData(index));
             }
 
             return new Response("The game has started", ResponseStatus.SUCCESS);

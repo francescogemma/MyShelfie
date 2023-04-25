@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.function.Function;
 
 public class GameOverEventData implements EventData {
-
     private final List<PlayerView> winners;
     public static final String ID = "GAME_OVER";
 

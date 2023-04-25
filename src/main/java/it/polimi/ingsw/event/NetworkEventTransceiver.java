@@ -26,8 +26,6 @@ public class NetworkEventTransceiver implements EventTransceiver {
         this.connection = connection;
         this.gson = new GsonBuilder()
             .registerTypeAdapterFactory(new EventDataTypeAdapterFactory())
-            .registerTypeAdapter(CommonGoal.class, new CommonGoalTypeAdapter())
-            .registerTypeAdapter(PersonalGoal.class, new PersonalGoalTypeAdapter())
             .create();
 
         new Thread(() -> {
