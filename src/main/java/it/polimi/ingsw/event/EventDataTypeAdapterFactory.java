@@ -36,7 +36,8 @@ public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
             Map.entry(CreateNewGameEventData.ID, CreateNewGameEventData.class),
             Map.entry(InsertTileEventData.ID, InsertTileEventData.class),
             Map.entry(SelectTileEventData.ID, SelectTileEventData.class),
-            Map.entry(DeselectTileEventData.ID, DeselectTileEventData.class)
+            Map.entry(DeselectTileEventData.ID, DeselectTileEventData.class),
+            Map.entry(GameHasBeenCreatedEventData.ID, GameHasBeenCreatedEventData.class)
     );
 
     private static final Map<String, Type> WRAPPER_DATA_TYPES = Map.of(

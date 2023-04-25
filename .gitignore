@@ -47,3 +47,5 @@ deliverables/.$uml.svg.bkp
 docs/
 
 **/.DS_store
+
+db/
