@@ -1,11 +1,13 @@
 package it.polimi.ingsw.utils;
 
+import java.util.List;
+
 public class Pair<T, F> {
     private T key;
     private F value;
-    public Pair(T row, F col) {
-        this.key = row;
-        this.value = col;
+    public Pair(T key, F value) {
+        this.key = key;
+        this.value = value;
     }
 
     public T getKey() {
@@ -24,26 +26,21 @@ public class Pair<T, F> {
         this.value = f;
     }
 
+    public static <T, F> Pair<T, F> of(T key, F value) {
+        return new Pair<>(key, value);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
 
-        if (obj instanceof Pair pair) {
-            if (pair.key != null ^ this.key != null) {
+        if (obj instanceof Pair) {
+            Pair pair = (Pair) obj;
+            if (key != null ? !key.equals(pair.key) : pair.key != null)
                 return false;
-            }
-
-            if (pair.key != null && !this.key.equals(pair.key))
+            if (value != null ? !value.equals(pair.value) : pair.value != null)
                 return false;
-
-            if (pair.value != null ^ this.value != null) {
-                return false;
-            }
-
-            if (pair.value != null && !this.value.equals(pair.value))
-                return false;
-
             return true;
         }
 

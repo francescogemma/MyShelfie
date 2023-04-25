@@ -68,7 +68,7 @@ public class LoginMenuLayout extends AppLayout {
             if (response.isOk()) {
                 switchAppLayout(AvailableGamesMenuLayout.NAME);
             } else {
-                popUpTextBox.text(response.getMessage());
+                popUpTextBox.text(response.message());
 
                 blurrableBackground.blur(true);
                 twoLayers.showForeground();

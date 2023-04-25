@@ -34,8 +34,8 @@ public class GameHasBeenCreatedEventData implements EventData {
         return new Responder<>(ID, transmitter, receiver, response);
     }
 
-    public List<String> getWinners () {
-        return new ArrayList<>(this.games);
+    public List<String> getNames () {
+        return new ArrayList<>(games);
     }
 
     @Override

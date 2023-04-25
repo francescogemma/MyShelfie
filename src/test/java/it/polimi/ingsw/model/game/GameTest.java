@@ -11,6 +11,7 @@ import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.utils.Coordinate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -499,7 +500,7 @@ class GameTest {
         Assertions.assertFalse(game.hasPlayerDisconnected());
     }
 
-    @Test
+    @RepeatedTest(100)
     void isOver_signalsEmittedLastPlayerCompleteBookshelf_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException, IllegalExtractionException, FullSelectionException {
         final String usernameUser1 = "Giacomo";
         final String usernameUser2 = "Michele";
@@ -608,7 +609,8 @@ class GameTest {
         Assertions.assertTrue(game.isOver());
     }
 
-    @Test
+    //@Test
+    @RepeatedTest(100)
     void isOver_signalsEmittedFirstPlayerCompleteBookshelf_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException, IllegalExtractionException, FullSelectionException {
         final String usernameUser1 = "Giacomo";
         final String usernameUser2 = "Michele";

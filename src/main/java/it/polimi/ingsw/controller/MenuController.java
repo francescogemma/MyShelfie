@@ -1,12 +1,12 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.controller.db.IdentifiableNotFoundException;
-import it.polimi.ingsw.event.data.LoginEventData;
-import it.polimi.ingsw.event.data.client.CreateNewGameEventData;
-import it.polimi.ingsw.event.data.client.JoinGameEventData;
+import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
+import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.controller.db.DBManager;
+import it.polimi.ingsw.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +16,8 @@ public class MenuController {
     private final List<GameController> gameControllerList;
     public static final MenuController INSTANCE;
 
-    private final List<VirtualView> authenticated;
-    private final List<VirtualView> notAuthenticated;
+    private final List<EventTransmitter> authenticated;
+    private final List<EventTransmitter> notAuthenticated;
     private final List<User> users;
 
     static {
@@ -61,16 +61,16 @@ public class MenuController {
     /**
      * We remove virtualView from notAuthenticated and place in authenticated
      * */
-    private boolean authenticate (VirtualView virtualView, String username, String password) {
+    private boolean authenticate (EventTransmitter transmitter, String username, String password) {
         User user = this.getUser(username, password);
 
         if (user.passwordMatches(password)) {
             synchronized (notAuthenticated) {
-                notAuthenticated.remove(virtualView);
+                notAuthenticated.remove(transmitter);
             }
 
             synchronized (authenticated) {
-                authenticated.add(virtualView);
+                authenticated.add(transmitter);
             }
             return true;
         } else {
@@ -106,41 +106,41 @@ public class MenuController {
                 throw new IllegalArgumentException("Already present in notAuthenticated");
             notAuthenticated.add(virtualView);
         }
-
-        LoginEventData.responder(virtualView.getNetworkTransmitter(), virtualView.getNetworkReceiver(), loginEventData -> {
-            String username = loginEventData.getUsername();
-            String password = loginEventData.getPassword();
-
-            if (this.authenticate(virtualView, username, password)) {
-                List<String> gamePresent = new ArrayList<>();
-
-                synchronized (this.gameControllerList) {
-                    for (GameController gameController : gameControllerList) {
-                        if (gameController.isAvailableForJoin()) {
-                            gamePresent.add(gameController.gameName());
-                        }
-                    }
-                }
-
-                virtualView.getNetworkTransmitter().broadcast(new GameHasBeenCreatedEventData(gamePresent));
-
-                // TODO we need to set here the new connection from client to server
-                JoinGameEventData.responder(virtualView.getNetworkTransmitter(), virtualView.getNetworkReceiver(), event ->
-                    this.joinGame(virtualView, event.getGameName())
-                );
-
-                CreateNewGameEventData.responder(virtualView.getNetworkTransmitter(), virtualView.getNetworkReceiver(), event -> {
-                    if (virtualView.isInGame()) {
-                        return new Response("You can't create a game if you are in a game...", ResponseStatus.FAILURE);
-                    }
-                    return this.createNewGame(event.gameName());
-                });
-            }
-            return new Response("You are not login", ResponseStatus.FAILURE);
-        });
     }
 
-    private Response createNewGame(String gameName) {
+    public Response authenticated(EventTransmitter view, String username, String password) {
+        if (this.authenticate(view, username, password)) {
+            List<String> gamePresent = new ArrayList<>();
+
+            synchronized (this.gameControllerList) {
+                for (GameController gameController : gameControllerList) {
+                    if (gameController.isAvailableForJoin()) {
+                        gamePresent.add(gameController.gameName());
+                    }
+                }
+            }
+
+            view.broadcast(new GameHasBeenCreatedEventData(gamePresent));
+
+            return new Response("You are log in", ResponseStatus.SUCCESS);
+        } else {
+            return new Response("You are not login", ResponseStatus.FAILURE);
+        }
+    }
+
+    private void forEachAuthenticatedBroadcast(EventData eventData) {
+        synchronized (authenticated) {
+            authenticated.forEach(t -> t.broadcast(eventData));
+        }
+    }
+
+    private void forEachNotAuthenticatedBroadcast(EventData eventData) {
+        synchronized (notAuthenticated) {
+            notAuthenticated.forEach(t -> t.broadcast(eventData));
+        }
+    }
+
+    public Response createNewGame(String gameName) {
         Game game = new Game(gameName);
         GameController controller = new GameController(game);
 
@@ -153,33 +153,28 @@ public class MenuController {
             this.gameControllerList.add(controller);
         }
 
-        synchronized (authenticated) {
-            for (VirtualView virtualView: authenticated) {
-                virtualView.getNetworkTransmitter().broadcast(new GameHasBeenCreatedEventData(List.of(gameName)));
-            }
-        }
+        this.forEachAuthenticatedBroadcast(new GameHasBeenCreatedEventData(List.of(gameName)));
 
         return new Response("Game : [" + gameName + "] has been created", ResponseStatus.SUCCESS);
     }
 
-    private Response joinGame(VirtualView virtualView, String gameName) {
-        if (virtualView.isInGame()) {
-            return new Response("You are already in a game", ResponseStatus.FAILURE);
-        }
-
+    public Pair<Response, GameController> joinGame(EventTransmitter transmitter, String username, String gameName) {
         synchronized (gameControllerList) {
             for (GameController gameController: this.gameControllerList) {
                 if (gameController.gameName().equals(gameName)) {
 
-                    Response response = gameController.join(virtualView);
+                    Response response = gameController.join(transmitter, username);
 
                     if (response.isOk()) {
-                        virtualView.setGameController(gameController);
+                        return Pair.of(response, gameController);
+                    } else {
+                        return Pair.of(response, null);
                     }
+
                 }
             }
         }
 
-        return new Response("There is no game with this name...", ResponseStatus.FAILURE);
+        return Pair.of(new Response("There is no game with this name...", ResponseStatus.FAILURE), null);
     }
 }

@@ -2,8 +2,6 @@ package it.polimi.ingsw.event;
 
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.receiver.EventListener;
-import it.polimi.ingsw.event.receiver.EventReceiver;
-import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.*;
 

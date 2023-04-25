@@ -1,6 +1,9 @@
 package it.polimi.ingsw.event;
 
+import it.polimi.ingsw.controller.Response;
+import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.event.data.LoginEventData;
+import it.polimi.ingsw.event.data.client.InsertTileEventData;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
@@ -18,8 +21,7 @@ public class Main {
         VirtualView virtualView = new VirtualView(networkTransceiver, controller);
 
         Requester<MessageEventData, LoginEventData> loginOnNetwork = MessageEventData.requester(networkTransceiver, networkTransceiver);
-        Requester<MessageEventData, InsertTilesEventData> insertTiles = MessageEventData.requester(networkTransceiver,
-            networkTransceiver);
+        Requester<MessageEventData, InsertTilesEventData> insertTiles = MessageEventData.requester(networkTransceiver, networkTransceiver);
 
         System.out.println(
                 loginOnNetwork.request(
@@ -65,36 +67,32 @@ class VirtualView {
 
         LoginEventData.responder(networkTransceiver, networkTransceiver, data -> {
                 if (isAuthenticated()) {
-                    return new MessageEventData("You're already authenticated!");
+                    return new Response("You're already authenticated!", ResponseStatus.SUCCESS);
                 }
 
                 if (controller.authenticate(data.getUsername(), data.getPassword())) {
                     username = data.getUsername();
 
-                    return new MessageEventData("Successful login!");
+                    return new Response("Successful login!", ResponseStatus.SUCCESS);
                 }
 
-                return new MessageEventData("Login failed!");
+                return new Response("Login failed!", ResponseStatus.FAILURE);
             });
 
-        MessageEventData.castEventReceiver(networkTransceiver).registerListener(data -> {
+        Response.castEventReceiver(networkTransceiver).registerListener(data -> {
             if (isAuthenticated()) {
                 controller.printMessage(username, data.getMessage());
             }
         });
 
-        InsertTilesEventData.responder(networkTransceiver, networkTransceiver, data -> {
+        InsertTileEventData.responder(networkTransceiver, networkTransceiver, event -> {
             if (!isAuthenticated()) {
-                return new MessageEventData("You can't perform this while you're not authenticated");
+                return new Response("You can't perform this while you're not authenticated", ResponseStatus.FAILURE);
             }
 
-            if (data.getTiles().size() > 3) {
-                return new MessageEventData("You're trying to insert too many tiles!");
-            }
+            System.out.println("Column insert: " + event.getColumn());
 
-            controller.printTiles(username, data.getTiles());
-
-            return new MessageEventData("Nice insertion!");
+            return new Response("Nice insertion!", ResponseStatus.SUCCESS);
         });
     }
 

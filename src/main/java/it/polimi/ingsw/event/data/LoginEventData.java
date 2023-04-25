@@ -41,9 +41,9 @@ public class LoginEventData implements EventData {
         return new Requester<>(ID, transmitter, receiver);
     }
 
-    public static <T extends EventData>Responder<LoginEventData, T> responder(EventTransmitter transmitter,
-                                                                              EventReceiver<EventData> receiver,
-                                                                              Function<LoginEventData, T> response) {
+    public static <T extends EventData> Responder<LoginEventData, T> responder(EventTransmitter transmitter,
+                                                                               EventReceiver<EventData> receiver,
+                                                                               Function<LoginEventData, T> response) {
         return new Responder<>(ID, transmitter, receiver, response);
     }
 }

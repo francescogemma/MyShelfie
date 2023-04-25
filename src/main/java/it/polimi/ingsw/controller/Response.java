@@ -9,40 +9,25 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
-public class Response implements EventData {
-    private final String message;
-    private final ResponseStatus status;
+public record Response(String message, ResponseStatus status) implements EventData {
     public static final String ID = "RESPONSE";
 
-    public Response(String message, ResponseStatus status) {
-        this.message = message;
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public ResponseStatus getStatus() {
-        return status;
-    }
-
-    public boolean isOk () {
+    public boolean isOk() {
         return status == ResponseStatus.SUCCESS;
     }
 
-    public static <T extends Response> CastEventReceiver<T> castEventReceiver(EventReceiver<EventData> receiver) {
+    public static CastEventReceiver<Response> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }
 
     public static <T extends EventData> Requester<Response, T> requester(EventTransmitter transmitter,
-                                                                                        EventReceiver<EventData> receiver) {
+                                                                         EventReceiver<EventData> receiver) {
         return new Requester<>(ID, transmitter, receiver);
     }
 
     public static <T extends EventData> Responder<Response, T> responder(EventTransmitter transmitter,
-                                                                                        EventReceiver<EventData> receiver,
-                                                                                        Function<Response, T> response) {
+                                                                         EventReceiver<EventData> receiver,
+                                                                         Function<Response, T> response) {
         return new Responder<>(ID, transmitter, receiver, response);
     }
 

@@ -112,6 +112,12 @@ public class Game implements Identifiable {
         return players.get(FIRST_PLAYER_INDEX);
     }
 
+    public boolean canStartGame (String username) throws IllegalFlowException {
+        if (isStarted() || isOver() || players.isEmpty())
+            throw new IllegalFlowException();
+        return this.players.get(0).getUsername().equals(username);
+    }
+
     /**
      * Checks if the game is over.
      * @return true iff the game is over, false otherwise
