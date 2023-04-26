@@ -18,7 +18,7 @@ import static java.util.Map.entry;
 /**
  * This class represents a common goal:
  * <p>
- * Eight tiles of the same type, there’s no restriction about the position of these tiles.
+ * Eight tiles of the same type, there's no restriction about the position of these tiles.
  * <p>
  * It extends CommonGoal.
  *
@@ -47,7 +47,7 @@ public class EightTilesGoal extends CommonGoal {
                 new ShapeFetcher(Shape.WHOLE_BOOKSHELF),
                 new AcceptsAllFilter(),
                 new EightTilesGoalEvaluator(),
-                "Eight tiles of the same type,\n there’s no restriction about\n the position of these tiles.",
+                "Eight tiles of the same type,\n there's no restriction about\n the position of these tiles.",
                 Map.ofEntries(
                         entry(Shelf.getInstance(0, 0), TileColor.GREEN),
                         entry(Shelf.getInstance(0, 2), TileColor.GREEN),
