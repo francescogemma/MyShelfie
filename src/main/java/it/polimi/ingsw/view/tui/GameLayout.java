@@ -10,6 +10,7 @@ import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
+import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
@@ -361,9 +362,13 @@ public class GameLayout extends AppLayout {
                         new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
                     ));
 
-                    tileDrawable.color(data.getBoard().tileAt(
+                    Tile tile = data.getBoard().tileAt(
                         new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
-                    ).getColor());
+                    );
+
+                    if (tile != null) {
+                        tileDrawable.color(tile.getColor());
+                    }
                 });
             });
 
