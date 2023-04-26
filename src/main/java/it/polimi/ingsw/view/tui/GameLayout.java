@@ -366,6 +366,8 @@ public class GameLayout extends AppLayout {
 
                     tileDrawable.selectable(data.getBoard().getSelectableCoordinate().contains(
                         new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
+                    ) || data.getBoard().getSelectedCoordinates().contains(
+                        new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
                     ));
 
                     Tile tile = data.getBoard().tileAt(
