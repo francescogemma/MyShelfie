@@ -8,7 +8,7 @@ import it.polimi.ingsw.event.data.client.InsertTileEventData;
 import it.polimi.ingsw.event.data.client.JoinStartedGameEventData;
 import it.polimi.ingsw.event.data.client.SelectTileEventData;
 import it.polimi.ingsw.event.data.game.BoardChangedEventData;
-import it.polimi.ingsw.event.data.game.BookshelfHasChanged;
+import it.polimi.ingsw.event.data.game.BookshelfHasChangedEventData;
 import it.polimi.ingsw.event.data.game.CurrentPlayerChangedEventData;
 import it.polimi.ingsw.event.data.game.GoalEventData;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
@@ -409,7 +409,7 @@ public class GameLayout extends AppLayout {
                 }
             });
 
-            BookshelfHasChanged.castEventReceiver(transceiver).registerListener(data -> {
+            BookshelfHasChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 synchronized (getLock()) {
                     bookshelves.set(playerNameToIndex(data.getUsername()), data.getBookshelf());
 
