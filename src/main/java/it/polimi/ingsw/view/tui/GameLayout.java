@@ -383,11 +383,6 @@ public class GameLayout extends AppLayout {
                     bookshelves = new ArrayList<>(data.gameView().getPlayers().stream().map(PlayerView::getBookshelf)
                         .toList());
 
-                    // TODO: Pass personal goal in a different way
-                    /*
-                    personalGoal = data.gameView().getPlayers()
-                        .get(clientPlayerIndex).getPersonalGoal();*/
-
                     commonGoals = data.gameView().getCommonGoals();
 
                     gameName = data.gameView().getName();
@@ -414,7 +409,7 @@ public class GameLayout extends AppLayout {
             PersonalGoalSetEventData.castEventReceiver(transceiver).registerListener(data -> {
                 synchronized (getLock()) {
                     personalGoal = PersonalGoal.fromIndex(data.personalGoal());
-                    playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
+                    populateGoalsMenu();
                 }
             });
 

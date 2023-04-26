@@ -22,9 +22,9 @@ public abstract class AppLayout extends FixedLayoutDrawable<FullyResizableDrawab
         if (getFocusedCoordinate().isEmpty()) {
             unfocus();
             focus(lastFocusedCoordinate);
-
-            lastFocusedCoordinate = getFocusedCoordinate().orElse(Coordinate.origin());
         }
+
+        lastFocusedCoordinate = getFocusedCoordinate().orElse(Coordinate.origin());
     }
 
     @Override
