@@ -128,7 +128,7 @@ public abstract class Terminal {
                     + "to draw: " + e.getMessage());
             }
 
-            appLayout =  app.getNextAppLayout().get();
+            appLayout =  app.getNextAppLayout();
 
             hasToDraw = true;
             drawing = true;
@@ -138,6 +138,14 @@ public abstract class Terminal {
                     .max().orElse(4));
 
                 while (true) {
+                    synchronized (drawingLock) {
+                        if (app.mustExit()) {
+                            hasToDraw = false;
+                            drawingLock.notifyAll();
+                            return;
+                        }
+                    }
+
                     if (ALLOWED_INPUT_KEYS.stream().noneMatch(s -> s.startsWith(input.toString()) &&
                         !s.equals(input.toString()))) {
                         input.setLength(0);
@@ -162,14 +170,7 @@ public abstract class Terminal {
                         if (ALLOWED_INPUT_KEYS.contains(input.toString())) {
                             appLayout.handleInput(input.toString());
 
-                            Optional<AppLayout> nextAppLayout = app.getNextAppLayout();
-                            if (nextAppLayout.isEmpty()) {
-                                hasToDraw = false;
-                                drawingLock.notifyAll();
-                                return;
-                            }
-
-                            appLayout = nextAppLayout.get();
+                            appLayout = app.getNextAppLayout();
                         }
                     }
                 }
@@ -178,6 +179,8 @@ public abstract class Terminal {
             new Thread(() -> {
                 synchronized (drawingLock) {
                     while (hasToDraw) {
+                        appLayout = app.getNextAppLayout();
+
                         TerminalSize newSize = getSize();
 
                         // Calling newSize.equals instead of size.equals, since size could be null.

@@ -50,7 +50,7 @@ public class App {
         this.appLayoutsData.put(START_NAME, startAppLayoutData);
     }
 
-    public Optional<AppLayout> getNextAppLayout() {
+    public AppLayout getNextAppLayout() {
         if (currentAppLayout == null) {
             currentAppLayout = startAppLayout;
             currentAppLayout.setIsCurrentLayout(true);
@@ -60,7 +60,7 @@ public class App {
             if (nextAppLayoutName.isPresent()) {
                 currentAppLayout.setIsCurrentLayout(false);
                 if (nextAppLayoutName.get().equals(EXIT_NAME)) {
-                    currentAppLayout = null;
+                    mustExit = true;
                 } else {
                     if (!appLayouts.containsKey(nextAppLayoutName.get())) {
                         throw new AppLayoutNotFoundException(nextAppLayoutName.get());
@@ -74,7 +74,13 @@ public class App {
             }
         }
 
-        return Optional.ofNullable(currentAppLayout);
+        return currentAppLayout;
+    }
+
+    private boolean mustExit = false;
+
+    public boolean mustExit() {
+        return mustExit;
     }
 
     public void setLock(Object lock) {
