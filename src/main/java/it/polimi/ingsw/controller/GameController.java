@@ -121,7 +121,8 @@ public class GameController {
                 this.game.insertTile(username, column);
                 return new Response("Ok!", ResponseStatus.SUCCESS);
             } catch (IllegalExtractionException | IllegalFlowException e) {
-                return new Response(e.getMessage(), ResponseStatus.FAILURE);
+                return new Response("Failure during insertion of tiles into the bookshelf",
+                    ResponseStatus.FAILURE);
             }
         }
     }
