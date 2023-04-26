@@ -64,7 +64,7 @@ public class LobbyLayout extends AppLayout {
         ));
 
         startButton.onpress(() -> {
-            startGameRequester.request(new StartGameEventData());
+            displayServerResponse(startGameRequester.request(new StartGameEventData()));
         });
 
         backButton.onpress(() -> switchAppLayout(AvailableGamesMenuLayout.NAME));

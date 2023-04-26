@@ -10,15 +10,19 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 import java.util.Optional;
 
 public class ServerResponseDrawable extends FullyResizableDrawable {
+    private final static int STATUS_COLUMNS = 8;
+    private final static int RESPONSE_COLUMNS = 40;
+
     private final FullyResizableDrawable toAddServerResponse;
 
     private final TextBox responseStatusTextBox = new TextBox();
     private final TextBox responseMessageTextBox = new TextBox();
 
     private final FullyResizableDrawable responseOverlay = new OrientedLayout(Orientation.HORIZONTAL,
-        responseStatusTextBox.alignUpLeft().crop().fixSize(new DrawableSize(1, 10))
-            .weight(1), responseMessageTextBox.weight(2)
-    ).alignUpLeft().crop().fixSize(new DrawableSize(1, 30)).alignDownRight().crop();
+        responseStatusTextBox.alignUpLeft().crop().fixSize(new DrawableSize(1, STATUS_COLUMNS))
+            .weight(1), responseMessageTextBox.alignUpLeft().crop().fixSize(new DrawableSize(1,
+        RESPONSE_COLUMNS - STATUS_COLUMNS)).weight(10)
+    ).alignUpLeft().crop().fixSize(new DrawableSize(1, RESPONSE_COLUMNS)).alignDownRight().crop();
 
     private boolean showResponse = false;
 
@@ -85,8 +89,8 @@ public class ServerResponseDrawable extends FullyResizableDrawable {
         }
 
         String message;
-        if (response.message().length() > 20) {
-            message = response.message().substring(0, 17) + "...";
+        if (response.message().length() > RESPONSE_COLUMNS - STATUS_COLUMNS) {
+            message = response.message().substring(0, RESPONSE_COLUMNS - STATUS_COLUMNS - 3) + "...";
         } else {
             message = response.message();
         }

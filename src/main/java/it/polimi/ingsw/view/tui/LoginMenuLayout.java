@@ -63,6 +63,8 @@ public class LoginMenuLayout extends AppLayout {
             Response response = loginRequester
                 .request(new LoginEventData(usernameEntry.getValue(), passwordEntry.getValue()));
 
+            displayServerResponse(response);
+
             if (response.isOk()) {
                 switchAppLayout(AvailableGamesMenuLayout.NAME);
             } else {
