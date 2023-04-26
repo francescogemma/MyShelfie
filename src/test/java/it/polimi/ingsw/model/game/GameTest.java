@@ -634,7 +634,7 @@ class GameTest {
         game.addPlayer(usernameUser2);
         game.addPlayer(usernameUser1);
 
-        game.startGame("Giacomo");
+        game.startGame("Michele");
 
         game.disconnectPlayer(usernameUser2);
 
