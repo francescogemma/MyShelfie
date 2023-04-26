@@ -1,8 +1,6 @@
 package it.polimi.ingsw.networking.RMI;
 
-import it.polimi.ingsw.networking.Connection;
-import it.polimi.ingsw.networking.ConnectionException;
-import it.polimi.ingsw.networking.DisconnectedException;
+import it.polimi.ingsw.networking.*;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -54,10 +52,18 @@ public class RMIConnection extends UnicastRemoteObject implements Connection, St
      *
      * @param address is the address of the server's host.
      * @param port is the port used by {@link it.polimi.ingsw.networking.ConnectionAcceptor the server} for RMI communication.
-     * @throws ConnectionException will be thrown if a failure occurs in the process of creating a new Connection.
+     * @throws ServerNotFoundException will be thrown if a failure occurs in the process of connecting to the server.
      * @throws RemoteException will be thrown in case of network problems, or server communication issues.
      */
-    public RMIConnection(String address, int port) throws ConnectionException, RemoteException {
+    public RMIConnection(String address, int port) throws ServerNotFoundException, RemoteException {
+        if (port < 1024 || port > 49151) {
+            throw new BadPortException("port " + port + " is out of range [1024, 49151]");
+        }
+
+        if (address == null) {
+            throw new BadHostException("host address is null");
+        }
+
         try {
             // get the server object, and ask to reserve a new name for the couple.
             Registry registry = LocateRegistry.getRegistry(address, port);
@@ -72,7 +78,7 @@ public class RMIConnection extends UnicastRemoteObject implements Connection, St
             otherConnection = (StringRemote) registry.lookup(name + "SERVER");
 
         } catch (Exception exception) {
-            throw new ConnectionException();
+            throw new ServerNotFoundException("exception while trying to connect to server", exception);
         }
 
         heartbeat();
