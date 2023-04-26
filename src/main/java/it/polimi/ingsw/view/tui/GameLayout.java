@@ -383,6 +383,8 @@ public class GameLayout extends AppLayout {
             CurrentPlayerChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 synchronized (getLock()) {
                     playingPlayerIndex = playerNameToIndex(data.getUsername());
+
+                    playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
                 }
             });
 
