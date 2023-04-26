@@ -1,6 +1,5 @@
 package it.polimi.ingsw.controller;
 
-import com.sun.glass.ui.Menu;
 import it.polimi.ingsw.event.EventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.LoginEventData;
@@ -31,7 +30,7 @@ public class VirtualView implements EventTransmitter{
 
         LoginEventData.responder(transceiver, transceiver,          event -> login(event.getUsername(), event.getPassword()));
         StartGameEventData.responder(transceiver, transceiver,      event -> startGame());
-        InsertTileEventData.responder(transceiver, transceiver,     event -> insertTile(event.getColumn()));
+        InsertTileEventData.responder(transceiver, transceiver,     event -> insertTile(event.column()));
         SelectTileEventData.responder(transceiver, transceiver,     event -> selectTile(event.getCoordinate()));
         DeselectTileEventData.responder(transceiver, transceiver,   event -> deselectTile(event.coordinate()));
         JoinGameEventData.responder(transceiver, transceiver,       event -> joinGame(event.getGameName()));

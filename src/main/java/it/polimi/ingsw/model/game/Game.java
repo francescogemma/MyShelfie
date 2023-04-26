@@ -432,6 +432,7 @@ public class Game implements Identifiable {
 
         this.transceiver.broadcast(new BoardChangedEventData(board.getView()));
 
+
         for (CommonGoal commonGoal: this.commonGoals) {
             int points;
             try {

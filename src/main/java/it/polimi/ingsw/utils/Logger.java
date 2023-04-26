@@ -1,10 +1,9 @@
 package it.polimi.ingsw.utils;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Logger {
@@ -26,7 +25,7 @@ public class Logger {
     }
 
     private PrintWriter writer;
-    private List<String> message;
+    private final List<String> message;
     private boolean shouldPrint = false;
     private final String nameLog =
             (
@@ -38,8 +37,10 @@ public class Logger {
 
     private String logPosition = "log/";
 
-    private Logger() throws FileNotFoundException, UnsupportedEncodingException {
-        writer = new PrintWriter(logPosition + nameLog, "UTF-8");
+    private Logger() throws IOException {
+        FileWriter fileWriter = new FileWriter(logPosition + nameLog + ".txt");
+        writer = new PrintWriter(fileWriter);
+        message = new ArrayList<>();
     }
 
     private static final Logger INSTANCE;
@@ -61,7 +62,7 @@ public class Logger {
     static {
         try {
             INSTANCE = new Logger();
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -81,5 +82,7 @@ public class Logger {
         }
     }
 
-
+    public static void main(String[] args) {
+        Logger.INSTANCE.write(Type.CRITICAL, "message");
+    }
 }
