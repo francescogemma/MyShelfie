@@ -17,55 +17,7 @@ import it.polimi.ingsw.utils.Coordinate;
 
 import java.util.*;
 
-public class Game implements Identifiable {
-    /*
-     * The index of the first player in the list of players.
-     */
-    private static final int FIRST_PLAYER_INDEX = 0;
-
-    /*
-     * The name of the game.
-     */
-    private final String name;
-
-    /*
-     * The list of players in the game.
-     */
-    private final List<Player> players = new ArrayList<>();
-
-    /*
-     * The optional winner of the game.
-     */
-    private final List<Player> winners = new ArrayList<>();
-
-    /**
-     * The common goals of the game.
-     * */
-    private CommonGoal[] commonGoals;
-
-    /**
-     * The bag of tiles in the game.
-     */
-    private final Bag bag = new Bag();
-
-    /**
-     * The board of the game.
-     */
-    private final Board board = new Board();
-
-    /**
-     * Whether the game has started.
-     */
-    private boolean isStarted;
-
-    private final transient List<Integer> personalGoalIndexes;
-    private transient int personalGoalIndex;
-
-    /**
-     * The index of the current player in the list of players.
-     */
-    private int currentPlayerIndex;
-
+public class Game extends GameView{
     private transient LocalEventTransceiver transceiver;
 
     /**
@@ -75,19 +27,9 @@ public class Game implements Identifiable {
      * @throws NullPointerException iff name is null
      */
     public Game(String name) {
-        if (name == null)
-            throw new NullPointerException();
+        super(name);
 
-        if (name.length() == 0)
-            throw new IllegalArgumentException("String is empty");
-
-        this.name = name;
-        this.currentPlayerIndex = -1;
-        this.isStarted = false;
-
-        this.personalGoalIndexes = new ArrayList<>(Arrays.asList( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ));
         Collections.shuffle(this.personalGoalIndexes);
-        this.personalGoalIndex = 0;
     }
 
     public void setTransceiver (LocalEventTransceiver transceiver) {
@@ -97,33 +39,6 @@ public class Game implements Identifiable {
             throw new NullPointerException();
 
         this.transceiver = transceiver;
-    }
-
-    /**
-     * Gets the starting player of the game.
-     * @return the starting player
-     * @throws IllegalFlowException if there are no players in the game
-     */
-    public Player getStartingPlayer() throws IllegalFlowException {
-        if (players.isEmpty()) {
-            throw new IllegalFlowException("There is no starting player until someone joins the game");
-        }
-
-        return players.get(FIRST_PLAYER_INDEX);
-    }
-
-    public boolean canStartGame (String username) throws IllegalFlowException {
-        if (isStarted() || isOver() || players.isEmpty())
-            throw new IllegalFlowException();
-        return this.players.get(0).getUsername().equals(username);
-    }
-
-    /**
-     * Checks if the game is over.
-     * @return true iff the game is over, false otherwise
-     */
-    public boolean isOver () {
-        return !winners.isEmpty();
     }
 
     /**
@@ -220,69 +135,6 @@ public class Game implements Identifiable {
         this.transceiver.broadcast(new GameHasStartedEventData());
     }
 
-    public int getPersonalGoalIndex (String username) {
-        for (Player player: players) {
-            if (player.getUsername().equals(username)) {
-                return player.getPersonalGoal().getIndex();
-            }
-        }
-        throw new IllegalArgumentException("....");
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * Returns the current {@link Player player}  of the game.
-     *
-     * @throws IllegalFlowException if the game is not started or if the game is over.
-     * @return the current player of the game.
-     */
-    public PlayerView getCurrentPlayer() throws IllegalFlowException {
-        if (!isStarted) {
-            throw new IllegalFlowException("There is no current player until you start the game");
-        }
-
-        if (isOver()) {
-            throw new IllegalFlowException("There is no current player when the game is over");
-        }
-
-        return players.get(currentPlayerIndex).getView();
-    }
-
-    /**
-     * @return whether the game is over or not.
-     */
-    public List<PlayerView> getWinners() throws IllegalFlowException {
-        if (!isOver()) {
-            throw new IllegalFlowException("There is no winner until the game is over");
-        }
-
-        return winners.stream().map(PlayerView::getView).toList();
-    }
-
-    /**
-     * @throws IllegalFlowException iff the game hasn't started yet.
-     * @return the last player in the list of players
-     * */
-    public Player getLastPlayer() throws IllegalFlowException {
-        if (!isStarted) {
-            throw new IllegalFlowException("There is no last player until you start the game");
-        }
-
-        return players.get(players.size() - 1);
-    }
-
-
-    /**
-     * @return The list of players in this game.
-     * */
-    public List<Player> getPlayers() {
-        return new ArrayList<>(players);
-    }
-
     public void forgetLastSelection(String username, Coordinate c) throws IllegalFlowException {
         if (!isStarted()) throw new IllegalFlowException("Game is not started");
         if (isOver()) throw new IllegalFlowException("Game has ended");
@@ -294,36 +146,10 @@ public class Game implements Identifiable {
     }
 
     /**
-     * @return The array of all common goals
-     * @see CommonGoal
-     * */
-    public CommonGoal[] getCommonGoals() {
-        return commonGoals;
-    }
-
-    /**
      * @return true iff at least one bookshelf is full
      * */
     public boolean atLeastOneBookshelfIsFull() {
         return players.stream().anyMatch(p -> p.getBookshelf().isFull());
-    }
-
-    private Player getPlayer(String username) {
-        for (Player p: this.players) {
-            if (p.getUsername().equals(username))
-                return p;
-        }
-        throw new IllegalArgumentException("Player not in this game");
-    }
-
-    private int getNextPlayerOnline (int currentPlayerIndex) throws NoPlayerConnectedException {
-        for (int i = 1; i < this.players.size(); i++) {
-            final int index = (currentPlayerIndex + i) % this.players.size();
-            if (this.players.get(index).isConnected) {
-                return index;
-            }
-        }
-        throw new NoPlayerConnectedException();
     }
 
     private void refillBoardIfNecessary () {
@@ -465,21 +291,5 @@ public class Game implements Identifiable {
 
         this.board.selectTile(coordinate);
         this.transceiver.broadcast(new BoardChangedEventData(board.getView()));
-    }
-
-    public BoardView getBoard () {
-        return board.getView();
-    }
-
-    public boolean isStarted() {
-        return this.isStarted;
-    }
-
-    public boolean hasPlayerDisconnected () {
-        for (Player player: this.players) {
-            if (!player.isConnected())
-                return true;
-        }
-        return false;
     }
 }

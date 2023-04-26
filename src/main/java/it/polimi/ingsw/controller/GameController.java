@@ -8,7 +8,9 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
 import it.polimi.ingsw.model.board.RemoveNotLastSelectedException;
+import it.polimi.ingsw.model.bookshelf.NotEnoughSpaceInColumnException;
 import it.polimi.ingsw.model.game.Game;
+import it.polimi.ingsw.model.game.GameView;
 import it.polimi.ingsw.model.game.IllegalFlowException;
 import it.polimi.ingsw.model.game.PlayerAlreadyInGameException;
 import it.polimi.ingsw.model.goal.CommonGoal;
@@ -79,10 +81,8 @@ public class GameController {
         return new Response("You've joined the game", ResponseStatus.SUCCESS);
     }
 
-    public void joinGame() {
-        synchronized (this) {
-            this.clients.forEach(client -> client.getKey().broadcast(new BoardChangedEventData(game.getBoard())));
-        }
+    public GameView getGameView () {
+        return this.game.getView();
     }
 
     public Response selectTile(String username, Coordinate coordinate) {
@@ -120,7 +120,7 @@ public class GameController {
             try {
                 this.game.insertTile(username, column);
                 return new Response("Ok!", ResponseStatus.SUCCESS);
-            } catch (IllegalExtractionException | IllegalFlowException e) {
+            } catch (IllegalExtractionException | IllegalFlowException | NotEnoughSpaceInColumnException e) {
                 return new Response("Failure during insertion of tiles into the bookshelf",
                     ResponseStatus.FAILURE);
             }

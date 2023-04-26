@@ -39,7 +39,7 @@ public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
             Map.entry(DeselectTileEventData.ID, DeselectTileEventData.class),
             Map.entry(GameHasBeenCreatedEventData.ID, GameHasBeenCreatedEventData.class),
             Map.entry(PlayerHasJoinMenu.ID, PlayerHasJoinMenu.class),
-            Map.entry(GoalEventData.ID, GoalEventData.class),
+            Map.entry(InitialGameEventData.ID, InitialGameEventData.class),
             Map.entry(JoinStartedGameEventData.ID, JoinStartedGameEventData.class),
             Map.entry(PlayerHasDeselectTile.ID, PlayerHasDeselectTile.class),
             Map.entry(BookshelfHasChangedEventData.ID, BookshelfHasChangedEventData.class)
