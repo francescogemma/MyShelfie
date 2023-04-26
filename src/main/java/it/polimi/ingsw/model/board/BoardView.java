@@ -44,6 +44,16 @@ public class BoardView {
         return this.tiles[c.getRow()][c.getCol()];
     }
 
+    // TODO: Add testing for this new method
+    /**
+     * @return all board coordinates selected so far [sorted by selection].
+     */
+    public List<Coordinate> getSelectedCoordinates() {
+        return this
+            .boardSelector
+            .getSelected();
+    }
+
     /**
      * The function returns the set of tiles selected up to this point.
      * The function does not remove the objects from the board.
