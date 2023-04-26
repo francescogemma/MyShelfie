@@ -47,6 +47,7 @@ public class VirtualView implements EventTransmitter{
             final List<Integer> commonGoal = this.gameController.getCommonGoal();
 
             transceiver.broadcast(new GoalEventData(personalGoal, commonGoal));
+            gameController.joinGame();
         }
     }
 

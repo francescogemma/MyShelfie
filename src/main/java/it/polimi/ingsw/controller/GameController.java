@@ -3,7 +3,6 @@ package it.polimi.ingsw.controller;
 import it.polimi.ingsw.controller.db.DBManager;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
-import it.polimi.ingsw.event.data.client.JoinStartedGameEventData;
 import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.board.FullSelectionException;
@@ -80,14 +79,22 @@ public class GameController {
         return new Response("You've joined the game", ResponseStatus.SUCCESS);
     }
 
+    public void joinGame() {
+        synchronized (this) {
+            this.clients.forEach(client -> client.getKey().broadcast(new BoardChangedEventData(game.getBoard())));
+        }
+    }
+
     public Response selectTile(String username, Coordinate coordinate) {
         assert username != null;
         synchronized (this) {
+            System.out.println(username + " trying to select tile at " + coordinate + " in " + gameName());
             try {
                 this.game.selectTile(username, coordinate);
             } catch (IllegalExtractionException | FullSelectionException | IllegalFlowException e) {
                 return new Response(e.toString(), ResponseStatus.FAILURE);
             }
+            System.out.println(username + " selected tile at " + coordinate + " in " + gameName());
 
             return new Response("You've selected a tile", ResponseStatus.SUCCESS);
         }
@@ -95,6 +102,7 @@ public class GameController {
 
     public Response deselectTile(String username, Coordinate coordinate) {
         assert username != null;
+        System.out.println(username + " trying to deselect " + coordinate + " in " + gameName());
         synchronized (this) {
             try {
                 this.game.forgetLastSelection(username, coordinate);
