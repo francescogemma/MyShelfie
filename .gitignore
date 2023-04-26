@@ -49,3 +49,4 @@ docs/
 **/.DS_store
 
 db/
+log_*

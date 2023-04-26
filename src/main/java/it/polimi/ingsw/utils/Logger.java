@@ -35,10 +35,11 @@ public class Logger {
             .replace("\\.", "_")
             .replace(":", "_");
 
-    private String logPosition = "log/";
+    private static String logPosition = "log/";
 
     private Logger() throws IOException {
-        FileWriter fileWriter = new FileWriter(logPosition + nameLog + ".txt");
+        String pos = logPosition + "/log_" + nameLog + ".txt";
+        FileWriter fileWriter = new FileWriter(pos, false);
         writer = new PrintWriter(fileWriter);
         message = new ArrayList<>();
     }
@@ -52,6 +53,15 @@ public class Logger {
     }
 
     public void changePositionLog(String newPosition) throws FileNotFoundException {
+        if (newPosition == null)
+            throw new NullPointerException();
+
+        if (newPosition.isEmpty())
+            throw new IllegalArgumentException("new position is empty");
+
+        if (newPosition.charAt(newPosition.length() - 1) == '/')
+            throw new IllegalArgumentException("You should not add / at end of the string");
+
         synchronized (INSTANCE) {
             writer.close();
             logPosition = newPosition;
@@ -61,6 +71,7 @@ public class Logger {
 
     static {
         try {
+            logPosition = System.getProperty("user.dir");
             INSTANCE = new Logger();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -69,20 +80,22 @@ public class Logger {
 
     public static void write (Type type, String message) {
         String appendMessage;
-        appendMessage = "\n";
-        appendMessage += type + LocalDate.now().toString() + LocalTime.now().toString() + message;
+        appendMessage = type + " " + LocalDate.now().toString() + LocalTime.now().toString() + " " +message;
+        appendMessage += "\n";
 
         synchronized (INSTANCE) {
             INSTANCE.message.add(appendMessage);
             INSTANCE.writer.print(appendMessage);
-
+            INSTANCE.writer.flush();
             if (INSTANCE.shouldPrint) {
                 System.out.print(appendMessage);
             }
         }
     }
 
-    public static void main(String[] args) {
-        Logger.INSTANCE.write(Type.CRITICAL, "message");
+    public static void printAllMessage () {
+        synchronized (INSTANCE) {
+            INSTANCE.message.forEach(System.out::print);
+        }
     }
 }
