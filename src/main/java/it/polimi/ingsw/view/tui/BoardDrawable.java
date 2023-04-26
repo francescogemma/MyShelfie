@@ -8,7 +8,6 @@ import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayoutE
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class BoardDrawable extends FixedLayoutDrawable<OrientedLayout> {
     private final int[][] fillTilesMap = new int[][]{
@@ -31,7 +30,7 @@ public class BoardDrawable extends FixedLayoutDrawable<OrientedLayout> {
             OrientedLayoutElement[] columns = new OrientedLayoutElement[Board.COLUMN_BOARDS];
             for (int column = 0; column < Board.COLUMN_BOARDS; column++) {
                 columns[column] = new TileDrawable(fillTilesMap[row][column] == 0,
-                    row, column).color(TileColor.values()[new Random().nextInt(7)]).weight(1);
+                    row, column).color(TileColor.EMPTY).weight(1);
             }
             rows[row] = new OrientedLayout(Orientation.HORIZONTAL, columns).weight(1);
         }
