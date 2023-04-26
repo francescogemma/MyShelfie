@@ -4,9 +4,12 @@ import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.client.DeselectTileEventData;
+import it.polimi.ingsw.event.data.client.InsertTileEventData;
 import it.polimi.ingsw.event.data.client.JoinStartedGameEventData;
 import it.polimi.ingsw.event.data.client.SelectTileEventData;
 import it.polimi.ingsw.event.data.game.BoardChangedEventData;
+import it.polimi.ingsw.event.data.game.BookshelfHasChanged;
+import it.polimi.ingsw.event.data.game.CurrentPlayerChangedEventData;
 import it.polimi.ingsw.event.data.game.GoalEventData;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
@@ -100,19 +103,22 @@ public class GameLayout extends AppLayout {
     private final Button previousBookshelfButton = new Button("<");
     private final TextBox gameNameTextBox = new TextBox().unfocusable();
     private static class PlayerDisplay {
-        public PlayerDisplay(String name, int points, int position, boolean isPlayer,
+        public PlayerDisplay(String name, int points, int position, boolean isPlayingPlayer,
+                             boolean isClientPlayer,
                              boolean blurred) {
             this.name = name;
             this.points = points;
             this.position = position;
-            this.isPlayer = isPlayer;
+            this.isClientPlayer = isClientPlayer;
+            this.isPlayingPlayer = isPlayingPlayer;
             this.blurred = blurred;
         }
 
         private String name;
         private int points;
         private int position;
-        private boolean isPlayer;
+        private boolean isPlayingPlayer;
+        private boolean isClientPlayer;
         private boolean blurred;
     }
 
@@ -135,8 +141,9 @@ public class GameLayout extends AppLayout {
         new RecyclerDrawable<>(Orientation.VERTICAL, PlayerDisplayDrawable::new,
             (playerDisplayDrawable, playerDisplay) -> {
                 playerDisplayDrawable.positionTextBox.text("# " + String.valueOf(playerDisplay.position) + " ");
-                playerDisplayDrawable.playerNameTextBox.text(playerDisplay.name + " ")
-                    .color(playerDisplay.isPlayer ? Color.FOCUS : Color.WHITE);
+                playerDisplayDrawable.playerNameTextBox.text(playerDisplay.name + " " +
+                        (playerDisplay.isPlayingPlayer ? "(playing)" : ""))
+                    .color(playerDisplay.isClientPlayer ? Color.FOCUS : Color.WHITE);
                 playerDisplayDrawable.playerPointsTextBox.text("Points: " + playerDisplay.points);
                 playerDisplayDrawable.getLayout().blur(playerDisplay.blurred);
             });
@@ -259,6 +266,7 @@ public class GameLayout extends AppLayout {
     private int selectedBookshelfIndex;
 
     // Populate these data through the transceiver
+    private int playingPlayerIndex;
     private List<String> playerNames;
     private List<Integer> playerPoints;
     private int clientPlayerIndex;
@@ -288,7 +296,9 @@ public class GameLayout extends AppLayout {
             }
 
             playerDisplays.add(j, new PlayerDisplay(playerNames.get(i), playerPoints.get(i),j + 1,
-                i == clientPlayerIndex, i != playerToExcludeFromBlurIndex && blurred));
+                i == playingPlayerIndex,
+                i == clientPlayerIndex,
+                i != playerToExcludeFromBlurIndex && blurred));
 
             for (j++; j < playerDisplays.size(); j++) {
                 if (playerDisplays.get(i).points < playerPoints.get(i)) {
@@ -303,6 +313,7 @@ public class GameLayout extends AppLayout {
     private NetworkEventTransceiver transceiver;
     private Requester<Response, SelectTileEventData> selectTileRequester;
     private Requester<Response, DeselectTileEventData> deselectTileRequester;
+    private Requester<Response, InsertTileEventData> insertTileRequester;
 
     @Override
     public void setup(String previousLayoutName) {
@@ -327,6 +338,7 @@ public class GameLayout extends AppLayout {
             transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME, "transceiver");
             selectTileRequester = Response.requester(transceiver, transceiver, getLock());
             deselectTileRequester = Response.requester(transceiver, transceiver, getLock());
+            insertTileRequester = Response.requester(transceiver, transceiver, getLock());
 
             populateBookshelfMenu();
             playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
@@ -343,6 +355,12 @@ public class GameLayout extends AppLayout {
                 )))
             ));
 
+            for (int column = 0; column < Bookshelf.COLUMNS; column++) {
+                bookshelfDrawable.getColumn(column).onselect(c -> {
+                   displayServerResponse(insertTileRequester.request(new InsertTileEventData(c)));
+                });
+            }
+
             GoalEventData.castEventReceiver(transceiver).registerListener(data -> {
                 synchronized (getLock()) {
                     commonGoals = new CommonGoal[2];
@@ -358,26 +376,45 @@ public class GameLayout extends AppLayout {
                 }
             });
 
+            // Retrieving current player index
+            playingPlayerIndex = 0;
+
+            CurrentPlayerChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
+                synchronized (getLock()) {
+                    playingPlayerIndex = playerNameToIndex(data.getUsername());
+                }
+            });
+
             BoardChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
-                boardDrawable.getNonFillTileDrawables().forEach(tileDrawable -> {
-                    tileDrawable.selected(data.board().getSelectedCoordinates().contains(
-                        new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
-                    ));
+                synchronized (getLock()) {
+                    boardDrawable.getNonFillTileDrawables().forEach(tileDrawable -> {
+                        tileDrawable.selected(data.board().getSelectedCoordinates().contains(
+                            new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
+                        ));
 
-                    tileDrawable.selectable(data.board().getSelectableCoordinate().contains(
-                        new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
-                    ) || data.board().getSelectedCoordinates().contains(
-                        new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
-                    ));
+                        tileDrawable.selectable(data.board().getSelectableCoordinate().contains(
+                            new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
+                        ) || data.board().getSelectedCoordinates().contains(
+                            new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
+                        ));
 
-                    Tile tile = data.board().tileAt(
-                        new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
-                    );
+                        Tile tile = data.board().tileAt(
+                            new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
+                        );
 
-                    if (tile != null) {
-                        tileDrawable.color(tile.getColor());
-                    }
-                });
+                        if (tile != null) {
+                            tileDrawable.color(tile.getColor());
+                        }
+                    });
+                }
+            });
+
+            BookshelfHasChanged.castEventReceiver(transceiver).registerListener(data -> {
+                synchronized (getLock()) {
+                    bookshelves.set(playerNameToIndex(data.getUsername()), data.getBookshelf());
+
+                    populateBookshelfMenu();
+                }
             });
 
             transceiver.broadcast(new JoinStartedGameEventData());
