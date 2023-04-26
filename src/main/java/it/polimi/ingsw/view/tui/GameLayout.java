@@ -1,6 +1,8 @@
 package it.polimi.ingsw.view.tui;
 
+import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
+import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.client.DeselectTileEventData;
 import it.polimi.ingsw.event.data.client.JoinStartedGameEventData;
 import it.polimi.ingsw.event.data.client.SelectTileEventData;
@@ -299,6 +301,8 @@ public class GameLayout extends AppLayout {
     }
 
     private NetworkEventTransceiver transceiver;
+    private Requester<Response, SelectTileEventData> selectTileRequester;
+    private Requester<Response, DeselectTileEventData> deselectTileRequester;
 
     @Override
     public void setup(String previousLayoutName) {
@@ -321,20 +325,22 @@ public class GameLayout extends AppLayout {
             gameNameTextBox.text("Game: " + gameName);
 
             transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME, "transceiver");
+            selectTileRequester = Response.requester(transceiver, transceiver, getLock());
+            deselectTileRequester = Response.requester(transceiver, transceiver, getLock());
 
             populateBookshelfMenu();
             playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
 
             boardDrawable.getNonFillTileDrawables().forEach(tileDrawable -> tileDrawable.onselect(
-                (rowInBoard, columnInBoard) -> transceiver.broadcast(new SelectTileEventData(
+                (rowInBoard, columnInBoard) -> displayServerResponse(selectTileRequester.request(new SelectTileEventData(
                     new Coordinate(rowInBoard, columnInBoard)
-                ))
+                )))
             ));
 
             boardDrawable.getNonFillTileDrawables().forEach(tileDrawable -> tileDrawable.ondeselect(
-                (rowInBoard, columnInBoard) -> transceiver.broadcast(new DeselectTileEventData(
+                (rowInBoard, columnInBoard) -> displayServerResponse(deselectTileRequester.request(new DeselectTileEventData(
                     new Coordinate(rowInBoard, columnInBoard)
-                ))
+                )))
             ));
 
             GoalEventData.castEventReceiver(transceiver).registerListener(data -> {
