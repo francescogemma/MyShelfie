@@ -145,7 +145,7 @@ public class GameLayout extends AppLayout {
             (playerDisplayDrawable, playerDisplay) -> {
                 playerDisplayDrawable.positionTextBox.text("# " + String.valueOf(playerDisplay.position) + " ");
                 playerDisplayDrawable.playerNameTextBox.text(playerDisplay.name + " " +
-                        (playerDisplay.isPlayingPlayer ? "(playing)" : ""))
+                        (playerDisplay.isPlayingPlayer ? "<-" : ""))
                     .color(playerDisplay.isClientPlayer ? Color.FOCUS : Color.WHITE);
                 playerDisplayDrawable.playerPointsTextBox.text("Points: " + playerDisplay.points);
                 playerDisplayDrawable.getLayout().blur(playerDisplay.blurred);
