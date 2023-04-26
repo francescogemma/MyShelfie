@@ -203,11 +203,15 @@ public class Game implements Identifiable {
     /**
      * Starts the game by initializing the common goals and the first player index.
      *
+     * @param username Name of the user who wants to start the game
      * @throws IllegalFlowException if there are less than two players.
      */
-    public void startGame() throws IllegalFlowException {
+    public void startGame(String username) throws IllegalFlowException {
         if (players.size() < 2)
             throw new IllegalFlowException("You need at least two players in order to start the game");
+
+        if (!this.canStartGame(username))
+            throw new IllegalFlowException("you can't start the game");
 
         this.isStarted = true;
         this.refillBoardIfNecessary();

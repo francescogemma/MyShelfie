@@ -138,7 +138,7 @@ public class GameController {
             }
 
             try {
-                game.startGame();
+                game.startGame(username);
             } catch (IllegalFlowException e) {
                 return new Response(e.getMessage(), ResponseStatus.FAILURE);
             }

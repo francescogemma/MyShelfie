@@ -132,7 +132,7 @@ class GameTest {
         game.addPlayer("Cristiano");
         game.addPlayer("Michele");
 
-        game.startGame();
+        game.startGame("Giacomo");
 
         Assertions.assertThrows(IllegalFlowException.class, () -> {
             game.addPlayer("Francesco");
@@ -155,14 +155,14 @@ class GameTest {
     void startGame_onePlayer_throwIllegalFlowException () throws IllegalFlowException, PlayerAlreadyInGameException {
         game.addPlayer("Giacomo");
         Assertions.assertThrows(IllegalFlowException.class, () -> {
-            game.startGame();
+            game.startGame("Giacomo");
         });
     }
 
     @Test
     void startGame_0Players_throwIllegalFlowException () {
         Assertions.assertThrows(IllegalFlowException.class, () -> {
-            game.startGame();
+            game.startGame("");
         });
     }
 
@@ -171,7 +171,7 @@ class GameTest {
         game.addPlayer("Giacomo");
         game.addPlayer("Michele");
 
-        game.startGame();
+        game.startGame("Giacomo");
         Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
     }
 
@@ -226,7 +226,7 @@ class GameTest {
                 }
         );
 
-        game.startGame();
+        game.startGame("Giacomo");
 
         game.disconnectPlayer("Giacomo");
 
@@ -244,7 +244,7 @@ class GameTest {
             game.getLastPlayer();
         });
 
-        game.startGame();
+        game.startGame("Giacomo");
 
         Assertions.assertEquals("Cristiano", game.getLastPlayer().getUsername());
     }
@@ -257,7 +257,7 @@ class GameTest {
         game.addPlayer("Michele");
 
 
-        game.startGame();
+        game.startGame("Giacomo");
 
         Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
 
@@ -275,7 +275,7 @@ class GameTest {
         game.addPlayer("Michele");
 
 
-        game.startGame();
+        game.startGame("Giacomo");
 
         Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
 
@@ -294,7 +294,7 @@ class GameTest {
         game.addPlayer("Michele");
 
 
-        game.startGame();
+        game.startGame("Giacomo");
 
         Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
 
@@ -314,7 +314,7 @@ class GameTest {
         game.addPlayer("Michele");
 
 
-        game.startGame();
+        game.startGame("Giacomo");
 
         Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
 
@@ -336,7 +336,7 @@ class GameTest {
             call.set(true);
         });
 
-        game.startGame();
+        game.startGame("Giacomo");
 
         Assertions.assertTrue(call.get());
     }
@@ -363,7 +363,7 @@ class GameTest {
 
         Assertions.assertFalse(call.get());
 
-        game.startGame();
+        game.startGame("Giacomo");
 
         call.set(false);
         try {
@@ -406,7 +406,7 @@ class GameTest {
             boardViewCall.set(event.board());
         });
 
-        game.startGame();
+        game.startGame("Giacomo");
 
         Assertions.assertThrows(IllegalExtractionException.class, () -> {
             game.insertTile("Giacomo", 0);
@@ -449,7 +449,7 @@ class GameTest {
             }
         });
 
-        game.startGame();
+        game.startGame("Giacomo");
 
         game.disconnectPlayer("Giacomo");
 
@@ -483,7 +483,7 @@ class GameTest {
             }
         });
 
-        game.startGame();
+        game.startGame("Giacomo");
 
         setCurrent.set(true);
         game.disconnectPlayer("Giacomo");
@@ -520,7 +520,7 @@ class GameTest {
         game.addPlayer(usernameUser1);
         game.addPlayer(usernameUser2);
 
-        game.startGame();
+        game.startGame("Giacomo");
 
         game.selectTile(usernameUser1, new Coordinate(4, 0));
         game.insertTile(usernameUser1, 0);
@@ -634,7 +634,7 @@ class GameTest {
         game.addPlayer(usernameUser2);
         game.addPlayer(usernameUser1);
 
-        game.startGame();
+        game.startGame("Giacomo");
 
         game.disconnectPlayer(usernameUser2);
 
@@ -769,7 +769,7 @@ class GameTest {
             game.forgetLastSelection(username1, new Coordinate(4, 0));
         });
 
-        this.game.startGame();
+        this.game.startGame("Giacomo");
 
         this.game.selectTile(username1, new Coordinate(4, 0));
 
