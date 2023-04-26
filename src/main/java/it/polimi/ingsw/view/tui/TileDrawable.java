@@ -164,6 +164,14 @@ public class TileDrawable extends Drawable {
         return this;
     }
 
+    public int getRowInBoard() {
+        return rowInBoard;
+    }
+
+    public int getColumnInBoard() {
+        return columnInBoard;
+    }
+
     private BiConsumer<Integer, Integer> onselect;
 
     public TileDrawable onselect(BiConsumer<Integer, Integer> onselect) {

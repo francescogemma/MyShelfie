@@ -1,16 +1,16 @@
 package it.polimi.ingsw.view.tui;
 
-import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
-import it.polimi.ingsw.event.Requester;
+import it.polimi.ingsw.event.data.client.DeselectTileEventData;
 import it.polimi.ingsw.event.data.client.JoinStartedGameEventData;
-import it.polimi.ingsw.event.data.client.StartGameEventData;
-import it.polimi.ingsw.event.data.game.GameHasStartedEventData;
+import it.polimi.ingsw.event.data.client.SelectTileEventData;
+import it.polimi.ingsw.event.data.game.BoardChangedEventData;
 import it.polimi.ingsw.event.data.game.GoalEventData;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
+import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
@@ -324,6 +324,18 @@ public class GameLayout extends AppLayout {
             populateBookshelfMenu();
             playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
 
+            boardDrawable.getNonFillTileDrawables().forEach(tileDrawable -> tileDrawable.onselect(
+                (rowInBoard, columnInBoard) -> transceiver.broadcast(new SelectTileEventData(
+                    new Coordinate(rowInBoard, columnInBoard)
+                ))
+            ));
+
+            boardDrawable.getNonFillTileDrawables().forEach(tileDrawable -> tileDrawable.ondeselect(
+                (rowInBoard, columnInBoard) -> transceiver.broadcast(new DeselectTileEventData(
+                    new Coordinate(rowInBoard, columnInBoard)
+                ))
+            ));
+
             GoalEventData.castEventReceiver(transceiver).registerListener(data -> {
                 synchronized (getLock()) {
                     commonGoals = new CommonGoal[2];
@@ -337,6 +349,22 @@ public class GameLayout extends AppLayout {
 
                     populateGoalsMenu();
                 }
+            });
+
+            BoardChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
+                boardDrawable.getNonFillTileDrawables().forEach(tileDrawable -> {
+                    tileDrawable.selected(data.getBoard().getSelectedCoordinates().contains(
+                        new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
+                    ));
+
+                    tileDrawable.selectable(data.getBoard().getSelectableCoordinate().contains(
+                        new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
+                    ));
+
+                    tileDrawable.color(data.getBoard().tileAt(
+                        new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
+                    ).getColor());
+                });
             });
 
             transceiver.broadcast(new JoinStartedGameEventData());
