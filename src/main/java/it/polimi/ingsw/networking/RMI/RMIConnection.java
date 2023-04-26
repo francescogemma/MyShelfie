@@ -71,7 +71,7 @@ public class RMIConnection extends UnicastRemoteObject implements Connection, St
             String name = server.getNewCoupleName();
 
             // bind this to registry, and tell the server to create its own connection.
-            registry.bind(name + "CLIENT", this);
+            registry.rebind(name + "CLIENT", this);
             server.createRemoteConnection(port, name);
 
             // get the newly created server-side object.
@@ -98,7 +98,7 @@ public class RMIConnection extends UnicastRemoteObject implements Connection, St
         try {
             // bind this to registry, assuming this method is called server side.
             Registry registry = LocateRegistry.getRegistry(port);
-            registry.bind(connectionName + "SERVER", this);
+            registry.rebind(connectionName + "SERVER", this);
 
             // get the client-side connection.
             otherConnection = (StringRemote) registry.lookup(connectionName + "CLIENT");

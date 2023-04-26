@@ -64,7 +64,7 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements NameProvi
         try {
             // export to server's localhost.
             Registry registry = LocateRegistry.createRegistry(RMIPort);
-            registry.bind("SERVER", this);
+            registry.rebind("SERVER", this);
 
             // initialize the server socket.
             serverSocket = new ServerSocket(TCPPort);
