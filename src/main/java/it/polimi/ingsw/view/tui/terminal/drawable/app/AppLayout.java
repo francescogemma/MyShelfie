@@ -1,10 +1,7 @@
 package it.polimi.ingsw.view.tui.terminal.drawable.app;
 
 import it.polimi.ingsw.controller.Response;
-import it.polimi.ingsw.view.tui.terminal.drawable.Coordinate;
-import it.polimi.ingsw.view.tui.terminal.drawable.FixedLayoutDrawable;
-import it.polimi.ingsw.view.tui.terminal.drawable.FullyResizableDrawable;
-import it.polimi.ingsw.view.tui.terminal.drawable.ServerResponseDrawable;
+import it.polimi.ingsw.view.tui.terminal.drawable.*;
 
 import java.util.Optional;
 import java.util.Timer;
@@ -15,6 +12,20 @@ public abstract class AppLayout extends FixedLayoutDrawable<FullyResizableDrawab
     private ServerResponseDrawable serverResponseDrawable;
 
     private Timer timer = null;
+
+    private Coordinate lastFocusedCoordinate = Coordinate.origin();
+
+    @Override
+    public void askForSize(DrawableSize desiredSize) {
+        super.askForSize(desiredSize);
+
+        if (getFocusedCoordinate().isEmpty()) {
+            unfocus();
+            focus(lastFocusedCoordinate);
+
+            lastFocusedCoordinate = getFocusedCoordinate().orElse(Coordinate.origin());
+        }
+    }
 
     @Override
     public boolean handleInput(String key) {

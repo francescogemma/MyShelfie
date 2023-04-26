@@ -108,12 +108,6 @@ public class OrientedLayout extends Drawable {
 
         size = DrawableSize.craftSizeByOrientation(orientation, elementsOriginParallelComponent
             .get(elementsOriginParallelComponent.size() - 1) - 1, maxPerpendicularSizeComponent);
-
-        // If the focused element became unfocused we switch to the next one
-        if (elementOnFocusIndex != -1 && elements.get(elementOnFocusIndex).getDrawable().getFocusedCoordinate()
-            .isEmpty()) {
-            focus(Coordinate.origin());
-        }
     }
 
     @Override
