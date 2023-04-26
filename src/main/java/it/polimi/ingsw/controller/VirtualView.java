@@ -7,6 +7,7 @@ import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.InitialGameEventData;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
+import it.polimi.ingsw.model.game.GameView;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Pair;
 
@@ -37,12 +38,13 @@ public class VirtualView implements EventTransmitter{
         CreateNewGameEventData.responder(transceiver, transceiver,  event -> createNewGame(event.gameName()));
 
         JoinStartedGameEventData.castEventReceiver(transceiver).registerListener(event -> this.sendGameState());
-        PlayerHasJoinMenu.castEventReceiver(transceiver).registerListener(event -> this.playerHasJoinMenu());
+        PlayerHasJoinMenu       .castEventReceiver(transceiver).registerListener(event -> this.playerHasJoinMenu());
     }
 
     private void sendGameState() {
         if (this.isInGame()) {
-            transceiver.broadcast(new InitialGameEventData(gameController.getGameView()));
+            GameView view = gameController.getGameView();
+            transceiver.broadcast(new InitialGameEventData(view));
         }
     }
 

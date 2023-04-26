@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Logger {
-    enum Type {
+    public enum Type {
         CRITICAL("Critical"),
         WARNING("Warning"),
         MESSAGE("Message");
@@ -26,7 +26,7 @@ public class Logger {
 
     private PrintWriter writer;
     private final List<String> message;
-    private boolean shouldPrint = false;
+    private boolean shouldPrint = true;
     private final String nameLog =
             (
                     LocalDate.now().toString() +

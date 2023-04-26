@@ -15,6 +15,7 @@ import it.polimi.ingsw.model.game.IllegalFlowException;
 import it.polimi.ingsw.model.game.PlayerAlreadyInGameException;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.utils.Coordinate;
+import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
 
 // events
@@ -102,7 +103,7 @@ public class GameController {
 
     public Response deselectTile(String username, Coordinate coordinate) {
         assert username != null;
-        System.out.println(username + " trying to deselect " + coordinate + " in " + gameName());
+        Logger.write(Logger.Type.MESSAGE, username + " trying to deselect " + coordinate + " in " + gameName());
         synchronized (this) {
             try {
                 this.game.forgetLastSelection(username, coordinate);

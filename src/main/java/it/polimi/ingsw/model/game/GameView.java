@@ -25,7 +25,7 @@ public class GameView implements Identifiable {
     /*
      * The list of players in the game.
      */
-    protected final List<Player> players = new ArrayList<>();
+    protected final List<Player> players;
 
     /*
      * The optional winner of the game.
@@ -75,6 +75,7 @@ public class GameView implements Identifiable {
         this.isStarted = false;
         this.personalGoalIndexes = new ArrayList<>(Arrays.asList( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ));
         this.personalGoalIndex = 0;
+        this.players = new ArrayList<>();
     }
 
     public GameView(GameView other) {
@@ -85,6 +86,7 @@ public class GameView implements Identifiable {
         this.name = other.name;
         this.personalGoalIndexes = new ArrayList<>(other.personalGoalIndexes);
         this.personalGoalIndex = other.personalGoalIndex;
+        this.players = new ArrayList<>(other.players);
     }
 
     /**
