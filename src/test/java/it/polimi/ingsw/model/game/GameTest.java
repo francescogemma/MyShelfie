@@ -648,6 +648,10 @@ class GameTest {
         final String usernameUser1 = "Giacomo";
         final String usernameUser2 = "Michele";
 
+        this.game = new Game("Testing", usernameUser2);
+        this.transceiver = new LocalEventTransceiver();
+        this.game.setTransceiver(transceiver);
+
         game.addPlayer(usernameUser2);
         game.addPlayer(usernameUser1);
 
@@ -799,5 +803,21 @@ class GameTest {
 
         Assertions.assertTrue(this.isPresentEvent(events, BoardChangedEventData.ID));
         Assertions.assertTrue(this.isPresentEvent(events, PlayerHasDeselectTile.ID));
+    }
+
+    @Test
+    void startGame_incorrectOwnership_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
+        game = new Game("testing", "Giacomo");
+
+        game.setTransceiver(new LocalEventTransceiver());
+
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+
+        Assertions.assertThrows(IllegalFlowException.class, () -> {
+            game.startGame("Michele");
+        });
+
+        game.startGame("Giacomo");
     }
 }
