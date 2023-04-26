@@ -8,22 +8,10 @@ import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.game.GameView;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Function;
 
-public class InitialGameEventData implements EventData {
-    private final GameView gameView;
-
-    public InitialGameEventData(GameView gameView) {
-        this.gameView = gameView;
-    }
-
-    public GameView getGameView () {
-        return this.gameView;
-    }
-
-    public static final String ID = "GOAL";
+public record InitialGameEventData(GameView gameView) implements EventData {
+    public static final String ID = "INITIAL_GAME";
 
     public static CastEventReceiver<InitialGameEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);

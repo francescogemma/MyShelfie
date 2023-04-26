@@ -1,11 +1,7 @@
 package it.polimi.ingsw.model.game;
 
-import it.polimi.ingsw.controller.db.Identifiable;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.game.*;
-import it.polimi.ingsw.model.bag.Bag;
-import it.polimi.ingsw.model.board.Board;
-import it.polimi.ingsw.model.board.BoardView;
 import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
 import it.polimi.ingsw.model.goal.AdjacencyGoal;
@@ -20,6 +16,10 @@ import java.util.*;
 public class Game extends GameView{
     private transient LocalEventTransceiver transceiver;
 
+    private final List<Player> players;
+    protected final transient List<Integer> personalGoalIndexes;
+    protected transient int personalGoalIndex;
+
     /**
      * Creates a new game with the given name.
      * @param name the name of the game
@@ -29,6 +29,9 @@ public class Game extends GameView{
     public Game(String name) {
         super(name);
 
+        this.personalGoalIndexes = new ArrayList<>(Arrays.asList( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ));
+        this.personalGoalIndex = 0;
+        this.players = new ArrayList<>();
         Collections.shuffle(this.personalGoalIndexes);
     }
 
@@ -87,10 +90,19 @@ public class Game extends GameView{
         player.setPersonalGoal(PersonalGoal.fromIndex(personalGoalIndexes.get(personalGoalIndex)));
         personalGoalIndex++;
         players.add(player);
+        super.addPlayerView(player);
 
         this.transceiver.broadcast(new PlayerHasJoinEventData(username));
 
         return player;
+    }
+
+    private Player getPlayer (String username) {
+        for (Player player: players) {
+            if (player.getUsername().equals(username))
+                return player;
+        }
+        throw new IllegalArgumentException("Player not in this game");
     }
 
     public void disconnectPlayer (String username) {
@@ -125,7 +137,7 @@ public class Game extends GameView{
         if (players.size() < 2)
             throw new IllegalFlowException("You need at least two players in order to start the game");
 
-        if (!this.canStartGame(username))
+        if (!this.players.get(0).is(username))
             throw new IllegalFlowException("you can't start the game");
 
         this.isStarted = true;
@@ -135,10 +147,18 @@ public class Game extends GameView{
         this.transceiver.broadcast(new GameHasStartedEventData());
     }
 
+    public boolean hasPlayerDisconnected () {
+        for (Player player: this.players) {
+            if (!player.isConnected())
+                return true;
+        }
+        return false;
+    }
+
     public void forgetLastSelection(String username, Coordinate c) throws IllegalFlowException {
         if (!isStarted()) throw new IllegalFlowException("Game is not started");
         if (isOver()) throw new IllegalFlowException("Game has ended");
-        if (!getCurrentPlayer().getUsername().equals(username)) throw new IllegalFlowException("It's not your turn");
+        if (!players.get(currentPlayerIndex).getUsername().equals(username)) throw new IllegalFlowException("It's not your turn");
 
         this.board.forgetSelected(c);
         this.transceiver.broadcast(new BoardChangedEventData(board.getView()));
@@ -173,6 +193,16 @@ public class Game extends GameView{
         if (hasChanged) {
             this.transceiver.broadcast(new BoardChangedEventData(this.board.getView()));
         }
+    }
+
+    private int getNextPlayerOnline (int currentPlayerIndex) throws NoPlayerConnectedException {
+        for (int i = 1; i < this.players.size(); i++) {
+            final int index = (currentPlayerIndex + i) % this.players.size();
+            if (this.players.get(index).isConnected) {
+                return index;
+            }
+        }
+        throw new NoPlayerConnectedException();
     }
 
     private void calculateNextPlayer() throws IllegalFlowException {
@@ -277,6 +307,19 @@ public class Game extends GameView{
         this.calculateNextPlayer();
     }
 
+    public int getPersonalGoal(String username) {
+        for (Player player: players) {
+            if (player.is(username)) {
+                return player.getPersonalGoal().getIndex();
+            }
+        }
+        throw new IllegalArgumentException("Player is not in this game");
+    }
+
+    public GameView createView () {
+        return super.createView();
+    }
+
     /**
      * TODO: javadoc
      * select a tile from the board
@@ -286,7 +329,7 @@ public class Game extends GameView{
             throw new IllegalFlowException("Game is not started");
         if (isOver())
             throw new IllegalFlowException("Game is over");
-        if (!this.getCurrentPlayer().getUsername().equals(username))
+        if (!this.players.get(currentPlayerIndex).getUsername().equals(username))
             throw new IllegalFlowException("It's not your turn");
 
         this.board.selectTile(coordinate);

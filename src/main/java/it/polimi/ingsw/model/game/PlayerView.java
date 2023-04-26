@@ -63,6 +63,10 @@ public class PlayerView {
         return username;
     }
 
+    public boolean is(String username) {
+        return this.username.equals(username);
+    }
+
     /**
      * @return {@link Player#points}
      */

@@ -78,6 +78,14 @@ public class Logger {
         }
     }
 
+    public static void writeWarning (String message) {
+        Logger.write(Type.WARNING, message);
+    }
+
+    public static void writeMessage (String message) {
+        Logger.write(Type.MESSAGE, message);
+    }
+
     public static void write (Type type, String message) {
         String appendMessage;
         appendMessage = type + " " + LocalDate.now().toString() + LocalTime.now().toString() + " " +message;

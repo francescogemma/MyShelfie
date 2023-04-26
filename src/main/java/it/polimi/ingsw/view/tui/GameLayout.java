@@ -7,14 +7,11 @@ import it.polimi.ingsw.event.data.client.DeselectTileEventData;
 import it.polimi.ingsw.event.data.client.InsertTileEventData;
 import it.polimi.ingsw.event.data.client.JoinStartedGameEventData;
 import it.polimi.ingsw.event.data.client.SelectTileEventData;
-import it.polimi.ingsw.event.data.game.BoardChangedEventData;
-import it.polimi.ingsw.event.data.game.BookshelfHasChangedEventData;
-import it.polimi.ingsw.event.data.game.CurrentPlayerChangedEventData;
-import it.polimi.ingsw.event.data.game.InitialGameEventData;
+import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.model.board.BoardView;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
-import it.polimi.ingsw.model.game.Player;
+import it.polimi.ingsw.model.game.PlayerView;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
 import it.polimi.ingsw.model.tile.Tile;
@@ -370,7 +367,7 @@ public class GameLayout extends AppLayout {
                 synchronized (getLock()) {
                     playingPlayerIndex = 0;
 
-                    playerNames = data.getGameView().getPlayers().stream().map(Player::getUsername)
+                    playerNames = data.gameView().getPlayers().stream().map(PlayerView::getUsername)
                         .toList();
 
                     clientPlayerIndex = playerNameToIndex(appDataProvider.getString(
@@ -380,25 +377,26 @@ public class GameLayout extends AppLayout {
 
                     selectedBookshelfIndex = clientPlayerIndex;
 
-                    playerPoints = new ArrayList<>(data.getGameView().getPlayers().stream().map(Player::getPoints)
+                    playerPoints = new ArrayList<>(data.gameView().getPlayers().stream().map(PlayerView::getPoints)
                         .toList());
 
-                    bookshelves = new ArrayList<>(data.getGameView().getPlayers().stream().map(Player::getBookshelf)
+                    bookshelves = new ArrayList<>(data.gameView().getPlayers().stream().map(PlayerView::getBookshelf)
                         .toList());
 
                     // TODO: Pass personal goal in a different way
-                    personalGoal = data.getGameView().getPlayers()
-                        .get(clientPlayerIndex).getPersonalGoal();
+                    /*
+                    personalGoal = data.gameView().getPlayers()
+                        .get(clientPlayerIndex).getPersonalGoal();*/
 
-                    commonGoals = data.getGameView().getCommonGoals();
+                    commonGoals = data.gameView().getCommonGoals();
 
-                    gameName = data.getGameView().getName();
+                    gameName = data.gameView().getName();
 
                     gameNameTextBox.text("Game: " + gameName);
                     populateBookshelfMenu();
                     playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
                     populateGoalsMenu();
-                    populateBoard(data.getGameView().getBoard());
+                    populateBoard(data.gameView().getBoard());
                 }
             });
 
@@ -409,6 +407,13 @@ public class GameLayout extends AppLayout {
                 synchronized (getLock()) {
                     playingPlayerIndex = playerNameToIndex(data.getUsername());
 
+                    playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
+                }
+            });
+
+            PersonalGoalSetEventData.castEventReceiver(transceiver).registerListener(data -> {
+                synchronized (getLock()) {
+                    personalGoal = PersonalGoal.fromIndex(data.personalGoal());
                     playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
                 }
             });

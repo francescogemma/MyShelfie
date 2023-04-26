@@ -5,13 +5,13 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.LoginEventData;
 import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.InitialGameEventData;
+import it.polimi.ingsw.event.data.game.PersonalGoalSetEventData;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.game.GameView;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Pair;
 
-import java.util.List;
 import java.util.Optional;
 
 public class VirtualView implements EventTransmitter{
@@ -34,7 +34,7 @@ public class VirtualView implements EventTransmitter{
         InsertTileEventData.responder(transceiver, transceiver,     event -> insertTile(event.column()));
         SelectTileEventData.responder(transceiver, transceiver,     event -> selectTile(event.getCoordinate()));
         DeselectTileEventData.responder(transceiver, transceiver,   event -> deselectTile(event.coordinate()));
-        JoinGameEventData.responder(transceiver, transceiver,       event -> joinGame(event.getGameName()));
+        JoinGameEventData.responder(transceiver, transceiver,       event -> joinGame(event.gameName()));
         CreateNewGameEventData.responder(transceiver, transceiver,  event -> createNewGame(event.gameName()));
 
         JoinStartedGameEventData.castEventReceiver(transceiver).registerListener(event -> this.sendGameState());
@@ -44,7 +44,10 @@ public class VirtualView implements EventTransmitter{
     private void sendGameState() {
         if (this.isInGame()) {
             GameView view = gameController.getGameView();
+            final int personalGoal = gameController.getPersonalGoal(username);
+
             transceiver.broadcast(new InitialGameEventData(view));
+            transceiver.broadcast(new PersonalGoalSetEventData(personalGoal));
         }
     }
 

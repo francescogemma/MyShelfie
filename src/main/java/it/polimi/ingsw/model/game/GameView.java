@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * @author Giacomo Groppi
+ * */
 public class GameView implements Identifiable {
     /*
      * The index of the first player in the list of players.
@@ -21,11 +24,6 @@ public class GameView implements Identifiable {
      * The name of the game.
      */
     protected final String name;
-
-    /*
-     * The list of players in the game.
-     */
-    protected final List<Player> players;
 
     /*
      * The optional winner of the game.
@@ -52,13 +50,12 @@ public class GameView implements Identifiable {
      */
     protected boolean isStarted;
 
-    protected final transient List<Integer> personalGoalIndexes;
-    protected transient int personalGoalIndex;
-
     /**
      * The index of the current player in the list of players.
      */
     protected int currentPlayerIndex;
+
+    private List<PlayerView> players;
 
     public GameView (String nameGame) {
         if (nameGame == null)
@@ -73,9 +70,7 @@ public class GameView implements Identifiable {
         this.winners = new ArrayList<>();
         this.currentPlayerIndex = -1;
         this.isStarted = false;
-        this.personalGoalIndexes = new ArrayList<>(Arrays.asList( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ));
-        this.personalGoalIndex = 0;
-        this.players = new ArrayList<>();
+        players = new ArrayList<>();
     }
 
     public GameView(GameView other) {
@@ -85,14 +80,10 @@ public class GameView implements Identifiable {
         this.isStarted = other.isStarted;
         this.name = other.name;
 
-        // TODO
-        this.commonGoals = new CommonGoal[2];
-        this.commonGoals[0] = other.commonGoals[0];
-        this.commonGoals[1] = other.commonGoals[1];
-
-        this.personalGoalIndexes = new ArrayList<>(other.personalGoalIndexes);
-        this.personalGoalIndex = other.personalGoalIndex;
-        this.players = new ArrayList<>(other.players);
+        this.commonGoals = new CommonGoal[other.commonGoals.length];
+        for (int i = 0; i < other.commonGoals.length; i++) {
+            this.commonGoals[i] = other.commonGoals[i];
+        }
     }
 
     /**
@@ -100,7 +91,7 @@ public class GameView implements Identifiable {
      * @return the starting player
      * @throws IllegalFlowException if there are no players in the game
      */
-    public Player getStartingPlayer() throws IllegalFlowException {
+    public PlayerView getStartingPlayer() throws IllegalFlowException {
         if (players.isEmpty()) {
             throw new IllegalFlowException("There is no starting player until someone joins the game");
         }
@@ -111,7 +102,7 @@ public class GameView implements Identifiable {
     public boolean canStartGame (String username) throws IllegalFlowException {
         if (isStarted() || isOver() || players.isEmpty())
             throw new IllegalFlowException();
-        return this.players.get(0).getUsername().equals(username);
+        return this.players.get(0).equals(username);
     }
 
     /**
@@ -120,15 +111,6 @@ public class GameView implements Identifiable {
      */
     public boolean isOver () {
         return !winners.isEmpty();
-    }
-
-    public int getPersonalGoalIndex (String username) {
-        for (Player player: players) {
-            if (player.getUsername().equals(username)) {
-                return player.getPersonalGoal().getIndex();
-            }
-        }
-        throw new IllegalArgumentException("....");
     }
 
     /**
@@ -146,7 +128,7 @@ public class GameView implements Identifiable {
             throw new IllegalFlowException("There is no current player when the game is over");
         }
 
-        return players.get(currentPlayerIndex).getView();
+        return players.get(currentPlayerIndex);
     }
 
     /**
@@ -164,7 +146,7 @@ public class GameView implements Identifiable {
      * @throws IllegalFlowException iff the game hasn't started yet.
      * @return the last player in the list of players
      * */
-    public Player getLastPlayer() throws IllegalFlowException {
+    public PlayerView getLastPlayer() throws IllegalFlowException {
         if (!isStarted) {
             throw new IllegalFlowException("There is no last player until you start the game");
         }
@@ -172,14 +154,11 @@ public class GameView implements Identifiable {
         return players.get(players.size() - 1);
     }
 
-    /**
-     * @return The list of players in this game.
-     * */
-    public List<Player> getPlayers() {
-        return new ArrayList<>(players);
+    protected void addPlayerView (PlayerView playerView) {
+        this.players.add(playerView);
     }
 
-    public GameView getView () {
+    protected GameView createView () {
         return new GameView(this);
     }
 
@@ -191,24 +170,6 @@ public class GameView implements Identifiable {
         return commonGoals;
     }
 
-    protected Player getPlayer(String username) {
-        for (Player p: this.players) {
-            if (p.getUsername().equals(username))
-                return p;
-        }
-        throw new IllegalArgumentException("Player not in this game");
-    }
-
-    protected int getNextPlayerOnline (int currentPlayerIndex) throws NoPlayerConnectedException {
-        for (int i = 1; i < this.players.size(); i++) {
-            final int index = (currentPlayerIndex + i) % this.players.size();
-            if (this.players.get(index).isConnected) {
-                return index;
-            }
-        }
-        throw new NoPlayerConnectedException();
-    }
-
     public BoardView getBoard () {
         return board.getView();
     }
@@ -217,12 +178,8 @@ public class GameView implements Identifiable {
         return this.isStarted;
     }
 
-    public boolean hasPlayerDisconnected () {
-        for (Player player: this.players) {
-            if (!player.isConnected())
-                return true;
-        }
-        return false;
+    public List<PlayerView> getPlayers () {
+        return new ArrayList<>(players);
     }
 
     @Override

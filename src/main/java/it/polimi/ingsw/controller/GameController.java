@@ -9,10 +9,7 @@ import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
 import it.polimi.ingsw.model.board.RemoveNotLastSelectedException;
 import it.polimi.ingsw.model.bookshelf.NotEnoughSpaceInColumnException;
-import it.polimi.ingsw.model.game.Game;
-import it.polimi.ingsw.model.game.GameView;
-import it.polimi.ingsw.model.game.IllegalFlowException;
-import it.polimi.ingsw.model.game.PlayerAlreadyInGameException;
+import it.polimi.ingsw.model.game.*;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Logger;
@@ -48,7 +45,7 @@ public class GameController {
     }
 
     public int getPersonalGoal(String username) {
-        return this.game.getPersonalGoalIndex(username);
+        return game.getPersonalGoal(username);
     }
 
     public List<Integer> getCommonGoal () {
@@ -82,20 +79,20 @@ public class GameController {
         return new Response("You've joined the game", ResponseStatus.SUCCESS);
     }
 
-    public GameView getGameView () {
-        return this.game.getView();
+    protected GameView getGameView () {
+        return this.game.createView();
     }
 
     public Response selectTile(String username, Coordinate coordinate) {
         assert username != null;
         synchronized (this) {
-            System.out.println(username + " trying to select tile at " + coordinate + " in " + gameName());
+            Logger.writeMessage(username + " trying to select tile at " + coordinate + " in " + gameName());
             try {
                 this.game.selectTile(username, coordinate);
             } catch (IllegalExtractionException | FullSelectionException | IllegalFlowException e) {
                 return new Response(e.toString(), ResponseStatus.FAILURE);
             }
-            System.out.println(username + " selected tile at " + coordinate + " in " + gameName());
+            Logger.write(Logger.Type.MESSAGE, " selected tile at " + coordinate + " in " + gameName());
 
             return new Response("You've selected a tile", ResponseStatus.SUCCESS);
         }
@@ -130,15 +127,6 @@ public class GameController {
 
     public Response startGame(String username) {
         synchronized (this) {
-            try {
-                if (!game.canStartGame(username)) {
-                    return new Response("Only the starting player: " + game.getStartingPlayer().getUsername() +
-                            " can start the game", ResponseStatus.FAILURE);
-                }
-            } catch (IllegalFlowException e) {
-                return new Response(e.getMessage(), ResponseStatus.FAILURE);
-            }
-
             try {
                 game.startGame(username);
             } catch (IllegalFlowException e) {
