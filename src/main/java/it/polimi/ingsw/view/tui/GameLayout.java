@@ -10,9 +10,10 @@ import it.polimi.ingsw.event.data.client.SelectTileEventData;
 import it.polimi.ingsw.event.data.game.BoardChangedEventData;
 import it.polimi.ingsw.event.data.game.BookshelfHasChangedEventData;
 import it.polimi.ingsw.event.data.game.CurrentPlayerChangedEventData;
-import it.polimi.ingsw.event.data.game.GoalEventData;
+import it.polimi.ingsw.event.data.game.InitialGameEventData;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
+import it.polimi.ingsw.model.game.Player;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
 import it.polimi.ingsw.model.tile.Tile;
@@ -319,30 +320,10 @@ public class GameLayout extends AppLayout {
     @Override
     public void setup(String previousLayoutName) {
         if (previousLayoutName.equals(LobbyLayout.NAME)) {
-            selectedBookshelfIndex = 0;
-            playerNames = (List<String>) appDataProvider.get(LobbyLayout.NAME, "playernames");
-            playerPoints = new ArrayList<>(playerNames.size());
-            bookshelves = new ArrayList<>(playerNames.size());
-            for (int i = 0; i < playerNames.size(); i++) {
-                playerPoints.add(0);
-                bookshelves.add(new Bookshelf());
-
-                if (playerNames.get(i).equals(appDataProvider.get(LoginMenuLayout.NAME, "username"))) {
-                    clientPlayerIndex = i;
-                }
-            }
-
-            gameName = appDataProvider.getString(AvailableGamesMenuLayout.NAME, "selectedgame");
-
-            gameNameTextBox.text("Game: " + gameName);
-
             transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME, "transceiver");
             selectTileRequester = Response.requester(transceiver, transceiver, getLock());
             deselectTileRequester = Response.requester(transceiver, transceiver, getLock());
             insertTileRequester = Response.requester(transceiver, transceiver, getLock());
-
-            populateBookshelfMenu();
-            playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
 
             boardDrawable.getNonFillTileDrawables().forEach(tileDrawable -> tileDrawable.onselect(
                 (rowInBoard, columnInBoard) -> displayServerResponse(selectTileRequester.request(new SelectTileEventData(
@@ -362,17 +343,37 @@ public class GameLayout extends AppLayout {
                 });
             }
 
-            GoalEventData.castEventReceiver(transceiver).registerListener(data -> {
+            InitialGameEventData.castEventReceiver(transceiver).registerListener(data -> {
                 synchronized (getLock()) {
-                    commonGoals = new CommonGoal[2];
+                    playingPlayerIndex = 0;
 
-                    // TODO: Disconnected and then reconnected player finds always full points stack
-                    // Remember to re add type adapters to network event transceiver.
-                    commonGoals[0] = CommonGoal.fromIndex(data.getCommonGoal().get(0), playerNames.size());
-                    commonGoals[1] = CommonGoal.fromIndex(data.getCommonGoal().get(1), playerNames.size());
-                    personalGoal = PersonalGoal.fromIndex(data.getPersonalGoal());
+                    playerNames = data.getGameView().getPlayers().stream().map(Player::getUsername)
+                        .toList();
 
+                    clientPlayerIndex = playerNameToIndex(appDataProvider.getString(
+                        LoginMenuLayout.NAME,
+                        "username"
+                    ));
 
+                    selectedBookshelfIndex = clientPlayerIndex;
+
+                    playerPoints = data.getGameView().getPlayers().stream().map(Player::getPoints)
+                        .toList();
+
+                    bookshelves = data.getGameView().getPlayers().stream().map(Player::getBookshelf)
+                        .toList();
+
+                    // TODO: Pass personal goal in a different way
+                    personalGoal = data.getGameView().getPlayers()
+                        .get(clientPlayerIndex).getPersonalGoal();
+
+                    commonGoals = data.getGameView().getCommonGoals();
+
+                    gameName = data.getGameView().getName();
+
+                    gameNameTextBox.text("Game: " + gameName);
+                    populateBookshelfMenu();
+                    playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
                     populateGoalsMenu();
                 }
             });

@@ -59,7 +59,6 @@ public class LobbyLayout extends AppLayout {
 
         setData(new AppLayoutData(
             Map.of(
-                "playernames", () -> playerNames
             )
         ));
 
