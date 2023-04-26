@@ -11,6 +11,7 @@ import it.polimi.ingsw.event.data.game.BoardChangedEventData;
 import it.polimi.ingsw.event.data.game.BookshelfHasChangedEventData;
 import it.polimi.ingsw.event.data.game.CurrentPlayerChangedEventData;
 import it.polimi.ingsw.event.data.game.InitialGameEventData;
+import it.polimi.ingsw.model.board.BoardView;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 import it.polimi.ingsw.model.game.Player;
@@ -221,6 +222,28 @@ public class GameLayout extends AppLayout {
         personalGoalDrawable.populate(personalGoal.getTilesColorMask());
     }
 
+    private void populateBoard(BoardView board) {
+        boardDrawable.getNonFillTileDrawables().forEach(tileDrawable -> {
+            tileDrawable.selected(board.getSelectedCoordinates().contains(
+                new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
+            ));
+
+            tileDrawable.selectable(board.getSelectableCoordinate().contains(
+                new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
+            ) || board.getSelectedCoordinates().contains(
+                new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
+            ));
+
+            Tile tile = board.tileAt(
+                new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
+            );
+
+            TileColor tileColor = (tile == null) ? TileColor.EMPTY : tile.getColor();
+
+            tileDrawable.color(tileColor);
+        });
+    }
+
     private void displayCommonGoalCompleted(int playerIndex, boolean completedFirstCommonGoal,
                                             BookshelfMaskSet bookshelfMaskSet) {
         if (completedFirstCommonGoal) {
@@ -375,6 +398,7 @@ public class GameLayout extends AppLayout {
                     populateBookshelfMenu();
                     playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
                     populateGoalsMenu();
+                    populateBoard(data.getGameView().getBoard());
                 }
             });
 
@@ -391,25 +415,7 @@ public class GameLayout extends AppLayout {
 
             BoardChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 synchronized (getLock()) {
-                    boardDrawable.getNonFillTileDrawables().forEach(tileDrawable -> {
-                        tileDrawable.selected(data.board().getSelectedCoordinates().contains(
-                            new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
-                        ));
-
-                        tileDrawable.selectable(data.board().getSelectableCoordinate().contains(
-                            new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
-                        ) || data.board().getSelectedCoordinates().contains(
-                            new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
-                        ));
-
-                        Tile tile = data.board().tileAt(
-                            new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
-                        );
-
-                        TileColor tileColor = (tile == null) ? TileColor.EMPTY : tile.getColor();
-
-                        tileDrawable.color(tileColor);
-                    });
+                    populateBoard(data.board());
                 }
             });
 
