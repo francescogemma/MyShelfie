@@ -84,6 +84,12 @@ public class GameView implements Identifiable {
         this.winners = new ArrayList<>(other.winners);
         this.isStarted = other.isStarted;
         this.name = other.name;
+
+        // TODO
+        this.commonGoals = new CommonGoal[2];
+        this.commonGoals[0] = other.commonGoals[0];
+        this.commonGoals[1] = other.commonGoals[1];
+
         this.personalGoalIndexes = new ArrayList<>(other.personalGoalIndexes);
         this.personalGoalIndex = other.personalGoalIndex;
         this.players = new ArrayList<>(other.players);
