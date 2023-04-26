@@ -280,12 +280,13 @@ public class Game implements Identifiable {
     }
 
     public void forgetLastSelection(String username, Coordinate c) throws IllegalFlowException {
-        if (isStarted()) throw new IllegalFlowException("Game is not started");
+        if (!isStarted()) throw new IllegalFlowException("Game is not started");
         if (isOver()) throw new IllegalFlowException("Game has ended");
         if (!getCurrentPlayer().getUsername().equals(username)) throw new IllegalFlowException("It's not your turn");
 
         this.board.forgetSelected(c);
         this.transceiver.broadcast(new BoardChangedEventData(board.getView()));
+        this.transceiver.broadcast(new PlayerHasDeselectTile(c));
     }
 
     /**
@@ -396,7 +397,7 @@ public class Game implements Identifiable {
             }
 
             if (players.get(index).equals(players.get(currentPlayerIndex))) {
-                // there is only one player conected
+                // there is only one player connected
                 index = (currentPlayerIndex + 1) % players.size();
             }
 
@@ -428,7 +429,13 @@ public class Game implements Identifiable {
         this.transceiver.broadcast(new BoardChangedEventData(board.getView()));
 
         for (CommonGoal commonGoal: this.commonGoals) {
-            int points = commonGoal.calculatePoints(player.getBookshelf());
+            int points;
+            try {
+                points = commonGoal.calculatePoints(player.getBookshelf());
+            } catch (Exception e) {
+                points = 0;
+            }
+
             if (points > 0) {
                 player.addPoints(points);
 

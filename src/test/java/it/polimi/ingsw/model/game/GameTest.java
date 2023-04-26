@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.event.LocalEventTransceiver;
+import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.model.bag.Bag;
 import it.polimi.ingsw.model.board.Board;
@@ -14,6 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -21,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * Tester for Game
  * @author Giacomo Groppi
  * */
-/*
+
 class GameTest {
     private Game game;
     private LocalEventTransceiver transceiver;
@@ -39,6 +42,14 @@ class GameTest {
             }
         }
         return board;
+    }
+
+    private boolean isPresentEvent(List<EventData> events, String id) {
+        for (EventData event: events) {
+            if (event.getId().equals(id))
+                return true;
+        }
+        return false;
     }
 
     @BeforeEach
@@ -341,7 +352,7 @@ class GameTest {
 
         BoardChangedEventData.castEventReceiver(transceiver).registerListener(event -> {
             call.set(true);
-            boardViewCall.set(event.getBoard());
+            boardViewCall.set(event.board());
         });
 
         try {
@@ -392,7 +403,7 @@ class GameTest {
 
         BoardChangedEventData.castEventReceiver(transceiver).registerListener(event -> {
             call.set(true);
-            boardViewCall.set(event.getBoard());
+            boardViewCall.set(event.board());
         });
 
         game.startGame();
@@ -501,7 +512,7 @@ class GameTest {
         Assertions.assertFalse(game.hasPlayerDisconnected());
     }
 
-    @RepeatedTest(100)
+    @RepeatedTest(500)
     void isOver_signalsEmittedLastPlayerCompleteBookshelf_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException, IllegalExtractionException, FullSelectionException {
         final String usernameUser1 = "Giacomo";
         final String usernameUser2 = "Michele";
@@ -604,14 +615,18 @@ class GameTest {
         });
 
         game.selectTile(usernameUser2, new Coordinate(6, 3));
-        game.insertTile(usernameUser2, 3);
+        try {
+            game.insertTile(usernameUser2, 3);
+        } catch (IllegalStateException e) {
+            Assertions.fail();
+        }
 
         Assertions.assertTrue(call.get());
         Assertions.assertTrue(game.isOver());
     }
 
     //@Test
-    @RepeatedTest(100)
+    @RepeatedTest(500)
     void isOver_signalsEmittedFirstPlayerCompleteBookshelf_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException, IllegalExtractionException, FullSelectionException {
         final String usernameUser1 = "Giacomo";
         final String usernameUser2 = "Michele";
@@ -731,7 +746,41 @@ class GameTest {
         Assertions.assertThrows(IllegalFlowException.class, () -> {
             game.selectTile(usernameUser1, new Coordinate(0, 0));
         });
+
+        Assertions.assertThrows(IllegalFlowException.class, () -> {
+            game.forgetLastSelection(usernameUser1, new Coordinate(4, 0));
+        });
+    }
+
+    @Test
+    void forgetLastSelection_correctDeselect_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException, IllegalExtractionException, FullSelectionException {
+        List<EventData> events = new ArrayList<>();
+
+        BoardChangedEventData.castEventReceiver(transceiver).registerListener(events::add);
+        PlayerHasDeselectTile.castEventReceiver(transceiver).registerListener(events::add);
+
+        final String username1 = "Giacomo";
+        final String username2 = "Michele";
+
+        this.game.addPlayer(username1);
+        this.game.addPlayer(username2);
+
+        Assertions.assertThrows(IllegalFlowException.class, () -> {
+            game.forgetLastSelection(username1, new Coordinate(4, 0));
+        });
+
+        this.game.startGame();
+
+        this.game.selectTile(username1, new Coordinate(4, 0));
+
+        // not current player
+        Assertions.assertThrows(IllegalFlowException.class, () -> {
+            game.forgetLastSelection(username2, new Coordinate(4, 0));
+        });
+
+        this.game.forgetLastSelection(username1, new Coordinate(4, 0));
+
+        Assertions.assertTrue(this.isPresentEvent(events, BoardChangedEventData.ID));
+        Assertions.assertTrue(this.isPresentEvent(events, PlayerHasDeselectTile.ID));
     }
 }
-
-*/

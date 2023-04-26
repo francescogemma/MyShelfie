@@ -360,17 +360,17 @@ public class GameLayout extends AppLayout {
 
             BoardChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 boardDrawable.getNonFillTileDrawables().forEach(tileDrawable -> {
-                    tileDrawable.selected(data.getBoard().getSelectedCoordinates().contains(
+                    tileDrawable.selected(data.board().getSelectedCoordinates().contains(
                         new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
                     ));
 
-                    tileDrawable.selectable(data.getBoard().getSelectableCoordinate().contains(
+                    tileDrawable.selectable(data.board().getSelectableCoordinate().contains(
                         new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
-                    ) || data.getBoard().getSelectedCoordinates().contains(
+                    ) || data.board().getSelectedCoordinates().contains(
                         new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
                     ));
 
-                    Tile tile = data.getBoard().tileAt(
+                    Tile tile = data.board().tileAt(
                         new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
                     );
 

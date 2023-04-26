@@ -98,7 +98,8 @@ public abstract class Goal {
                 throw new IllegalStateException("Evaluator returned a negative number of points");
             }
             return points;
-        } finally {
+        }
+        finally {
             evaluator.clear();
         }
     }
