@@ -380,11 +380,11 @@ public class GameLayout extends AppLayout {
 
                     selectedBookshelfIndex = clientPlayerIndex;
 
-                    playerPoints = data.getGameView().getPlayers().stream().map(Player::getPoints)
-                        .toList();
+                    playerPoints = new ArrayList<>(data.getGameView().getPlayers().stream().map(Player::getPoints)
+                        .toList());
 
-                    bookshelves = data.getGameView().getPlayers().stream().map(Player::getBookshelf)
-                        .toList();
+                    bookshelves = new ArrayList<>(data.getGameView().getPlayers().stream().map(Player::getBookshelf)
+                        .toList());
 
                     // TODO: Pass personal goal in a different way
                     personalGoal = data.getGameView().getPlayers()
