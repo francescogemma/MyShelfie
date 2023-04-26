@@ -358,7 +358,7 @@ class UnixTerminal extends Terminal {
     public int read() throws IOException {
         int readByte = System.in.read();
 
-        if (Platform.isMac() && readByte == 127) {
+        if (readByte == 127) {
             // We always use backspace instead of delete
             return 8;
         }
