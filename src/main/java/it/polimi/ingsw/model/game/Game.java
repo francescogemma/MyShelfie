@@ -26,8 +26,8 @@ public class Game extends GameView{
      * @throws IllegalArgumentException iff the name is empty
      * @throws NullPointerException iff name is null
      */
-    public Game(String name) {
-        super(name);
+    public Game(String name, String username) {
+        super(name, username);
 
         this.personalGoalIndexes = new ArrayList<>(Arrays.asList( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ));
         this.personalGoalIndex = 0;

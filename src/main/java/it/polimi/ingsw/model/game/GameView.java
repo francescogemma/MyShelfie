@@ -50,6 +50,8 @@ public class GameView implements Identifiable {
      */
     protected boolean isStarted;
 
+    protected String creator;
+
     /**
      * The index of the current player in the list of players.
      */
@@ -57,11 +59,11 @@ public class GameView implements Identifiable {
 
     private List<PlayerView> players;
 
-    public GameView (String nameGame) {
-        if (nameGame == null)
+    public GameView (String nameGame, String username) {
+        if (nameGame == null || username == null)
             throw new NullPointerException();
 
-        if (nameGame.length() == 0)
+        if (nameGame.isEmpty() || username.isEmpty())
             throw new IllegalArgumentException("String is empty");
 
         this.name = nameGame;
@@ -70,7 +72,8 @@ public class GameView implements Identifiable {
         this.winners = new ArrayList<>();
         this.currentPlayerIndex = -1;
         this.isStarted = false;
-        players = new ArrayList<>();
+        this.players = new ArrayList<>();
+        this.creator = username;
     }
 
     public GameView(GameView other) {
@@ -79,6 +82,7 @@ public class GameView implements Identifiable {
         this.winners = new ArrayList<>(other.winners);
         this.isStarted = other.isStarted;
         this.name = other.name;
+        this.creator = other.creator;
 
         this.commonGoals = new CommonGoal[other.commonGoals.length];
         for (int i = 0; i < other.commonGoals.length; i++) {
@@ -102,7 +106,7 @@ public class GameView implements Identifiable {
     public boolean canStartGame (String username) throws IllegalFlowException {
         if (isStarted() || isOver() || players.isEmpty())
             throw new IllegalFlowException();
-        return this.players.get(0).equals(username);
+        return this.creator.equals(username);
     }
 
     /**

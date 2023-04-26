@@ -147,8 +147,8 @@ public class MenuController {
         }
     }
 
-    public Response createNewGame(String gameName) {
-        Game game = new Game(gameName);
+    public Response createNewGame(String gameName, String username) {
+        Game game = new Game(gameName, username);
         GameController controller = new GameController(game);
 
         synchronized (gameControllerList) {

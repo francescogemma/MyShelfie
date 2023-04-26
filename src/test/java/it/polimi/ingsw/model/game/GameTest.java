@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 class GameTest {
     private Game game;
     private LocalEventTransceiver transceiver;
+    private final String creator = "Giacomo";
 
     private Board getBoardFull (int numberOfPlayers) {
         Bag bag = new Bag();
@@ -54,28 +55,44 @@ class GameTest {
 
     @BeforeEach
     void setUp () {
-        game = new Game("testing");
+        game = new Game("testing", creator);
         transceiver = new LocalEventTransceiver();
         game.setTransceiver(transceiver);
     }
 
     @Test
     void getName__correctOutput() {
-        Game g2 = new Game("testing2");
+        Game g2 = new Game("testing2", creator);
         Assertions.assertEquals("testing2", g2.getName());
     }
 
     @Test
     void constructor__throwNullPointerException() {
         Assertions.assertThrows(NullPointerException.class, () -> {
-            new Game(null);
+            new Game(null, creator);
+        });
+
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            new Game("prova", null);
+        });
+
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            new Game(null, null);
         });
     }
 
     @Test
     void contructor__throwIllegalArgumentException () {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new Game("");
+            new Game("", "");
+        });
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            new Game("foo", "");
+        });
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            new Game("", "bar");
         });
     }
 
@@ -184,7 +201,7 @@ class GameTest {
 
     @Test
     void setTransceiver_nullPointer_throws () {
-        this.game = new Game("testing");
+        this.game = new Game("testing", creator);
         Assertions.assertThrows(NullPointerException.class, () -> {
             game.setTransceiver(null);
         });

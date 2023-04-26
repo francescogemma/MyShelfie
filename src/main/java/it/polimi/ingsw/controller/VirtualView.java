@@ -60,7 +60,7 @@ public class VirtualView implements EventTransmitter{
     private Response createNewGame (String gameName) {
         if (this.isAuthenticated()) {
             if (!isInGame()) {
-                return MenuController.INSTANCE.createNewGame(gameName);
+                return MenuController.INSTANCE.createNewGame(gameName, username);
             } else {
                 return DEFAULT_MESSAGE_ALREADY_IN_GAME;
             }
