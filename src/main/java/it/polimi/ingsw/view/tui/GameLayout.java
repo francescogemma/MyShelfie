@@ -199,7 +199,8 @@ public class GameLayout extends AppLayout {
     private void populateBookshelfMenu() {
         previousBookshelfButton.focusable(selectedBookshelfIndex > 0);
         nextBookshelfButton.focusable(selectedBookshelfIndex < bookshelves.size() - 1);
-        bookshelfDrawable.focusable(selectedBookshelfIndex == clientPlayerIndex);
+        bookshelfDrawable.focusable(playingPlayerIndex == clientPlayerIndex &&
+            selectedBookshelfIndex == clientPlayerIndex);
         bookshelfDrawable.populate(bookshelves.get(selectedBookshelfIndex));
         playerNameTextBox.text(playerNames.get(selectedBookshelfIndex))
             .color(selectedBookshelfIndex == clientPlayerIndex ? Color.FOCUS : Color.WHITE);
@@ -225,11 +226,11 @@ public class GameLayout extends AppLayout {
                 new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
             ));
 
-            tileDrawable.selectable(board.getSelectableCoordinate().contains(
+            tileDrawable.selectable(playingPlayerIndex == clientPlayerIndex && (board.getSelectableCoordinate().contains(
                 new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
             ) || board.getSelectedCoordinates().contains(
                 new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
-            ));
+            )));
 
             Tile tile = board.tileAt(
                 new Coordinate(tileDrawable.getRowInBoard(), tileDrawable.getColumnInBoard())
@@ -296,6 +297,7 @@ public class GameLayout extends AppLayout {
     private PersonalGoal personalGoal = null;
     private CommonGoal[] commonGoals = null;
     private String gameName;
+    private BoardView board;
 
     private int playerNameToIndex(String name) {
         for (int i = 0; i < playerNames.size(); i++) {
@@ -402,6 +404,9 @@ public class GameLayout extends AppLayout {
                     playingPlayerIndex = playerNameToIndex(data.getUsername());
 
                     playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
+
+                    populateBoard(board);
+                    populateBookshelfMenu();
                 }
             });
 
@@ -414,7 +419,9 @@ public class GameLayout extends AppLayout {
 
             BoardChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 synchronized (getLock()) {
-                    populateBoard(data.board());
+                    board = data.board();
+
+                    populateBoard(board);
                 }
             });
 

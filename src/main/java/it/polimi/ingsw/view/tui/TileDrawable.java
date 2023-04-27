@@ -78,8 +78,13 @@ public class TileDrawable extends Drawable {
         }
 
         return WithBorderBoxDrawable.addBorder(coordinate, size)
-            .map(primitiveSymbol -> primitiveSymbol.highlight(Color.FOCUS, onFocus))
-                .orElse(tileColor == TileColor.EMPTY ? getContent() :
+            .map(primitiveSymbol -> {
+                if (!selectable) {
+                    return primitiveSymbol.blur();
+                }
+
+                return primitiveSymbol.highlight(Color.FOCUS, onFocus);
+            }).orElse(tileColor == TileColor.EMPTY ? getContent() :
                     getContent().colorBackground(tileColorToColor(tileColor)));
     }
 
