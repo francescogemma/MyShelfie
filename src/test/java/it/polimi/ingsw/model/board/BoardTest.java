@@ -37,16 +37,13 @@ class BoardTest {
         }
     }
 
-    @Test
-    void testFill() {
-        final boolean printBoard = false;
+    @RepeatedTest(numberOfRun)
+    void fillRandomly__correctOutput() {
         Bag bag = new Bag();
 
         for (int i = 0; i < 33; i++) {
             assertFalse(board.isFull(2));
             board.fillRandomly(bag.getRandomTile(), 2);
-            if (printBoard) System.out.print(board);
-
         }
 
         assertTrue(board.isFull(2));
@@ -56,7 +53,6 @@ class BoardTest {
         for (int i = 0; i < 7; i++) {
             assertFalse(board.isFull(3));
             board.fillRandomly(bag.getRandomTile(), 3);
-            if (printBoard) System.out.print(board);
         }
 
         assertTrue(board.isFull(3));
@@ -65,14 +61,12 @@ class BoardTest {
         for (int i = 0; i < 5; i++) {
             assertFalse(board.isFull(4));
             board.fillRandomly(bag.getRandomTile(), 4);
-            if (printBoard) System.out.print(board);
-
         }
 
         assertTrue(board.isFull(4));
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     void fillRandomly_boardIsFull_ShouldThrowException() {
         fillBoard(board);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -101,7 +95,7 @@ class BoardTest {
         fillBoard(board, 4);
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     void getSelectableTiles__correctOutput() throws IllegalExtractionException, FullSelectionException {
         fillBoard(board);
 
@@ -117,8 +111,8 @@ class BoardTest {
 
     }
 
-    @Test
-    void testWrongeSelectAfterOne() {
+    @RepeatedTest(numberOfRun)
+    void selectTile_tileWith0FreeSides_throwsIllegalExtractionException() {
         fillBoard(this.board);
 
         Assertions.assertThrows(IllegalExtractionException.class, () -> {
@@ -126,16 +120,17 @@ class BoardTest {
         });
     }
 
-    @Test
-    void testWrongeSelectAfterTwo() throws IllegalExtractionException, FullSelectionException {
+    @RepeatedTest(numberOfRun)
+    void selectTile_diagonal_throwsIllegalExtractionException() throws IllegalExtractionException, FullSelectionException {
         fillBoard(this.board);
         board.selectTile(5, 1);
+
         Assertions.assertThrows(IllegalExtractionException.class, () -> {
             board.selectTile(4, 2);
         });
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     void selectTile_illegalStructure_ShouldThrowException() throws IllegalExtractionException, FullSelectionException {
         fillBoard(this.board, 2);
         board.selectTile(7, 3);
@@ -145,7 +140,7 @@ class BoardTest {
         });
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     void selectTile_verticalExtraction_correctOutput() throws IllegalExtractionException, FullSelectionException {
         fillBoard(this.board, 4);
         board.selectTile(4, 0);
@@ -157,7 +152,7 @@ class BoardTest {
         board.selectTile(5, 1);
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     void selectTile_horizontalExtraction_correctOutput() throws IllegalExtractionException, FullSelectionException {
         fillBoard(this.board, 2);
         board.selectTile(7, 3);
@@ -165,21 +160,14 @@ class BoardTest {
         board.selectTile(7, 5);
     }
 
-    @Test
-    void testSelectDrawOne() throws IllegalExtractionException, FullSelectionException {
+    @RepeatedTest(numberOfRun)
+    void draw_oneSelected_correctOutput() throws IllegalExtractionException, FullSelectionException {
         fillBoard(this.board);
         board.selectTile(7, 3);
         Assertions.assertEquals(1, board.draw().size());
     }
 
-    @Test
-    void testSelectDrawTwo() throws IllegalExtractionException, FullSelectionException {
-        fillBoard(this.board);
-        board.selectTile(7, 3);
-        Assertions.assertEquals(1, board.draw().size());
-    }
-
-    @Test
+    @RepeatedTest(numberOfRun)
     void selectTile_tripleExtractionTwoPlayers_correctOutput() throws IllegalExtractionException, FullSelectionException {
         fillBoard(this.board, 2);
 
@@ -194,8 +182,8 @@ class BoardTest {
         Assertions.assertEquals(3, board.draw().size());
     }
 
-    @Test
-    void testNeedRefill() throws IllegalExtractionException, FullSelectionException {
+    @RepeatedTest(numberOfRun)
+    void needRefill_onlyOneCellWith4FreeBorder_correctOutput() throws IllegalExtractionException, FullSelectionException {
         fillBoard(this.board);
         assertFalse(board.needsRefill());
 
@@ -223,17 +211,19 @@ class BoardTest {
         assertFalse(board.needsRefill());
     }
 
-    @Test
-    void testRemoveSameTile() throws IllegalExtractionException, FullSelectionException {
+    @RepeatedTest(numberOfRun)
+    void selectTile_tileAlreadyInThisSelection_throwsIllegalExtractionException() throws IllegalExtractionException, FullSelectionException {
         fillBoard(this.board);
+
         board.selectTile(4, 0);
         board.selectTile(5, 0);
+
         Assertions.assertThrows(IllegalExtractionException.class, () ->  {
             board.selectTile(4, 0);
         });
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     void selectTile_selectMoreThan4Tile_ShouldThrowException() throws IllegalExtractionException, FullSelectionException {
         fillBoard(this.board, 2);
 
@@ -255,7 +245,7 @@ class BoardTest {
         board.draw();
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     @Description("Make sure that getSelectedTiles does not return null.")
     void getSelectedTiles_testCombination_correctOutput() throws FullSelectionException, IllegalExtractionException {
         fillBoard(board, 2);
@@ -269,7 +259,7 @@ class BoardTest {
         Assertions.assertEquals(3, board.getSelectedTiles().size());
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     @Description("Make sure that needsRefill return false if we didn't touch any Tile on Board")
     void needsRefill_testZeroExtraction_correctOutput () throws FullSelectionException, IllegalExtractionException {
         fillBoard(board);
@@ -285,7 +275,7 @@ class BoardTest {
         assertTrue(board.needsRefill());
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     void needsRefill_testMoreThanFourPlayer_ShouldThrowException() {
         fillBoard(board);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -297,7 +287,7 @@ class BoardTest {
         });
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     void selectTile_coordinateOutside_ShouldThrowException() {
         fillBoard(board);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
@@ -305,7 +295,7 @@ class BoardTest {
         });
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     void selectTile_selectDistanceMoreThan1Vertical_correctOutput () throws IllegalExtractionException, FullSelectionException {
         fillBoard(board, 3);
 
@@ -322,7 +312,7 @@ class BoardTest {
         board.selectTile(4, 2);
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     void selectTile_selectDistanceMoreThan1Horizontal_correctOutput () throws IllegalExtractionException, FullSelectionException {
         fillBoard(board, 3);
 
@@ -338,7 +328,7 @@ class BoardTest {
         board.draw();
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     void getSelectableCoordinate_selectDistanceMoreThan1Horizontal_correctOutput () throws IllegalExtractionException, FullSelectionException {
         fillBoard(board, 4);
 
@@ -354,7 +344,7 @@ class BoardTest {
         Assertions.assertTrue(board.getSelectableCoordinate().contains(new Coordinate(4, 1)));
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     void draw_distanceMoreThan1Vertical_throwIllegalExtractionException () throws IllegalExtractionException, FullSelectionException {
         fillBoard(board, 3);
 
@@ -383,7 +373,7 @@ class BoardTest {
         Assertions.assertEquals(3, tiles.size());
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     void draw_distanceMoreThan1Horizontal_throwIllegalExtractionException() throws IllegalExtractionException, FullSelectionException {
         fillBoard(board, 4);
 
@@ -412,9 +402,8 @@ class BoardTest {
         Assertions.assertEquals(3, tiles.size());
     }
 
-    //@RepeatedTest(numberOfRun)
-    @Test
-    void test () throws IllegalExtractionException, FullSelectionException {
+    @RepeatedTest(numberOfRun)
+    void needsRefill__correctOutput () throws IllegalExtractionException, FullSelectionException {
         fillBoard(board, 3);
 
         List<Coordinate> toBeRemove = new ArrayList<>();
@@ -455,5 +444,4 @@ class BoardTest {
 
         Assertions.assertTrue(board.needsRefill());
     }
-
 }
