@@ -24,8 +24,8 @@ public class TwoTwoByTwoSquaresGoal extends CommonGoal {
         super(  new ShapeFetcher(Shape.SQUARE),
                 new NumDifferentColorFilter(1, 1),
                 new CompatibleEvaluator(2, BookshelfMask.DO_NOT_INTERSECT),
-                "Two groups\n each containing 4\n tiles of the same\n type in a 2x2 square.\n" +
-                        "The tiles of one\n square can be\n different from those\n of the other square.",
+                "Two groups\neach containing four\ntiles of the same\ntype in a 2x2 square.\n" +
+                        "The tiles of one\nsquare can be\ndifferent from those\nof the other square.",
                 Map.ofEntries(
                         entry(Shelf.getInstance(0, 0), TileColor.MAGENTA),
                         entry(Shelf.getInstance(1, 0), TileColor.MAGENTA),

@@ -28,7 +28,7 @@ public class XPatternGoal extends CommonGoal{
         super(new ShapeFetcher(Shape.X),
             new NumDifferentColorFilter(1, 1),
             new AtLeastEvaluator(1),
-            "Five tiles\n of the same type\n forming an X.",
+            "Five tiles\nof the same type\nforming an X.",
             Map.ofEntries(
                 entry(Shelf.getInstance(1, 3), TileColor.YELLOW),
                 entry(Shelf.getInstance(1, 1), TileColor.YELLOW),

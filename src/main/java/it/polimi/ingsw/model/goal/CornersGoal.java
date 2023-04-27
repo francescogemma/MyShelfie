@@ -45,7 +45,7 @@ public class CornersGoal extends CommonGoal {
         super(  new ShapeFetcher(Shape.CORNERS),
                 new NumDifferentColorFilter(1, 1),
                 new AtLeastEvaluator(1),
-                "Four tiles of the same type\n in the four corners.",
+                "Four tiles of the same type\nin the four corners.",
                 Map.ofEntries(
                         entry(Shelf.getInstance(0, 0), TileColor.MAGENTA),
                         entry(Shelf.getInstance(0, 4), TileColor.MAGENTA),

@@ -57,7 +57,7 @@ public class StairGoal extends CommonGoal{
                 )),
                 new NumDifferentColorFilter(1, 6),
                 new AtLeastEvaluator(1, check),
-                "The tiles inside\n the bookshelf must\n take the form\n of a staircase.",
+                "The tiles inside\nthe bookshelf must\ntake the form\nof a staircase.",
                 Map.ofEntries(
                         entry(Shelf.getInstance(1, 0), TileColor.GREEN),
                         entry(Shelf.getInstance(2, 0), TileColor.MAGENTA),

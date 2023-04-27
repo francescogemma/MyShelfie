@@ -46,8 +46,8 @@ public class ThreeColumnsGoal extends CommonGoal {
                 new ShapeFetcher(Shape.getColumn(6)),
                 new NumDifferentColorFilter(1, 3),
                 new AtLeastEvaluator(3),
-                "Three columns\n each formed by\n 6 tiles of maximum\n three different types,\n" +
-                        " one column can\n show the same or\n a different combination\n of another column.",
+                "Three columns\neach formed by\nsix tiles of maximum\nthree different types,\n" +
+                        "one column can\nshow the same or\na different combination\nof another column.",
                 Map.ofEntries(
                         entry(Shelf.getInstance(0, 0), TileColor.MAGENTA),
                         entry(Shelf.getInstance(1, 0), TileColor.BLUE),

@@ -21,7 +21,7 @@ public class RowFiveAllDifferentColor extends CommonGoal{
                 new ShapeFetcher(Shape.getRow(5)),
                 new NumDifferentColorFilter(5, 5),
                 new AtLeastEvaluator(2, bookshelfMask -> bookshelfMask.getShelves().size() >= 2),
-                "Two rows,\n each consisting of\n 5 different types\n of tiles.",
+                "Two rows,\neach consisting of\nfive different\ntypes of tiles.",
                 Map.ofEntries(
                         entry(Shelf.getInstance(1, 0), TileColor.GREEN),
                         entry(Shelf.getInstance(1, 1), TileColor.BLUE),

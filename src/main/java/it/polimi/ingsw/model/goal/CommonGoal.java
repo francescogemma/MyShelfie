@@ -81,6 +81,11 @@ public abstract class CommonGoal extends IndexedGoal {
         };
     }
 
+    /**
+     * @param index the index of the common goal.
+     * @param playersAmount the number of players in the game.
+     * @return a new common goal which type depends on the index, with the point stack set according to the number of players
+     */
     public static CommonGoal fromIndex(int index, int playersAmount) {
         CommonGoal commonGoal = fromIndex(index);
 

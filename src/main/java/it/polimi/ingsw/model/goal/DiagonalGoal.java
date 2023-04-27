@@ -50,7 +50,7 @@ public class DiagonalGoal extends CommonGoal {
                 )),
                 new NumDifferentColorFilter(1, 1),
                 new AtLeastEvaluator(1),
-                "Five tiles of the same\n type forming a diagonal.",
+                "Five tiles of the same\ntype forming a diagonal.",
                 Map.ofEntries(
                         entry(Shelf.getInstance(0, 0), TileColor.MAGENTA),
                         entry(Shelf.getInstance(1, 1), TileColor.MAGENTA),

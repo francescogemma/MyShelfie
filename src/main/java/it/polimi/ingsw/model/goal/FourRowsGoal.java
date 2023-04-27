@@ -46,8 +46,8 @@ public class FourRowsGoal extends CommonGoal {
                 new ShapeFetcher(Shape.getRow(5)),
                 new NumDifferentColorFilter(1, 3),
                 new AtLeastEvaluator(4),
-                "Four lines each formed\n by 5 tiles of maximum\n three different types,\n" +
-                        " one line can show\n the same or a different\n combination of another line.",
+                "Four lines each formed\nby five tiles of maximum\nthree different types,\n" +
+                        " one line can show\nthe same or a different\ncombination of another line.",
                 Map.ofEntries(
                         entry(Shelf.getInstance(0, 0), TileColor.GREEN),
                         entry(Shelf.getInstance(0, 1), TileColor.GREEN),

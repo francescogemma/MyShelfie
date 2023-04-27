@@ -37,7 +37,7 @@ public class ColumnDifferentGoal extends CommonGoal {
                 new ShapeFetcher(Shape.getColumn(6)),
                 new NumDifferentColorFilter(6, 6),
                 new AtLeastEvaluator(2, bookshelfMask -> bookshelfMask.getShelves().size() >= 2),
-                "Two columns made up,\n each one, of\n all different colors.",
+                "Two columns made up,\neach one, of\nall different colors.",
                 Map.ofEntries(
                         entry(Shelf.getInstance(0, 1), TileColor.MAGENTA),
                         entry(Shelf.getInstance(1, 1), TileColor.BLUE),

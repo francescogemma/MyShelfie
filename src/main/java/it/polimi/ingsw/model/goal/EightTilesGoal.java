@@ -47,7 +47,7 @@ public class EightTilesGoal extends CommonGoal {
                 new ShapeFetcher(Shape.WHOLE_BOOKSHELF),
                 new AcceptsAllFilter(),
                 new EightTilesGoalEvaluator(),
-                "Eight tiles of the same type,\n there's no restriction about\n the position of these tiles.",
+                "Eight tiles of the same type,\nthere's no restriction about\nthe position of these tiles.",
                 Map.ofEntries(
                         entry(Shelf.getInstance(0, 0), TileColor.GREEN),
                         entry(Shelf.getInstance(0, 2), TileColor.GREEN),

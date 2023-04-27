@@ -23,8 +23,8 @@ public class SixGroupsTwoTilesGoal extends CommonGoal {
         super(  new AdjacencyFetcher(),
                 new NumDifferentColorFilter(1, 1),
                 new AtLeastEvaluator(6, bookshelfMask -> bookshelfMask.getShelves().size() >= 2),
-                "Six groups\n each containing\n at least 2 tiles\n of the same type.\n " +
-                        "The tiles of\n one group can be\n different from those\n of another group.",
+                "Six groups\neach containing\nat least two tiles\nof the same type.\n" +
+                        "The tiles of\none group can be\ndifferent from those\nof another group.",
                 Map.ofEntries(
                         entry(Shelf.getInstance(0, 0), TileColor.GREEN),
                         entry(Shelf.getInstance(0, 1), TileColor.GREEN),
