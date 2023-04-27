@@ -13,7 +13,7 @@ import it.polimi.ingsw.utils.Coordinate;
 
 import java.util.*;
 
-public class Game extends GameView{
+public class Game extends GameView {
     private transient LocalEventTransceiver transceiver;
 
     private final List<Player> players;

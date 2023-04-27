@@ -18,22 +18,7 @@ import java.util.List;
  *
  * @author Cristiano Migali
  */
-public class Bookshelf {
-    /**
-     * The number of rows in the bookshelf grid.
-     */
-    public static final int ROWS = 6;
-
-    /**
-     * The number of columns in the bookshelf grid.
-     */
-    public static final int COLUMNS = 5;
-
-    /**
-     * The maximum number of tiles that can be inserted in the bookshelf within a single insertion.
-     */
-    private static final int MAX_INSERTION_SIZE = 3;
-
+public class Bookshelf extends BookshelfView {
     /**
      * @param row is the index of the row that we want to check.
      * @return true if the argument row corresponds to the index of a row which is inside the bookshelf,
@@ -53,40 +38,15 @@ public class Bookshelf {
     }
 
     /**
-     * The content of the bookshelf. In particular inside content[i][j] is stored the tile that is on
-     * the shelf at the ith row and jth column, inside the bookshelf.
-     * (Remember that rows and columns are enumerated starting from 0).
-     * The field is protected to allow direct access from a mock subclass, used for testing purpose.
-     */
-    protected final Tile[][] content = new Tile[ROWS][COLUMNS];
-
-    /**
      * Constructor of the class.
      * Creates a new bookshelf where every shelf is empty.
      */
     public Bookshelf() {
-        for (int row = 0; row < ROWS; row++) {
-            for (int column = 0; column < COLUMNS; column++) {
-                content[row][column] = Tile.getInstance(TileColor.EMPTY, TileVersion.FIRST);
-            }
-        }
+
     }
 
     public Bookshelf(Bookshelf other) {
-        for (int r = 0; r < content.length; r ++) {
-            for (int c = 0; c < content[r].length; c ++) {
-                content[r][c] = other.content[r][c];
-            }
-        }
-    }
-
-    /**
-     * @param shelf where we want to know what kind of {@link TileColor color} is the {@link Tile tile} in it.
-     * @return the {@link TileColor color of the tile} inside the specified shelf.
-     * @throws NullPointerException if shelf is null.
-     */
-    public TileColor getTileColorAt(Shelf shelf) {
-        return content[shelf.getRow()][shelf.getColumn()].getColor();
+        super(other);
     }
 
     /**
@@ -161,21 +121,6 @@ public class Bookshelf {
             content[row][column] = tile;
             row--;
         }
-    }
-
-    /**
-     * @return true iff it is not possible to insert new Tiles in the bookshelf.
-     * @author Giacomo Groppi
-     * */
-    public boolean isFull () {
-        for (int i = 0; i < Bookshelf.COLUMNS; i++) {
-            TileColor tile = getTileColorAt(Shelf.getInstance(0, i));
-            if (tile.equals(TileColor.EMPTY)){
-                return false;
-            }
-        }
-
-        return true;
     }
 
     @Override
