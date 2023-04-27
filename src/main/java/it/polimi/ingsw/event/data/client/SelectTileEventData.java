@@ -10,31 +10,22 @@ import it.polimi.ingsw.utils.Coordinate;
 
 import java.util.function.Function;
 
-public class SelectTileEventData implements EventData {
+public record SelectTileEventData(Coordinate coordinate) implements EventData {
     public static final String ID = "SELECT_TILE";
-    private final Coordinate coordinate;
-
-    public SelectTileEventData(Coordinate coordinate) {
-        this.coordinate = coordinate;
-    }
-
-    public Coordinate getCoordinate () {
-        return this.coordinate;
-    }
 
     public static CastEventReceiver<SelectTileEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }
 
     public static <T extends EventData> Requester<SelectTileEventData, T> requester(EventTransmitter transmitter,
-                                                                                  EventReceiver<EventData> receiver,
+                                                                                    EventReceiver<EventData> receiver,
                                                                                     Object responsesLock) {
         return new Requester<>(ID, transmitter, receiver, responsesLock);
     }
 
     public static <T extends EventData> Responder<SelectTileEventData, T> responder(EventTransmitter transmitter,
-                                                                                  EventReceiver<EventData> receiver,
-                                                                                  Function<SelectTileEventData, T> response) {
+                                                                                    EventReceiver<EventData> receiver,
+                                                                                    Function<SelectTileEventData, T> response) {
         return new Responder<>(ID, transmitter, receiver, response);
     }
 

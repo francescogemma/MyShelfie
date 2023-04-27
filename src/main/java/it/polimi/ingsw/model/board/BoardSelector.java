@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
+import static java.lang.Math.*;
 
 /**
  * Manager for Tile selection
@@ -27,6 +26,21 @@ class BoardSelector extends BoardSelectorView {
      * */
     public int selectionSize() {
         return this.selected.size();
+    }
+
+    /*
+     * we assume the extraction is legal from now
+    * */
+    private int distanceFromTwoSelectedTile () {
+        assert selected.size() == 2;
+        final Coordinate c1 = selected.get(0);
+        final Coordinate c2 = selected.get(1);
+
+        if (c1.getCol() == c2.getCol()) {
+            return abs(c1.getRow() - c2.getRow());
+        } else {
+            return abs(c1.getCol() - c2.getCol());
+        }
     }
 
     /**
@@ -56,30 +70,52 @@ class BoardSelector extends BoardSelectorView {
             case 1 -> {
                 final int r = this.selected.get(0).getRow();
                 final int c = this.selected.get(0).getCol();
+
+                // all possible combination of distance 1 or 2
                 res.addAll(Arrays.asList(
                         new Coordinate(r, c + 1),
+                        new Coordinate(r, c + 2),
+
                         new Coordinate(r ,c - 1),
+                        new Coordinate(r, c - 2),
+
+
                         new Coordinate(r + 1, c),
-                        new Coordinate(r - 1, c)
+                        new Coordinate(r + 2, c),
+
+                        new Coordinate(r - 1, c),
+                        new Coordinate(r - 2, c)
                 ));
             }
             case 2 -> {
-                if (isVerticalExtraction()) {
-                    final int col = this.selected.get(0).getCol();
-                    final int biggerRow =   max(selected.get(0).getRow(), selected.get(1).getRow());
-                    final int smallerRow =  min(selected.get(0).getRow(), selected.get(1).getRow());
-                    res.addAll(Arrays.asList(
-                            new Coordinate(smallerRow - 1, col),
-                            new Coordinate(biggerRow + 1, col)
-                    ));
+                if (distanceFromTwoSelectedTile() == 1) {
+                    if (isVerticalExtraction()) {
+                        final int col = this.selected.get(0).getCol();
+                        final int biggerRow =   max(selected.get(0).getRow(), selected.get(1).getRow());
+                        final int smallerRow =  min(selected.get(0).getRow(), selected.get(1).getRow());
+                        res.addAll(Arrays.asList(
+                                new Coordinate(smallerRow - 1, col),
+                                new Coordinate(biggerRow + 1, col)
+                        ));
+                    } else {
+                        final int row = this.selected.get(0).getRow();
+                        final int biggerCol =   max(selected.get(0).getCol(), selected.get(1).getCol());
+                        final int smallerCol =  min(selected.get(0).getCol(), selected.get(1).getCol());
+                        res.addAll(Arrays.asList(
+                                new Coordinate(row, smallerCol - 1),
+                                new Coordinate(row, biggerCol + 1)
+                        ));
+                    }
                 } else {
-                    final int row = this.selected.get(0).getRow();
-                    final int biggerCol =   max(selected.get(0).getCol(), selected.get(1).getCol());
-                    final int smallerCol =  min(selected.get(0).getCol(), selected.get(1).getCol());
-                    res.addAll(Arrays.asList(
-                            new Coordinate(row, smallerCol - 1),
-                            new Coordinate(row, biggerCol + 1)
-                    ));
+                    if (isVerticalExtraction()) {
+                        final int col = this.selected.get(0).getCol();
+                        final int biggerRow = max(selected.get(0).getRow(), selected.get(1).getRow());
+                        res.add(new Coordinate(biggerRow - 1, col));
+                    } else {
+                        final int row = selected.get(0).getRow();
+                        final int biggerCol = max(selected.get(0).getCol(), selected.get(1).getCol());
+                        res.add(new Coordinate(row, biggerCol - 1 ));
+                    }
                 }
             }
             default -> res = new ArrayList<>();

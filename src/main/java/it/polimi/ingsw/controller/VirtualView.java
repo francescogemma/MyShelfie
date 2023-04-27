@@ -32,7 +32,7 @@ public class VirtualView implements EventTransmitter{
         LoginEventData.responder(transceiver, transceiver,          event -> login(event.getUsername(), event.getPassword()));
         StartGameEventData.responder(transceiver, transceiver,      event -> startGame());
         InsertTileEventData.responder(transceiver, transceiver,     event -> insertTile(event.column()));
-        SelectTileEventData.responder(transceiver, transceiver,     event -> selectTile(event.getCoordinate()));
+        SelectTileEventData.responder(transceiver, transceiver,     event -> selectTile(event.coordinate()));
         DeselectTileEventData.responder(transceiver, transceiver,   event -> deselectTile(event.coordinate()));
         JoinGameEventData.responder(transceiver, transceiver,       event -> joinGame(event.gameName()));
         CreateNewGameEventData.responder(transceiver, transceiver,  event -> createNewGame(event.gameName()));

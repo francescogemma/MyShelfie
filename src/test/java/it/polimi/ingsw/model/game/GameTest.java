@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicReference;
  * Tester for Game
  * @author Giacomo Groppi
  * */
-
 class GameTest {
     private Game game;
     private LocalEventTransceiver transceiver;

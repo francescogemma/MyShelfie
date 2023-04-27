@@ -81,9 +81,8 @@ public class Board extends BoardView {
      * @return The {@link Tile Tile} selected.
     * */
     public Tile selectTile(Coordinate c) throws IllegalExtractionException, FullSelectionException {
-        if (isOutOfBoard(c)) {
+        if (isOutOfBoard(c))
             throw new IllegalArgumentException("It's out of the board");
-        }
 
         if (this.isEmpty(c))
             throw new IllegalExtractionException("Can't extract tile at: [" + c.getRow() + ", " + c.getCol() + "] because tile is empty");
@@ -163,8 +162,7 @@ public class Board extends BoardView {
     }
 
     private Tile remove (Coordinate c) {
-        if (this.isEmpty(c))
-            throw new IllegalArgumentException();
+        assert !isEmpty(c);
 
         Tile t = this.tileAt(c);
         this.occupied --;
@@ -175,18 +173,12 @@ public class Board extends BoardView {
     // TODO: javadoc
     public void forgetSelected (Coordinate c) {
         if (!this.boardSelector.contains(c))
-            throw new IllegalArgumentException("Cooridnate is not selected");
+            throw new IllegalArgumentException("Coordinate is not selected");
 
         if (!this.boardSelector.lastSelected().equals(c))
             throw new RemoveNotLastSelectedException();
 
         this.boardSelector.forgetLastSelected();
-    }
-
-    // TODO: javadoc
-    // TODO: Allow to deselect one tile at the time
-    public void forgetSelection () {
-        this.boardSelector = new BoardSelector();
     }
 
     @Override

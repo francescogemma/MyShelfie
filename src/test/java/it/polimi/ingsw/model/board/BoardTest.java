@@ -5,8 +5,12 @@ import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.bag.Bag;
 
 import it.polimi.ingsw.model.tile.TileVersion;
+import it.polimi.ingsw.utils.Coordinate;
 import jdk.jfr.Description;
 import org.junit.jupiter.api.*;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,6 +19,25 @@ class BoardTest {
     @BeforeEach
     public void setUp() {
         board = new Board();
+    }
+
+    private void removeAndDraw (Coordinate coordinate) throws IllegalExtractionException, FullSelectionException {
+        assert coordinate != null;
+        board.selectTile(coordinate);
+        board.draw();
+    }
+
+    private void removeAndDraw(List<Coordinate> coordinate) {
+        coordinate.forEach(
+                c -> {
+                    try {
+                        board.selectTile(c);
+                    } catch (IllegalExtractionException | FullSelectionException e) {
+                        Assertions.fail();
+                    }
+                    board.draw();
+                }
+        );
     }
 
     @Test
@@ -283,6 +306,38 @@ class BoardTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             board.selectTile(-1, 5);
         });
+    }
 
+    @Test
+    void selectTile_selectDistanceMoreThan1Vertical_correctOutput () throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 3);
+
+        this.removeAndDraw(Arrays.asList(
+                new Coordinate(4, 0),
+                new Coordinate(5, 0),
+                new Coordinate(3, 1),
+                new Coordinate(4, 1),
+                new Coordinate(5, 1)
+        ));
+
+        board.selectTile(3, 2);
+        board.selectTile(5, 2);
+        board.selectTile(4, 2);
+    }
+
+    @Test
+    void selectTile_selectDistanceMoreThan1Horizontal_correctOutput () throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 3);
+
+        this.removeAndDraw(Arrays.asList(
+                new Coordinate(0, 3),
+                new Coordinate(1, 3),
+                new Coordinate(1, 4)
+        ));
+
+        board.selectTile(2, 2);
+        board.selectTile(2, 4);
+        board.selectTile(2, 3);
+        board.draw();
     }
 }
