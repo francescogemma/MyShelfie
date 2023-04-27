@@ -79,7 +79,6 @@ class BoardSelector extends BoardSelectorView {
                         new Coordinate(r ,c - 1),
                         new Coordinate(r, c - 2),
 
-
                         new Coordinate(r + 1, c),
                         new Coordinate(r + 2, c),
 

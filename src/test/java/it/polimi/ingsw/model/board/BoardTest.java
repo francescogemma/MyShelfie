@@ -340,4 +340,20 @@ class BoardTest {
         board.selectTile(2, 3);
         board.draw();
     }
+
+    @Test
+    void test () throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 4);
+
+        this.removeAndDraw(Arrays.asList(
+                new Coordinate(4, 0),
+                new Coordinate(5, 0)
+        ));
+
+        board.selectTile(3, 1);
+
+        Assertions.assertEquals(2, board.getSelectableCoordinate().size());
+        Assertions.assertTrue(board.getSelectableCoordinate().contains(new Coordinate(5, 1)));
+        Assertions.assertTrue(board.getSelectableCoordinate().contains(new Coordinate(4, 1)));
+    }
 }

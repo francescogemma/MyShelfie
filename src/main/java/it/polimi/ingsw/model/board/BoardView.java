@@ -128,13 +128,12 @@ public class BoardView {
             return new ArrayList<>();
         }
 
-        Consumer<Coordinate> a = p -> {
-            if (numberOfFreeSides(p) > 0 && !isEmpty(p))
-                res.add(p);
-        };
-
         switch (boardSelector.selectionSize()) {
             case 0 -> {
+                Consumer<Coordinate> a = p -> {
+                    if (numberOfFreeSides(p) > 0 && !isEmpty(p))
+                        res.add(p);
+                };
                 Board.TWO_PLAYER_POSITIONS.forEach(a);
                 Board.THREE_PLAYER_POSITIONS.forEach(a);
                 Board.FOUR_PLAYER_POSITIONS.forEach(a);
@@ -145,11 +144,15 @@ public class BoardView {
                             .stream()
                             .filter(p -> !isOutOfBoard(p))
                             .filter(p -> !isEmpty(p))
-                            .filter(p -> numberOfFreeSides(p) > 0)
+                            .filter(this::canExtractForNumberOfFreeSides)
                             .forEach(res::add);
         }
 
         return res;
+    }
+
+    private boolean canExtractForNumberOfFreeSides (Coordinate coordinate) {
+        return this.numberOfFreeSides(coordinate) > 0;
     }
 
     protected boolean isOutOfBoard (Coordinate c) {
