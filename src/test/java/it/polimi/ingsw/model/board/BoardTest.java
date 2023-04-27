@@ -27,17 +27,11 @@ class BoardTest {
         board.draw();
     }
 
-    private void removeAndDraw(List<Coordinate> coordinate) {
-        coordinate.forEach(
-                c -> {
-                    try {
-                        board.selectTile(c);
-                    } catch (IllegalExtractionException | FullSelectionException e) {
-                        Assertions.fail();
-                    }
-                    board.draw();
-                }
-        );
+    private void removeAndDraw(List<Coordinate> coordinates) throws IllegalExtractionException, FullSelectionException {
+        for (Coordinate coordinate: coordinates) {
+            board.selectTile(coordinate);
+            board.draw();
+        }
     }
 
     @Test
@@ -342,7 +336,7 @@ class BoardTest {
     }
 
     @Test
-    void test () throws IllegalExtractionException, FullSelectionException {
+    void getSelectableCoordinate_selectDistanceMoreThan1Horizontal_correctOutput () throws IllegalExtractionException, FullSelectionException {
         fillBoard(board, 4);
 
         this.removeAndDraw(Arrays.asList(
@@ -355,5 +349,63 @@ class BoardTest {
         Assertions.assertEquals(2, board.getSelectableCoordinate().size());
         Assertions.assertTrue(board.getSelectableCoordinate().contains(new Coordinate(5, 1)));
         Assertions.assertTrue(board.getSelectableCoordinate().contains(new Coordinate(4, 1)));
+    }
+
+    @Test
+    void draw_distanceMoreThan1Vertical_throwIllegalExtractionException () throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 3);
+
+        this.removeAndDraw(Arrays.asList(
+                new Coordinate(4, 0),
+                new Coordinate(5, 0)
+        ));
+
+        board.selectTile(3, 1);
+        board.selectTile(5, 1);
+
+        Assertions.assertThrows(IllegalExtractionException.class, () -> {
+            board.draw();
+        });
+
+        board.selectTile(4, 1);
+
+        List<Coordinate> coordinates = board.getSelectedCoordinates();
+
+        Assertions.assertEquals(new Coordinate(3, 1), coordinates.get(0));
+        Assertions.assertEquals(new Coordinate(5, 1), coordinates.get(1));
+        Assertions.assertEquals(new Coordinate(4, 1), coordinates.get(2));
+
+        List<Tile> tiles = board.draw();
+
+        Assertions.assertEquals(3, tiles.size());
+    }
+
+    @Test
+    void draw_distanceMoreThan1Horizontal_throwIllegalExtractionException() throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 4);
+
+        this.removeAndDraw(Arrays.asList(
+                new Coordinate(0, 3),
+                new Coordinate(0, 4)
+        ));
+
+        board.selectTile(1, 3);
+        board.selectTile(1, 5);
+
+        Assertions.assertThrows(IllegalExtractionException.class, () -> {
+            board.draw();
+        });
+
+        board.selectTile(1, 4);
+
+        List<Coordinate> coordinates = board.getSelectedCoordinates();
+
+        Assertions.assertEquals(new Coordinate(1, 3), coordinates.get(0));
+        Assertions.assertEquals(new Coordinate(1, 5), coordinates.get(1));
+        Assertions.assertEquals(new Coordinate(1, 4), coordinates.get(2));
+
+        List<Tile> tiles = board.draw();
+
+        Assertions.assertEquals(3, tiles.size());
     }
 }

@@ -122,6 +122,17 @@ class BoardSelector extends BoardSelectorView {
         return res;
     }
 
+    public List<Coordinate> draw () throws IllegalExtractionException {
+        if (selectionSize() == 0)
+            throw new IllegalExtractionException("Tiles selected is empty");
+
+        if (selectionSize() == 2 && distanceFromTwoSelectedTile() > 1) {
+            throw new IllegalExtractionException("You can't extract tiles in this order");
+        }
+
+        return new ArrayList<>(selected);
+    }
+
     /**
      * The function checks that wrong positions are not selected, but it does not check whether the cell can actually be selected, i.e., whether it has a free side.
      * @exception IllegalExtractionException if the position of the Tile is along the diagonal

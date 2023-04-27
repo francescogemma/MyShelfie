@@ -103,11 +103,11 @@ public class Board extends BoardView {
      * The function removes the tiles from the board and return a List of selected {@link Tile tiles}.
      * @return The list of all selected {@link Tile tiles}.
      */
-    public List<Tile> draw() {
+    public List<Tile> draw() throws IllegalExtractionException {
         List<Tile> res = new ArrayList<>();
 
         this.boardSelector
-                .getSelected()
+                .draw()
                 .forEach(t -> res.add(this.remove(t)));
 
         this.boardSelector = new BoardSelector();
