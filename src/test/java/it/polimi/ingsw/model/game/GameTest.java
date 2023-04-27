@@ -29,6 +29,8 @@ class GameTest {
     private LocalEventTransceiver transceiver;
     private final String creator = "Giacomo";
 
+    private static final int numberOfRun = 1000;
+
     private Board getBoardFull (int numberOfPlayers) {
         Bag bag = new Bag();
         Board board = new Board();
@@ -528,7 +530,7 @@ class GameTest {
         Assertions.assertFalse(game.hasPlayerDisconnected());
     }
 
-    @RepeatedTest(500)
+    @RepeatedTest(numberOfRun)
     void isOver_signalsEmittedLastPlayerCompleteBookshelf_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException, IllegalExtractionException, FullSelectionException {
         final String usernameUser1 = "Giacomo";
         final String usernameUser2 = "Michele";
@@ -641,8 +643,7 @@ class GameTest {
         Assertions.assertTrue(game.isOver());
     }
 
-    //@Test
-    @RepeatedTest(500)
+    @RepeatedTest(numberOfRun)
     void isOver_signalsEmittedFirstPlayerCompleteBookshelf_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException, IllegalExtractionException, FullSelectionException {
         final String usernameUser1 = "Giacomo";
         final String usernameUser2 = "Michele";

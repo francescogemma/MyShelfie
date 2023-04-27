@@ -22,7 +22,7 @@ import java.util.Map;
 public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
     private static final Map<String, Type> EVENT_DATA_TYPES = Map.ofEntries(
             Map.entry(LoginEventData.ID, LoginEventData.class),
-            Map.entry(PlayerPointsChangeEventData.ID, PlayerPointsChangeEventData.class),
+            Map.entry(CommonGoalCompletedEventData.ID, CommonGoalCompletedEventData.class),
             Map.entry(BoardChangedEventData.ID, BoardChangedEventData.class),
             Map.entry(GameOverEventData.ID, GameOverEventData.class),
             Map.entry(CurrentPlayerChangedEventData.ID, CurrentPlayerChangedEventData.class),

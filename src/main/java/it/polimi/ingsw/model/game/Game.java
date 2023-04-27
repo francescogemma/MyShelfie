@@ -1,6 +1,8 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.event.LocalEventTransceiver;
+import it.polimi.ingsw.event.data.EventData;
+import it.polimi.ingsw.event.data.client.CreateNewGameEventData;
 import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
@@ -10,6 +12,7 @@ import it.polimi.ingsw.model.goal.Goal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.utils.Coordinate;
+import it.polimi.ingsw.utils.Pair;
 
 import java.util.*;
 
@@ -224,6 +227,10 @@ public class Game extends GameView {
         throw new NoPlayerConnectedException();
     }
 
+    private void broadcast(EventData eventData) {
+        this.transceiver.broadcast(eventData);
+    }
+
     private void calculateNextPlayer() throws IllegalFlowException {
         assert this.players.size() >= 2 && this.players.size() <= 4;
         assert this.isStarted;
@@ -237,8 +244,6 @@ public class Game extends GameView {
                 int personalGoalPoints = player.getPersonalGoal().calculatePoints(player.getBookshelf());
                 if (personalGoalPoints > 0) {
                     player.addPoints(personalGoalPoints);
-
-                    this.transceiver.broadcast(new PlayerPointsChangeEventData(player, player.getPersonalGoal().getPointMasks()));
                 }
 
                 Goal adjacencyGoal = new AdjacencyGoal();
@@ -246,8 +251,6 @@ public class Game extends GameView {
 
                 if (adjacencyGoalPoints > 0) {
                     player.addPoints(adjacencyGoalPoints);
-
-                    this.transceiver.broadcast(new PlayerPointsChangeEventData(player, adjacencyGoal.getPointMasks()));
                 }
             }
 
@@ -262,7 +265,20 @@ public class Game extends GameView {
                 }
             }
 
-            this.transceiver.broadcast(new GameOverEventData(this.getWinners()));
+            broadcast(
+                    new GameOverEventData(
+                            this.getWinners(),
+                            players
+                                    .stream()
+                                    .map(p ->
+                                        new Pair<>(
+                                                p.getPersonalGoal().getIndex(),
+                                                p.getPersonalGoal().getPointMasks()
+                                        )
+                                    )
+                                    .toList()
+                            )
+            );
         } else {
             this.refillBoardIfNecessary();
 
@@ -319,7 +335,7 @@ public class Game extends GameView {
             if (points > 0) {
                 player.addPoints(points);
 
-                this.transceiver.broadcast(new PlayerPointsChangeEventData(player, commonGoal.getPointMasks()));
+                broadcast(new CommonGoalCompletedEventData(player, commonGoal.getPointMasks(), commonGoal.getIndex()));
             }
         }
 
