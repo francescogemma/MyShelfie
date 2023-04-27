@@ -166,14 +166,14 @@ public class BoardView {
      */
     public boolean needsRefill() {
         Predicate<Coordinate> checkEdges = c ->
-                !isEmpty(c) && (numberOfFreeSides(c) == 4);
+            isEmpty(c) || numberOfFreeSides(c) == 4;
 
         if (this.occupied == 0)
             return true;
 
-        return  Board.TWO_PLAYER_POSITIONS.stream().anyMatch(checkEdges) ||
-                Board.THREE_PLAYER_POSITIONS.stream().anyMatch(checkEdges) ||
-                Board.FOUR_PLAYER_POSITIONS.stream().anyMatch(checkEdges);
+        return  Board.TWO_PLAYER_POSITIONS.stream().allMatch(checkEdges) &&
+                Board.THREE_PLAYER_POSITIONS.stream().allMatch(checkEdges) &&
+                Board.FOUR_PLAYER_POSITIONS.stream().allMatch(checkEdges);
     }
 
     /**

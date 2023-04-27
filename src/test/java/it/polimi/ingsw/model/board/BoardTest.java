@@ -9,6 +9,7 @@ import it.polimi.ingsw.utils.Coordinate;
 import jdk.jfr.Description;
 import org.junit.jupiter.api.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,6 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
     private Board board;
+    private static final int numberOfRun = 100;
+
     @BeforeEach
     public void setUp() {
         board = new Board();
@@ -217,7 +220,7 @@ class BoardTest {
         assertFalse(board.needsRefill());
 
         board.selectTile(3, 8); board.draw();
-        assertTrue(board.needsRefill());
+        assertFalse(board.needsRefill());
     }
 
     @Test
@@ -408,4 +411,49 @@ class BoardTest {
 
         Assertions.assertEquals(3, tiles.size());
     }
+
+    //@RepeatedTest(numberOfRun)
+    @Test
+    void test () throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 3);
+
+        List<Coordinate> toBeRemove = new ArrayList<>();
+        toBeRemove.add(new Coordinate(5, 0));
+        toBeRemove.add(new Coordinate(3, 1));
+        toBeRemove.add(new Coordinate(3, 2));
+        toBeRemove.add(new Coordinate(4, 2));
+        toBeRemove.add(new Coordinate(5, 2));
+        toBeRemove.add(new Coordinate(5, 3));
+        toBeRemove.add(new Coordinate(6, 3));
+        toBeRemove.add(new Coordinate(3, 3));
+        toBeRemove.add(new Coordinate(2, 3));
+        toBeRemove.add(new Coordinate(1, 3));
+        toBeRemove.add(new Coordinate(2, 4));
+        toBeRemove.add(new Coordinate(2, 5));
+        toBeRemove.add(new Coordinate(3, 5));
+        toBeRemove.add(new Coordinate(3, 6));
+        toBeRemove.add(new Coordinate(3, 8));
+        toBeRemove.add(new Coordinate(5, 4));
+        toBeRemove.add(new Coordinate(4, 4));
+        toBeRemove.add(new Coordinate(5, 5));
+        toBeRemove.add(new Coordinate(4, 5));
+        toBeRemove.add(new Coordinate(4, 7));
+        toBeRemove.add(new Coordinate(5, 6));
+        toBeRemove.add(new Coordinate(6, 6));
+        toBeRemove.add(new Coordinate(7, 5));
+        toBeRemove.add(new Coordinate(6, 4));
+        toBeRemove.add(new Coordinate(4, 1));
+
+        for (Coordinate coordinate: toBeRemove) {
+            board.selectTile(coordinate);
+            board.draw();
+            Assertions.assertFalse(board.needsRefill());
+        }
+
+        board.selectTile(new Coordinate(7, 4));
+        board.draw();
+
+        Assertions.assertTrue(board.needsRefill());
+    }
+
 }
