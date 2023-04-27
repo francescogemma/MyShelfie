@@ -56,7 +56,7 @@ public class GameView implements Identifiable {
     protected int currentPlayerIndex;
 
     // TODO: Write custom GSON adapter for Game to remove players redundancy
-    private List<PlayerView> playerViews;
+    private final List<PlayerView> playerViews;
 
     public GameView (String nameGame, String username) {
         if (nameGame == null || username == null)
@@ -160,6 +160,9 @@ public class GameView implements Identifiable {
 
     protected void addPlayerView (PlayerView playerView) {
         this.playerViews.add(playerView);
+    }
+    protected void removePlayerView(int index) {
+        playerViews.remove(index);
     }
 
     protected GameView createView () {

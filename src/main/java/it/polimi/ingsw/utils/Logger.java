@@ -86,6 +86,10 @@ public class Logger {
         Logger.write(Type.MESSAGE, message);
     }
 
+    public static void writeCritical(String message) {
+        Logger.write(Type.CRITICAL, message);
+    }
+
     public static void write (Type type, String message) {
         String appendMessage;
         appendMessage = type + " " + LocalDate.now().toString() + LocalTime.now().toString() + " " +message;

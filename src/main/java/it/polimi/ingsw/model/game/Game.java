@@ -105,6 +105,25 @@ public class Game extends GameView {
         throw new IllegalArgumentException("Player not in this game");
     }
 
+    public boolean containPlayer (String username) {
+        return players.stream().anyMatch(p -> p.getUsername().equals(username));
+    }
+
+    public void removePlayer (String username) throws IllegalFlowException {
+        if (isStarted())
+            throw new IllegalFlowException("Game has already started");
+
+        for (int i = 0; i < players.size(); i++) {
+            if (players.get(i).is(username)) {
+                players.remove(i);
+                super.removePlayerView(i);
+                return;
+            }
+        }
+
+        throw new IllegalArgumentException("Player not in this game");
+    }
+
     public void disconnectPlayer (String username) {
         Player player = this.getPlayer(username);
 

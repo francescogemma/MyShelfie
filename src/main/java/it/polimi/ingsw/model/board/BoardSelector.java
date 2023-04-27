@@ -1,9 +1,11 @@
 package it.polimi.ingsw.model.board;
 
 import it.polimi.ingsw.utils.Coordinate;
+import it.polimi.ingsw.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import static java.lang.Math.*;
@@ -61,8 +63,8 @@ class BoardSelector extends BoardSelectorView {
      * taking into account the previous extractions.
      * @return List of legal Coordinates for selection.
      * */
-    protected List<Coordinate> getAvailableSelection() {
-        List<Coordinate> res = new ArrayList<>();
+    protected List<List<Coordinate>> getAvailableSelection() {
+        List<List<Coordinate>> res = new ArrayList<>();
         switch (selectionSize()) {
             case 0 -> {
                 assert false: "Can't call this function if sizeSelection() is equals to 0";
@@ -71,20 +73,25 @@ class BoardSelector extends BoardSelectorView {
                 final int r = this.selected.get(0).getRow();
                 final int c = this.selected.get(0).getCol();
 
-                // all possible combination of distance 1 or 2
-                res.addAll(Arrays.asList(
+                res.add(new ArrayList<>(Arrays.asList(
                         new Coordinate(r, c + 1),
-                        new Coordinate(r, c + 2),
+                        new Coordinate(r, c + 2)
+                )));
 
-                        new Coordinate(r ,c - 1),
-                        new Coordinate(r, c - 2),
+                res.add(new ArrayList<>(Arrays.asList(
+                        new Coordinate(r, c - 1),
+                        new Coordinate(r, c - 2)
+                )));
 
+                res.add(new ArrayList<>(Arrays.asList(
                         new Coordinate(r + 1, c),
-                        new Coordinate(r + 2, c),
+                        new Coordinate(r + 2, c)
+                )));
 
+                res.add(new ArrayList<>(Arrays.asList(
                         new Coordinate(r - 1, c),
                         new Coordinate(r - 2, c)
-                ));
+                )));
             }
             case 2 -> {
                 if (distanceFromTwoSelectedTile() == 1) {
@@ -92,28 +99,26 @@ class BoardSelector extends BoardSelectorView {
                         final int col = this.selected.get(0).getCol();
                         final int biggerRow =   max(selected.get(0).getRow(), selected.get(1).getRow());
                         final int smallerRow =  min(selected.get(0).getRow(), selected.get(1).getRow());
-                        res.addAll(Arrays.asList(
-                                new Coordinate(smallerRow - 1, col),
-                                new Coordinate(biggerRow + 1, col)
-                        ));
+
+                        res.add(List.of(new Coordinate(smallerRow - 1, col)));
+                        res.add(List.of(new Coordinate(biggerRow + 1, col)));
                     } else {
                         final int row = this.selected.get(0).getRow();
                         final int biggerCol =   max(selected.get(0).getCol(), selected.get(1).getCol());
                         final int smallerCol =  min(selected.get(0).getCol(), selected.get(1).getCol());
-                        res.addAll(Arrays.asList(
-                                new Coordinate(row, smallerCol - 1),
-                                new Coordinate(row, biggerCol + 1)
-                        ));
+
+                        res.add(List.of(new Coordinate(row, smallerCol - 1)));
+                        res.add(List.of(new Coordinate(row, biggerCol  + 1)));
                     }
                 } else {
                     if (isVerticalExtraction()) {
                         final int col = this.selected.get(0).getCol();
                         final int biggerRow = max(selected.get(0).getRow(), selected.get(1).getRow());
-                        res.add(new Coordinate(biggerRow - 1, col));
+                        res.add(List.of(new Coordinate(biggerRow - 1, col)));
                     } else {
                         final int row = selected.get(0).getRow();
                         final int biggerCol = max(selected.get(0).getCol(), selected.get(1).getCol());
-                        res.add(new Coordinate(row, biggerCol - 1 ));
+                        res.add(List.of(new Coordinate(row, biggerCol - 1 )));
                     }
                 }
             }
@@ -148,7 +153,12 @@ class BoardSelector extends BoardSelectorView {
             throw new IllegalExtractionException("The specified coordinate already exists");
         }
 
-        if (selectionSize() != 0 && (!getAvailableSelection().contains(c))) {
+        if (selectionSize() != 0 &&
+                getAvailableSelection()
+                        .stream()
+                        .flatMap(Collection::stream)
+                        .noneMatch(p -> p.equals(c)))
+        {
             throw new IllegalExtractionException();
         }
 

@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class MenuController {
-    private final List<GameController> gameControllerList;
     public static final MenuController INSTANCE;
+    private final List<GameController> gameControllerList;
 
     private final List<EventTransmitter> authenticated;
     private final List<EventTransmitter> notAuthenticated;
@@ -147,7 +147,31 @@ public class MenuController {
         }
     }
 
+    public Response exitGame (String username) {
+        assert username != null;
+
+        Optional<GameController> selectedGame = Optional.empty();
+
+        synchronized (gameControllerList) {
+            for (GameController gameController: gameControllerList) {
+                if (gameController.containerPlayer(username)) {
+                    selectedGame = Optional.of(gameController);
+                }
+            }
+        }
+
+        if (selectedGame.isPresent()) {
+            return selectedGame.get().exitGame(username);
+        } else {
+            return new Response("This player is in no game", ResponseStatus.FAILURE);
+        }
+    }
+
     public Response createNewGame(String gameName, String username) {
+        if (gameName == null || gameName.isEmpty()) {
+            return new Response("Game is empty or null", ResponseStatus.FAILURE);
+        }
+
         Game game = new Game(gameName, username);
         GameController controller = new GameController(game);
 

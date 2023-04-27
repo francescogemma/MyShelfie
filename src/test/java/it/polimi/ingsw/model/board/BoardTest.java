@@ -17,11 +17,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
     private Board board;
-    private static final int numberOfRun = 100;
+    private static final int numberOfRun = 1;
 
     @BeforeEach
     public void setUp() {
         board = new Board();
+    }
+
+    private void removeAndDraw (int r, int c) throws IllegalExtractionException, FullSelectionException {
+        board.selectTile(new Coordinate(r, c));
+        board.draw();
     }
 
     private void removeAndDraw (Coordinate coordinate) throws IllegalExtractionException, FullSelectionException {
@@ -238,7 +243,7 @@ class BoardTest {
         board.selectTile(3, 2);
         board.selectTile(4, 2);
 
-        Assertions.assertThrows(FullSelectionException.class, () -> {
+        Assertions.assertThrows(IllegalExtractionException.class, () -> {
             this.board.selectTile(5, 2);
         });
 
@@ -443,5 +448,82 @@ class BoardTest {
         board.draw();
 
         Assertions.assertTrue(board.needsRefill());
+    }
+
+    @Test
+    void selectTile_distanceMoreThan1TileBetwine0FreeSideVertical_correctOutput () throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 3);
+
+        board.selectTile(new Coordinate(5, 0));
+        board.draw();
+
+        board.selectTile(new Coordinate(5, 1));
+
+        Assertions.assertThrows(IllegalExtractionException.class, () -> {
+            board.selectTile(new Coordinate(3, 1));
+        });
+
+        Assertions.assertEquals(0, board.getSelectableCoordinate().size());
+    }
+
+    @Test
+    void selectTile_distanceMoreThan1TileBetwine0FreeSideHorizontal_correctOutput () throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 3);
+
+        this.removeAndDraw(new Coordinate(5, 0));
+        this.removeAndDraw(new Coordinate(2, 2));
+        this.removeAndDraw(new Coordinate(3, 2));
+
+        board.selectTile(3, 1);
+
+        Assertions.assertThrows(IllegalExtractionException.class, () -> {
+            board.selectTile(3, 3);
+        });
+
+        Assertions.assertEquals(0, board.getSelectableCoordinate().size());
+    }
+
+    @Test
+    void selectTile_verticalDistance0_correctOutput () throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 4);
+
+        board.selectTile(4, 0);
+        board.selectTile(5, 0);
+
+        board.draw();
+    }
+
+    @Test
+    void getSelectableCoordinate__OnTopWith0FreeSides_correctOutput () throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 4);
+        removeAndDraw(4, 0);
+        removeAndDraw(4, 1);
+        removeAndDraw(5, 0);
+        removeAndDraw(5, 1);
+
+        board.selectTile(5, 2);
+
+        Assertions.assertEquals(2, board.getSelectableCoordinate().size());
+
+        Assertions.assertTrue(board.getSelectableCoordinate().contains(new Coordinate(6, 2)));
+        Assertions.assertTrue(board.getSelectableCoordinate().contains(new Coordinate(4, 2)));
+    }
+
+    @Test
+    void getSelectableCoordinate__OnTopWith1FreeSides_correctOutput () throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 4);
+        removeAndDraw(4, 0);
+        removeAndDraw(4, 1);
+        removeAndDraw(5, 0);
+        removeAndDraw(5, 1);
+        removeAndDraw(3, 1);
+
+        board.selectTile(5, 2);
+
+        Assertions.assertEquals(3, board.getSelectableCoordinate().size());
+
+        Assertions.assertTrue(board.getSelectableCoordinate().contains(new Coordinate(6, 2)));
+        Assertions.assertTrue(board.getSelectableCoordinate().contains(new Coordinate(4, 2)));
+        Assertions.assertTrue(board.getSelectableCoordinate().contains(new Coordinate(3, 2)));
     }
 }

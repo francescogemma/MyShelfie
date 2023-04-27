@@ -35,7 +35,6 @@ public class GameController {
                         client -> {
                             client.getKey().broadcast(event);
                             synchronized (this) {
-                                // TODO --> don't pass game, pass a GameView
                                 if (this.game.isStarted())
                                     DBManager.getGamesDBManager().save(game);
                             }
@@ -48,8 +47,33 @@ public class GameController {
         return game.getPersonalGoal(username);
     }
 
-    public List<Integer> getCommonGoal () {
-        return Arrays.asList(this.game.getCommonGoals()).stream().map(CommonGoal::getIndex).toList();
+    public boolean containerPlayer(String username) {
+        if (username == null)
+            throw new NullPointerException();
+        synchronized (this) {
+            return this.game.containPlayer(username);
+        }
+    }
+
+    protected Response exitGame (String username) {
+        synchronized (this) {
+            try {
+                game.removePlayer (username);
+
+                for (int i = 0; i < this.clients.size(); i++) {
+                    if (clients.get(i).getValue().equals(username)) {
+                        clients.remove(i);
+                        return new Response("You have been remove from this game", ResponseStatus.SUCCESS);
+                    }
+                }
+                Logger.writeCritical("Game has this player but i don't");
+                assert false;
+            } catch (IllegalFlowException e) {
+                return new Response(e.getMessage(), ResponseStatus.FAILURE);
+            }
+
+            return new Response("Player not in this game", ResponseStatus.FAILURE);
+        }
     }
 
     private void broadcastForEachView (EventData data) {

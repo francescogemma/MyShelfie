@@ -36,9 +36,23 @@ public class VirtualView implements EventTransmitter{
         DeselectTileEventData.responder(transceiver, transceiver,   event -> deselectTile(event.coordinate()));
         JoinGameEventData.responder(transceiver, transceiver,       event -> joinGame(event.gameName()));
         CreateNewGameEventData.responder(transceiver, transceiver,  event -> createNewGame(event.gameName()));
+        PlayerExitGame.responder(transceiver, transceiver,          event -> exitGame());
 
         JoinStartedGameEventData.castEventReceiver(transceiver).registerListener(event -> this.sendGameState());
         PlayerHasJoinMenu       .castEventReceiver(transceiver).registerListener(event -> this.playerHasJoinMenu());
+    }
+
+    private Response exitGame () {
+        if (isInGame()) {
+            Response response = MenuController.INSTANCE.exitGame(username);
+
+            if (response.isOk()) {
+                this.gameController = null;
+            }
+            return response;
+        } else {
+            return new Response("You are not in a game", ResponseStatus.FAILURE);
+        }
     }
 
     private void sendGameState() {

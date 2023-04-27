@@ -17,14 +17,13 @@ import java.util.concurrent.atomic.AtomicReference;
 class GameControllerTest {
     private GameController gameController;
 
-    /*
+
     @BeforeEach
     void setUp () {
-        this.gameController = new GameController(new Game("Testing"));
+        this.gameController = new GameController(new Game("Testing", "Giacomo"));
     }
 
     private VirtualView getNewVirtualView () {
-
         EventTransceiver transceiver = new LocalEventTransceiver();
         return new VirtualView(transceiver);
     }
@@ -32,110 +31,56 @@ class GameControllerTest {
     @Test
     void join_nullPointer_throwNullPointerException () {
         Assertions.assertThrows(NullPointerException.class, () -> {
-            this.gameController.join(null);
+            this.gameController.join(null, "Ciao");
+        });
+
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            this.gameController.join(new LocalEventTransceiver(), null);
+        });
+
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            this.gameController.join(null, null);
         });
     }
 
     @Test
-    void join_singalsEmitted_correctOutput () {
-        VirtualView virtualViewGiacomo = this.getNewVirtualView();
-        VirtualView virtualViewMichele = this.getNewVirtualView();
+    void exitGame_playerExitAndJoin_correctOutput () {
+        gameController.join(new LocalEventTransceiver(), "Giacomo");
+        gameController.join(new LocalEventTransceiver(), "Michele");
 
-        virtualViewGiacomo.setUsername("Giacomo");
-        virtualViewMichele.setUsername("Michele");
+        Assertions.assertTrue(
+                gameController.exitGame("Giacomo").isOk()
+        );
 
-        AtomicReference<String> usernameGiacomo = new AtomicReference<>(null);
+        gameController.join(new LocalEventTransceiver(), "Giacomo");
 
-        AtomicBoolean callGiacomo = new AtomicBoolean(false);
-        AtomicBoolean callMichele = new AtomicBoolean(false);
+        Assertions.assertTrue(
+                gameController.startGame("Giacomo").isOk()
+        );
 
-        virtualViewMichele.setGameController(gameController);
-
-        // we synchronize on player "Giacomo"
-        virtualViewGiacomo.getNetworkReceiver().registerListener(event -> {
-            Assertions.assertEquals(PlayerHasJoinEventData.ID, event.getId());
-            Assertions.assertEquals("Michele", ((PlayerHasJoinEventData) event).getUsername());
-            callGiacomo.set(true);
-        });
-
-        // we synchronize on player "Michele"
-        virtualViewMichele.getNetworkReceiver().registerListener(event -> {
-            callMichele.set(true);
-        });
-
-        callGiacomo.set(false);
-        callMichele.set(false);
-        usernameGiacomo.set(null);
-
-        this.gameController.join(virtualViewGiacomo);
-
-        Assertions.assertTrue(callGiacomo.get() == false);
-        Assertions.assertTrue(callMichele.get() == false);
-
-        this.gameController.join(virtualViewMichele);
-
-        Assertions.assertTrue(callGiacomo.get() == true);
-        Assertions.assertTrue(callMichele.get() == false);
+        Assertions.assertFalse(
+                gameController.exitGame("Michele").isOk()
+        );
     }
 
     @Test
-    void join_fivePlayers_correctOutput () {
-        VirtualView virtualViewGiacomo = this.getNewVirtualView();
-        VirtualView virtualViewMichele = this.getNewVirtualView();
-        VirtualView virtualViewCristiano = this.getNewVirtualView();
-        VirtualView virtualViewFrancesco = this.getNewVirtualView();
-        VirtualView virtualViewPluto = this.getNewVirtualView();
+    void exitGame_playerNotInGame_shouldThrow () {
+        gameController.join(new LocalEventTransceiver(), "Giacomo");
 
-        virtualViewGiacomo.setUsername("Giacomo");
-        virtualViewMichele.setUsername("Michele");
-        virtualViewCristiano.setUsername("Cristiano");
-        virtualViewFrancesco.setUsername("Francesco");
-        virtualViewPluto.setUsername("Pluto");
-
-        AtomicBoolean callGiacomo = new AtomicBoolean(false);
-        AtomicBoolean callMichele = new AtomicBoolean(false);
-        AtomicBoolean callCrisitano = new AtomicBoolean(false);
-        AtomicBoolean callFrancesco = new AtomicBoolean(false);
-
-        virtualViewMichele.setGameController(gameController);
-
-        // we synchronize on player "Giacomo"
-        virtualViewGiacomo.getNetworkReceiver().registerListener(event -> {
-            Assertions.assertEquals(PlayerHasJoinEventData.ID, event.getId());
-            callGiacomo.set(true);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            gameController.exitGame("Michele");
         });
-
-        // we synchronize on player "Michele"
-        virtualViewMichele.getNetworkReceiver().registerListener(event -> {
-            callMichele.set(true);
-        });
-
-        // we synchronize on player "Cristiano"
-        virtualViewCristiano.getNetworkReceiver().registerListener(event -> {
-            callCrisitano.set(true);
-        });
-
-        // we synchronize on player "Francesco"
-        virtualViewFrancesco.getNetworkReceiver().registerListener(event -> {
-            callFrancesco.set(true);
-        });
-
-        this.gameController.join(virtualViewGiacomo);
-        this.gameController.join(virtualViewMichele);
-        this.gameController.join(virtualViewCristiano);
-        this.gameController.join(virtualViewFrancesco);
-
-        callGiacomo.set(false);
-        callMichele.set(false);
-        callCrisitano.set(false);
-        callFrancesco.set(false);
-        this.gameController.join(virtualViewPluto);
-
-        Assertions.assertFalse(callGiacomo.get());
-        Assertions.assertFalse(callMichele.get());
-        Assertions.assertFalse(callCrisitano.get());
-        Assertions.assertFalse(callFrancesco.get());
-
     }
-    */
+
+    @Test
+    void exitGame_gameHasStarted_correctOutput () {
+        gameController.join(new LocalEventTransceiver(), "Giacomo");
+        gameController.join(new LocalEventTransceiver(), "Michele");
+
+        gameController.startGame("Giacomo");
+
+        Assertions.assertFalse(
+                gameController.exitGame("Michele").isOk()
+        );
+    }
 }

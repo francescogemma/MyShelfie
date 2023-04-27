@@ -87,9 +87,8 @@ public class Board extends BoardView {
         if (this.isEmpty(c))
             throw new IllegalExtractionException("Can't extract tile at: [" + c.getRow() + ", " + c.getCol() + "] because tile is empty");
 
-        if (numberOfFreeSides(c) == 0) {
+        if (!getSelectableCoordinate().contains(c))
             throw new IllegalExtractionException("Can't extract tile at: [" + c.getRow() + ", " + c.getCol() + "]");
-        }
 
         this.boardSelector.select(c);
         return this.tileAt(c);

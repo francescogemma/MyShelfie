@@ -131,27 +131,30 @@ public class BoardView {
         switch (boardSelector.selectionSize()) {
             case 0 -> {
                 Consumer<Coordinate> a = p -> {
-                    if (numberOfFreeSides(p) > 0 && !isEmpty(p))
+                    if (canExtractForNumberOfFreeSides(p) && !isEmpty(p))
                         res.add(p);
                 };
                 Board.TWO_PLAYER_POSITIONS.forEach(a);
                 Board.THREE_PLAYER_POSITIONS.forEach(a);
                 Board.FOUR_PLAYER_POSITIONS.forEach(a);
             }
-            case 1, 2 ->
-                    boardSelector
-                            .getAvailableSelection()
-                            .stream()
-                            .filter(p -> !isOutOfBoard(p))
-                            .filter(p -> !isEmpty(p))
-                            .filter(this::canExtractForNumberOfFreeSides)
-                            .forEach(res::add);
+            case 1, 2 -> {
+                for (List<Coordinate> positions : boardSelector.getAvailableSelection()) {
+                    for (Coordinate coordinate: positions) {
+                        if (isOutOfBoard(coordinate) ||
+                                isEmpty(coordinate) ||
+                                !canExtractForNumberOfFreeSides(coordinate))
+                            break;
+                        res.add(coordinate);
+                    }
+                }
+            }
         }
 
         return res;
     }
 
-    private boolean canExtractForNumberOfFreeSides (Coordinate coordinate) {
+    protected boolean canExtractForNumberOfFreeSides (Coordinate coordinate) {
         return this.numberOfFreeSides(coordinate) > 0;
     }
 
