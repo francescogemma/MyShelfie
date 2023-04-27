@@ -8,7 +8,10 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.PrimitiveSymbol;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 import com.sun.jna.Platform;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
@@ -270,4 +273,29 @@ public abstract class Terminal {
             Arrays.fill(line, PrimitiveSymbol.EMPTY);
         }
     }
+
+    /* // TUI debug utilities
+    private static final Long debugLock = System.currentTimeMillis();
+    private static int count = 0;
+    private static final File debugLog = new File("debug-" + debugLock + ".txt");
+
+    static {
+        try {
+            debugLog.createNewFile();
+        } catch (IOException e) {
+
+        }
+    }
+
+    public static void debug(String toPrint) {
+        synchronized (debugLock) {
+            try {
+                PrintWriter pW = new PrintWriter(new FileWriter(debugLog, true));
+                pW.println("[" + count++ + "] " + toPrint);
+                pW.close();
+            } catch (IOException e) {
+
+            }
+        }
+    } */
 }

@@ -1,14 +1,12 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.controller.db.Identifiable;
-import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.model.bag.Bag;
 import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.board.BoardView;
 import it.polimi.ingsw.model.goal.CommonGoal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -57,7 +55,8 @@ public class GameView implements Identifiable {
      */
     protected int currentPlayerIndex;
 
-    private List<PlayerView> players;
+    // TODO: Write custom GSON adapter for Game to remove players redundancy
+    private List<PlayerView> playerViews;
 
     public GameView (String nameGame, String username) {
         if (nameGame == null || username == null)
@@ -72,7 +71,7 @@ public class GameView implements Identifiable {
         this.winners = new ArrayList<>();
         this.currentPlayerIndex = -1;
         this.isStarted = false;
-        this.players = new ArrayList<>();
+        this.playerViews = new ArrayList<>();
         this.creator = username;
     }
 
@@ -82,6 +81,7 @@ public class GameView implements Identifiable {
         this.winners = new ArrayList<>(other.winners);
         this.isStarted = other.isStarted;
         this.name = other.name;
+        this.playerViews = new ArrayList<>(other.playerViews);
         this.creator = other.creator;
 
         this.commonGoals = new CommonGoal[other.commonGoals.length];
@@ -96,15 +96,15 @@ public class GameView implements Identifiable {
      * @throws IllegalFlowException if there are no players in the game
      */
     public PlayerView getStartingPlayer() throws IllegalFlowException {
-        if (players.isEmpty()) {
+        if (playerViews.isEmpty()) {
             throw new IllegalFlowException("There is no starting player until someone joins the game");
         }
 
-        return players.get(FIRST_PLAYER_INDEX);
+        return playerViews.get(FIRST_PLAYER_INDEX);
     }
 
     public boolean canStartGame (String username) throws IllegalFlowException {
-        if (isStarted() || isOver() || players.isEmpty())
+        if (isStarted() || isOver() || playerViews.isEmpty())
             throw new IllegalFlowException();
         return this.creator.equals(username);
     }
@@ -132,7 +132,7 @@ public class GameView implements Identifiable {
             throw new IllegalFlowException("There is no current player when the game is over");
         }
 
-        return players.get(currentPlayerIndex);
+        return playerViews.get(currentPlayerIndex);
     }
 
     /**
@@ -155,11 +155,11 @@ public class GameView implements Identifiable {
             throw new IllegalFlowException("There is no last player until you start the game");
         }
 
-        return players.get(players.size() - 1);
+        return playerViews.get(playerViews.size() - 1);
     }
 
     protected void addPlayerView (PlayerView playerView) {
-        this.players.add(playerView);
+        this.playerViews.add(playerView);
     }
 
     protected GameView createView () {
@@ -183,7 +183,7 @@ public class GameView implements Identifiable {
     }
 
     public List<PlayerView> getPlayers () {
-        return new ArrayList<>(players);
+        return new ArrayList<>(playerViews);
     }
 
     @Override

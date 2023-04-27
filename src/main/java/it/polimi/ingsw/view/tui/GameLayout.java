@@ -390,7 +390,6 @@ public class GameLayout extends AppLayout {
                     gameNameTextBox.text("Game: " + gameName);
                     populateBookshelfMenu();
                     playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
-                    populateGoalsMenu();
                     populateBoard(data.gameView().getBoard());
                 }
             });
