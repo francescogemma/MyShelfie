@@ -16,19 +16,19 @@ public class PlayerDisconnectedInternalEventData implements EventData {
     public PlayerDisconnectedInternalEventData() {
     }
 
-    public static CastEventReceiver<BoardChangedEventData> castEventReceiver(EventReceiver<EventData> receiver) {
+    public static CastEventReceiver<PlayerDisconnectedInternalEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }
 
-    public static <T extends EventData> Requester<BoardChangedEventData, T> requester(EventTransmitter transmitter,
+    public static <T extends EventData> Requester<PlayerDisconnectedInternalEventData, T> requester(EventTransmitter transmitter,
                                                                                       EventReceiver<EventData> receiver,
                                                                                       Object responsesLock) {
         return new Requester<>(ID, transmitter, receiver, responsesLock);
     }
 
-    public static <T extends EventData> Responder<BoardChangedEventData, T> responder(EventTransmitter transmitter,
-                                                                                      EventReceiver<EventData> receiver,
-                                                                                      Function<BoardChangedEventData, T> response) {
+    public static <T extends EventData> Responder<PlayerDisconnectedInternalEventData, T> responder(EventTransmitter transmitter,
+                                                                                                    EventReceiver<EventData> receiver,
+                                                                                                    Function<PlayerDisconnectedInternalEventData, T> response) {
         return new Responder<>(ID, transmitter, receiver, response);
     }
 
