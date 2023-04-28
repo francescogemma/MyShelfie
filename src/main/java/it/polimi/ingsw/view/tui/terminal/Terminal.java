@@ -274,7 +274,7 @@ public abstract class Terminal {
         }
     }
 
-    /* // TUI debug utilities
+    // TUI debug utilities
     private static final Long debugLock = System.currentTimeMillis();
     private static int count = 0;
     private static final File debugLog = new File("debug-" + debugLock + ".txt");
@@ -297,5 +297,5 @@ public abstract class Terminal {
 
             }
         }
-    } */
+    }
 }

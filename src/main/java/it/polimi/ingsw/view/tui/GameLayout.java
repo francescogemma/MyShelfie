@@ -18,6 +18,7 @@ import it.polimi.ingsw.model.goal.PersonalGoal;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.utils.Coordinate;
+import it.polimi.ingsw.view.tui.terminal.Terminal;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
@@ -533,11 +534,16 @@ public class GameLayout extends AppLayout {
 
             CommonGoalCompletedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 synchronized (getLock()) {
+                    Terminal.debug("Common goal completed");
+
                     CompletedGoal completedGoal = new CompletedGoal(CompletedGoal.GoalType.COMMON,
                         data.getCommonGoalCompleted(), data.getPlayer().getUsername(),
                         data.getPlayer().getPoints() - playerPoints
                             .get(playerNameToIndex(data.getPlayer().getUsername())), data.getBookshelfMaskSet());
                     displayCompletedGoal(completedGoal);
+
+                    playerPoints.set(playerNameToIndex(data.getPlayer().getUsername()),
+                        data.getPlayer().getPoints());
                 }
             });
 
