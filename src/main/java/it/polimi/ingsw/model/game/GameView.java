@@ -50,6 +50,8 @@ public class GameView implements Identifiable {
 
     protected String creator;
 
+    protected boolean isStopped;
+
     /**
      * The index of the current player in the list of players.
      */
@@ -73,6 +75,7 @@ public class GameView implements Identifiable {
         this.isStarted = false;
         this.playerViews = new ArrayList<>();
         this.creator = username;
+        this.isStopped = false;
     }
 
     public GameView(GameView other) {
@@ -83,6 +86,7 @@ public class GameView implements Identifiable {
         this.name = other.name;
         this.playerViews = new ArrayList<>(other.playerViews);
         this.creator = other.creator;
+        this.isStopped = other.isStopped;
 
         this.commonGoals = new CommonGoal[other.commonGoals.length];
         for (int i = 0; i < other.commonGoals.length; i++) {
@@ -107,6 +111,10 @@ public class GameView implements Identifiable {
         if (isStarted() || isOver() || playerViews.isEmpty())
             throw new IllegalFlowException();
         return this.creator.equals(username);
+    }
+
+    public boolean isStopped() {
+        return isStopped;
     }
 
     /**

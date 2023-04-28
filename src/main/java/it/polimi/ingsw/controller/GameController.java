@@ -55,6 +55,24 @@ public class GameController {
         }
     }
 
+    public Response stopGame (String username) {
+        synchronized (this) {
+            try {
+                if (!game.containPlayer(username))
+                    throw new IllegalArgumentException();
+
+                if (game.stopGame(username)) {
+                    this.clients.clear();
+                    return new Response("Game has been successfully paused", ResponseStatus.SUCCESS);
+                }
+                return new Response("You are not the owner", ResponseStatus.FAILURE);
+            } catch (NoPlayerConnectedException e) {
+                Logger.writeCritical("It's not possible one player ask me to stop a game and he is disconnected");
+                return new Response("We have and internal problem", ResponseStatus.FAILURE);
+            }
+        }
+    }
+
     protected Response exitGame (String username) {
         synchronized (this) {
             try {

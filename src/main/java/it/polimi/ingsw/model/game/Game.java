@@ -2,7 +2,6 @@ package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
-import it.polimi.ingsw.event.data.client.CreateNewGameEventData;
 import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
@@ -13,6 +12,7 @@ import it.polimi.ingsw.model.goal.PersonalGoal;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Pair;
+import it.polimi.ingsw.event.data.client.StartGameEventData;
 
 import java.util.*;
 
@@ -36,6 +36,22 @@ public class Game extends GameView {
         this.personalGoalIndex = 0;
         this.players = new ArrayList<>();
         Collections.shuffle(this.personalGoalIndexes);
+    }
+
+    /**
+     * This method stop the game. The only way to resume it is
+     * @param username The player that want to stop the game
+     * @see StartGameEventData
+     * */
+    public boolean stopGame (String username) throws NoPlayerConnectedException {
+        int playerOnline = this.getNextPlayerOnline(this.creator);
+
+        if (players.get(playerOnline).is(username)) {
+            broadcast(new GameHasBeenStoppedEventData());
+            return true;
+        }
+
+        return false;
     }
 
     public void setTransceiver (LocalEventTransceiver transceiver) {
@@ -80,7 +96,7 @@ public class Game extends GameView {
             }
         }
 
-        if (isStarted) {
+        if (isStarted() || isStopped()) {
             throw new IllegalFlowException("You can't add players when the game has already started");
         }
 
@@ -163,9 +179,15 @@ public class Game extends GameView {
             throw new IllegalFlowException("you can't start the game");
 
         this.isStarted = true;
+
+        if (!isStopped) {
+            this.currentPlayerIndex = FIRST_PLAYER_INDEX;
+            this.commonGoals = CommonGoal.getTwoRandomCommonGoals(players.size());
+        }
+
+        this.isStopped = false;
+
         this.refillBoardIfNecessary();
-        this.currentPlayerIndex = FIRST_PLAYER_INDEX;
-        this.commonGoals = CommonGoal.getTwoRandomCommonGoals(players.size());
         this.transceiver.broadcast(new GameHasStartedEventData());
     }
 
@@ -178,7 +200,7 @@ public class Game extends GameView {
     }
 
     public void forgetLastSelection(String username, Coordinate c) throws IllegalFlowException {
-        if (!isStarted()) throw new IllegalFlowException("Game is not started");
+        if (!isStarted() || isStopped()) throw new IllegalFlowException("Game is not started or is stopped");
         if (isOver()) throw new IllegalFlowException("Game has ended");
         if (!players.get(currentPlayerIndex).getUsername().equals(username)) throw new IllegalFlowException("It's not your turn");
 
@@ -217,6 +239,19 @@ public class Game extends GameView {
         }
     }
 
+    private int getNextPlayerOnline(String username) throws NoPlayerConnectedException {
+        int index = -1;
+        for (int i = 0; i < players.size(); i++) {
+            if (players.get(i).is(username))
+                index = i;
+        }
+
+        if (index == -1)
+            throw new IllegalArgumentException("Player not in this game");
+
+        return getNextPlayerOnline(index);
+    }
+
     private int getNextPlayerOnline (int currentPlayerIndex) throws NoPlayerConnectedException {
         for (int i = 1; i < this.players.size(); i++) {
             final int index = (currentPlayerIndex + i) % this.players.size();
@@ -233,7 +268,7 @@ public class Game extends GameView {
 
     private void calculateNextPlayer() throws IllegalFlowException {
         assert this.players.size() >= 2 && this.players.size() <= 4;
-        assert this.isStarted;
+        assert this.isStarted() && !isStopped();
         assert currentPlayerIndex >=  0 && currentPlayerIndex < players.size();
 
         refillBoardIfNecessary();
@@ -321,8 +356,8 @@ public class Game extends GameView {
         player.getBookshelf().insertTiles(t, col);
         board.draw();
 
-        this.transceiver.broadcast(new BoardChangedEventData(board.getView()));
-        this.transceiver.broadcast(new BookshelfHasChangedEventData(username, player.getBookshelf()));
+        broadcast(new BoardChangedEventData(board.getView()));
+        broadcast(new BookshelfHasChangedEventData(username, player.getBookshelf()));
 
         for (CommonGoal commonGoal: this.commonGoals) {
             int points;
@@ -335,7 +370,13 @@ public class Game extends GameView {
             if (points > 0) {
                 player.addPoints(points);
 
-                broadcast(new CommonGoalCompletedEventData(player.createView(), commonGoal.getPointMasks(), commonGoal.getIndex()));
+                broadcast(
+                        new CommonGoalCompletedEventData(
+                            player.createView(),
+                            commonGoal.getPointMasks(),
+                            commonGoal.getIndex()
+                        )
+                );
             }
         }
 
@@ -360,7 +401,7 @@ public class Game extends GameView {
      * select a tile from the board
      * */
     public void selectTile (String username, Coordinate coordinate) throws IllegalFlowException, IllegalExtractionException, FullSelectionException {
-        if (!this.isStarted)
+        if (!this.isStarted() || isStopped())
             throw new IllegalFlowException("Game is not started");
         if (isOver())
             throw new IllegalFlowException("Game is over");

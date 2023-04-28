@@ -7,6 +7,7 @@ import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.controller.db.DBManager;
+import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
 
 import java.util.ArrayList;
@@ -23,6 +24,20 @@ public class MenuController {
 
     static {
         INSTANCE = new MenuController();
+
+        List<Game> allGame;
+
+        try {
+            allGame = DBManager.getGamesDBManager().loadAllInFolder();
+        } catch (IdentifiableNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        for (Game game: allGame) {
+            if (!game.isOver()) {
+                INSTANCE.gameControllerList.add(new GameController(game));
+            }
+        }
     }
 
     private MenuController() {
@@ -34,6 +49,21 @@ public class MenuController {
 
     public static MenuController getInstance() {
         return INSTANCE;
+    }
+
+    public Response stopGame (String username) {
+        synchronized (gameControllerList) {
+            for (GameController game: gameControllerList) {
+                try {
+                    return game.stopGame(username);
+                } catch (IllegalArgumentException e) {
+                    // [username] is not in this game
+                }
+            }
+        }
+
+        Logger.writeCritical("Username is in no game");
+        return new Response(null, ResponseStatus.FAILURE);
     }
 
     /**
@@ -52,10 +82,13 @@ public class MenuController {
 
             try {
                 user = userDBManager.load(username);
+
+                Logger.writeMessage("User has been loaded" + user.getName());
             } catch (IdentifiableNotFoundException e) {
                 user = new User(username, password);
                 userDBManager.save(user);
-                System.out.println("Created new user: " + user.getName());
+
+                Logger.writeMessage("Created new user: " + user.getName());
             }
 
             users.add(user);

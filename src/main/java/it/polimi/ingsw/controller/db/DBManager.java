@@ -119,6 +119,17 @@ public class DBManager<T extends Identifiable> {
         }
     }
 
+    public List<T> loadAllInFolder() throws IdentifiableNotFoundException {
+        Set<String> positions = this.getSavedIdentifiablesNames();
+        List<T> res = new ArrayList<>();
+
+        for (String position: positions) {
+            res.add(this.load(position));
+        }
+
+        return res;
+    }
+
     private static final DBManager<User> USERS_DB_MANAGER_INSTANCE = new DBManager<>("users", User.class);
 
     public static DBManager<User> getUsersDBManager() {
