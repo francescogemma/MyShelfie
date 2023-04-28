@@ -64,9 +64,7 @@ public class LobbyLayout extends AppLayout {
         ));
 
         startButton.onpress(() -> {
-            Terminal.debug("Before requesting start");
             displayServerResponse(startGameRequester.request(new StartGameEventData()));
-            Terminal.debug("After requesting start");
         });
 
         backButton.onpress(() -> switchAppLayout(AvailableGamesMenuLayout.NAME));
@@ -116,9 +114,7 @@ public class LobbyLayout extends AppLayout {
             });
 
             GameHasStartedEventData.castEventReceiver(transceiver).registerListener(data -> {
-                Terminal.debug("Got game has started event, before lock");
                 synchronized (getLock()) {
-                    Terminal.debug("Got game has started event, after lock");
                     switchAppLayout(GameLayout.NAME);
                 }
             });
