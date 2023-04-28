@@ -34,6 +34,10 @@ public class CommonGoalCompletedEventData implements EventData {
         return this.player;
     }
 
+    public int getCommonGoalCompleted () {
+        return this.commonGoalCompleted;
+    }
+
     public static CastEventReceiver<CommonGoalCompletedEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }
