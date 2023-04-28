@@ -8,17 +8,19 @@ import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 import it.polimi.ingsw.model.game.Player;
+import it.polimi.ingsw.model.game.PlayerView;
 
 import java.util.function.Function;
 
 public class CommonGoalCompletedEventData implements EventData {
     private final BookshelfMaskSet maskSet;
-    private final Player player;
+    private final PlayerView player;
     private final int commonGoalCompleted;
 
     public static final String ID = "COMMON_GOAL_COMPLETED";
 
-    public CommonGoalCompletedEventData(Player player, BookshelfMaskSet maskSet, int commonGoalCompleted) {
+    public CommonGoalCompletedEventData(PlayerView player, BookshelfMaskSet maskSet, int commonGoalCompleted) {
+        assert player.getClass() == PlayerView.class;
         this.player = player;
         this.maskSet = maskSet;
         this.commonGoalCompleted = commonGoalCompleted;
@@ -28,7 +30,7 @@ public class CommonGoalCompletedEventData implements EventData {
         return this.maskSet;
     }
 
-    public Player getPlayer() {
+    public PlayerView getPlayer() {
         return this.player;
     }
 

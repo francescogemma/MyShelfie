@@ -40,22 +40,25 @@ public class MenuController {
      * password is required in case of player not existing
      * */
     private User getUser (String username, String password) {
-        synchronized (users) {
-            for (User user: users) {
-                if (user.getName().equals(username))
-                    return user;
-            }
-        }
-
         User user;
-        DBManager<User> userDBManager = DBManager.getUsersDBManager();
 
-        try {
-            user = userDBManager.load(username);
-        } catch (IdentifiableNotFoundException e) {
-            user = new User(username, password);
-            userDBManager.save(user);
-            System.out.println("Created new user: " + user.getName());
+        synchronized (users) {
+            for (User u: users) {
+                if (u.getName().equals(username))
+                    return u;
+            }
+
+            DBManager<User> userDBManager = DBManager.getUsersDBManager();
+
+            try {
+                user = userDBManager.load(username);
+            } catch (IdentifiableNotFoundException e) {
+                user = new User(username, password);
+                userDBManager.save(user);
+                System.out.println("Created new user: " + user.getName());
+            }
+
+            users.add(user);
         }
 
         return user;

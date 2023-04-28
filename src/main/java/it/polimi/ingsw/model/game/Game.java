@@ -335,7 +335,7 @@ public class Game extends GameView {
             if (points > 0) {
                 player.addPoints(points);
 
-                broadcast(new CommonGoalCompletedEventData(player, commonGoal.getPointMasks(), commonGoal.getIndex()));
+                broadcast(new CommonGoalCompletedEventData(player.createView(), commonGoal.getPointMasks(), commonGoal.getIndex()));
             }
         }
 
