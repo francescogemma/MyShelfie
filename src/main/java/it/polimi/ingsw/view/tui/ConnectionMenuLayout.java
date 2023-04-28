@@ -55,7 +55,7 @@ public class ConnectionMenuLayout extends AppLayout {
                 return;
             }
 
-            transceiver = new NetworkEventTransceiver(connection);
+            transceiver = new NetworkEventTransceiver(connection, getLock());
 
             switchAppLayout(LoginMenuLayout.NAME);
         });

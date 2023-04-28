@@ -99,16 +99,14 @@ public class AvailableGamesMenuLayout extends AppLayout {
             createGameRequester = Response.requester(transceiver, transceiver, getLock());
 
             GameHasBeenCreatedEventData.castEventReceiver(transceiver).registerListener(data -> {
-                synchronized (getLock()) {
-                    availableGames.addAll(data.getNames());
+                availableGames.addAll(data.getNames());
 
-                    if (availableGames.size() > 0) {
-                        recyclerGamesList.populate(availableGames);
+                if (availableGames.size() > 0) {
+                    recyclerGamesList.populate(availableGames);
 
-                        alternative.second();
-                    } else {
-                        alternative.first();
-                    }
+                    alternative.second();
+                } else {
+                    alternative.first();
                 }
             });
 

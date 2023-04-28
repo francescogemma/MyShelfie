@@ -7,7 +7,6 @@ import it.polimi.ingsw.event.data.client.JoinGameEventData;
 import it.polimi.ingsw.event.data.client.StartGameEventData;
 import it.polimi.ingsw.event.data.game.GameHasStartedEventData;
 import it.polimi.ingsw.event.data.game.PlayerHasJoinEventData;
-import it.polimi.ingsw.view.tui.terminal.Terminal;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
@@ -92,31 +91,27 @@ public class LobbyLayout extends AppLayout {
             startGameRequester = Response.requester(transceiver, transceiver, getLock());
 
             PlayerHasJoinEventData.castEventReceiver(transceiver).registerListener(data -> {
-                synchronized (getLock()) {
-                    playerNames.add(data.getUsername());
+                playerNames.add(data.getUsername());
 
-                    recyclerPlayersList.populate(playerNames);
+                recyclerPlayersList.populate(playerNames);
 
-                    boolean isOwner = true;
+                boolean isOwner = true;
 
-                    if (isOwner) {
-                        startButtonLayoutElement.setWeight(1);
+                if (isOwner) {
+                    startButtonLayoutElement.setWeight(1);
 
-                        if (playerNames.size() >= 2) {
-                            startButton.focusable(true);
-                        } else {
-                            startButton.focusable(false);
-                        }
+                    if (playerNames.size() >= 2) {
+                        startButton.focusable(true);
                     } else {
-                        startButtonLayoutElement.setWeight(0);
+                        startButton.focusable(false);
                     }
+                } else {
+                    startButtonLayoutElement.setWeight(0);
                 }
             });
 
             GameHasStartedEventData.castEventReceiver(transceiver).registerListener(data -> {
-                synchronized (getLock()) {
-                    switchAppLayout(GameLayout.NAME);
-                }
+                switchAppLayout(GameLayout.NAME);
             });
 
             displayServerResponse(joinGameRequester.request(new JoinGameEventData(gameName)));

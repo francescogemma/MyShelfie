@@ -27,7 +27,7 @@ public class Server {
             Connection connection = connectionAcceptor.accept();
             System.out.println("New connection");
 
-            NetworkEventTransceiver transceiver = new NetworkEventTransceiver(connection);
+            NetworkEventTransceiver transceiver = new NetworkEventTransceiver(connection, new Object());
 
             VirtualView virtualView = new VirtualView(transceiver);
 

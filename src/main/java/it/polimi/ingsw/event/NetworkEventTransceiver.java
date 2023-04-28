@@ -12,18 +12,21 @@ import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.DisconnectedException;
+import it.polimi.ingsw.utils.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class NetworkEventTransceiver implements EventTransceiver {
-    private final Object lock = new Object();
+    private final Object lock;
 
     private final List<EventListener<EventData>> listeners = new ArrayList<>();
     private final Connection connection;
     private final Gson gson;
 
-    public NetworkEventTransceiver(Connection connection) {
+    public NetworkEventTransceiver(Connection connection, Object lock) {
+        this.lock = lock;
+
         this.connection = connection;
         this.gson = new GsonBuilder()
             .registerTypeAdapterFactory(new EventDataTypeAdapterFactory())
@@ -36,6 +39,7 @@ public class NetworkEventTransceiver implements EventTransceiver {
                 String eventJSON;
                 try {
                     eventJSON = connection.receive();
+                    Logger.writeCritical(eventJSON);
                 } catch (DisconnectedException e) {
                     return;
                 }
@@ -45,6 +49,8 @@ public class NetworkEventTransceiver implements EventTransceiver {
                     eventData = gson.fromJson(eventJSON, EventData.class);
                 } catch (JsonParseException e) {
                     // We skip non-valid event JSONs
+                    Logger.writeCritical("Got exception while deserializing");
+                    Logger.writeCritical(e.getMessage());
                     continue;
                 }
 
