@@ -24,28 +24,6 @@ class BoardSelector extends BoardSelectorView {
     }
 
     /**
-     * @return The number of points selected so far.
-     * */
-    public int selectionSize() {
-        return this.selected.size();
-    }
-
-    /*
-     * we assume the extraction is legal from now
-    * */
-    private int distanceFromTwoSelectedTile () {
-        assert selected.size() == 2;
-        final Coordinate c1 = selected.get(0);
-        final Coordinate c2 = selected.get(1);
-
-        if (c1.getCol() == c2.getCol()) {
-            return abs(c1.getRow() - c2.getRow());
-        } else {
-            return abs(c1.getCol() - c2.getCol());
-        }
-    }
-
-    /**
      * @exception RuntimeException if sizeSelection() != 2
      * @return true if the extraction is Vertical
      */
@@ -131,7 +109,7 @@ class BoardSelector extends BoardSelectorView {
         if (selectionSize() == 0)
             throw new IllegalExtractionException("Tiles selected is empty");
 
-        if (selectionSize() == 2 && distanceFromTwoSelectedTile() > 1) {
+        if (!canDraw()) {
             throw new IllegalExtractionException("You can't extract tiles in this order");
         }
 

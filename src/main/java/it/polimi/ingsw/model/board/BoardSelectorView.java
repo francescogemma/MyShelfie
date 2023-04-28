@@ -5,6 +5,8 @@ import it.polimi.ingsw.utils.Coordinate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.abs;
+
 /**
  * @author Giacomo Groppi
  * */
@@ -24,6 +26,28 @@ class BoardSelectorView {
     }
 
     /**
+     * @return The number of points selected so far.
+     * */
+    protected int selectionSize() {
+        return this.selected.size();
+    }
+
+    /*
+     * we assume the extraction is legal from now
+     * */
+    protected int distanceFromTwoSelectedTile () {
+        assert selected.size() == 2;
+        final Coordinate c1 = selected.get(0);
+        final Coordinate c2 = selected.get(1);
+
+        if (c1.getCol() == c2.getCol()) {
+            return abs(c1.getRow() - c2.getRow());
+        } else {
+            return abs(c1.getCol() - c2.getCol());
+        }
+    }
+
+    /**
      * The function checks in all the possible previous selections
      * and returns whether the coordinate has already been selected.
      * @param c the point to check
@@ -31,6 +55,17 @@ class BoardSelectorView {
      * */
     protected boolean contains(Coordinate c) {
         return this.selected.contains(c);
+    }
+
+    public boolean canDraw () {
+        if (selectionSize() == 0)
+            return false;
+
+        if (selectionSize() == 2 && distanceFromTwoSelectedTile() > 1) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override

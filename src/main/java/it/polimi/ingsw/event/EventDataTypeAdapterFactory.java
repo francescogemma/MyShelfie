@@ -12,6 +12,7 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.LoginEventData;
 import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.*;
+import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.data.wrapper.SyncEventDataWrapper;
 
 import java.io.IOException;
@@ -46,7 +47,8 @@ public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
             Map.entry(PersonalGoalSetEventData.ID, PersonalGoalSetEventData.class),
             Map.entry(PlayerExitGame.ID, PlayerExitGame.class),
             Map.entry(PauseGameEventData.ID, PauseGameEventData.class),
-            Map.entry(GameHasBeenStoppedEventData.ID, GameHasBeenStoppedEventData.class)
+            Map.entry(GameHasBeenStoppedEventData.ID, GameHasBeenStoppedEventData.class),
+            Map.entry(PlayerDisconnectedInternalEventData.ID, PlayerDisconnectedInternalEventData.class)
     );
 
     private static final Map<String, Type> WRAPPER_DATA_TYPES = Map.of(

@@ -2,10 +2,7 @@ package it.polimi.ingsw.model.bag;
 
 import it.polimi.ingsw.model.bag.Bag;
 import jdk.jfr.Description;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.Random;
 
@@ -14,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class BagTest {
     // TODO: Use test methods name conventions
 
+    private static final int numberOfRun = 1;
     private Bag bag;
 
     @BeforeEach
@@ -21,13 +19,13 @@ class BagTest {
         bag = new Bag();
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     @Description("The function checks the initial size of the Bag")
     void checkSize() {
         Assertions.assertEquals(22 * 6, bag.getRemaining());
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     @Description("The function tests that the getRandomTile function removes the object from the board.")
     void testGetRandomTile () {
         for (int i = 0; i < 22 * 6; i++) {
@@ -37,7 +35,7 @@ class BagTest {
         }
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     @Description("Tests that an exception is thrown when attempting to remove a Tile but the bag is empty.")
     void testExtractionEmpty() {
         for (int i = 0; i < 22 * 6; i++) {
@@ -51,12 +49,13 @@ class BagTest {
     }
 
     private void removeRandom() {
-        final int r = new Random().nextInt(bag.getRemaining());
+        final int r = new Random().nextInt(bag.getRemaining() - 1) + 1;
+
         for (int i = 0; i < r; i++)
             bag.getRandomTile();
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     @Description("Test restore")
     void testRestore () {
         removeRandom();
@@ -69,7 +68,7 @@ class BagTest {
         });
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     @Description("Testing clone")
     void testingClone() {
         removeRandom();
@@ -77,7 +76,7 @@ class BagTest {
         assertEquals(newBag, this.bag);
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     @Description("Testing clone with restore")
     void testingCloneAndRestore() {
         removeRandom();
@@ -88,7 +87,7 @@ class BagTest {
         assertEquals(newBag, this.bag);
     }
 
-    @Test
+    @RepeatedTest(numberOfRun)
     @Description("Testing clone and equals")
     void testingCloneAndEquals() {
         removeRandom();

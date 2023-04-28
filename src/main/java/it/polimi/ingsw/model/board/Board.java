@@ -98,6 +98,10 @@ public class Board extends BoardView {
         return this.selectTile(new Coordinate(row, col));
     }
 
+    public boolean canDraw () {
+        return this.boardSelector.canDraw();
+    }
+
     /**
      * The function removes the tiles from the board and return a List of selected {@link Tile tiles}.
      * @return The list of all selected {@link Tile tiles}.

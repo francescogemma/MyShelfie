@@ -167,7 +167,7 @@ public class Bag {
 
         this.remaining --;
         this.remainingTiles[index] --;
-        lastExtraction = index;
+        this.lastExtraction = index;
         return Tile.indexToNonEmptyTile(index);
     }
 

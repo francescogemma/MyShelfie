@@ -6,6 +6,7 @@ import com.google.gson.JsonParseException;
 import it.polimi.ingsw.controller.db.CommonGoalTypeAdapter;
 import it.polimi.ingsw.controller.db.PersonalGoalTypeAdapter;
 import it.polimi.ingsw.event.data.EventData;
+import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.receiver.EventListener;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
@@ -68,7 +69,12 @@ public class NetworkEventTransceiver implements EventTransceiver {
         try {
             connection.send(gson.toJson(data, EventData.class));
         } catch (DisconnectedException e) {
-
+            synchronized (lock) {
+                listeners
+                        .forEach(l ->
+                            l.handle(new PlayerDisconnectedInternalEventData())
+                        );
+            }
         }
     }
 
