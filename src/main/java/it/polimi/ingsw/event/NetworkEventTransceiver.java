@@ -39,7 +39,6 @@ public class NetworkEventTransceiver implements EventTransceiver {
                 String eventJSON;
                 try {
                     eventJSON = connection.receive();
-                    Logger.writeCritical(eventJSON);
                 } catch (DisconnectedException e) {
                     return;
                 }
