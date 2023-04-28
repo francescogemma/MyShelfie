@@ -89,7 +89,9 @@ public class ServerResponseDrawable extends FullyResizableDrawable {
         }
 
         String message;
-        if (response.message().length() > RESPONSE_COLUMNS - STATUS_COLUMNS) {
+        if (response.message() == null) {
+            message = "";
+        } else if (response.message().length() > RESPONSE_COLUMNS - STATUS_COLUMNS) {
             message = response.message().substring(0, RESPONSE_COLUMNS - STATUS_COLUMNS - 3) + "...";
         } else {
             message = response.message();
