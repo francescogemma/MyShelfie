@@ -533,8 +533,9 @@ public class GameLayout extends AppLayout {
             });
 
             CommonGoalCompletedEventData.castEventReceiver(transceiver).registerListener(data -> {
+                Terminal.debug("Got common goal completed event, before lock");
                 synchronized (getLock()) {
-                    Terminal.debug("Common goal completed");
+                    Terminal.debug("Got common goal completed event, after lock");
 
                     CompletedGoal completedGoal = new CompletedGoal(CompletedGoal.GoalType.COMMON,
                         data.getCommonGoalCompleted(), data.getPlayer().getUsername(),

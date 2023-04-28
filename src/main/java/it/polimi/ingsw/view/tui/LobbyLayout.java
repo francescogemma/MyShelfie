@@ -7,6 +7,7 @@ import it.polimi.ingsw.event.data.client.JoinGameEventData;
 import it.polimi.ingsw.event.data.client.StartGameEventData;
 import it.polimi.ingsw.event.data.game.GameHasStartedEventData;
 import it.polimi.ingsw.event.data.game.PlayerHasJoinEventData;
+import it.polimi.ingsw.view.tui.terminal.Terminal;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
@@ -63,7 +64,9 @@ public class LobbyLayout extends AppLayout {
         ));
 
         startButton.onpress(() -> {
+            Terminal.debug("Before requesting start");
             displayServerResponse(startGameRequester.request(new StartGameEventData()));
+            Terminal.debug("After requesting start");
         });
 
         backButton.onpress(() -> switchAppLayout(AvailableGamesMenuLayout.NAME));
@@ -113,7 +116,9 @@ public class LobbyLayout extends AppLayout {
             });
 
             GameHasStartedEventData.castEventReceiver(transceiver).registerListener(data -> {
+                Terminal.debug("Got game has started event, before lock");
                 synchronized (getLock()) {
+                    Terminal.debug("Got game has started event, after lock");
                     switchAppLayout(GameLayout.NAME);
                 }
             });
