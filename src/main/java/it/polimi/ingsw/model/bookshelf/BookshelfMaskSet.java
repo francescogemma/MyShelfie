@@ -28,7 +28,7 @@ public class BookshelfMaskSet {
     /**
      * This predicate will be used to check if an object can be added to the set or not.
      */
-    private Predicate<BookshelfMask> predicate;
+    private transient Predicate<BookshelfMask> predicate;
 
     /**
      * This helper method converts a biPredicate to a predicate, by implementing the algorithm for "couples checking"
