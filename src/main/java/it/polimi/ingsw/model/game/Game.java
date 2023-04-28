@@ -350,8 +350,12 @@ public class Game extends GameView {
 
         List<Tile> t = board.getSelectedTiles();
 
-        if (t.isEmpty() || board.canDraw())
+        if (t.isEmpty())
             throw new IllegalExtractionException("You have select 0 tiles");
+
+        if (!board.canDraw()) {
+            throw new IllegalExtractionException("You can't draw this tiles");
+        }
 
         player.getBookshelf().insertTiles(t, col);
         board.draw();

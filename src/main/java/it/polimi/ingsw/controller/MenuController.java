@@ -203,6 +203,24 @@ public class MenuController {
         }
     }
 
+    public void forceDisconnect(EventTransmitter transmitter, String username) {
+        synchronized (notAuthenticated) {
+            notAuthenticated.remove(transmitter);
+        }
+
+        synchronized (authenticated) {
+            authenticated.remove(transmitter);
+        }
+
+        synchronized (gameControllerList) {
+            for (GameController controller: gameControllerList) {
+                if (controller.containerPlayer(username)) {
+                    controller.disconnect(username);
+                }
+            }
+        }
+    }
+
     public Response createNewGame(String gameName, String username) {
         if (gameName == null || gameName.isEmpty()) {
             return new Response("Game is empty or null", ResponseStatus.FAILURE);

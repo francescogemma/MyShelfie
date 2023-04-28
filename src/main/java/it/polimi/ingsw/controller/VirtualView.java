@@ -6,6 +6,7 @@ import it.polimi.ingsw.event.data.LoginEventData;
 import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.InitialGameEventData;
 import it.polimi.ingsw.event.data.game.PersonalGoalSetEventData;
+import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.game.GameView;
@@ -41,8 +42,16 @@ public class VirtualView implements EventTransmitter{
         PlayerExitGame.responder(transceiver, transceiver,          event -> exitGame());
         PauseGameEventData.responder(transceiver, transceiver,      event -> pauseGame());
 
+        PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(event -> disconnet());
+
         JoinStartedGameEventData.castEventReceiver(transceiver).registerListener(event -> this.sendGameState());
         PlayerHasJoinMenu       .castEventReceiver(transceiver).registerListener(event -> this.playerHasJoinMenu());
+    }
+
+    private synchronized void disconnet () {
+        MenuController.getInstance().forceDisconnect(this, username);
+
+        this.gameController = null;
     }
 
     private synchronized Response pauseGame () {

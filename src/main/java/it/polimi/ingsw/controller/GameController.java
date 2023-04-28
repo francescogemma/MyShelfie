@@ -10,12 +10,9 @@ import it.polimi.ingsw.model.board.IllegalExtractionException;
 import it.polimi.ingsw.model.board.RemoveNotLastSelectedException;
 import it.polimi.ingsw.model.bookshelf.NotEnoughSpaceInColumnException;
 import it.polimi.ingsw.model.game.*;
-import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
-
-// events
 
 import java.util.*;
 
