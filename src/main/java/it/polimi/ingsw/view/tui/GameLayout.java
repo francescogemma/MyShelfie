@@ -13,6 +13,7 @@ import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 import it.polimi.ingsw.model.game.PlayerView;
 import it.polimi.ingsw.model.goal.CommonGoal;
+import it.polimi.ingsw.model.goal.Goal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
@@ -23,6 +24,7 @@ import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
 import it.polimi.ingsw.view.tui.terminal.drawable.menu.Button;
 import it.polimi.ingsw.view.tui.terminal.drawable.menu.value.TextBox;
 import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayout;
+import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayoutElement;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Color;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.PrimitiveSymbol;
 import it.polimi.ingsw.view.tui.terminal.drawable.twolayers.TwoLayersDrawable;
@@ -103,21 +105,21 @@ public class GameLayout extends AppLayout {
     private final Button previousBookshelfButton = new Button("<");
     private final TextBox gameNameTextBox = new TextBox().unfocusable();
     private static class PlayerDisplay {
-        public PlayerDisplay(String name, int points, int position, boolean isPlayingPlayer,
+        public PlayerDisplay(String name, int points, int additionalPoints, int position,
                              boolean isClientPlayer,
                              boolean blurred) {
+            this.position = position;
             this.name = name;
             this.points = points;
-            this.position = position;
+            this.additionalPoints = additionalPoints;
             this.isClientPlayer = isClientPlayer;
-            this.isPlayingPlayer = isPlayingPlayer;
             this.blurred = blurred;
         }
 
         private String name;
         private int points;
+        private int additionalPoints;
         private int position;
-        private boolean isPlayingPlayer;
         private boolean isClientPlayer;
         private boolean blurred;
     }
@@ -126,12 +128,16 @@ public class GameLayout extends AppLayout {
         private final TextBox positionTextBox = new TextBox().unfocusable();
         private final TextBox playerNameTextBox = new TextBox().hideCursor();
         private final TextBox playerPointsTextBox = new TextBox().hideCursor();
+        private final TextBox playerAdditionalPointsTextBox = new TextBox().unfocusable().color(Color.GREEN);
+        private final OrientedLayoutElement playerAdditionalPointsElement = playerAdditionalPointsTextBox
+            .center().weight(0);
 
         public PlayerDisplayDrawable() {
             setLayout(new OrientedLayout(Orientation.HORIZONTAL,
-                positionTextBox.center().weight(1),
-                playerNameTextBox.center().weight(1),
-                playerPointsTextBox.center().weight(1)).center().crop()
+                positionTextBox.center().weight(3),
+                playerNameTextBox.center().weight(3),
+                playerPointsTextBox.center().weight(3),
+                playerAdditionalPointsElement).center().crop()
                 .fixSize(new DrawableSize(5, 40)).addBorderBox().blurrable()
             );
         }
@@ -140,16 +146,23 @@ public class GameLayout extends AppLayout {
     private final RecyclerDrawable<PlayerDisplayDrawable, PlayerDisplay> playerDisplayRecyclerDrawable =
         new RecyclerDrawable<>(Orientation.VERTICAL, PlayerDisplayDrawable::new,
             (playerDisplayDrawable, playerDisplay) -> {
-                playerDisplayDrawable.positionTextBox.text("# " + String.valueOf(playerDisplay.position) + " ");
-                playerDisplayDrawable.playerNameTextBox.text(playerDisplay.name + " " +
-                        (playerDisplay.isPlayingPlayer ? "<-" : ""))
+                playerDisplayDrawable.positionTextBox.text("# " + String.valueOf(playerDisplay.position));
+                playerDisplayDrawable.playerNameTextBox.text(playerDisplay.name)
                     .color(playerDisplay.isClientPlayer ? Color.FOCUS : Color.WHITE);
                 playerDisplayDrawable.playerPointsTextBox.text("Points: " + playerDisplay.points);
+
+                if (playerDisplay.additionalPoints > 0) {
+                    playerDisplayDrawable.playerAdditionalPointsTextBox.text("+" + playerDisplay.additionalPoints);
+                    playerDisplayDrawable.playerAdditionalPointsElement.setWeight(1);
+                } else {
+                    playerDisplayDrawable.playerAdditionalPointsElement.setWeight(0);
+                }
+
                 playerDisplayDrawable.getLayout().blur(playerDisplay.blurred);
             });
 
-    private final static int GOALS_TEXT_BOX_LINES = 10;
-    private final static int GOALS_TEXT_BOX_COLUMNS = 30;
+    private static final int GOALS_TEXT_BOX_LINES = 10;
+    private static final int GOALS_TEXT_BOX_COLUMNS = 30;
 
     public GameLayout() {
         setLayout(new OrientedLayout(Orientation.HORIZONTAL,
@@ -242,48 +255,107 @@ public class GameLayout extends AppLayout {
         });
     }
 
-    private void displayCommonGoalCompleted(int playerIndex, boolean completedFirstCommonGoal,
-                                            BookshelfMaskSet bookshelfMaskSet) {
-        if (completedFirstCommonGoal) {
-            blurrableSecondCommonGoal.blur(true);
-        } else {
-            blurrableFirstCommonGoal.blur(true);
+    private static class CompletedGoal {
+        enum GoalType {
+            COMMON,
+            PERSONAL,
+            ADJACENCY
         }
 
-        blurrablePersonalGoal.blur(true);
-        blurrableAdjacencyGoal.blur(true);
+        public CompletedGoal(GoalType type, int index, String playerName, int points, BookshelfMaskSet maskSet) {
+            this.type = type;
+            this.index = index;
+            this.playerName = playerName;
+            this.points = points;
+            this.maskSet = maskSet;
+        }
 
-        completedCommonGoalPopUpTextBox.text(playerNames.get(playerIndex) + " completed the\n" +
-            (completedFirstCommonGoal ? "first" : "second") + " common goal");
+        private GoalType type;
+        private int index;
+        private String playerName;
+        private int points;
+        private BookshelfMaskSet maskSet;
+    }
+
+    private final Queue<CompletedGoal> completedGoals = new ArrayDeque<>();
+    private Timer completedGoalTimer = null;
+
+    private boolean isFirstPersonalGoalIndex(int index) {
+        return commonGoals[0].getIndex() == index;
+    }
+
+    private void displayCompletedGoal(CompletedGoal completedGoal) {
+        boolean blurFirstCommonGoalDisplay = completedGoal.type != CompletedGoal.GoalType.COMMON ||
+            !isFirstPersonalGoalIndex(completedGoal.index);
+        boolean blurSecondCommonGoalDisplay = completedGoal.type != CompletedGoal.GoalType.COMMON ||
+            isFirstPersonalGoalIndex(completedGoal.index);
+        boolean blurPersonalGoalDisplay = completedGoal.type != CompletedGoal.GoalType.PERSONAL;
+        boolean blurAdjacencyGoalDisplay = completedGoal.type != CompletedGoal.GoalType.ADJACENCY;
+
+        blurrableFirstCommonGoal.blur(blurFirstCommonGoalDisplay);
+        blurrableSecondCommonGoal.blur(blurSecondCommonGoalDisplay);
+        blurrablePersonalGoal.blur(blurPersonalGoalDisplay);
+        blurrableAdjacencyGoal.blur(blurAdjacencyGoalDisplay);
+
+        String goalType = switch (completedGoal.type) {
+            case COMMON -> "common";
+            case PERSONAL -> "personal";
+            case ADJACENCY -> "final";
+        };
+        completedCommonGoalPopUpTextBox.text(completedGoal.playerName + " completed " +
+            (completedGoal.type == CompletedGoal.GoalType.COMMON ? "a " : "the ") +
+            goalType + " goal");
         blurrableBoard.blur(true);
         twoLayersBoard.showForeground();
 
-        playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(true, playerIndex));
+        playerDisplayRecyclerDrawable.populate(craftPlayerDisplayListWithAdditionalPoints(completedGoal.playerName,
+            completedGoal.points));
 
-        playerNameTextBox.text(playerNames.get(playerIndex));
-
-        selectedBookshelfIndex = playerIndex;
-
+        playerNameTextBox.text(completedGoal.playerName);
+        selectedBookshelfIndex = playerNameToIndex(completedGoal.playerName);
         previousBookshelfButton.focusable(false);
-        bookshelfDrawable.mask(bookshelfMaskSet);
+        bookshelfDrawable.mask(completedGoal.maskSet);
         nextBookshelfButton.focusable(false);
+    }
 
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                synchronized (getLock()) {
-                    blurrableFirstCommonGoal.blur(false);
-                    blurrableSecondCommonGoal.blur(false);
-                    blurrablePersonalGoal.blur(false);
-                    blurrableAdjacencyGoal.blur(false);
-                    blurrableBoard.blur(false);
-                    twoLayersBoard.hideForeground();
-                    playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
+    private void restoreLayoutAfterCompletedGoal() {
+        blurrableFirstCommonGoal.blur(false);
+        blurrableSecondCommonGoal.blur(false);
+        blurrablePersonalGoal.blur(false);
+        blurrableAdjacencyGoal.blur(false);
 
-                    populateBookshelfMenu();
+        blurrableBoard.blur(false);
+        twoLayersBoard.hideForeground();
+
+        playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList());
+
+        populateBookshelfMenu();
+    }
+
+    TimerTask displayGoalTask = new TimerTask() {
+        @Override
+        public void run() {
+            synchronized (getLock()) {
+                restoreLayoutAfterCompletedGoal();
+
+                if (!completedGoals.isEmpty()) {
+                    displayCompletedGoal(completedGoals.poll());
+                    completedGoalTimer = new Timer();
+                    completedGoalTimer.schedule(displayGoalTask, 10000);
                 }
             }
-        }, 10000);
+        }
+    };
+
+    private void addCompletedGoalToDisplayQueue(CompletedGoal completedGoal) {
+        if (completedGoalTimer == null) {
+            displayCompletedGoal(completedGoal);
+
+            completedGoalTimer = new Timer();
+            completedGoalTimer.schedule(displayGoalTask, 10000);
+        } else {
+            completedGoals.add(completedGoal);
+        }
     }
 
     private int selectedBookshelfIndex;
@@ -298,6 +370,7 @@ public class GameLayout extends AppLayout {
     private CommonGoal[] commonGoals = null;
     private String gameName;
     private BoardView board;
+    private boolean gameOver;
 
     private int playerNameToIndex(String name) {
         for (int i = 0; i < playerNames.size(); i++) {
@@ -309,7 +382,7 @@ public class GameLayout extends AppLayout {
         throw new IllegalArgumentException("There is no player named " + name);
     }
 
-    private List<PlayerDisplay> craftPlayerDisplayList(boolean blurred, int playerToExcludeFromBlurIndex) {
+    private List<PlayerDisplay> craftPlayerDisplayList() {
         List<PlayerDisplay> playerDisplays = new ArrayList<>();
 
         for (int i = 0; i < playerNames.size(); i++) {
@@ -319,15 +392,45 @@ public class GameLayout extends AppLayout {
                 j++;
             }
 
-            playerDisplays.add(j, new PlayerDisplay(playerNames.get(i), playerPoints.get(i),j + 1,
-                i == playingPlayerIndex,
-                i == clientPlayerIndex,
-                i != playerToExcludeFromBlurIndex && blurred));
+            playerDisplays.add(j, new PlayerDisplay(playerNames.get(i), playerPoints.get(i), 0, j + 1,
+                i == clientPlayerIndex, false));
 
             for (j++; j < playerDisplays.size(); j++) {
                 if (playerDisplays.get(i).points < playerPoints.get(i)) {
                     playerDisplays.get(i).position++;
                 }
+            }
+        }
+
+        return playerDisplays;
+    }
+
+    private List<PlayerDisplay> craftPlayerDisplayListWithAdditionalPoints(String playerName, int additionalPoints) {
+        List<PlayerDisplay> playerDisplays = craftPlayerDisplayList();
+
+        int playerIndex = 0;
+        for (int i = 0; i < playerDisplays.size(); i++) {
+            playerDisplays.get(i).blurred = !playerDisplays.get(i).name.equals(playerName);
+
+            if (playerDisplays.get(i).name.equals(playerName)) {
+                playerIndex = i;
+            }
+        }
+
+        for (int j = playerIndex - 1; j >= 0; j--) {
+            if (playerDisplays.get(j).points < playerDisplays.get(j + 1).points + additionalPoints) {
+                if (j == 0) {
+                    playerDisplays.get(j + 1).position = 1;
+                } else {
+                    playerDisplays.get(j + 1).position = playerDisplays.get(j - 1).position;
+                    if (playerDisplays.get(j - 1).points > playerDisplays.get(j + 1).points + additionalPoints) {
+                        playerDisplays.get(j + 1).position++;
+                    }
+                }
+
+                playerDisplays.get(j).position = playerDisplays.get(j + 1).position + 1;
+
+                Collections.swap(playerDisplays, j, j + 1);
             }
         }
 
@@ -391,7 +494,7 @@ public class GameLayout extends AppLayout {
 
                     gameNameTextBox.text("Game: " + gameName);
                     populateBookshelfMenu();
-                    playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
+                    playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList());
                     populateBoard(data.gameView().getBoard());
                 }
             });
@@ -402,9 +505,6 @@ public class GameLayout extends AppLayout {
             CurrentPlayerChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 synchronized (getLock()) {
                     playingPlayerIndex = playerNameToIndex(data.getUsername());
-
-                    playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList(false, 0));
-
                     populateBoard(board);
                     populateBookshelfMenu();
                 }
@@ -420,7 +520,6 @@ public class GameLayout extends AppLayout {
             BoardChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 synchronized (getLock()) {
                     board = data.board();
-
                     populateBoard(board);
                 }
             });
@@ -428,10 +527,21 @@ public class GameLayout extends AppLayout {
             BookshelfHasChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 synchronized (getLock()) {
                     bookshelves.set(playerNameToIndex(data.getUsername()), data.getBookshelf());
-
                     populateBookshelfMenu();
                 }
             });
+
+            CommonGoalCompletedEventData.castEventReceiver(transceiver).registerListener(data -> {
+                synchronized (getLock()) {
+                    CompletedGoal completedGoal = new CompletedGoal(CompletedGoal.GoalType.COMMON,
+                        data.getCommonGoalCompleted(), data.getPlayer().getUsername(),
+                        data.getPlayer().getPoints() - playerPoints
+                            .get(playerNameToIndex(data.getPlayer().getUsername())), data.getBookshelfMaskSet());
+                    displayCompletedGoal(completedGoal);
+                }
+            });
+
+            gameOver = false;
 
             transceiver.broadcast(new JoinStartedGameEventData());
         }

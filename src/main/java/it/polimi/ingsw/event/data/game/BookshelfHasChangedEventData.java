@@ -11,6 +11,7 @@ import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import java.util.function.Function;
 
 public class BookshelfHasChangedEventData implements EventData {
+    // TODO: Use a BookshelfView instead
     private final Bookshelf bookshelf;
     private final String username;
 
