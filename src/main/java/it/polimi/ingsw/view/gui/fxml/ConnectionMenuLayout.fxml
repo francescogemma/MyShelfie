@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+
+<VBox>
+    <children>
+        <Label text="GUI not implemented yet!"/>
+    </children>
+</VBox>

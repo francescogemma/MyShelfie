@@ -1,6 +1,7 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.utils.Logger;
+import it.polimi.ingsw.view.gui.GuiApplication;
 import it.polimi.ingsw.view.tui.*;
 import it.polimi.ingsw.view.tui.terminal.Terminal;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.App;
@@ -15,7 +16,7 @@ public class Client {
         AppLayoutData data = terminal.start(new App(InitialMenuLayout::new));
 
         if (data.getString("interface").equals("GUI")) {
-            System.out.println("GUI not yet implemented! I'm going to blow up! 3... 2... 1... BOOM!");
+            GuiApplication.main(args);
         } else {
             terminal.start(new App(data, ConnectionMenuLayout::new, LoginMenuLayout::new,
                 AvailableGamesMenuLayout::new, LobbyLayout::new, GameLayout::new));
