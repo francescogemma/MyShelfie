@@ -42,7 +42,7 @@ public class PersonalGoalEvaluator implements Evaluator {
      * Points that should be given the player so far.
      */
     private int points;
-    private final BookshelfMaskSet pointMasks;
+    private BookshelfMaskSet pointMasks;
 
     /**
      * Type constructor.
@@ -86,7 +86,7 @@ public class PersonalGoalEvaluator implements Evaluator {
     public void clear() {
         successfulShelves = 0;
         points = 0;
-        pointMasks.clear();
+        pointMasks = new BookshelfMaskSet();
     }
 
     @Override
