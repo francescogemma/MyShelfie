@@ -831,7 +831,7 @@ class GameTest {
         game.startGame("Giacomo");
     }
 
-    @RepeatedTest(1)
+    @RepeatedTest(numberOfRun)
     void disconnect__correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
 
         final String username1 = "Giacomo";
@@ -860,5 +860,51 @@ class GameTest {
 
         game.addPlayer(username1);
         Assertions.assertEquals(username3, game.getCurrentPlayer().getUsername());
+    }
+
+    @Test
+    void disconnectPlayer_gameshouldstop_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
+        final String username1 = "Giacomo";
+        final String username2 = "Michele";
+        final String username3 = "Cristiano";
+
+        this.game = new Game("Prova", "Giacomo");
+
+        this.game.setTransceiver(new LocalEventTransceiver());
+
+        this.game.addPlayer(username1);
+        this.game.addPlayer(username2);
+        this.game.addPlayer(username3);
+
+        this.game.startGame(username1);
+
+        Assertions.assertEquals(username1, game.getCurrentPlayer().getUsername());
+
+        game.disconnectPlayer(username2);
+
+        Assertions.assertEquals(username1, game.getCurrentPlayer().getUsername());
+
+        game.disconnectPlayer(username1);
+
+        Assertions.assertEquals(username3, game.getCurrentPlayer().getUsername());
+
+        game.addPlayer(username1);
+        Assertions.assertEquals(username3, game.getCurrentPlayer().getUsername());
+
+        game.disconnectPlayer(username1);
+        game.disconnectPlayer(username2);
+        game.disconnectPlayer(username3);
+
+        Assertions.assertTrue(game.isStopped());
+
+        game.addPlayer(username1);
+        game.addPlayer(username2);
+
+        Assertions.assertTrue(game.isStopped());
+
+        game.startGame(username1);
+
+        Assertions.assertFalse(game.isStopped());
+        Assertions.assertEquals(username1, game.getCurrentPlayer().getUsername());
     }
 }

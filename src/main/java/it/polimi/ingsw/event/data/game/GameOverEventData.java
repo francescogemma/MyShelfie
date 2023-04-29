@@ -17,12 +17,14 @@ import java.util.List;
 import java.util.function.Function;
 
 public record GameOverEventData(List<PlayerView> winners,
-                                List<Pair<Integer, BookshelfMaskSet>> personalGoal) implements EventData {
+                                List<Pair<Integer, BookshelfMaskSet>> personalGoal,
+                                List<Pair<Integer, BookshelfMaskSet>> adjacencyGoal) implements EventData {
     public static final String ID = "GAME_OVER";
 
-    public GameOverEventData(List<PlayerView> winners, List<Pair<Integer, BookshelfMaskSet>> personalGoal) {
+    public GameOverEventData(List<PlayerView> winners, List<Pair<Integer, BookshelfMaskSet>> personalGoal, List<Pair<Integer, BookshelfMaskSet>> adjacencyGoal) {
         this.winners = new ArrayList<>(winners);
         this.personalGoal = new ArrayList<>(personalGoal);
+        this.adjacencyGoal = new ArrayList<>(adjacencyGoal);
     }
 
     @Override

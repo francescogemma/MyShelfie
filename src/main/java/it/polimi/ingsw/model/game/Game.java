@@ -5,6 +5,7 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
+import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 import it.polimi.ingsw.model.goal.AdjacencyGoal;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.goal.Goal;
@@ -14,6 +15,7 @@ import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Pair;
 import it.polimi.ingsw.event.data.client.StartGameEventData;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
 public class Game extends GameView {
@@ -270,18 +272,24 @@ public class Game extends GameView {
 
         if (atLeastOneBookshelfIsFull() && this.currentPlayerIndex + 1 == this.players.size()) {
             // Game ending logic:
+            List<Pair<Integer, BookshelfMaskSet>> pointsAchievePersonal = new ArrayList<>();
+            List<Pair<Integer, BookshelfMaskSet>> pointsAchieveAdjacency = new ArrayList<>();
+
             for (Player player : players) {
-                int personalGoalPoints = player.getPersonalGoal().calculatePoints(player.getBookshelf());
+                final int personalGoalPoints = player.getPersonalGoal().calculatePoints(player.getBookshelf());
+
                 if (personalGoalPoints > 0) {
+                    pointsAchievePersonal.add(new Pair<>(personalGoalPoints, player.getPersonalGoal().getPointMasks()));
                     player.addPoints(personalGoalPoints);
-                }
+                } else pointsAchievePersonal.add(new Pair<>(0, null));
 
                 Goal adjacencyGoal = new AdjacencyGoal();
                 int adjacencyGoalPoints = adjacencyGoal.calculatePoints(player.getBookshelf());
 
                 if (adjacencyGoalPoints > 0) {
+                    pointsAchieveAdjacency.add(new Pair<>(adjacencyGoalPoints, adjacencyGoal.getPointMasks()));
                     player.addPoints(adjacencyGoalPoints);
-                }
+                } else pointsAchieveAdjacency.add(new Pair<>(0, null));
             }
 
             for (Player player : players) {
@@ -298,16 +306,9 @@ public class Game extends GameView {
             broadcast(
                     new GameOverEventData(
                             this.getWinners(),
-                            players
-                                    .stream()
-                                    .map(p ->
-                                        new Pair<>(
-                                                p.getPersonalGoal().getIndex(),
-                                                p.getPersonalGoal().getPointMasks()
-                                        )
-                                    )
-                                    .toList()
-                            )
+                            pointsAchievePersonal,
+                            pointsAchieveAdjacency
+                    )
             );
         } else {
             this.refillBoardIfNecessary();

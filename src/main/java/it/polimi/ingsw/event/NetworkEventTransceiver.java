@@ -83,8 +83,8 @@ public class NetworkEventTransceiver implements EventTransceiver {
     public void broadcast(EventData data) {
         try {
             connection.send(gson.toJson(data, EventData.class));
-        } catch (DisconnectedException e) {
-            notifyDisconnection();
+        } catch (DisconnectedException ignored) {
+
         }
     }
 
