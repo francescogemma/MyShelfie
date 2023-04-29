@@ -104,7 +104,7 @@ public class GameLayout extends AppLayout {
     private final Button nextBookshelfButton = new Button(">");
     private final Button previousBookshelfButton = new Button("<");
     private final TextBox gameNameTextBox = new TextBox().unfocusable();
-    private static class PlayerDisplay {
+    public static class PlayerDisplay {
         public PlayerDisplay(String name, int points, int position,
                              boolean isClientPlayer,
                              boolean blurred) {
@@ -113,6 +113,22 @@ public class GameLayout extends AppLayout {
             this.points = points;
             this.isClientPlayer = isClientPlayer;
             this.blurred = blurred;
+        }
+
+        public int getPosition() {
+            return position;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getPoints() {
+            return points;
+        }
+
+        public boolean isClientPlayer() {
+            return isClientPlayer;
         }
 
         private String name;
@@ -198,7 +214,9 @@ public class GameLayout extends AppLayout {
         );
 
         setData(new AppLayoutData(
-            Map.of()
+            Map.of(
+                "scoreboard", () -> craftPlayerDisplayList()
+            )
         ));
 
         nextBookshelfButton.onpress(() -> {
@@ -364,7 +382,7 @@ public class GameLayout extends AppLayout {
         } else {
             completedGoalTimer = null;
             if (gameOver) {
-                // TODO: Switch to game over layout
+                switchAppLayout(GameOverLayout.NAME);
             }
         }
     }
@@ -588,6 +606,25 @@ public class GameLayout extends AppLayout {
             });
 
             gameOver = false;
+
+            GameOverEventData.castEventReceiver(transceiver).registerListener(data -> {
+                // Add final goal
+                for (int i = 0; i < playerNames.size(); i++) {
+                    if (data.personalGoal().get(i).getKey() > 0) {
+                        addCompletedGoalToDisplayQueue(new CompletedGoal(CompletedGoal.GoalType.PERSONAL,
+                            0, playerNames.get(i), data.personalGoal().get(i).getKey(),
+                            data.personalGoal().get(i).getValue()));
+                    }
+
+                    if (data.adjacencyGoal().get(i).getKey() > 0) {
+                        addCompletedGoalToDisplayQueue(new CompletedGoal(CompletedGoal.GoalType.ADJACENCY,
+                            0, playerNames.get(i), data.adjacencyGoal().get(i).getKey(),
+                            data.adjacencyGoal().get(i).getValue()));
+                    }
+                }
+
+                gameOver = true;
+            });
 
             transceiver.broadcast(new JoinStartedGameEventData());
         }

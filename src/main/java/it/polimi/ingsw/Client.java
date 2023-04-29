@@ -19,7 +19,8 @@ public class Client {
             GuiApplication.main(args);
         } else {
             terminal.start(new App(data, ConnectionMenuLayout::new, LoginMenuLayout::new,
-                AvailableGamesMenuLayout::new, LobbyLayout::new, GameLayout::new));
+                AvailableGamesMenuLayout::new, LobbyLayout::new, GameLayout::new,
+                GameOverLayout::new));
         }
     }
 }
