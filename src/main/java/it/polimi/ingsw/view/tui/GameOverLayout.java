@@ -46,8 +46,8 @@ public class GameOverLayout extends AppLayout {
     public GameOverLayout() {
         setLayout(new OrientedLayout(Orientation.VERTICAL,
             new TextBox().text("Scoreboard").unfocusable().center().weight(1),
-            playerDisplayRecyclerDrawable.alignUpLeft()
-                .scrollable().center().weight(8),
+            playerDisplayRecyclerDrawable.center()
+                .scrollable().alignUpLeft().weight(8),
             new OrientedLayout(Orientation.HORIZONTAL,
                 new Fill(PrimitiveSymbol.EMPTY).weight(1),
                 backToAvailableGamesButton.center().weight(1),
