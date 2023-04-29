@@ -25,7 +25,7 @@ public class GameOverLayout extends AppLayout {
                 positionTextBox.center().weight(1),
                 playerNameTextBox.center().weight(1),
                 playerPointsTextBox.center().weight(1)
-            ).center().crop().fixSize(new DrawableSize(5, 80))
+            ).center().crop().fixSize(new DrawableSize(5, 70))
                 .addBorderBox());
         }
     }
