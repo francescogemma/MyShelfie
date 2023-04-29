@@ -104,13 +104,12 @@ public class GameLayout extends AppLayout {
     private final Button previousBookshelfButton = new Button("<");
     private final TextBox gameNameTextBox = new TextBox().unfocusable();
     private static class PlayerDisplay {
-        public PlayerDisplay(String name, int points, int additionalPoints, int position,
+        public PlayerDisplay(String name, int points, int position,
                              boolean isClientPlayer,
                              boolean blurred) {
             this.position = position;
             this.name = name;
             this.points = points;
-            this.additionalPoints = additionalPoints;
             this.isClientPlayer = isClientPlayer;
             this.blurred = blurred;
         }
@@ -129,15 +128,18 @@ public class GameLayout extends AppLayout {
         private final TextBox playerPointsTextBox = new TextBox().hideCursor();
         private final TextBox playerAdditionalPointsTextBox = new TextBox().unfocusable().color(Color.GREEN);
         private final OrientedLayoutElement playerAdditionalPointsElement = playerAdditionalPointsTextBox
-            .center().weight(0);
+            .alignUpLeft().weight(0);
 
         public PlayerDisplayDrawable() {
             setLayout(new OrientedLayout(Orientation.HORIZONTAL,
-                positionTextBox.center().weight(3),
-                playerNameTextBox.center().weight(3),
-                playerPointsTextBox.center().weight(3),
-                playerAdditionalPointsElement).center().crop()
-                .fixSize(new DrawableSize(5, 40)).addBorderBox().blurrable()
+                positionTextBox.center().weight(1),
+                playerNameTextBox.center().weight(1),
+                new OrientedLayout(Orientation.HORIZONTAL,
+                    playerPointsTextBox.alignUpLeft().weight(1),
+                    playerAdditionalPointsElement)
+                .center().crop().fixSize(new DrawableSize(1, 15)).center().weight(1))
+                .center().crop()
+                .fixSize(new DrawableSize(5, 50)).addBorderBox().blurrable()
             );
         }
     }
@@ -221,13 +223,13 @@ public class GameLayout extends AppLayout {
     private void populateGoalsMenu() {
         firstCommonGoalDescriptionTextBox.text(commonGoals[0].getDescription());
         firstCommonGoalDrawable.populate(commonGoals[0].getDisplay());
-        firstCommonGoalPointsTextBox.text("Points: " + commonGoals[0].getPointStack()
-            .get(commonGoals[0].getPointStack().size() - 1));
+        firstCommonGoalPointsTextBox.text("Points: " + (commonGoals[0].getPointStack().size() == 0 ? 0 :
+            commonGoals[0].getPointStack().get(commonGoals[0].getPointStack().size() - 1)));
 
         secondCommonGoalDescriptionTextBox.text(commonGoals[1].getDescription());
         secondCommonGoalDrawable.populate(commonGoals[1].getDisplay());
-        secondCommonGoalPointsTextBox.text("Points: " + commonGoals[1].getPointStack()
-            .get(commonGoals[1].getPointStack().size() - 1));
+        secondCommonGoalPointsTextBox.text("Points: " + (commonGoals[1].getPointStack().size() == 0 ? 0 :
+            commonGoals[1].getPointStack().get(commonGoals[1].getPointStack().size() - 1)));
 
         personalGoalDrawable.populate(personalGoal.getTilesColorMask());
     }
@@ -301,7 +303,7 @@ public class GameLayout extends AppLayout {
             case PERSONAL -> "personal";
             case ADJACENCY -> "final";
         };
-        completedCommonGoalPopUpTextBox.text(completedGoal.playerName + " completed " +
+        completedCommonGoalPopUpTextBox.text(completedGoal.playerName + " completed\n" +
             (completedGoal.type == CompletedGoal.GoalType.COMMON ? "a " : "the ") +
             goalType + " goal");
         blurrableBoard.blur(true);
@@ -331,29 +333,60 @@ public class GameLayout extends AppLayout {
         populateBookshelfMenu();
     }
 
-    TimerTask displayGoalTask = new TimerTask() {
-        @Override
-        public void run() {
-            synchronized (getLock()) {
-                restoreLayoutAfterCompletedGoal();
+    private void displayGoalTask() {
+        CompletedGoal completedGoal = completedGoals.poll();
+        playerPoints.set(playerNameToIndex(completedGoal.playerName),
+            playerPoints.get(playerNameToIndex(completedGoal.playerName)) + completedGoal.points);
+        restoreLayoutAfterCompletedGoal();
 
-                if (!completedGoals.isEmpty()) {
-                    displayCompletedGoal(completedGoals.poll());
-                    completedGoalTimer = new Timer();
-                    completedGoalTimer.schedule(displayGoalTask, 10000);
+        if (!completedGoals.isEmpty()) {
+            displayCompletedGoal(completedGoals.peek());
+
+            completedGoalTimer = new Timer();
+            completedGoalTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (getLock()) {
+                        displayGoalTask();
+                    }
                 }
+            }, 8000);
+        } else {
+            completedGoalTimer = null;
+            if (gameOver) {
+                // TODO: Switch to game over layout
             }
         }
-    };
+    }
 
     private void addCompletedGoalToDisplayQueue(CompletedGoal completedGoal) {
+        if (completedGoal.type == CompletedGoal.GoalType.COMMON) {
+            int i = 1;
+            if (isFirstPersonalGoalIndex(completedGoal.index)) {
+                i = 0;
+            }
+
+            List<Integer> newPointStack = commonGoals[i].getPointStack();
+            newPointStack.remove(newPointStack.size() - 1);
+            commonGoals[i].setPointStack(newPointStack);
+
+            populateGoalsMenu();
+        }
+
+        completedGoals.add(completedGoal);
+
         if (completedGoalTimer == null) {
             displayCompletedGoal(completedGoal);
 
             completedGoalTimer = new Timer();
-            completedGoalTimer.schedule(displayGoalTask, 10000);
-        } else {
-            completedGoals.add(completedGoal);
+            completedGoalTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    synchronized (getLock()) {
+                        displayGoalTask();
+                    }
+                }
+            }, 8000);
         }
     }
 
@@ -391,7 +424,7 @@ public class GameLayout extends AppLayout {
                 j++;
             }
 
-            playerDisplays.add(j, new PlayerDisplay(playerNames.get(i), playerPoints.get(i), 0, j + 1,
+            playerDisplays.add(j, new PlayerDisplay(playerNames.get(i), playerPoints.get(i), j + 1,
                 i == clientPlayerIndex, false));
 
             for (j++; j < playerDisplays.size(); j++) {
@@ -430,8 +463,13 @@ public class GameLayout extends AppLayout {
                 playerDisplays.get(j).position = playerDisplays.get(j + 1).position + 1;
 
                 Collections.swap(playerDisplays, j, j + 1);
+                playerIndex = j;
+            } else {
+                break;
             }
         }
+
+        playerDisplays.get(playerIndex).additionalPoints = additionalPoints;
 
         return playerDisplays;
     }
@@ -502,7 +540,10 @@ public class GameLayout extends AppLayout {
             CurrentPlayerChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 playingPlayerIndex = playerNameToIndex(data.getUsername());
                 populateBoard(board);
-                populateBookshelfMenu();
+
+                if (completedGoalTimer == null) {
+                    populateBookshelfMenu();
+                }
             });
 
             PersonalGoalSetEventData.castEventReceiver(transceiver).registerListener(data -> {
@@ -517,7 +558,10 @@ public class GameLayout extends AppLayout {
 
             BookshelfHasChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 bookshelves.set(playerNameToIndex(data.getUsername()), data.getBookshelf());
-                populateBookshelfMenu();
+
+                if (completedGoalTimer == null) {
+                    populateBookshelfMenu();
+                }
             });
 
             CommonGoalCompletedEventData.castEventReceiver(transceiver).registerListener(data -> {
@@ -525,10 +569,7 @@ public class GameLayout extends AppLayout {
                     data.getCommonGoalCompleted(), data.getPlayer().getUsername(),
                     data.getPlayer().getPoints() - playerPoints
                         .get(playerNameToIndex(data.getPlayer().getUsername())), data.getBookshelfMaskSet());
-                displayCompletedGoal(completedGoal);
-
-                playerPoints.set(playerNameToIndex(data.getPlayer().getUsername()),
-                    data.getPlayer().getPoints());
+                addCompletedGoalToDisplayQueue(completedGoal);
             });
 
             gameOver = false;
