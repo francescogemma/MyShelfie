@@ -381,6 +381,9 @@ public class GameLayout extends AppLayout {
             }, 8000);
         } else {
             completedGoalTimer = null;
+
+            getLock().notifyAll();
+
             if (gameOver) {
                 switchAppLayout(GameOverLayout.NAME);
             }
@@ -388,6 +391,14 @@ public class GameLayout extends AppLayout {
     }
 
     private void addCompletedGoalToDisplayQueue(CompletedGoal completedGoal) {
+        while (displayingFullBookshelf) {
+            try {
+                getLock().wait();
+            } catch (InterruptedException e) {
+
+            }
+        }
+
         if (completedGoal.type == CompletedGoal.GoalType.COMMON) {
             int i = 1;
             if (isFirstPersonalGoalIndex(completedGoal.index)) {
@@ -507,6 +518,8 @@ public class GameLayout extends AppLayout {
     private Requester<Response, DeselectTileEventData> deselectTileRequester;
     private Requester<Response, InsertTileEventData> insertTileRequester;
 
+    private boolean displayingFullBookshelf = false;
+
     @Override
     public void setup(String previousLayoutName) {
         if (previousLayoutName.equals(LobbyLayout.NAME)) {
@@ -624,6 +637,46 @@ public class GameLayout extends AppLayout {
                 }
 
                 gameOver = true;
+            });
+
+            FirstFullBookshelfEventData.castEventReceiver(transceiver).registerListener(data -> {
+                while (completedGoalTimer != null) {
+                    try {
+                        getLock().wait();
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+
+                displayingFullBookshelf = true;
+
+                playerDisplayRecyclerDrawable.populate(craftPlayerDisplayListWithAdditionalPoints(
+                    data.username(),
+                    1
+                ));
+
+                blurrableBoard.blur(true);
+                completedCommonGoalPopUpTextBox.text(data.username() + " filled\nthe bookshelf");
+                twoLayersBoard.showForeground();
+
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        synchronized (getLock()) {
+                            playerPoints.set(playerNameToIndex(data.username()),
+                                playerPoints.get(playerNameToIndex(data.username())) + 1);
+
+                            playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList());
+
+                            blurrableBoard.blur(false);
+                            twoLayersBoard.hideForeground();
+
+                            displayingFullBookshelf = false;
+
+                            getLock().notifyAll();
+                        }
+                    }
+                }, 2000);
             });
 
             transceiver.broadcast(new JoinStartedGameEventData());
