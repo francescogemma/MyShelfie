@@ -52,6 +52,8 @@ public class GameView implements Identifiable {
 
     protected boolean isStopped;
 
+    protected int firstPlayerCompleteBookshelf = -1;
+
     /**
      * The index of the current player in the list of players.
      */
@@ -87,11 +89,16 @@ public class GameView implements Identifiable {
         this.playerViews = new ArrayList<>(other.playerViews);
         this.creator = other.creator;
         this.isStopped = other.isStopped;
+        this.firstPlayerCompleteBookshelf = other.firstPlayerCompleteBookshelf;
 
         this.commonGoals = new CommonGoal[other.commonGoals.length];
         for (int i = 0; i < other.commonGoals.length; i++) {
             this.commonGoals[i] = other.commonGoals[i];
         }
+    }
+
+    public int getFirstPlayerCompleteBookshelf() {
+        return this.firstPlayerCompleteBookshelf;
     }
 
     /**

@@ -22,6 +22,7 @@ public record GameOverEventData(List<PlayerView> winners,
     public static final String ID = "GAME_OVER";
 
     public GameOverEventData(List<PlayerView> winners, List<Pair<Integer, BookshelfMaskSet>> personalGoal, List<Pair<Integer, BookshelfMaskSet>> adjacencyGoal) {
+        assert personalGoal.size() == adjacencyGoal.size();
         this.winners = new ArrayList<>(winners);
         this.personalGoal = new ArrayList<>(personalGoal);
         this.adjacencyGoal = new ArrayList<>(adjacencyGoal);

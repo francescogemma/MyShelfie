@@ -387,6 +387,11 @@ public class Game extends GameView {
             }
         }
 
+        if (player.getBookshelf().isFull() && firstPlayerCompleteBookshelf != -1) {
+            firstPlayerCompleteBookshelf = currentPlayerIndex;
+            broadcast(new FirstFullBookshelfEventData(player.getUsername()));
+        }
+
         try {
             this.calculateNextPlayer();
         } catch (NoPlayerConnectedException e) {
