@@ -7,6 +7,7 @@ import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.game.GameView;
+import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 

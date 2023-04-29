@@ -131,7 +131,7 @@ public class GameController {
             } catch (IllegalExtractionException | FullSelectionException | IllegalFlowException e) {
                 return new Response(e.toString(), ResponseStatus.FAILURE);
             }
-            Logger.write(Logger.Type.MESSAGE, " selected tile at " + coordinate + " in " + gameName());
+            Logger.writeMessage("selected tile at " + coordinate + " in " + gameName());
 
             return new Response("You've selected a tile", ResponseStatus.SUCCESS);
         }
@@ -139,7 +139,7 @@ public class GameController {
 
     public Response deselectTile(String username, Coordinate coordinate) {
         assert username != null;
-        Logger.write(Logger.Type.MESSAGE, username + " trying to deselect " + coordinate + " in " + gameName());
+        Logger.writeMessage(username + " trying to deselect " + coordinate + " in " + gameName());
         synchronized (this) {
             try {
                 this.game.forgetLastSelection(username, coordinate);
@@ -176,10 +176,17 @@ public class GameController {
         }
     }
 
-    public Response disconnect(String username) {
+    public Response disconnect(String username) throws NoPlayerConnectedException {
+        boolean shouldThrow = false;
+
         synchronized (this) {
             try {
-                this.game.disconnectPlayer(username);
+                if (this.game.disconnectPlayer(username)) {
+                    // game has been stopped
+                    assert this.clients.size() == 1;
+                    shouldThrow = true;
+                    assert game.isStopped();
+                }
             } catch (IllegalArgumentException e) {
                 return new Response("You're not connected to the game", ResponseStatus.FAILURE);
             }
@@ -191,6 +198,9 @@ public class GameController {
                 }
             }
 
+            if (shouldThrow)
+                throw new NoPlayerConnectedException();
+
             return new Response("You're not connected to the game", ResponseStatus.FAILURE);
         }
     }
@@ -200,7 +210,7 @@ public class GameController {
      * */
     public boolean isAvailableForJoin () {
         synchronized (this) {
-            return !this.game.isStarted() || this.game.hasPlayerDisconnected();
+            return !this.game.isStarted() || this.game.hasPlayerDisconnected() || game.isStopped();
         }
     }
 

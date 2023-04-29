@@ -91,7 +91,7 @@ public class LobbyLayout extends AppLayout {
             startGameRequester = Response.requester(transceiver, transceiver, getLock());
 
             PlayerHasJoinEventData.castEventReceiver(transceiver).registerListener(data -> {
-                playerNames.add(data.getUsername());
+                playerNames.add(data.username());
 
                 recyclerPlayersList.populate(playerNames);
 

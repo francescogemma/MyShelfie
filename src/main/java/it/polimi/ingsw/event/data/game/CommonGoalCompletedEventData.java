@@ -9,6 +9,7 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 import it.polimi.ingsw.model.game.Player;
 import it.polimi.ingsw.model.game.PlayerView;
+import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 

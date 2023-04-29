@@ -1,6 +1,7 @@
 package it.polimi.ingsw.model.bag;
 
 import it.polimi.ingsw.model.bag.Bag;
+import it.polimi.ingsw.utils.Logger;
 import jdk.jfr.Description;
 import org.junit.jupiter.api.*;
 
@@ -11,12 +12,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class BagTest {
     // TODO: Use test methods name conventions
 
-    private static final int numberOfRun = 1;
+    private static final int numberOfRun = 10000;
     private Bag bag;
 
     @BeforeEach
     public void setUp() {
         bag = new Bag();
+        Logger.setShouldPrint(false);
     }
 
     @RepeatedTest(numberOfRun)

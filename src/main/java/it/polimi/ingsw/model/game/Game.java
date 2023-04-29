@@ -38,6 +38,10 @@ public class Game extends GameView {
         Collections.shuffle(this.personalGoalIndexes);
     }
 
+    public void forceStop () {
+        this.isStopped = true;
+    }
+
     /**
      * This method stop the game. The only way to resume it is
      * @param username The player that want to stop the game
@@ -48,6 +52,7 @@ public class Game extends GameView {
 
         if (players.get(playerOnline).is(username)) {
             broadcast(new GameHasBeenStoppedEventData());
+            this.isStopped = true;
             return true;
         }
 
@@ -61,6 +66,12 @@ public class Game extends GameView {
             throw new NullPointerException();
 
         this.transceiver = transceiver;
+    }
+
+    public void forceDisconnectAllPlayer() {
+        for (Player player: players) {
+            player.setConnectionState(false);
+        }
     }
 
     /**
@@ -143,11 +154,14 @@ public class Game extends GameView {
         throw new IllegalArgumentException("Player not in this game");
     }
 
-    public void disconnectPlayer (String username) {
+    /**
+     * @return true iff there are no player connected
+     * */
+    public boolean disconnectPlayer (String username) {
         Player player = this.getPlayer(username);
 
         if (!player.isConnected()) {
-            return;
+            return false;
         }
 
         player.setConnectionState(false);
@@ -157,12 +171,16 @@ public class Game extends GameView {
                 calculateNextPlayer();
             } catch (IllegalFlowException e) {
                 throw new RuntimeException();
+            } catch (NoPlayerConnectedException e) {
+                isStopped = true;
+                return true;
             }
 
             this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex)));
         }
 
         this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
+        return false;
     }
 
     /**
@@ -239,34 +257,11 @@ public class Game extends GameView {
         }
     }
 
-    private int getNextPlayerOnline(String username) throws NoPlayerConnectedException {
-        int index = -1;
-        for (int i = 0; i < players.size(); i++) {
-            if (players.get(i).is(username))
-                index = i;
-        }
-
-        if (index == -1)
-            throw new IllegalArgumentException("Player not in this game");
-
-        return getNextPlayerOnline(index);
-    }
-
-    private int getNextPlayerOnline (int currentPlayerIndex) throws NoPlayerConnectedException {
-        for (int i = 1; i < this.players.size(); i++) {
-            final int index = (currentPlayerIndex + i) % this.players.size();
-            if (this.players.get(index).isConnected) {
-                return index;
-            }
-        }
-        throw new NoPlayerConnectedException();
-    }
-
     private void broadcast(EventData eventData) {
         this.transceiver.broadcast(eventData);
     }
 
-    private void calculateNextPlayer() throws IllegalFlowException {
+    private void calculateNextPlayer() throws IllegalFlowException, NoPlayerConnectedException {
         assert this.players.size() >= 2 && this.players.size() <= 4;
         assert this.isStarted() && !isStopped();
         assert currentPlayerIndex >=  0 && currentPlayerIndex < players.size();
@@ -323,7 +318,12 @@ public class Game extends GameView {
                 index = getNextPlayerOnline(this.currentPlayerIndex);
             } catch (NoPlayerConnectedException e) {
                 // there is no players connected
-                index = (currentPlayerIndex + 1) % players.size();
+                this.currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+
+                // we need to notify internally that game is stop
+                this.isStopped = true;
+
+                throw e;
             }
 
             if (players.get(index).equals(players.get(currentPlayerIndex))) {
@@ -345,6 +345,9 @@ public class Game extends GameView {
     public void insertTile (String username, int col) throws IllegalFlowException, IllegalExtractionException {
         final Player player = getPlayer(username);
 
+        if (isStopped())
+            throw new IllegalFlowException("Game is stopped");
+
         if (!this.players.get(currentPlayerIndex).equals(player))
             throw new IllegalFlowException();
 
@@ -363,28 +366,31 @@ public class Game extends GameView {
         broadcast(new BoardChangedEventData(board.getView()));
         broadcast(new BookshelfHasChangedEventData(username, player.getBookshelf()));
 
-        for (CommonGoal commonGoal: this.commonGoals) {
-            int points;
-            try {
-                points = commonGoal.calculatePoints(player.getBookshelf());
-            } catch (Exception e) {
-                points = 0;
-            }
+        for (int i = 0; i < commonGoals.length; i++){
+            if (player.hasAchievedCommonGoal(i))
+                continue;
+
+            final int points = commonGoals[i].calculatePoints(player.getBookshelf());
 
             if (points > 0) {
                 player.addPoints(points);
+                player.setAchievedCommonGoals(i);
 
                 broadcast(
                         new CommonGoalCompletedEventData(
                             player.createView(),
-                            commonGoal.getPointMasks(),
-                            commonGoal.getIndex()
+                            commonGoals[i].getPointMasks(),
+                            commonGoals[i].getIndex()
                         )
                 );
             }
         }
 
-        this.calculateNextPlayer();
+        try {
+            this.calculateNextPlayer();
+        } catch (NoPlayerConnectedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public int getPersonalGoal(String username) {

@@ -40,6 +40,7 @@ public class NetworkEventTransceiver implements EventTransceiver {
                 try {
                     eventJSON = connection.receive();
                 } catch (DisconnectedException e) {
+                    this.notifyDisconnection();
                     return;
                 }
 
@@ -53,13 +54,22 @@ public class NetworkEventTransceiver implements EventTransceiver {
                     continue;
                 }
 
-                synchronized (lock) {
+                synchronized (this.lock) {
                     for (EventListener<EventData> listener : listeners) {
                         listener.handle(eventData);
                     }
                 }
             }
         }).start();
+    }
+
+    private void notifyDisconnection () {
+        synchronized (lock) {
+            listeners
+                    .forEach(l ->
+                            l.handle(new PlayerDisconnectedInternalEventData())
+                    );
+        }
     }
 
     @Override
@@ -74,12 +84,7 @@ public class NetworkEventTransceiver implements EventTransceiver {
         try {
             connection.send(gson.toJson(data, EventData.class));
         } catch (DisconnectedException e) {
-            synchronized (lock) {
-                listeners
-                        .forEach(l ->
-                            l.handle(new PlayerDisconnectedInternalEventData())
-                        );
-            }
+            notifyDisconnection();
         }
     }
 

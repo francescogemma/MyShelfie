@@ -10,6 +10,7 @@ import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.utils.Coordinate;
+import it.polimi.ingsw.utils.Logger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
@@ -59,6 +60,7 @@ class GameTest {
         game = new Game("testing", creator);
         transceiver = new LocalEventTransceiver();
         game.setTransceiver(transceiver);
+        Logger.setShouldPrint(false);
     }
 
     @Test
@@ -217,7 +219,7 @@ class GameTest {
                 event -> {
                     assert !called.get();
                     called.set(true);
-                    username.set(event.getUsername());
+                    username.set(event.username());
                 }
         );
 
@@ -240,7 +242,7 @@ class GameTest {
 
         PlayerHasDisconnectedEventData.castEventReceiver(transceiver).registerListener(
                 event -> {
-                    username.set(event.getUsername());
+                    username.set(event.username());
                 }
         );
 
@@ -447,7 +449,7 @@ class GameTest {
     void addPlayer_signalsEmitted_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
         transceiver.registerListener(event -> {
             Assertions.assertEquals(PlayerHasJoinEventData.ID, event.getId());
-            Assertions.assertEquals("Giacomo", ((PlayerHasJoinEventData) event).getUsername());
+            Assertions.assertEquals("Giacomo", ((PlayerHasJoinEventData) event).username());
         });
 
         game.addPlayer("Giacomo");
@@ -463,7 +465,7 @@ class GameTest {
         transceiver.registerListener(event -> {
             if (set.get()) {
                 Assertions.assertEquals(PlayerHasJoinEventData.ID, event.getId());
-                Assertions.assertEquals("Giacomo", ((PlayerHasJoinEventData) event).getUsername());
+                Assertions.assertEquals("Giacomo", ((PlayerHasJoinEventData) event).username());
             }
         });
 
@@ -489,7 +491,7 @@ class GameTest {
 
         PlayerHasDisconnectedEventData.castEventReceiver(transceiver).registerListener(event -> {
             if (setPlayer.get()) {
-                Assertions.assertEquals("Giacomo", event.getUsername());
+                Assertions.assertEquals("Giacomo", event.username());
                 callPlayerHasJoinEventData.set(true);
             }
         });
@@ -660,9 +662,17 @@ class GameTest {
         game.disconnectPlayer(usernameUser2);
 
         game.selectTile(usernameUser1, new Coordinate(4, 0));
-        game.insertTile(usernameUser1, 0);
+
+        try {
+            game.insertTile(usernameUser1, 0);
+            Assertions.fail();
+        } catch (RuntimeException e) {
+            Assertions.assertEquals(usernameUser2, game.getCurrentPlayer().getUsername());
+        }
 
         game.addPlayer(usernameUser2);
+
+        game.startGame(usernameUser2);
 
         game.selectTile(usernameUser2, new Coordinate(3, 1));
         game.selectTile(usernameUser2, new Coordinate(4, 1));
@@ -819,5 +829,36 @@ class GameTest {
         });
 
         game.startGame("Giacomo");
+    }
+
+    @RepeatedTest(1)
+    void disconnect__correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
+
+        final String username1 = "Giacomo";
+        final String username2 = "Michele";
+        final String username3 = "Cristiano";
+
+        this.game = new Game("Prova", "Giacomo");
+
+        this.game.setTransceiver(new LocalEventTransceiver());
+
+        this.game.addPlayer(username1);
+        this.game.addPlayer(username2);
+        this.game.addPlayer(username3);
+
+        this.game.startGame(username1);
+
+        Assertions.assertEquals(username1, game.getCurrentPlayer().getUsername());
+
+        game.disconnectPlayer(username2);
+
+        Assertions.assertEquals(username1, game.getCurrentPlayer().getUsername());
+
+        game.disconnectPlayer(username1);
+
+        Assertions.assertEquals(username3, game.getCurrentPlayer().getUsername());
+
+        game.addPlayer(username1);
+        Assertions.assertEquals(username3, game.getCurrentPlayer().getUsername());
     }
 }

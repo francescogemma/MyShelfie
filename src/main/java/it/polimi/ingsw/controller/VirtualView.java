@@ -13,7 +13,6 @@ import it.polimi.ingsw.model.game.GameView;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Pair;
 
-import java.awt.*;
 import java.util.Optional;
 
 public class VirtualView implements EventTransmitter{
@@ -42,13 +41,13 @@ public class VirtualView implements EventTransmitter{
         PlayerExitGame.responder(transceiver, transceiver,          event -> exitGame());
         PauseGameEventData.responder(transceiver, transceiver,      event -> pauseGame());
 
-        PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(event -> disconnet());
+        PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(event -> disconnect());
 
         JoinStartedGameEventData.castEventReceiver(transceiver).registerListener(event -> this.sendGameState());
         PlayerHasJoinMenu       .castEventReceiver(transceiver).registerListener(event -> this.playerHasJoinMenu());
     }
 
-    private synchronized void disconnet () {
+    private synchronized void disconnect() {
         MenuController.getInstance().forceDisconnect(this, username);
 
         this.gameController = null;

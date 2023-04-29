@@ -7,6 +7,7 @@ import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
+import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 

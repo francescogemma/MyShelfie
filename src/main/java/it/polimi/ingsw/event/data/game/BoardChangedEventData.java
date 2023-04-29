@@ -6,7 +6,9 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
+import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.board.BoardView;
+import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 

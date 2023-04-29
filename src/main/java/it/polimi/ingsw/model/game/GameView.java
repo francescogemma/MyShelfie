@@ -107,10 +107,46 @@ public class GameView implements Identifiable {
         return playerViews.get(FIRST_PLAYER_INDEX);
     }
 
+    protected int getNextPlayerOnline(String username) throws NoPlayerConnectedException {
+        int index = -1;
+        for (int i = 0; i < playerViews.size(); i++) {
+            if (playerViews.get(i).is(username))
+                index = i;
+        }
+
+        if (index == -1)
+            throw new IllegalArgumentException("Player not in this game");
+
+        return getNextPlayerOnline(index);
+    }
+
+    protected int getNextPlayerOnline (int currentPlayerIndex) throws NoPlayerConnectedException {
+        for (int i = 1; i < this.playerViews.size(); i++) {
+            final int index = (currentPlayerIndex + i) % this.playerViews.size();
+            if (this.playerViews.get(index).isConnected) {
+                return index;
+            }
+        }
+        throw new NoPlayerConnectedException();
+    }
+
     public boolean canStartGame (String username) throws IllegalFlowException {
-        if (isStarted() || isOver() || playerViews.isEmpty())
+        final boolean canStartAfterStop = isStopped() && playerViews.size() < 2;
+
+        if (isOver())
             throw new IllegalFlowException();
-        return this.creator.equals(username);
+
+        if (isStarted() && !isStopped())
+            throw new IllegalFlowException();
+
+        // it is stop, and it can't start with only 1 player connected
+        if (isStarted() && isStopped() && playerViews.size() < 2)
+            throw new IllegalFlowException();
+
+        if (playerViews.isEmpty())
+            throw new IllegalFlowException();
+
+        return username.equals(creator);
     }
 
     public boolean isStopped() {

@@ -23,19 +23,19 @@ public class Requester<R extends EventData, S extends EventData> {
 
     public Requester(String responseEventId, EventTransmitter transmitter, EventReceiver<EventData> receiver, Object responsesLock) {
         this.transmitter = transmitter;
+        this.responsesLock = responsesLock;
 
         new CastEventReceiver<SyncEventDataWrapper<R>>(SyncEventDataWrapper.WRAPPER_ID + "_" + responseEventId,
             receiver).registerListener(data -> {
-                synchronized (responsesLock) {
+                synchronized (this.responsesLock) {
                     if (waitingFor.contains(data.getCount())) {
                         waitingFor.remove(data.getCount());
                         responses.put(data.getCount(), data.getWrappedData());
 
-                        responsesLock.notifyAll();
+                        this.responsesLock.notifyAll();
                     }
                 }
         });
-        this.responsesLock = responsesLock;
     }
 
     public R request(S data) {

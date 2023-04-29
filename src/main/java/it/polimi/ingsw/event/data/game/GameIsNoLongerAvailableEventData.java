@@ -6,16 +6,14 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
+import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 
-public class GameIsNoLongerAvailableEventData implements EventData {
+public record GameIsNoLongerAvailableEventData(String gameName) implements EventData {
     public static final String ID = "GAME_IS_NO_LONGER_AVAILABLE";
 
-    private final String gameName;
-
-    public GameIsNoLongerAvailableEventData(String gameName) {
-        this.gameName = gameName;
+    public GameIsNoLongerAvailableEventData {
     }
 
     public static CastEventReceiver<GameIsNoLongerAvailableEventData> castEventReceiver(EventReceiver<EventData> receiver) {
@@ -23,19 +21,15 @@ public class GameIsNoLongerAvailableEventData implements EventData {
     }
 
     public static <T extends EventData> Requester<GameIsNoLongerAvailableEventData, T> requester(EventTransmitter transmitter,
-                                                                                        EventReceiver<EventData> receiver,
+                                                                                                 EventReceiver<EventData> receiver,
                                                                                                  Object responsesLock) {
         return new Requester<>(ID, transmitter, receiver, responsesLock);
     }
 
     public static <T extends EventData> Responder<GameIsNoLongerAvailableEventData, T> responder(EventTransmitter transmitter,
-                                                                                        EventReceiver<EventData> receiver,
-                                                                                        Function<GameIsNoLongerAvailableEventData, T> response) {
+                                                                                                 EventReceiver<EventData> receiver,
+                                                                                                 Function<GameIsNoLongerAvailableEventData, T> response) {
         return new Responder<>(ID, transmitter, receiver, response);
-    }
-
-    public String getGameName () {
-        return this.gameName;
     }
 
     @Override

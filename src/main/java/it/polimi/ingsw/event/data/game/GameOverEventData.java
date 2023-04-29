@@ -8,30 +8,30 @@ import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
 import it.polimi.ingsw.model.game.PlayerView;
+import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-public class GameOverEventData implements EventData {
+public record GameOverEventData(List<PlayerView> winners,
+                                List<Pair<Integer, BookshelfMaskSet>> personalGoal) implements EventData {
     public static final String ID = "GAME_OVER";
-
-    private final List<PlayerView> winners;
-    private final List<Pair<Integer, BookshelfMaskSet>> personalGoal;
 
     public GameOverEventData(List<PlayerView> winners, List<Pair<Integer, BookshelfMaskSet>> personalGoal) {
         this.winners = new ArrayList<>(winners);
         this.personalGoal = new ArrayList<>(personalGoal);
     }
 
-    public List<Pair<Integer, BookshelfMaskSet>> getPersonalGoal() {
+    @Override
+    public List<Pair<Integer, BookshelfMaskSet>> personalGoal() {
         return Collections.unmodifiableList(personalGoal);
     }
 
-    public List<PlayerView> getWinners () {
+    @Override
+    public List<PlayerView> winners() {
         return Collections.unmodifiableList(this.winners);
     }
 
@@ -41,14 +41,14 @@ public class GameOverEventData implements EventData {
     }
 
     public static <T extends EventData> Requester<GameOverEventData, T> requester(EventTransmitter transmitter,
-                                                                                      EventReceiver<EventData> receiver,
-                                                                                      Object responsesLock) {
+                                                                                  EventReceiver<EventData> receiver,
+                                                                                  Object responsesLock) {
         return new Requester<>(ID, transmitter, receiver, responsesLock);
     }
 
     public static <T extends EventData> Responder<GameOverEventData, T> responder(EventTransmitter transmitter,
-                                                                                      EventReceiver<EventData> receiver,
-                                                                                      Function<GameOverEventData, T> response) {
+                                                                                  EventReceiver<EventData> receiver,
+                                                                                  Function<GameOverEventData, T> response) {
         return new Responder<>(ID, transmitter, receiver, response);
     }
 

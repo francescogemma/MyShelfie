@@ -7,6 +7,7 @@ import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.controller.db.DBManager;
+import it.polimi.ingsw.model.game.NoPlayerConnectedException;
 import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
 
@@ -35,6 +36,8 @@ public class MenuController {
 
         for (Game game: allGame) {
             if (!game.isOver()) {
+                game.forceStop();
+                game.forceDisconnectAllPlayer();
                 INSTANCE.gameControllerList.add(new GameController(game));
             }
         }
@@ -212,10 +215,17 @@ public class MenuController {
             authenticated.remove(transmitter);
         }
 
-        synchronized (gameControllerList) {
-            for (GameController controller: gameControllerList) {
-                if (controller.containerPlayer(username)) {
-                    controller.disconnect(username);
+        if (username != null) {
+            synchronized (gameControllerList) {
+                for (GameController controller: gameControllerList) {
+                    if (controller.containerPlayer(username)) {
+                        try {
+                            controller.disconnect(username);
+                        } catch (NoPlayerConnectedException e) {
+                            gameControllerList.remove(controller);
+                            return;
+                        }
+                    }
                 }
             }
         }

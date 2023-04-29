@@ -40,6 +40,11 @@ public class PlayerView {
         return new Bookshelf(bookshelf);
     }
 
+    public void setAchievedCommonGoals(int index) {
+        assert index >= 0 && index < achievedCommonGoals.length;
+        achievedCommonGoals[index] = true;
+    }
+
     /**
      * @return {@link Player#isConnected} the connection state of the player.
      */

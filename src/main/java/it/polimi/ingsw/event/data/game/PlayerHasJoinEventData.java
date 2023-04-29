@@ -6,15 +6,14 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
+import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 
-public class PlayerHasJoinEventData implements EventData {
-    private final String username;
+public record PlayerHasJoinEventData(String username) implements EventData {
     public static final String ID = "PLAYER_HAS_JOIN";
 
-    public PlayerHasJoinEventData(String username) {
-        this.username = username;
+    public PlayerHasJoinEventData {
     }
 
     public static CastEventReceiver<PlayerHasJoinEventData> castEventReceiver(EventReceiver<EventData> receiver) {
@@ -28,13 +27,9 @@ public class PlayerHasJoinEventData implements EventData {
     }
 
     public static <T extends EventData> Responder<PlayerHasJoinEventData, T> responder(EventTransmitter transmitter,
-                                                                                  EventReceiver<EventData> receiver,
-                                                                                  Function<PlayerHasJoinEventData, T> response) {
+                                                                                       EventReceiver<EventData> receiver,
+                                                                                       Function<PlayerHasJoinEventData, T> response) {
         return new Responder<>(ID, transmitter, receiver, response);
-    }
-
-    public String getUsername() {
-        return this.username;
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Logger {
@@ -90,9 +91,20 @@ public class Logger {
         Logger.write(Type.CRITICAL, message);
     }
 
-    public static void write (Type type, String message) {
+    private static void write (Type type, String message) {
         String appendMessage;
-        appendMessage = type + " " + LocalDate.now().toString() + LocalTime.now().toString() + " " +message;
+
+        StackTraceElement[] res = Thread.currentThread().getStackTrace();
+        final String m =
+                res[3]
+                        .toString()
+                        .substring(
+                                0,
+                                res[3].toString().indexOf("(")
+                        );
+
+        appendMessage = m + type + " " + LocalDate.now().toString() + LocalTime.now().toString() + " " + message;
+
         appendMessage += "\n";
 
         synchronized (INSTANCE) {
