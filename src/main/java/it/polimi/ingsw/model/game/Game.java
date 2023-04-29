@@ -389,6 +389,7 @@ public class Game extends GameView {
 
         if (player.getBookshelf().isFull() && firstPlayerCompleteBookshelf != -1) {
             firstPlayerCompleteBookshelf = currentPlayerIndex;
+            player.addPoints(1);
             broadcast(new FirstFullBookshelfEventData(player.getUsername()));
         }
 
