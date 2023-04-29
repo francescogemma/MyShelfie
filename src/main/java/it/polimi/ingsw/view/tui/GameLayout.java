@@ -90,6 +90,7 @@ public class GameLayout extends AppLayout {
                         adjacencyGoalTextBox.center().weight(4)
                     ).addBorderBox().blurrable();
 
+    private final TextBox turnTextBox = new TextBox().unfocusable();
     private final BoardDrawable boardDrawable = new BoardDrawable();
     private final BlurrableDrawable blurrableBoard = boardDrawable.center().scrollable().blurrable();
     private final TextBox completedCommonGoalPopUpTextBox = new TextBox().hideCursor();
@@ -173,7 +174,10 @@ public class GameLayout extends AppLayout {
                     blurrablePersonalGoal.weight(1),
                     blurrableAdjacencyGoal.weight(1)
                 ).alignUpLeft().scrollable().weight(3),
-                twoLayersBoard.weight(2),
+                new OrientedLayout(Orientation.VERTICAL,
+                    turnTextBox.center().weight(1),
+                    twoLayersBoard.weight(15)
+                ).weight(2),
                 new OrientedLayout(Orientation.VERTICAL,
                     new Fill(PrimitiveSymbol.EMPTY).weight(1),
                     gameNameTextBox.center().weight(2),
@@ -232,6 +236,12 @@ public class GameLayout extends AppLayout {
             commonGoals[1].getPointStack().get(commonGoals[1].getPointStack().size() - 1)));
 
         personalGoalDrawable.populate(personalGoal.getTilesColorMask());
+    }
+
+    private void populateTurnTextBox() {
+        turnTextBox.text("It's " + (clientPlayerIndex == playingPlayerIndex ? "your" :
+            playerNames.get(playingPlayerIndex)) + " turn")
+            .color(clientPlayerIndex == playingPlayerIndex ? Color.GREEN : Color.WHITE);
     }
 
     private void populateBoard(BoardView board) {
@@ -529,6 +539,9 @@ public class GameLayout extends AppLayout {
                 gameName = data.gameView().getName();
 
                 gameNameTextBox.text("Game: " + gameName);
+
+                populateTurnTextBox();
+
                 populateBookshelfMenu();
                 playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList());
                 populateBoard(data.gameView().getBoard());
@@ -540,6 +553,8 @@ public class GameLayout extends AppLayout {
             CurrentPlayerChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 playingPlayerIndex = playerNameToIndex(data.getUsername());
                 populateBoard(board);
+
+                populateTurnTextBox();
 
                 if (completedGoalTimer == null) {
                     populateBookshelfMenu();
