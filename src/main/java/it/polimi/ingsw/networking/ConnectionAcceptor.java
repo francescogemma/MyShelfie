@@ -16,7 +16,8 @@ import java.util.Queue;
 
 /**
  * This object will keep waiting for {@link Connection connections} to request a pair element.
- * New {@link Connection connections} will be created to communicate back.
+ * New {@link Connection connections} will be created to communicate back. This object also acts as a server,
+ * and has a remotely invokable method.
  *
  * @author Francesco Gemma
  * @author Michele Miotti
@@ -26,18 +27,30 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements RemoteSer
      * Socket object used to implement TCP support.
      */
     private final ServerSocket serverSocket;
-    private final int RMIPort;
 
+    /**
+     * Port used for RMI communication
+     */
+    private final int RMIPort;
 
     /**
      * Lock used to handle multiple threads requesting names concurrently.
      * It is static because many ConnectionAcceptors may be instantiated, and they all need to share
      * the same lastRMIConnectionIndex.
      */
-    private static final Object lock = new Object();
+    private final Object lock = new Object();
 
     /**
-     * Indicates the index of the most recent RMI connection couple's name.
+     * Used for RMI
+     * Lock used to handle multiple threads requesting names concurrently.
+     * It is static because many ConnectionAcceptors may be instantiated, and they all need to share
+     * the same lastRMIConnectionIndex.
+     */
+    private static final Object registryLock = new Object();
+
+    /**
+     * Needed for RMI communication.
+     * Indicates the index of the next index that will be assigned as a name to a new remote queue pair.
      * It is static because even if many ConnectionAcceptors may be instantiated,
      * the values contained in the registry are the same for all of them.
      */
@@ -49,11 +62,6 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements RemoteSer
      */
     private final Queue<Connection> connectionQueue = new LinkedList<>();
     private final Registry registry;
-
-    /**
-     * Lock mainly needed to protect the connectionQueue from concurrent access.
-     */
-    private final Object acceptLock = new Object();
 
     /**
      * This constructor needs both ports, because this particular object will be used
@@ -87,9 +95,9 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements RemoteSer
             try {
                 // create a tcpConnection and add it to the queue.
                 TCPConnection tcpConnection = new TCPConnection(serverSocket.accept());
-                synchronized (acceptLock) {
+                synchronized (lock) {
                     connectionQueue.add(tcpConnection);
-                    acceptLock.notifyAll();
+                    lock.notifyAll();
                 }
 
             } catch (Exception exception) {
@@ -99,25 +107,22 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements RemoteSer
         // finally, start the thread.
         tcpThread.start();
 
-        synchronized (acceptLock) {
-            // make all threads wait for a new connection.
+        synchronized (lock) {
             while (connectionQueue.isEmpty()) {
                 try {
-                    acceptLock.wait();
-
+                    lock.wait();
                 } catch (InterruptedException interruptedException) {
                     interruptedException.printStackTrace();
                 }
             }
 
-            // once the queue is not empty, return the oldest object.
             return connectionQueue.poll();
         }
     }
 
     @Override
     public String getBoundName() throws RemoteException {
-        synchronized (lock) {
+        synchronized (registryLock) {
             String boundName = "QUEUE" + nextBoundIndex++;
 
             try {
