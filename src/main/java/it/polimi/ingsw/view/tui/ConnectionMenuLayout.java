@@ -2,6 +2,7 @@ package it.polimi.ingsw.view.tui;
 
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.networking.Connection;
+import it.polimi.ingsw.networking.RMI.RMIConnection;
 import it.polimi.ingsw.networking.TCP.TCPConnection;
 import it.polimi.ingsw.view.tui.terminal.drawable.Orientation;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.App;
@@ -48,9 +49,13 @@ public class ConnectionMenuLayout extends AppLayout {
             Connection connection;
 
             try {
-                connection = new TCPConnection(ipAddress, port);
+                if (appDataProvider.getString(App.START_NAME, "connection").equals("TCP")) {
+                    connection = new TCPConnection(ipAddress, port);
+                } else {
+                    connection = new RMIConnection(ipAddress, port);
+                }
             } catch (Exception e) {
-
+                // TODO: Handle connection problems
                 System.exit(1);
                 return;
             }
