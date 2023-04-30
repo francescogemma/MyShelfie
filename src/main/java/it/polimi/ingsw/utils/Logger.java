@@ -28,6 +28,7 @@ public class Logger {
     private PrintWriter writer;
     private final List<String> message;
     private boolean shouldPrint = true;
+    private boolean writeFile = true;
     private final String nameLog =
             (
                     LocalDate.now().toString() +
@@ -38,11 +39,31 @@ public class Logger {
 
     private static String logPosition;
 
+    private String getLogPosition () {
+        return logPosition + "/log_" + nameLog + ".txt";
+    }
+
     private Logger() throws IOException {
-        String pos = logPosition + "/log_" + nameLog + ".txt";
-        FileWriter fileWriter = new FileWriter(pos, false);
-        writer = new PrintWriter(fileWriter);
         message = new ArrayList<>();
+    }
+
+    public static void setEnableWriteToFile (boolean write) {
+        synchronized (INSTANCE) {
+            INSTANCE.writeFile = write;
+
+            if (!write) {
+                INSTANCE.removeFile(INSTANCE.getLogPosition());
+            }
+        }
+    }
+
+    private void removeFile (String position) {
+        final boolean delete = new File(position).delete();
+        if (!delete) {
+            System.exit(-1);
+        }
+        System.out.println("\n" + position);
+        System.exit(-2);
     }
 
     private static final Logger INSTANCE;
@@ -111,8 +132,20 @@ public class Logger {
 
         synchronized (INSTANCE) {
             INSTANCE.message.add(appendMessage);
-            INSTANCE.writer.print(appendMessage);
-            INSTANCE.writer.flush();
+
+            if (INSTANCE.writeFile) {
+                if (INSTANCE.writer == null) {
+                    try {
+                        FileWriter fileWriter = new FileWriter(INSTANCE.getLogPosition(), false);
+                        INSTANCE.writer = new PrintWriter(fileWriter);
+                    } catch (IOException e) {
+
+                    }
+                }
+                INSTANCE.writer.print(appendMessage);
+                INSTANCE.writer.flush();
+            }
+
             if (INSTANCE.shouldPrint) {
                 System.out.print(appendMessage);
             }

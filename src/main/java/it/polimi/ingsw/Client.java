@@ -12,6 +12,7 @@ public class Client {
         Terminal terminal = Terminal.getInstance();
 
         Logger.setShouldPrint(false);
+        Logger.setEnableWriteToFile(false);
 
         AppLayoutData data = terminal.start(new App(InitialMenuLayout::new));
 
