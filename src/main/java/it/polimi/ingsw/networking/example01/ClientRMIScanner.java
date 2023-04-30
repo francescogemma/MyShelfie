@@ -3,7 +3,6 @@ package it.polimi.ingsw.networking.example01;
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.networking.RMI.RMIConnection;
-import it.polimi.ingsw.networking.TCP.TCPConnection;
 
 import java.util.Scanner;
 

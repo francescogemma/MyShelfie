@@ -1,10 +1,12 @@
 package it.polimi.ingsw.networking;
 
-import it.polimi.ingsw.networking.RMI.NameProvidingRemote;
+import it.polimi.ingsw.networking.RMI.RemoteLinkedList;
+import it.polimi.ingsw.networking.RMI.RemoteServer;
 import it.polimi.ingsw.networking.RMI.RMIConnection;
 import it.polimi.ingsw.networking.TCP.TCPConnection;
 
 import java.net.ServerSocket;
+import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -19,31 +21,34 @@ import java.util.Queue;
  * @author Francesco Gemma
  * @author Michele Miotti
  */
-public class ConnectionAcceptor extends UnicastRemoteObject implements NameProvidingRemote {
+public class ConnectionAcceptor extends UnicastRemoteObject implements RemoteServer {
     /**
      * Socket object used to implement TCP support.
      */
     private final ServerSocket serverSocket;
+    private final int RMIPort;
+
 
     /**
      * Lock used to handle multiple threads requesting names concurrently.
      * It is static because many ConnectionAcceptors may be instantiated, and they all need to share
      * the same lastRMIConnectionIndex.
      */
-    private static final Object getNameLock = new Object();
+    private static final Object lock = new Object();
 
     /**
      * Indicates the index of the most recent RMI connection couple's name.
      * It is static because even if many ConnectionAcceptors may be instantiated,
      * the values contained in the registry are the same for all of them.
      */
-    private static int lastRMIConnectionIndex; // TODO: is it realistically possible to overflow indices?
+    private static int nextBoundIndex;
 
     /**
      * A queue of Connections, received through the createRemoteConnection method and through a thread
      * created in the "receive" method.
      */
     private final Queue<Connection> connectionQueue = new LinkedList<>();
+    private final Registry registry;
 
     /**
      * Lock mainly needed to protect the connectionQueue from concurrent access.
@@ -53,22 +58,20 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements NameProvi
     /**
      * This constructor needs both ports, because this particular object will be used
      * server-side, so both TCP and RMI must be supported.
-     * These ports will listen for communications from {@link Connection connections}.
      *
      * @param TCPPort the port that TCP will listen through.
      * @param RMIPort the port that RMI will listen through.
      * @throws RemoteException will be thrown in case of network problems, or server communication issues.
      * @throws ConnectionException will be thrown if a failure occurs in the process of creating a new Connection.
      */
+
     public ConnectionAcceptor(int TCPPort, int RMIPort) throws RemoteException, ConnectionException {
+        this.RMIPort = RMIPort;
+        registry = LocateRegistry.createRegistry(RMIPort);
+
         try {
-            // export to server's localhost.
-            Registry registry = LocateRegistry.createRegistry(RMIPort);
-            registry.rebind("SERVER", this);
-
-            // initialize the server socket.
+            registry.bind("SERVER", this);
             serverSocket = new ServerSocket(TCPPort);
-
         } catch (Exception exception) {
             throw new ConnectionException();
         }
@@ -113,24 +116,26 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements NameProvi
     }
 
     @Override
-    public void createRemoteConnection(int port, String coupleName) throws RemoteException {
-        synchronized (acceptLock) {
+    public String getBoundName() throws RemoteException {
+        synchronized (lock) {
+            String boundName = "QUEUE" + nextBoundIndex++;
+
             try {
-                // create the connection and add it to the queue.
-                connectionQueue.add(new RMIConnection(port, coupleName));
-                acceptLock.notifyAll();
-
-            } catch (ConnectionException connectionException) {
-                throw new RemoteException();
+                registry.bind("ADD_" + boundName, new RemoteLinkedList());
+                registry.bind("POLL_" + boundName, new RemoteLinkedList());
+            } catch (AlreadyBoundException alreadyBoundException) {
+                throw new RuntimeException("queue already bound");
             }
-        }
-    }
 
-    @Override
-    public String getNewCoupleName() throws RemoteException {
-        synchronized (getNameLock) {
-            // increment index and decorate it.
-            return "CONN" + ++lastRMIConnectionIndex;
+            try {
+                RMIConnection rmiConnection = new RMIConnection("localhost", RMIPort, boundName);
+                connectionQueue.add(rmiConnection);
+                lock.notifyAll();
+            } catch (ServerNotFoundException serverNotFoundException) {
+                serverNotFoundException.printStackTrace();
+            }
+
+            return boundName;
         }
     }
 }
