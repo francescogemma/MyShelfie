@@ -5,6 +5,11 @@ import it.polimi.ingsw.networking.*;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.*;
 
 /**
  * {@link Connection Connection} class that represents one side of an RMI pair of connections.
@@ -23,12 +28,13 @@ public class RMIConnection implements Connection {
      * A client will poll string from this queue, the server will add them.
      */
     private final RemoteQueue pollQueue;
+    private final Queue<String> pendingMessages;
 
     /**
      * Used to keep track of connection state. Methods "send" and "receive" can only work if this
      * boolean is false.
      */
-    private boolean disconnected = false;
+    private boolean disconnected;
 
     /**
      * Lock needed to protect portions of object state that need to be modified by threads, such as
@@ -54,6 +60,9 @@ public class RMIConnection implements Connection {
             throw new BadHostException("host address is null");
         }
 
+        pendingMessages = new LinkedList<>();
+        disconnected = false;
+
         try {
             // get the server object, and ask to reserve a new name for the couple.
             Registry registry = LocateRegistry.getRegistry(address, port);
@@ -65,6 +74,9 @@ public class RMIConnection implements Connection {
         } catch (Exception exception) {
             throw new ServerNotFoundException(exception.getMessage());
         }
+
+        heartbeat();
+        reader();
     }
 
     /**
@@ -79,6 +91,9 @@ public class RMIConnection implements Connection {
      * @throws ServerNotFoundException will be thrown if a failure occurs in the process of connecting to the server.
      */
     public RMIConnection(String address, int port, String boundName) throws ServerNotFoundException {
+        pendingMessages = new LinkedList<>();
+        disconnected = false;
+
         try {
             Registry registry = LocateRegistry.getRegistry(address, port);
             addQueue = (RemoteQueue) registry.lookup("POLL_" + boundName);
@@ -86,6 +101,9 @@ public class RMIConnection implements Connection {
         } catch (Exception exception) {
             throw new ServerNotFoundException(exception.getMessage());
         }
+
+        heartbeat();
+        reader();
     }
 
     @Override
@@ -106,17 +124,23 @@ public class RMIConnection implements Connection {
 
     @Override
     public String receive() throws DisconnectedException {
-        synchronized (lock) {
-            if (disconnected) {
+        synchronized(lock) {
+            if(disconnected) {
                 throw new DisconnectedException();
             }
 
-            try {
-                return pollQueue.poll();
-            } catch (RemoteException remoteException) {
-                disconnect();
-                throw new DisconnectedException(remoteException.getMessage());
+            while(pendingMessages.isEmpty()) {
+                try {
+                    lock.wait();
+                } catch(InterruptedException e) {
+                    throw new DisconnectedException();
+                }
+                if(disconnected) {
+                    throw new DisconnectedException();
+                }
             }
+
+            return pendingMessages.poll();
         }
     }
 
@@ -126,5 +150,67 @@ public class RMIConnection implements Connection {
             disconnected = true;
             lock.notifyAll();
         }
+    }
+
+    private void heartbeat() {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    send("heartbeat");
+                } catch (DisconnectedException e) {
+                    timer.cancel();
+                }
+            }
+        }, 0, 2500);
+    }
+
+    private void reader() {
+        Thread reader = new Thread(() -> {
+            while(true) {
+                Callable<String> poller = new Callable<String>() {
+                    @Override
+                    public String call() {
+                        String read = null;
+                        try {
+                            read = pollQueue.poll();
+                        } catch (RemoteException remoteException) {
+                            disconnect();
+                        }
+
+                        return read;
+                    }
+                };
+
+                final ExecutorService executor = Executors.newSingleThreadExecutor();
+                final Future future = executor.submit(poller);
+                executor.shutdown();
+
+                String read;
+                try {
+                    read = (String) future.get(5000, TimeUnit.MILLISECONDS);
+                    if (read == null) {
+                        disconnect();
+                        return;
+                    }
+                }
+                catch (Exception e) {
+                    disconnect();
+                    return;
+                }
+                if (!executor.isTerminated()) {
+                    executor.shutdownNow();
+                }
+
+                if(!read.equals("heartbeat")) {
+                    synchronized(lock) {
+                        pendingMessages.add(read);
+                        lock.notifyAll();
+                    }
+                }
+            }
+        });
+        reader.start();
     }
 }
