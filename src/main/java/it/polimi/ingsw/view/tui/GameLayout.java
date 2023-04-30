@@ -621,8 +621,7 @@ public class GameLayout extends AppLayout {
             CommonGoalCompletedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 CompletedGoal completedGoal = new CompletedGoal(CompletedGoal.GoalType.COMMON,
                     data.getCommonGoalCompleted(), data.getPlayer().getUsername(),
-                    data.getPlayer().getPoints() - playerPoints
-                        .get(playerNameToIndex(data.getPlayer().getUsername())), data.getBookshelfMaskSet());
+                    data.getPoints(), data.getBookshelfMaskSet());
                 addCompletedGoalToDisplayQueue(completedGoal);
             });
 
