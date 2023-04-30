@@ -59,11 +59,6 @@ public class Logger {
 
     private void removeFile (String position) {
         final boolean delete = new File(position).delete();
-        if (!delete) {
-            System.exit(-1);
-        }
-        System.out.println("\n" + position);
-        System.exit(-2);
     }
 
     private static final Logger INSTANCE;
