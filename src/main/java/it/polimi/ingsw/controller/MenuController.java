@@ -218,13 +218,17 @@ public class MenuController {
         if (username != null) {
             synchronized (gameControllerList) {
                 for (GameController controller: gameControllerList) {
-                    if (controller.containerPlayer(username)) {
-                        try {
-                            controller.disconnect(username);
-                        } catch (NoPlayerConnectedException e) {
-                            gameControllerList.remove(controller);
-                            return;
-                        }
+
+                    try {
+                        controller.disconnect(username);
+                    } catch (NoPlayerConnectedException e) {
+                        assert controller.isStopped();
+                        /*
+                         * We don't have to remove the controller as the game is not finished yet
+                         * */
+                        return;
+                    } catch (IllegalArgumentException e) {
+                        // player is not in this controller.
                     }
                 }
             }

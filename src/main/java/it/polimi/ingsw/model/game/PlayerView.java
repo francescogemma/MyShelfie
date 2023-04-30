@@ -52,6 +52,10 @@ public class PlayerView {
         return isConnected;
     }
 
+    public boolean isDisconnected () {
+        return !isConnected();
+    }
+
     /**
      * This method checks if the common goal at the given index has been achieved.
      * @param index the index of the {@link it.polimi.ingsw.model.goal.CommonGoal CommonGoal} to check.

@@ -33,6 +33,16 @@ public class GameHasBeenStoppedEventData implements EventData {
     }
 
     @Override
+    public boolean equals(Object other) {
+        if (other == this)
+            return true;
+        if (other == null || other.getClass() != this.getClass())
+            return false;
+
+        return true;
+    }
+
+    @Override
     public String getId() {
         return ID;
     }

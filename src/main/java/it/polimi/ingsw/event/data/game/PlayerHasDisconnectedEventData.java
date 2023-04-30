@@ -33,6 +33,15 @@ public record PlayerHasDisconnectedEventData(String username) implements EventDa
     }
 
     @Override
+    public boolean equals (Object other) {
+        if (other == this)
+            return true;
+        if (other == null || other.getClass() != this.getClass())
+            return false;
+        return this.username.equals( ((PlayerHasDisconnectedEventData) other).username );
+    }
+
+    @Override
     public String getId() {
         return ID;
     }

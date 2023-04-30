@@ -12,6 +12,7 @@ import it.polimi.ingsw.model.goal.Goal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.utils.Coordinate;
+import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
 import it.polimi.ingsw.event.data.client.StartGameEventData;
 
@@ -49,10 +50,16 @@ public class Game extends GameView {
      * @param username The player that want to stop the game
      * @see StartGameEventData
      * */
-    public boolean stopGame (String username) throws NoPlayerConnectedException {
-        int playerOnline = this.getNextPlayerOnline(this.creator);
+    public boolean stopGame (String username) {
+        String playerOnline;
+        try {
+            playerOnline = players.get(this.getNextPlayerOnline(this.creator)).getUsername();
+        } catch (NoPlayerConnectedException ignored) {
+            // there are no player except [username]
+            playerOnline = username;
+        }
 
-        if (players.get(playerOnline).is(username)) {
+        if (username.equals(playerOnline)) {
             broadcast(new GameHasBeenStoppedEventData());
             this.isStopped = true;
             return true;
@@ -156,10 +163,16 @@ public class Game extends GameView {
         throw new IllegalArgumentException("Player not in this game");
     }
 
+    private void setStopped () {
+        isStopped = true;
+        broadcast(new GameHasBeenStoppedEventData());
+    }
+
     /**
      * @return true iff there are no player connected
      * */
     public boolean disconnectPlayer (String username) {
+        boolean res = false;
         Player player = this.getPlayer(username);
 
         if (!player.isConnected()) {
@@ -168,21 +181,25 @@ public class Game extends GameView {
 
         player.setConnectionState(false);
 
-        if (isStarted() && (this.players.get(currentPlayerIndex).equals(player))) {
+        if (numberOfPlayerOnline() < 2) {
+            setStopped();
+            res = true;
+        } else if (isStarted() && (this.players.get(currentPlayerIndex).equals(player))) {
             try {
                 calculateNextPlayer();
             } catch (IllegalFlowException e) {
-                throw new RuntimeException();
+                Logger.writeCritical("This function should not be throw IllegalFlowException");
+                assert false;
             } catch (NoPlayerConnectedException e) {
-                isStopped = true;
-                return true;
+                setStopped();
+                res = true;
             }
 
             this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex)));
         }
 
         this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
-        return false;
+        return res;
     }
 
     /**
@@ -200,7 +217,16 @@ public class Game extends GameView {
 
         this.isStarted = true;
 
-        if (!isStopped) {
+        if (isStopped) {
+            isStopped = false;
+            if (players.get(currentPlayerIndex).isDisconnected()) {
+                try {
+                    calculateNextPlayer();
+                } catch (IllegalFlowException | NoPlayerConnectedException e) {
+                    Logger.writeCritical("This method should not fail here");
+                }
+            }
+        } else {
             this.currentPlayerIndex = FIRST_PLAYER_INDEX;
             this.commonGoals = CommonGoal.getTwoRandomCommonGoals(players.size());
         }
@@ -263,6 +289,9 @@ public class Game extends GameView {
         this.transceiver.broadcast(eventData);
     }
 
+    /**
+     * @throws NoPlayerConnectedException iff there are no other connected players besides the current one.
+     * */
     private void calculateNextPlayer() throws IllegalFlowException, NoPlayerConnectedException {
         assert this.players.size() >= 2 && this.players.size() <= 4;
         assert this.isStarted() && !isStopped();
@@ -342,8 +371,9 @@ public class Game extends GameView {
     /**
      * TODO: javadoc
      * insert tile selected
+     * @return true iff we need to stop this game.
      * */
-    public void insertTile (String username, int col) throws IllegalFlowException, IllegalExtractionException {
+    public boolean insertTile (String username, int col) throws IllegalFlowException, IllegalExtractionException {
         final Player player = getPlayer(username);
 
         if (isStopped())
@@ -396,8 +426,14 @@ public class Game extends GameView {
         try {
             this.calculateNextPlayer();
         } catch (NoPlayerConnectedException e) {
-            throw new RuntimeException(e);
+            // there is no other player online, we need to stop this game.
+
+            this.stopGame(username);
+
+            return true;
         }
+
+        return false;
     }
 
     public int getPersonalGoal(String username) {

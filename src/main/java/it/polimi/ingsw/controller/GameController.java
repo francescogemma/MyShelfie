@@ -54,19 +54,14 @@ public class GameController {
 
     public Response stopGame (String username) {
         synchronized (this) {
-            try {
-                if (!game.containPlayer(username))
-                    throw new IllegalArgumentException();
+            if (!game.containPlayer(username))
+                throw new IllegalArgumentException();
 
-                if (game.stopGame(username)) {
-                    this.clients.clear();
-                    return new Response("Game has been successfully paused", ResponseStatus.SUCCESS);
-                }
-                return new Response("You are not the owner", ResponseStatus.FAILURE);
-            } catch (NoPlayerConnectedException e) {
-                Logger.writeCritical("It's not possible one player ask me to stop a game and he is disconnected");
-                return new Response("We have and internal problem", ResponseStatus.FAILURE);
+            if (game.stopGame(username)) {
+                this.clients.clear();
+                return new Response("Game has been successfully paused", ResponseStatus.SUCCESS);
             }
+            return new Response("You are not the owner", ResponseStatus.FAILURE);
         }
     }
 
@@ -155,7 +150,12 @@ public class GameController {
         assert username != null;
         synchronized (this) {
             try {
-                this.game.insertTile(username, column);
+                final boolean needToStop = this.game.insertTile(username, column);
+
+                if (needToStop) {
+                    assert this.clients.size() < 2;
+                }
+
                 return new Response("Ok!", ResponseStatus.SUCCESS);
             } catch (IllegalExtractionException | IllegalFlowException | NotEnoughSpaceInColumnException e) {
                 return new Response("Failure during insertion of tiles into the bookshelf",
@@ -176,32 +176,36 @@ public class GameController {
         }
     }
 
-    public Response disconnect(String username) throws NoPlayerConnectedException {
+    public synchronized boolean isStopped() {
+        return game.isStopped();
+    }
+
+    /**
+     * @throws IllegalArgumentException iff the player is not in this game.
+     * @throws NoPlayerConnectedException iff there are no player connected
+     * */
+    public void disconnect(String username) throws NoPlayerConnectedException {
         boolean shouldThrow = false;
 
         synchronized (this) {
-            try {
-                if (this.game.disconnectPlayer(username)) {
-                    // game has been stopped
-                    assert this.clients.size() == 1;
-                    shouldThrow = true;
-                    assert game.isStopped();
-                }
-            } catch (IllegalArgumentException e) {
-                return new Response("You're not connected to the game", ResponseStatus.FAILURE);
+            if (this.game.disconnectPlayer(username)) {
+                // game has been stopped
+                assert this.clients.size() == 1;
+                shouldThrow = true;
+                assert game.isStopped();
+            } else {
+                assert !game.isStopped();
             }
 
             for (int i = 0; i < clients.size(); i++) {
                 if (this.clients.get(i).getValue().equals(username)) {
                     this.clients.remove(i);
-                    return new Response("You're now disconnected to the game", ResponseStatus.SUCCESS);
+                    return;
                 }
             }
 
             if (shouldThrow)
                 throw new NoPlayerConnectedException();
-
-            return new Response("You're not connected to the game", ResponseStatus.FAILURE);
         }
     }
 

@@ -130,16 +130,18 @@ public class GameView implements Identifiable {
     protected int getNextPlayerOnline (int currentPlayerIndex) throws NoPlayerConnectedException {
         for (int i = 1; i < this.playerViews.size(); i++) {
             final int index = (currentPlayerIndex + i) % this.playerViews.size();
-            if (this.playerViews.get(index).isConnected) {
+            if (this.playerViews.get(index).isConnected()) {
                 return index;
             }
         }
         throw new NoPlayerConnectedException();
     }
 
-    public boolean canStartGame (String username) throws IllegalFlowException {
-        final boolean canStartAfterStop = isStopped() && playerViews.size() < 2;
+    public int numberOfPlayerOnline () {
+        return (int) this.playerViews.stream().filter(PlayerView::isConnected).count();
+    }
 
+    public boolean canStartGame (String username) throws IllegalFlowException {
         if (isOver())
             throw new IllegalFlowException();
 
@@ -182,6 +184,9 @@ public class GameView implements Identifiable {
         if (isOver()) {
             throw new IllegalFlowException("There is no current player when the game is over");
         }
+
+        if (isStopped())
+            throw new IllegalFlowException("Game is stopped");
 
         return playerViews.get(currentPlayerIndex);
     }
