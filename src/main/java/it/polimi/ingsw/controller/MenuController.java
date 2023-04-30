@@ -206,6 +206,23 @@ public class MenuController {
         }
     }
 
+    /**
+     * Let's assume that the player is not in any game.
+     * */
+    public Response logout (EventTransmitter eventTransmitter) {
+        synchronized (authenticated) {
+            assert authenticated.contains(eventTransmitter);
+            authenticated.remove(eventTransmitter);
+        }
+
+        synchronized (notAuthenticated) {
+            assert !notAuthenticated.contains(eventTransmitter);
+            notAuthenticated.add(eventTransmitter);
+        }
+
+        return new Response("You are now logout", ResponseStatus.SUCCESS);
+    }
+
     public void forceDisconnect(EventTransmitter transmitter, String username) {
         synchronized (notAuthenticated) {
             notAuthenticated.remove(transmitter);

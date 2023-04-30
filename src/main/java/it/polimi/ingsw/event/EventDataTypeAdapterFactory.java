@@ -49,7 +49,8 @@ public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
             Map.entry(PauseGameEventData.ID, PauseGameEventData.class),
             Map.entry(GameHasBeenStoppedEventData.ID, GameHasBeenStoppedEventData.class),
             Map.entry(PlayerDisconnectedInternalEventData.ID, PlayerDisconnectedInternalEventData.class),
-            Map.entry(FirstFullBookshelfEventData.ID, FirstFullBookshelfEventData.class)
+            Map.entry(FirstFullBookshelfEventData.ID, FirstFullBookshelfEventData.class),
+            Map.entry(LogoutEventData.ID, LogoutEventData.class)
     );
 
     private static final Map<String, Type> WRAPPER_DATA_TYPES = Map.of(

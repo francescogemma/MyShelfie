@@ -11,8 +11,10 @@ import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.game.GameView;
 import it.polimi.ingsw.utils.Coordinate;
+import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
 
+import java.awt.*;
 import java.util.Optional;
 
 public class VirtualView implements EventTransmitter{
@@ -40,11 +42,32 @@ public class VirtualView implements EventTransmitter{
         CreateNewGameEventData.responder(transceiver, transceiver,  event -> createNewGame(event.gameName()));
         PlayerExitGame.responder(transceiver, transceiver,          event -> exitGame());
         PauseGameEventData.responder(transceiver, transceiver,      event -> pauseGame());
+        LogoutEventData.responder(transceiver, transceiver,         event -> logout());
 
         PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(event -> disconnect());
 
         JoinStartedGameEventData.castEventReceiver(transceiver).registerListener(event -> this.sendGameState());
         PlayerHasJoinMenu       .castEventReceiver(transceiver).registerListener(event -> this.playerHasJoinMenu());
+    }
+
+    private synchronized Response logout () {
+        if (isInGame()) {
+            Logger.writeWarning("The client has asked to log out but is in game");
+            return new Response("You are in a game...", ResponseStatus.FAILURE);
+        }
+
+        if (isAuthenticated()) {
+            Response response = MenuController.getInstance().logout(this);
+
+            if (response.isOk()) {
+                this.username = null;
+            }
+
+            return response;
+        } else {
+            Logger.writeWarning("The client has asked to log out but is not authenticated");
+            return new Response("You are not login", ResponseStatus.SUCCESS);
+        }
     }
 
     private synchronized void disconnect() {
@@ -175,19 +198,33 @@ public class VirtualView implements EventTransmitter{
         return Optional.of(username);
     }
 
-    public synchronized EventReceiver<EventData> getNetworkReceiver () {
-        return this.transceiver;
-    }
-
     public boolean isInGame() {
+        /*
+         * this method is not synchronized, and you need to
+         * synchronized on this!!
+         */
+        assert Thread.holdsLock(this);
+
         return this.gameController != null;
     }
 
     public void setGameController(GameController gameController) {
+        /*
+         * this method is not synchronized, and you need to
+         * synchronized on this!!
+         */
+        assert Thread.holdsLock(this);
+
         this.gameController = gameController;
     }
 
     public boolean isAuthenticated () {
+        /*
+         * this method is not synchronized, and you need to
+         * synchronized on this!!
+         */
+        assert Thread.holdsLock(this);
+
         return username != null;
     }
 
