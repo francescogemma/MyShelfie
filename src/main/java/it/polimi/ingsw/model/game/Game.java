@@ -424,6 +424,7 @@ public class Game extends GameView {
                 broadcast(
                         new CommonGoalCompletedEventData(
                             player.createView(),
+                            points,
                             commonGoals[i].getPointMasks(),
                             commonGoals[i].getIndex()
                         )

@@ -17,14 +17,20 @@ public class CommonGoalCompletedEventData implements EventData {
     private final BookshelfMaskSet maskSet;
     private final PlayerView player;
     private final int commonGoalCompleted;
+    private final int points;
 
     public static final String ID = "COMMON_GOAL_COMPLETED";
 
-    public CommonGoalCompletedEventData(PlayerView player, BookshelfMaskSet maskSet, int commonGoalCompleted) {
+    public CommonGoalCompletedEventData(PlayerView player, int points, BookshelfMaskSet maskSet, int commonGoalCompleted) {
         assert player.getClass() == PlayerView.class;
         this.player = player;
         this.maskSet = maskSet;
         this.commonGoalCompleted = commonGoalCompleted;
+        this.points = points;
+    }
+
+    public int getPoints () {
+        return points;
     }
 
     public BookshelfMaskSet getBookshelfMaskSet() {
