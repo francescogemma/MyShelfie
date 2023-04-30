@@ -289,6 +289,20 @@ public class Game extends GameView {
         this.transceiver.broadcast(eventData);
     }
 
+    private boolean isLastPlayerSelected() throws NoPlayerConnectedException {
+        Player lastConnected = null;
+
+        for (Player player : players) {
+            if (player.isConnected())
+                lastConnected = player;
+        }
+
+        if (lastConnected == null)
+            throw new NoPlayerConnectedException();
+
+        return players.get(currentPlayerIndex).equals(lastConnected);
+    }
+
     /**
      * @throws NoPlayerConnectedException iff there are no other connected players besides the current one.
      * */
@@ -299,7 +313,7 @@ public class Game extends GameView {
 
         refillBoardIfNecessary();
 
-        if (atLeastOneBookshelfIsFull() && this.currentPlayerIndex + 1 == this.players.size()) {
+        if (atLeastOneBookshelfIsFull() && isLastPlayerSelected()) {
             // Game ending logic:
             List<Pair<Integer, BookshelfMaskSet>> pointsAchievePersonal = new ArrayList<>();
             List<Pair<Integer, BookshelfMaskSet>> pointsAchieveAdjacency = new ArrayList<>();
