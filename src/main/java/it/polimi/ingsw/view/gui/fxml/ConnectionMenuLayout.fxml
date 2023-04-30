@@ -1,10 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Label?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<VBox>
-    <children>
-        <Label text="GUI not implemented yet!"/>
-    </children>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.Cursor?>
+<VBox fx:id="connectionVBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox fx:id="connectionImageHBox" alignment="CENTER" VBox.vgrow="ALWAYS">
+         <children>
+            <ImageView fx:id="connectionImageView" fitHeight="${connectionImageHBox.height * 0.8}" fitWidth="${connectionImageHBox.width * 0.8}" preserveRatio="true" >
+               <Image url="/Publisher material/Title 2000x618px.png"/>
+            </ImageView>
+         </children>
+      </HBox>
+
+      <HBox VBox.vgrow="ALWAYS">
+         <children>
+            <HBox fx:id="serverIPBackground" alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Server IP" />
+                  <TextField fx:id="serverIPTextField" promptText="Server IP" text="10.0.0.2" HBox.hgrow="ALWAYS" />
+               </children>
+               <padding>
+                  <Insets left="20.0" right="20.0" />
+               </padding>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="10" left="90.0" right="90.0" top="10" />
+         </padding>
+      </HBox>
+
+      <HBox VBox.vgrow="ALWAYS">
+         <children>
+            <HBox fx:id="serverPortBackground" alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Server Port" />
+                  <TextField fx:id="serverPortTextField" promptText="Server Port" text="8080" HBox.hgrow="ALWAYS" />
+               </children>
+               <padding>
+                  <Insets left="20.0" right="20.0" />
+               </padding>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="10" left="90.0" right="90.0" top="10" />
+         </padding>
+      </HBox>
+
+      <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+         <children>
+            <Button fx:id="connectionMenuNextButton" mnemonicParsing="false" text="NEXT">
+               <cursor>
+                  <Cursor fx:constant="HAND"/>
+               </cursor>
+            </Button>
+         </children>
+      </HBox>
+   </children>
 </VBox>

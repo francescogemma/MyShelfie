@@ -121,6 +121,15 @@
       <resource>
         <directory>src/main/java/it/polimi/ingsw/view/gui/fxml</directory>
       </resource>
+      <resource>
+        <directory>assets</directory>
+      </resource>
+      <resource>
+        <directory>fonts</directory>
+      </resource>
+      <resource>
+        <directory>src/main/java/it/polimi/ingsw/view/gui/css</directory>
+      </resource>
     </resources>
   </build>
 </project>
