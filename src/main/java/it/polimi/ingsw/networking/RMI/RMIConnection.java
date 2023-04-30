@@ -12,8 +12,17 @@ import java.rmi.registry.Registry;
  * @author Michele Miotti
  */
 public class RMIConnection implements Connection {
-    RemoteQueue addQueue;
-    RemoteQueue pollQueue;
+    /**
+     * This queue is a remote object, bound to the server's registry.
+     * A client will add strings to this queue, the server will poll them.
+     */
+    private final RemoteQueue addQueue;
+
+    /**
+     * This queue is a remote object, bound to the server's registry.
+     * A client will poll string from this queue, the server will add them.
+     */
+    private final RemoteQueue pollQueue;
 
     /**
      * Used to keep track of connection state. Methods "send" and "receive" can only work if this
@@ -23,13 +32,13 @@ public class RMIConnection implements Connection {
 
     /**
      * Lock needed to protect portions of object state that need to be modified by threads, such as
-     * the "disconnected" boolean, or the messages queue.
+     * the "disconnected" boolean, and both remote queues.
      */
     private final Object lock = new Object();
 
     /**
      * This constructor creates a connection with some {@link it.polimi.ingsw.networking.ConnectionAcceptor acceptor}.
-     * This acceptor will then pair this object with another {@link Connection connection}.
+     * This acceptor will then return the name of a newly created remote queue pair, through a remote method.
      * This constructor should be used client-side.
      *
      * @param address is the address of the server's host.
@@ -60,11 +69,13 @@ public class RMIConnection implements Connection {
 
     /**
      * This constructor does NOT request names to an {@link it.polimi.ingsw.networking.ConnectionAcceptor acceptor},
-     * and should only be constructed BY an acceptor to generate new connections, while already knowing the target's name.
+     * and should only be constructed BY an acceptor to create a connection that is already looking for the right queue
+     * on the registry. Of course, this constructor needs to know the undecorated queue name in order to work.
      * This method should be called server-side.
      *
+     * @param address is the address of the server's host.
      * @param port is the port used by {@link it.polimi.ingsw.networking.ConnectionAcceptor the server} for RMI communication.
-     * @param boundName is the name of the Connection pair that needs to be completed with the server-side connection.
+     * @param boundName is the name of the undecorated queue that should already be bound to the registry.
      * @throws ServerNotFoundException will be thrown if a failure occurs in the process of connecting to the server.
      */
     public RMIConnection(String address, int port, String boundName) throws ServerNotFoundException {
