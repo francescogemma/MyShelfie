@@ -8,8 +8,8 @@ import java.util.Scanner;
 
 public class ClientRMIScanner {
     public static void main(String[] args) {
-        final String ADDRESS = "localhost";
-        final int PORT = 1099;
+        final String ADDRESS = "x.x.x.x";
+        final int PORT = 5678;
         Connection connection;
         Scanner scanner = new Scanner(System.in);
 

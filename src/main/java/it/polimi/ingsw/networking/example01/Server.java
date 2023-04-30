@@ -8,10 +8,12 @@ import java.util.concurrent.TimeUnit;
 public class Server {
     public Server() { }
     public static void main( String[] args ) {
+        System.setProperty("java.rmi.server.hostname","x.x.x.x");
+
         try {
             // create and export our acceptor.
             System.out.println("Starting server...");
-            ConnectionAcceptor serverAcceptor = new ConnectionAcceptor(1234, 1099);
+            ConnectionAcceptor serverAcceptor = new ConnectionAcceptor(1234, 5678);
             System.out.println("Server started.");
 
             // from here on, we can use the serverAcceptor.

@@ -9,7 +9,10 @@ import java.util.Scanner;
 public class ServerScanner {
     public static void main(String[] args) {
         final int TCP_PORT = 1234;
-        final int RMI_PORT = 1099;
+        final int RMI_PORT = 5678;
+
+        System.setProperty("java.rmi.server.hostname","x.x.x.x");
+
         Connection connection;
         Scanner scanner = new Scanner(System.in);
 

@@ -8,7 +8,7 @@ public class DisconnectingClientRMI {
     public static void main( String[] args ) {
         try {
             // "null" means localhost. change it to the actual server address.
-            RMIConnection myClient = new RMIConnection(null, 1099);
+            RMIConnection myClient = new RMIConnection("x.x.x.x", 5678);
 
             // sending two messages without accepting immediately.
             myClient.send("Hello! I'm Disconnecting RMI Client!");

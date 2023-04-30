@@ -53,6 +53,10 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements RemoteSer
      * created in the "receive" method.
      */
     private final Queue<Connection> connectionQueue = new LinkedList<>();
+
+    /**
+     * Pointer to this server's registry.
+     */
     private final Registry registry;
 
     /**

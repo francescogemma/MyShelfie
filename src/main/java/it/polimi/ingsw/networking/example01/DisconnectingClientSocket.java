@@ -8,7 +8,7 @@ public class DisconnectingClientSocket {
     public static void main( String[] args ) {
         try {
             // "null" means localhost. change it to the actual server address.
-            TCPConnection myClient = new TCPConnection("localhost", 1234);
+            TCPConnection myClient = new TCPConnection("x.x.x.x", 1234);
 
             // sending two messages without accepting immediately.
             myClient.send("Hello! I'm Disconnecting Socket Client!");

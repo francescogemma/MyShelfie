@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class ClientSocketScanner {
     public static void main(String[] args) {
-        final String ADDRESS = "localhost";
+        final String ADDRESS = "x.x.x.x";
         final int PORT = 1234;
         Connection connection;
         Scanner scanner = new Scanner(System.in);
