@@ -50,3 +50,4 @@ docs/
 
 db/
 log_*
+testdb/*
