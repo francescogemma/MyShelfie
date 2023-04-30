@@ -99,6 +99,8 @@ public class GameLayout extends AppLayout {
         completedCommonGoalPopUpTextBox.center().crop()
             .fixSize(new DrawableSize(10, 25)).addBorderBox().center()
     );
+    private final Button exitButton = new Button("Exit");
+    private final Button stopGameButton = new Button("Stop game");
     private final TextBox playerNameTextBox = new TextBox().unfocusable();
     private final BookshelfDrawable bookshelfDrawable = new BookshelfDrawable();
     private final Button nextBookshelfButton = new Button(">");
@@ -156,7 +158,7 @@ public class GameLayout extends AppLayout {
                     playerAdditionalPointsElement)
                 .center().crop().fixSize(new DrawableSize(1, 15)).center().weight(1))
                 .center().crop()
-                .fixSize(new DrawableSize(5, 50)).addBorderBox().blurrable()
+                .fixSize(new DrawableSize(5, 45)).addBorderBox().blurrable()
             );
         }
     }
@@ -191,8 +193,14 @@ public class GameLayout extends AppLayout {
                     blurrableAdjacencyGoal.weight(1)
                 ).alignUpLeft().scrollable().weight(3),
                 new OrientedLayout(Orientation.VERTICAL,
-                    turnTextBox.center().weight(1),
-                    twoLayersBoard.weight(15)
+                    turnTextBox.center().weight(2),
+                    twoLayersBoard.weight(15),
+                    new OrientedLayout(Orientation.HORIZONTAL,
+                        new Fill(PrimitiveSymbol.EMPTY).weight(1),
+                        stopGameButton.center().weight(2),
+                        exitButton.center().weight(2),
+                        new Fill(PrimitiveSymbol.EMPTY).weight(1)
+                    ).weight(3)
                 ).weight(2),
                 new OrientedLayout(Orientation.VERTICAL,
                     new Fill(PrimitiveSymbol.EMPTY).weight(1),
