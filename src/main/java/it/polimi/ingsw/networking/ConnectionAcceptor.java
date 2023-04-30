@@ -38,15 +38,7 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements RemoteSer
      * It is static because many ConnectionAcceptors may be instantiated, and they all need to share
      * the same lastRMIConnectionIndex.
      */
-    private final Object lock = new Object();
-
-    /**
-     * Used for RMI
-     * Lock used to handle multiple threads requesting names concurrently.
-     * It is static because many ConnectionAcceptors may be instantiated, and they all need to share
-     * the same lastRMIConnectionIndex.
-     */
-    private static final Object registryLock = new Object();
+    private static final Object lock = new Object();
 
     /**
      * Needed for RMI communication.
@@ -88,6 +80,8 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements RemoteSer
     /**
      * This method will simply wait for a connection, and return a connection object to connect
      * back to that caller
+     *
+     * @return {@link Connection} object
      */
     public Connection accept() {
         // this thread will concur with the createRemoteConnection method.
@@ -122,7 +116,7 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements RemoteSer
 
     @Override
     public String getBoundName() throws RemoteException {
-        synchronized (registryLock) {
+        synchronized (lock) {
             String boundName = "QUEUE" + nextBoundIndex++;
 
             try {
