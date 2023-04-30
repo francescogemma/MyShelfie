@@ -6,6 +6,7 @@ import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.ConnectionAcceptor;
 import it.polimi.ingsw.networking.ConnectionException;
+import it.polimi.ingsw.utils.Logger;
 
 import java.rmi.RemoteException;
 
@@ -17,15 +18,18 @@ public class Server {
         try {
             connectionAcceptor = new ConnectionAcceptor(8080, 8081);
         } catch (RemoteException | ConnectionException e) {
-            System.out.println(e);
+            System.out.println(e.toString());
+            Logger.writeCritical(e.toString());
 
             System.exit(1);
             return;
         }
 
+        Logger.writeMessage("Server start");
+
         while (true) {
             Connection connection = connectionAcceptor.accept();
-            System.out.println("New connection");
+            Logger.writeMessage("New connection");
 
             NetworkEventTransceiver transceiver = new NetworkEventTransceiver(connection, new Object());
 

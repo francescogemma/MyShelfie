@@ -36,7 +36,7 @@ public class Logger {
             .replace("\\.", "_")
             .replace(":", "_");
 
-    private static String logPosition = "log/";
+    private static String logPosition;
 
     private Logger() throws IOException {
         String pos = logPosition + "/log_" + nameLog + ".txt";
@@ -71,8 +71,10 @@ public class Logger {
     }
 
     static {
+        final String nameFolder = "/log_MyShelfie";
         try {
-            logPosition = System.getProperty("user.dir");
+            new File(System.getProperty("user.home") + nameFolder).mkdirs();
+            logPosition = System.getProperty("user.home") + nameFolder;
             INSTANCE = new Logger();
         } catch (Exception e) {
             throw new RuntimeException(e);
