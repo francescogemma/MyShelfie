@@ -4,6 +4,7 @@ import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.client.CreateNewGameEventData;
+import it.polimi.ingsw.event.data.client.LogoutEventData;
 import it.polimi.ingsw.event.data.client.PlayerHasJoinMenu;
 import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
@@ -55,6 +56,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
     private final ValueMenuEntry<String> gameNameEntry = new ValueMenuEntry<>("New game's name", new TextBox());
     private final Button createNewGameButton = new Button("Create new game");
     private final Button backToLoginButton = new Button("Back to login");
+    private final Button exitButton = new Button("Exit");
 
     private List<String> availableGames;
     private String selectedGameName;
@@ -68,6 +70,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
                 gameNameEntry.center().weight(1),
                 createNewGameButton.center().weight(1),
                 backToLoginButton.center().weight(1),
+                exitButton.center().weight(1),
                 new Fill(PrimitiveSymbol.EMPTY).weight(1)
             ).center().weight(2)
         ).center().crop());
@@ -80,11 +83,20 @@ public class AvailableGamesMenuLayout extends AppLayout {
             displayServerResponse(createGameRequester.request(new CreateNewGameEventData(gameNameEntry.getValue())));
         });
 
-        backToLoginButton.onpress(() -> switchAppLayout(LoginMenuLayout.NAME));
+        backToLoginButton.onpress(() -> {
+            displayServerResponse(logoutRequester.request(new LogoutEventData()));
+            switchAppLayout(LoginMenuLayout.NAME);
+        });
+
+        exitButton.onpress(() -> {
+            transceiver.disconnect();
+            mustExit();
+        });
     }
 
     private NetworkEventTransceiver transceiver;
     private Requester<Response, CreateNewGameEventData> createGameRequester;
+    private Requester<Response, LogoutEventData> logoutRequester;
 
     @Override
     public void setup(String previousLayoutName) {
@@ -95,8 +107,8 @@ public class AvailableGamesMenuLayout extends AppLayout {
 
             transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
                 "transceiver");
-
             createGameRequester = Response.requester(transceiver, transceiver, getLock());
+            logoutRequester = Response.requester(transceiver, transceiver, getLock());
 
             GameHasBeenCreatedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 availableGames.addAll(data.getNames());
