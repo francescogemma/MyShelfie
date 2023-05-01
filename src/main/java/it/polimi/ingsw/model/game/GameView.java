@@ -271,7 +271,7 @@ public class GameView implements Identifiable {
             throw new IllegalFlowException("There is no winner until the game is over");
         }
 
-        return winners.stream().map(PlayerView::getView).toList();
+        return winners.stream().map(PlayerView::createView).toList();
     }
 
     /**

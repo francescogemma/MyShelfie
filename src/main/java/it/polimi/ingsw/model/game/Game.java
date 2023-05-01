@@ -409,7 +409,7 @@ public class Game extends GameView {
             // set new turn
             this.currentPlayerIndex = index;
 
-            this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex).getView()));
+            this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex).createView()));
         }
     }
 
