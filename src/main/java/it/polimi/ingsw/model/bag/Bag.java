@@ -3,7 +3,6 @@ import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.tile.TileVersion;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -98,13 +97,23 @@ public class Bag {
         }
     }
 
+    /**
+     * Contains the number of tiles remaining.
+     * @author Giacomo Groppi
+     * */
     private int remaining;
+
+    /**
+     * Contains all the remaining tiles per type.
+     * @author Giacomo Groppi
+     * */
     private final int[] remainingTiles = new int[Tile.NUM_OF_DIFFERENT_NON_EMPTY_TILES];
     private int lastExtraction;
 
     /**
      * Constructor of the class.
      * It initializes all 22*6 {@link Tile tiles}
+     * @author Giacomo Groppi
      * */
     public Bag() {
         for (TileColor tileColor : TileColor.values()) {
@@ -121,6 +130,10 @@ public class Bag {
         remaining = NUM_OF_NON_EMPTY_TILES;
     }
 
+    /**
+     * Constructs a new object equal to the past one
+     * @author Giacomo Groppi
+     * */
     public Bag (final Bag bag) {
         for (int i = 0; i < bag.remainingTiles.length; i++) {
             this.remainingTiles[i] = bag.remainingTiles[i];
@@ -134,6 +147,7 @@ public class Bag {
      * The function selects a random {@link Tile tile} from the bag and removes it.
      * @return a random {@link Tile tile}
      * @see Tile
+     * @author Giacomo Groppi
      * */
     public Tile getRandomTile() {
         if (this.isEmpty()) {
@@ -159,6 +173,7 @@ public class Bag {
      * The function removes the Tile at position index
      * @param index index of extraction
      * @throws IllegalArgumentException If there is no Tile left at index i
+     * @author Giacomo Groppi
      */
     private Tile removeAndReturn(int index) {
         if (this.remainingTiles[index] < 1) {
@@ -182,6 +197,7 @@ public class Bag {
     /**
      * This function reintroduces the last drawn Tile back into the bag.
      * @throws RuntimeException If there has been no draw or the last draw has already been restored.
+     * @author Giacomo Groppi
      * */
     public void forgetLastExtraction () {
         if (lastExtraction == -1) {
@@ -196,6 +212,7 @@ public class Bag {
     /**
      * @param index index of interrogation
      * @return The number of remaining Tiles at index i.
+     * @author Giacomo Groppi
      * */
     protected int getAvailable(int index) {
         return this.remainingTiles[index];
@@ -203,11 +220,16 @@ public class Bag {
 
     /**
      * @return the number of tiles left in the bag.
+     * @author Giacomo Groppi
      * */
     protected int getRemaining() {
         return this.remaining;
     }
 
+    /**
+     * @return true iff there are no more tiles in the bag.
+     * @author Giacomo Groppi
+     * */
     public boolean isEmpty() {
         return this.getRemaining() == 0;
     }

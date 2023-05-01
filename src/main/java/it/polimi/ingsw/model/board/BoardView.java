@@ -13,11 +13,25 @@ import static it.polimi.ingsw.model.board.Board.BOARD_ROWS;
 import static it.polimi.ingsw.model.board.Board.COLUMN_BOARDS;
 
 /**
+ * Container for all data related to the board, containing only getters.
+ * If the class was created using the {@link #createView()} method,
+ * objects are immutable.
+ *
+ * @see BoardView
+ * @see Board
  * @author Giacomo Groppi
- * */
+ */
 public class BoardView {
+    /**
+     * board selector instance
+     * */
     protected BoardSelector boardSelector;
+
+    /**
+     * number of occupied positions
+     * */
     protected int occupied;
+
     /**
      * tiles[i][j] will be null if the cell is empty
      */
@@ -27,6 +41,10 @@ public class BoardView {
 
     }
 
+    /**
+     * Constructs a new BoardView object that is a copy of the specified BoardView object.
+     * @param other the BoardView object to be copied
+     */
     BoardView(BoardView other) {
         for (int i = 0; i < tiles.length; i++) {
             for (int j = 0; j < tiles[i].length; j++) {
@@ -35,6 +53,14 @@ public class BoardView {
         }
         this.occupied = other.occupied;
         this.boardSelector = new BoardSelector(other.boardSelector);
+    }
+
+    /**
+     * Use this method to understand if the current selection can be drawn
+     * @return true iff the current selection can be drawn.
+     * */
+    public boolean canDraw () {
+        return this.boardSelector.canDraw();
     }
 
     /**
@@ -223,7 +249,10 @@ public class BoardView {
                 ((BoardView) other).boardSelector.equals(this.boardSelector);
     }
 
-    public BoardView getView () {
+    /**
+     * @return a new instance of BoardView immutable
+     * */
+    public BoardView createView() {
         return new BoardView(this);
     }
 

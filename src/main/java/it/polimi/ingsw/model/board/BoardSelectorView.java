@@ -57,6 +57,9 @@ class BoardSelectorView {
         return this.selected.contains(c);
     }
 
+    /**
+     * Use this method to understand if the current selection can be drawn
+     * */
     public boolean canDraw () {
         if (selectionSize() == 0)
             return false;

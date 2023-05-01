@@ -24,7 +24,7 @@ class BoardSelector extends BoardSelectorView {
     }
 
     /**
-     * @exception RuntimeException if sizeSelection() != 2
+     * @throws RuntimeException if sizeSelection() != 2
      * @return true if the extraction is Vertical
      */
     protected boolean isVerticalExtraction () {
@@ -118,9 +118,9 @@ class BoardSelector extends BoardSelectorView {
 
     /**
      * The function checks that wrong positions are not selected, but it does not check whether the cell can actually be selected, i.e., whether it has a free side.
-     * @exception IllegalExtractionException if the position of the Tile is along the diagonal
-     * @exception IllegalArgumentException if we are trying to extract more than 3 tiles
-     * @exception IllegalArgumentException if [r, c] is already in the list
+     * @throws IllegalExtractionException if the position of the Tile is along the diagonal
+     * @throws IllegalArgumentException if we are trying to extract more than 3 tiles
+     * @throws IllegalArgumentException if [r, c] is already in the list
      */
     public void select (Coordinate c) throws IllegalExtractionException, FullSelectionException {
         if (selectionSize() > 2) {

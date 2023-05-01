@@ -12,7 +12,14 @@ import java.util.*;
 public class Board extends BoardView {
     // TODO: JavaDoc for some private fields is missing (we must add it :( [Laboratorio 2 - Javadoc-1.pdf, slide number 9])
 
+    /**
+     * The number of rows in the board.
+     * */
     public static final int BOARD_ROWS = 9;
+
+    /**
+     * The number of columns in the board.
+     * */
     public static final int COLUMN_BOARDS = 9;
 
     /**
@@ -64,7 +71,8 @@ public class Board extends BoardView {
     }
 
     /**
-     * TODO: add javadoc
+     * Construct a new Board equals to the one passed as parameter.
+     * @param other The Board to copy.
      * */
     public Board (Board other) {
         this.boardSelector = new BoardSelector(other.boardSelector);
@@ -78,28 +86,40 @@ public class Board extends BoardView {
      * The function selects the Tile for extraction, it handles both the case where a Tile without
      * a free side is selected, and if a Tile is selected that cannot be extracted together with
      * the Tiles previously selected.
+     *
      * @return The {@link Tile Tile} selected.
+     *
+     * @throws IllegalExtractionException
+     *  <ul>
+     *      <li> There are no selection coordinate </li>
+     *      <li> Coordinate can't be selected </li>
+     *  </ul>
+     *
+     * @throws IllegalArgumentException iff coordinate is outside the border
+     *
+     * @param coordinate The {@link Coordinate Coordinate} of the {@link Tile Tile} to select.
+     *
+     * @see #getSelectableCoordinate()
     * */
-    public Tile selectTile(Coordinate c) throws IllegalExtractionException, FullSelectionException {
-        if (isOutOfBoard(c))
+    public Tile selectTile(Coordinate coordinate) throws IllegalExtractionException, FullSelectionException {
+        if (isOutOfBoard(coordinate))
             throw new IllegalArgumentException("It's out of the board");
 
-        if (this.isEmpty(c))
-            throw new IllegalExtractionException("Can't extract tile at: [" + c.getRow() + ", " + c.getCol() + "] because tile is empty");
+        if (this.isEmpty(coordinate))
+            throw new IllegalExtractionException("Can't extract tile at: [" + coordinate.getRow() + ", " + coordinate.getCol() + "] because tile is empty");
 
-        if (!getSelectableCoordinate().contains(c))
-            throw new IllegalExtractionException("Can't extract tile at: [" + c.getRow() + ", " + c.getCol() + "]");
+        if (!getSelectableCoordinate().contains(coordinate))
+            throw new IllegalExtractionException("Can't extract tile at: [" + coordinate.getRow() + ", " + coordinate.getCol() + "]");
 
-        this.boardSelector.select(c);
-        return this.tileAt(c);
+        this.boardSelector.select(coordinate);
+        return this.tileAt(coordinate);
     }
 
+    /**
+     *
+     * */
     public Tile selectTile (int row, int col) throws IllegalExtractionException, FullSelectionException {
         return this.selectTile(new Coordinate(row, col));
-    }
-
-    public boolean canDraw () {
-        return this.boardSelector.canDraw();
     }
 
     /**
@@ -173,12 +193,19 @@ public class Board extends BoardView {
         return t;
     }
 
-    // TODO: javadoc
-    public void forgetSelected (Coordinate c) {
-        if (!this.boardSelector.contains(c))
+    /**
+     * Use this method to deselect a coordinate from the current extraction
+     * @param coordinate the coordinate to deselect
+     * @throws IllegalArgumentException iff coordinate is not selected
+     * @throws RemoveNotLastSelectedException iff coordinate is not the last Coordinate selected
+     * */
+    public void forgetSelected (Coordinate coordinate) {
+        if (coordinate == null)
+            throw new NullPointerException();
+        if (!this.boardSelector.contains(coordinate))
             throw new IllegalArgumentException("Coordinate is not selected");
 
-        if (!this.boardSelector.lastSelected().equals(c))
+        if (!this.boardSelector.lastSelected().equals(coordinate))
             throw new RemoveNotLastSelectedException();
 
         this.boardSelector.forgetLastSelected();

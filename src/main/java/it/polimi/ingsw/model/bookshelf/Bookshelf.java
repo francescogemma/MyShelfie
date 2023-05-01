@@ -45,6 +45,10 @@ public class Bookshelf extends BookshelfView {
 
     }
 
+    /**
+     * Constructs a new object equal to the past one
+     * @author Giacomo Groppi
+     * */
     public Bookshelf(Bookshelf other) {
         super(other);
     }

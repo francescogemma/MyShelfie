@@ -10,6 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Class containing all the getters for the Game class.
+ * Objects of type GameView do not contain sensitive information, such as
+ * personal objectives, and can be sent over the network
+ * after calling the {@link #createView()} function.
+ * GameView objects created with the {@link #createView()} command are immutable.
+ *
+ * @see Game
  * @author Giacomo Groppi
  * */
 public class GameView implements Identifiable {
@@ -28,33 +35,42 @@ public class GameView implements Identifiable {
      */
     protected final List<Player> winners;
 
-    /**
+    /*
      * The common goals of the game.
-     * */
+     */
     protected CommonGoal[] commonGoals;
 
-    /**
+    /*
      * The bag of tiles in the game.
      */
     protected final Bag bag;
 
-    /**
+    /*
      * The board of the game.
      */
     protected final Board board;
 
-    /**
+    /*
      * Whether the game has started.
      */
     protected boolean isStarted;
 
+    /*
+     * name of the creator of the game
+     */
     protected String creator;
 
+    /*
+     * true if game is stopped
+     */
     protected boolean isStopped;
 
+    /*
+     * Index of the first player who completed the bookshelf
+     */
     protected int firstPlayerCompleteBookshelf = -1;
 
-    /**
+    /*
      * The index of the current player in the list of players.
      */
     protected int currentPlayerIndex;
@@ -62,6 +78,15 @@ public class GameView implements Identifiable {
     // TODO: Write custom GSON adapter for Game to remove players redundancy
     private final List<PlayerView> playerViews;
 
+    /**
+     * Constructs a new GameView with the given game name and username of the creator.
+     *
+     * @param nameGame the name of the game
+     * @param username the username of the creator
+     *
+     * @throws NullPointerException if either nameGame or username is null
+     * @throws IllegalArgumentException if either nameGame or username is an empty string
+     * */
     public GameView (String nameGame, String username) {
         if (nameGame == null || username == null)
             throw new NullPointerException();
@@ -80,6 +105,11 @@ public class GameView implements Identifiable {
         this.isStopped = false;
     }
 
+    /**
+     * Constructs a new GameView object by copying another GameView object.
+     *
+     * @param other the GameView object to copy
+     * */
     public GameView(GameView other) {
         this.bag = new Bag(other.bag);
         this.board = new Board(other.board);
@@ -97,6 +127,9 @@ public class GameView implements Identifiable {
         }
     }
 
+    /**
+     * @return The index of the first player that completed the bookshelf
+     * */
     public int getFirstPlayerCompleteBookshelf() {
         return this.firstPlayerCompleteBookshelf;
     }
@@ -114,6 +147,17 @@ public class GameView implements Identifiable {
         return playerViews.get(FIRST_PLAYER_INDEX);
     }
 
+    /**
+     * @return true iff there is one player online
+     * */
+    public boolean hasPlayerDisconnected () {
+        return playerViews.stream().anyMatch(PlayerView::isDisconnected);
+    }
+
+    /**
+     * @return The next player online from username
+     * @throws NoPlayerConnectedException iff there is no player online except username
+     * */
     protected int getNextPlayerOnline(String username) throws NoPlayerConnectedException {
         int index = -1;
         for (int i = 0; i < playerViews.size(); i++) {
@@ -137,11 +181,28 @@ public class GameView implements Identifiable {
         throw new NoPlayerConnectedException();
     }
 
+    /**
+     * @return Number of players online
+     * */
     public int numberOfPlayerOnline () {
         return (int) this.playerViews.stream().filter(PlayerView::isConnected).count();
     }
 
+    /**
+     * This method is call to understand if one player can start or resume one game
+     * @throws NullPointerException iff username is null
+     * @throws IllegalFlowException
+     * <ul>
+     *     <li> Game is over </li>
+     *     <li> Game is started and it's not stopped </li>
+     *     <li> Game is started, it's stopped, and there are less then 2 player online </li>
+     * </ul>
+     * @return true iff username can start or resume this game.
+     * */
     public boolean canStartGame (String username) throws IllegalFlowException {
+        if (username == null)
+            throw new NullPointerException();
+
         if (isOver())
             throw new IllegalFlowException();
 
@@ -158,6 +219,10 @@ public class GameView implements Identifiable {
         return username.equals(creator);
     }
 
+    /**
+     * Returns a boolean indicating whether the game has been stopped.
+     * @return true if the game has been stopped, false otherwise
+     */
     public boolean isStopped() {
         return isStopped;
     }
@@ -192,6 +257,13 @@ public class GameView implements Identifiable {
     }
 
     /**
+     * @return true iff at least one bookshelf is full
+     * */
+    public boolean atLeastOneBookshelfIsFull() {
+        return playerViews.stream().anyMatch(p -> p.getBookshelf().isFull());
+    }
+
+    /**
      * @return whether the game is over or not.
      */
     public List<PlayerView> getWinners() throws IllegalFlowException {
@@ -215,13 +287,20 @@ public class GameView implements Identifiable {
     }
 
     protected void addPlayerView (PlayerView playerView) {
+        assert playerView.getClass() == Player.class;
         this.playerViews.add(playerView);
     }
+
     protected void removePlayerView(int index) {
         playerViews.remove(index);
     }
 
-    protected GameView createView () {
+    /**
+     * This method is useful when we want to create a new GameView that
+     * can't be modified by anyone.
+     * @return a new immutable GameView
+     * */
+    public GameView createView () {
         return new GameView(this);
     }
 
@@ -233,14 +312,29 @@ public class GameView implements Identifiable {
         return commonGoals;
     }
 
+    /**
+     * Creates a new immutable viewBoard and returns it to the caller.
+     * @return a new immutable viewBoard
+     *
+     * @see Board
+     * @see BoardView
+     */
     public BoardView getBoard () {
-        return board.getView();
+        return board.createView();
     }
 
+    /**
+     * Returns a boolean indicating whether the game has been started.
+     * @return true if the game has been started, false otherwise
+     */
     public boolean isStarted() {
         return this.isStarted;
     }
 
+    /**
+     * Returns a new immutable list of player views.
+     * @return a new list of immutable player view instances
+     * */
     public List<PlayerView> getPlayers () {
         return new ArrayList<>(playerViews);
     }

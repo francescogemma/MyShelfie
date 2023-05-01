@@ -150,11 +150,7 @@ public class GameController {
         assert username != null;
         synchronized (this) {
             try {
-                final boolean needToStop = this.game.insertTile(username, column);
-
-                if (needToStop) {
-                    assert this.clients.size() < 2;
-                }
+                game.insertTile(username, column);
 
                 return new Response("Ok!", ResponseStatus.SUCCESS);
             } catch (IllegalExtractionException | IllegalFlowException | NotEnoughSpaceInColumnException e) {
