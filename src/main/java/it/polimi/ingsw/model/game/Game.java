@@ -215,10 +215,10 @@ public class Game extends GameView {
             return false;
         }
 
+        player.setConnectionState(false);
+
         if (!isStarted())
             return false;
-
-        player.setConnectionState(false);
 
         if (numberOfPlayerOnline() < 2) {
             setStopped();
