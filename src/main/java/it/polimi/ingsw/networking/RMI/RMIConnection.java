@@ -63,16 +63,28 @@ public class RMIConnection implements Connection {
         pendingMessages = new LinkedList<>();
         disconnected = false;
 
+        ExecutorService executor = Executors.newCachedThreadPool();
+        Callable<Object> serverGetter = new Callable<Object>() {
+            public Object call() {
+                try {
+                    Registry registry = LocateRegistry.getRegistry(address, port);
+                    return registry.lookup("SERVER");
+                } catch (Exception exception) {
+                    return null;
+                }
+            }
+        };
+        Future<Object> future = executor.submit(serverGetter);
+
         try {
-            // get the server object, and ask to reserve a new name for the couple.
             Registry registry = LocateRegistry.getRegistry(address, port);
-            RemoteServer remoteServer = (RemoteServer) registry.lookup("SERVER");
+            RemoteServer remoteServer = (RemoteServer) future.get(3000, TimeUnit.MILLISECONDS);
 
             String boundName = remoteServer.getBoundName();
             addQueue = (RemoteQueue) registry.lookup("ADD_" + boundName);
             pollQueue = (RemoteQueue) registry.lookup("POLL_" + boundName);
         } catch (Exception exception) {
-            throw new ServerNotFoundException(exception.getMessage());
+            throw new ServerNotFoundException();
         }
 
         heartbeat();
