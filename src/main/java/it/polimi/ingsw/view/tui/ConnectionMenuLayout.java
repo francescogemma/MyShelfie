@@ -1,9 +1,15 @@
 package it.polimi.ingsw.view.tui;
 
 import it.polimi.ingsw.event.NetworkEventTransceiver;
+import it.polimi.ingsw.networking.BadHostException;
+import it.polimi.ingsw.networking.BadPortException;
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.RMI.RMIConnection;
+import it.polimi.ingsw.networking.ServerNotFoundException;
+import it.polimi.ingsw.networking.TCP.SocketCreationException;
 import it.polimi.ingsw.networking.TCP.TCPConnection;
+import it.polimi.ingsw.view.tui.terminal.drawable.BlurrableDrawable;
+import it.polimi.ingsw.view.tui.terminal.drawable.DrawableSize;
 import it.polimi.ingsw.view.tui.terminal.drawable.Orientation;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.App;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
@@ -13,8 +19,11 @@ import it.polimi.ingsw.view.tui.terminal.drawable.menu.value.IntTextBox;
 import it.polimi.ingsw.view.tui.terminal.drawable.menu.value.TextBox;
 import it.polimi.ingsw.view.tui.terminal.drawable.menu.value.ValueMenuEntry;
 import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayout;
+import it.polimi.ingsw.view.tui.terminal.drawable.twolayers.TwoLayersDrawable;
 
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ConnectionMenuLayout extends AppLayout {
     public static final String NAME = "CONNECTION_MENU";
@@ -25,14 +34,24 @@ public class ConnectionMenuLayout extends AppLayout {
         new IntTextBox().integer(8080));
     private final Button nextButton = new Button("Next");
 
-    private NetworkEventTransceiver transceiver;
+    private final TextBox popUpTextBox = new TextBox().unfocusable();
 
-    public ConnectionMenuLayout() {
-        setLayout(new OrientedLayout(Orientation.VERTICAL,
+    private final BlurrableDrawable blurrableBackground = new OrientedLayout(Orientation.VERTICAL,
             ipAddressEntry.center().weight(1),
             portEntry.center().weight(1),
             nextButton.center().weight(1)
-        ).center().scrollable().alignUpLeft().crop());
+        ).center().scrollable().blurrable();
+
+    private final TwoLayersDrawable twoLayers = new TwoLayersDrawable(
+        blurrableBackground,
+        popUpTextBox.center().crop().fixSize(new DrawableSize(5, 30))
+            .addBorderBox().center()
+    );
+
+    private NetworkEventTransceiver transceiver;
+
+    public ConnectionMenuLayout() {
+        setLayout(twoLayers.alignUpLeft().crop());
 
         setData(new AppLayoutData(
             Map.of(
@@ -46,7 +65,7 @@ public class ConnectionMenuLayout extends AppLayout {
             String ipAddress = ipAddressEntry.getValue();
             int port = portEntry.getValue();
 
-            Connection connection;
+            Connection connection = null;
 
             try {
                 if (appDataProvider.getString(App.START_NAME, "connection").equals("TCP")) {
@@ -54,15 +73,35 @@ public class ConnectionMenuLayout extends AppLayout {
                 } else {
                     connection = new RMIConnection(ipAddress, port);
                 }
-            } catch (Exception e) {
-                // TODO: Handle connection problems
-                System.exit(1);
-                return;
+            } catch (BadHostException e) {
+                blurrableBackground.blur(true);
+                popUpTextBox.text("The IP address that\nyou have entered\nis invalid");
+                twoLayers.showForeground();
+            } catch (BadPortException e) {
+                blurrableBackground.blur(true);
+                popUpTextBox.text("The port number that\nyou have entered\nis invalid");
+                twoLayers.showForeground();
+            } catch (ServerNotFoundException | SocketCreationException e) {
+                blurrableBackground.blur(true);
+                popUpTextBox.text("Cannot reach\nthe server");
+                twoLayers.showForeground();
             }
 
-            transceiver = new NetworkEventTransceiver(connection, getLock());
+            if (connection == null) {
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        synchronized (getLock()) {
+                            blurrableBackground.blur(false);
+                            twoLayers.hideForeground();
+                        }
+                    }
+                }, 2000);
+            } else {
+                transceiver = new NetworkEventTransceiver(connection, getLock());
 
-            switchAppLayout(LoginMenuLayout.NAME);
+                switchAppLayout(LoginMenuLayout.NAME);
+            }
         });
     }
 

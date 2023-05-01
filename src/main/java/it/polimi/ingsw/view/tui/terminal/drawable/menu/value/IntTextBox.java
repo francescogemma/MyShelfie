@@ -48,7 +48,11 @@ public class IntTextBox extends ValueDrawable<Integer> {
 
     @Override
     public Integer getValue() {
-        return Integer.valueOf(textBox.getValue().equals(" ") ? "0" : textBox.getValue());
+        try {
+            return Integer.valueOf(textBox.getValue());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     public IntTextBox integer(int integer) {
