@@ -1,0 +1,42 @@
+.root {
+    -fx-font-family: Eskargot;
+    -fx-font-size: 18.0;
+    dark-gray: #403f28;
+    form-background: #ddc99b;
+    palette-brown: #77471f;
+    background: #b08036;
+    light-gray: #95a5a2;
+    almost-white: #f0ede3;
+    light-brown: #8a746a;
+    palette-gold: #c79c5a;
+    palette-green: #51a93e;
+}
+
+
+* {
+    -fx-text-fill: dark-gray;
+}
+
+.button {
+    -fx-background-radius: 500;
+    -fx-border-radius: 500;
+    -fx-border-width: 2;
+    -fx-background-color: almost-white;
+    -fx-border-color: dark-gray;
+}
+
+.button:pressed {
+    -fx-background-color: dark-gray;
+    -fx-text-fill: almost-white;
+}
+
+.text-field {
+    -fx-background-radius: 100;
+    -fx-border-radius: 100;
+    -fx-border-width: 2;
+    -fx-background-color: almost-white;
+}
+
+.text-field:focused {
+    -fx-border-color: dark-gray;
+}
