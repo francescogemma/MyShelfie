@@ -256,6 +256,13 @@ public class GameView implements Identifiable {
         return playerViews.get(currentPlayerIndex);
     }
 
+    public boolean isAvailableForJoin(String username) {
+        if (isStopped()) {
+            return playerViews.stream().anyMatch(p -> p.is(username)) || creator.equals(username);
+        }
+        return !isStarted() || numberOfPlayerOnline() != playerViews.size();
+    }
+
     /**
      * @return true iff at least one bookshelf is full
      * */

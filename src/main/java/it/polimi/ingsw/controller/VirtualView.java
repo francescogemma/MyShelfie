@@ -115,7 +115,9 @@ public class VirtualView implements EventTransmitter{
 
     private synchronized void playerHasJoinMenu () {
         if (this.isAuthenticated()) {
-            MenuController.getInstance().playerHasJoinMenu(this.transceiver);
+            MenuController.getInstance().playerHasJoinMenu(this.transceiver, username);
+        } else {
+            Logger.writeCritical("View send join menu but he is not authenticated");
         }
     }
 

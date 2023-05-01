@@ -211,9 +211,12 @@ public class Game extends GameView {
         boolean res = false;
         Player player = this.getPlayer(username);
 
-        if (!player.isConnected()) {
+        if (player.isDisconnected()) {
             return false;
         }
+
+        if (!isStarted())
+            return false;
 
         player.setConnectionState(false);
 
@@ -251,9 +254,12 @@ public class Game extends GameView {
         if (!this.canStartGame(username))
             throw new IllegalFlowException("you can't start the game");
 
+        if (numberOfPlayerOnline() < 2)
+            throw new IllegalFlowException("Player online can't be 1 or 0");
+
         this.isStarted = true;
 
-        if (isStopped) {
+        if (isStopped()) {
             isStopped = false;
             if (players.get(currentPlayerIndex).isDisconnected()) {
                 try {

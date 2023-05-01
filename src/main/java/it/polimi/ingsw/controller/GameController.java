@@ -208,9 +208,10 @@ public class GameController {
     /**
      * @return true iff game is not started or game has at least one player disconnected
      * */
-    public boolean isAvailableForJoin () {
+    public boolean isAvailableForJoin (String username) {
         synchronized (this) {
-            return !this.game.isStarted() || this.game.hasPlayerDisconnected() || game.isStopped();
+            return game.isAvailableForJoin(username);
+            //return !this.game.isStarted() || this.game.hasPlayerDisconnected() || game.isStopped();
         }
     }
 

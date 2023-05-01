@@ -134,7 +134,7 @@ public class MenuController {
     }
 
     /**
-     * this function add virtualView and connect transmitter to GameHasBeenCreated
+     * this function adds virtualView and connect transmitter to GameHasBeenCreated
      * */
     public void join(VirtualView virtualView) {
         if (virtualView == null)
@@ -152,12 +152,12 @@ public class MenuController {
         }
     }
 
-    public void playerHasJoinMenu (EventTransceiver transceiver) {
+    public void playerHasJoinMenu (EventTransceiver transceiver, String username) {
         List<String> gamePresent = new ArrayList<>();
 
         synchronized (this.gameControllerList) {
             for (GameController gameController : gameControllerList) {
-                if (gameController.isAvailableForJoin()) {
+                if (gameController.isAvailableForJoin(username)) {
                     gamePresent.add(gameController.gameName());
                 }
             }
