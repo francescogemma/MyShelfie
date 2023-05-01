@@ -8,6 +8,7 @@ import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.board.BoardView;
 import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
+import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Logger;
@@ -15,7 +16,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
 
+import java.awt.print.Book;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -958,5 +961,45 @@ class GameTest {
         game.disconnectPlayer("Michele");
 
         Assertions.assertTrue(game.isStopped());
+    }
+
+    private void selectAndDraw(String username) throws IllegalExtractionException, FullSelectionException, IllegalFlowException {
+        Coordinate c = game.getBoard().getSelectableCoordinate().get(0);
+        game.selectTile(username, c);
+
+        for (int i = 0; i < Bookshelf.COLUMNS; i++) {
+            try {
+                game.insertTile(username, i);
+                return;
+            } catch (Throwable e) {
+
+            }
+        }
+    }
+
+    @RepeatedTest(1)
+    void test () throws IllegalExtractionException, FullSelectionException, IllegalFlowException, PlayerAlreadyInGameException {
+        final String username1 = "Giacomo";
+        final String username2 = "Cristiano";
+        final String username3 = "Michele";
+
+        game.addPlayer(username1);
+        game.addPlayer(username2);
+        game.addPlayer(username3);
+
+        game.startGame(username1);
+
+        for (int i = 0; i < Bookshelf.COLUMNS * Bookshelf.ROWS; i++) {
+            selectAndDraw(username1);
+            selectAndDraw(username2);
+
+            if (i == 4) {
+                game.disconnectPlayer(username3);
+            } else if (i < 4) {
+                selectAndDraw(username3);
+            }
+        }
+
+        Assertions.assertTrue(game.isOver());
     }
 }

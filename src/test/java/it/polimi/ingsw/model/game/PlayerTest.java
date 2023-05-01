@@ -93,4 +93,10 @@ class PlayerTest {
         Assertions.assertTrue(player.hasAchievedCommonGoal(0));
         Assertions.assertTrue(player.hasAchievedCommonGoal(1));
     }
+
+    @Test
+    void is__correctOutput() {
+        player = new Player("Giacomo");
+        Assertions.assertTrue(player.is("Giacomo"));
+    }
 }

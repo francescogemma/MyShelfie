@@ -1,15 +1,20 @@
 package it.polimi.ingsw.controller.db;
 
+import it.polimi.ingsw.controller.GameController;
+import it.polimi.ingsw.controller.MenuController;
 import it.polimi.ingsw.controller.User;
-import it.polimi.ingsw.model.game.Game;
-import it.polimi.ingsw.model.game.Player;
+import it.polimi.ingsw.controller.VirtualView;
+import it.polimi.ingsw.event.LocalEventTransceiver;
+import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Set;
 
 class DBManagerTest {
@@ -31,13 +36,16 @@ class DBManagerTest {
 
     private static final String TEST_ROOT_FOLDER_NAME = "testdb";
 
-    @BeforeEach
-    public void setUp() {
+    public static void setPositionDebug () {
         DBManager.setRootFolderName(TEST_ROOT_FOLDER_NAME);
     }
 
-    @AfterEach
-    public void tearDown() {
+    @BeforeEach
+    public void setUp() {
+        setPositionDebug();
+    }
+
+    public static void removeCache () {
         Path rootFolderPath = Paths.get(TEST_ROOT_FOLDER_NAME);
         if (rootFolderPath.toFile().exists()) {
             if (!rootFolderPath.toFile().isDirectory()) {
@@ -46,6 +54,11 @@ class DBManagerTest {
 
             deleteDirectoryRecursively(rootFolderPath);
         }
+    }
+
+    @AfterEach
+    public void tearDown() {
+        removeCache();
     }
 
     @Test
@@ -157,4 +170,59 @@ class DBManagerTest {
     }
 
     // TODO: Add tests for GamesDBManager
+
+    public static class MenuControllerTest {
+
+        @BeforeEach
+        void t () {
+            setPositionDebug();
+        }
+
+        private String getPassword(String username) {
+            if (username.equals("Giacomo")) return "ciao";
+            if (username.equals("Michele")) return "foo";
+            if (username.equals("Cristiano")) return "paperino";
+            return null;
+        }
+
+        void setUp () throws IllegalAccessException, NoSuchFieldException {
+            Field instanceGameController = MenuController.class.getDeclaredField("gameControllerList");
+            Field instanceAuthenticated = MenuController.class.getDeclaredField("authenticated");
+            Field instanceNotAuthenticated = MenuController.class.getDeclaredField("notAuthenticated");
+            Field instanceUsers = MenuController.class.getDeclaredField("users");
+
+            instanceGameController.setAccessible(true);
+            instanceAuthenticated.setAccessible(true);
+            instanceNotAuthenticated.setAccessible(true);
+            instanceUsers.setAccessible(true);
+
+            instanceGameController.set(MenuController.getInstance(), new ArrayList<GameController>());
+            instanceAuthenticated.set(MenuController.getInstance(), new ArrayList<EventTransmitter>());
+            instanceNotAuthenticated.set(MenuController.getInstance(), new ArrayList<EventTransmitter>());
+            instanceUsers.set(MenuController.getInstance(), new ArrayList<User>());
+        }
+
+        @Test
+        void stopGame() throws NoSuchFieldException, IllegalAccessException {
+            setUp();
+            VirtualView view1 = new VirtualView(new LocalEventTransceiver());
+            VirtualView view2 = new VirtualView(new LocalEventTransceiver());
+
+            MenuController.getInstance().join(view1);
+            MenuController.getInstance().join(view2);
+
+            MenuController.getInstance().authenticated(view1, "Giacomo", getPassword("Giacomo"));
+            MenuController.getInstance().authenticated(view2, "Michele", getPassword("Michele"));
+
+            MenuController.getInstance().createNewGame("Prova", "Giacomo");
+
+            MenuController.getInstance().joinGame(view1, "Prova", "Giacomo");
+            MenuController.getInstance().joinGame(view2, "Prova", "Michele");
+        }
+
+        @AfterEach
+        void t2 () {
+            removeCache();
+        }
+    }
 }
