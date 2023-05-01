@@ -1,5 +1,7 @@
 package it.polimi.ingsw.view.tui;
 
+import it.polimi.ingsw.event.NetworkEventTransceiver;
+import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
@@ -69,11 +71,24 @@ public class GameOverLayout extends AppLayout {
         });
     }
 
+    private NetworkEventTransceiver transceiver = null;
+
     @Override
     public void setup(String previousLayoutName) {
         if (previousLayoutName.equals(GameLayout.NAME)) {
             playerDisplayRecyclerDrawable.populate((List<GameLayout.PlayerDisplay>) appDataProvider
                 .get(GameLayout.NAME, "scoreboard"));
+
+            transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
+                "transceiver");
+
+            PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
+                transceiver = null;
+
+                if (isCurrentLayout()) {
+                    switchAppLayout(ConnectionMenuLayout.NAME);
+                }
+            });
         }
     }
 

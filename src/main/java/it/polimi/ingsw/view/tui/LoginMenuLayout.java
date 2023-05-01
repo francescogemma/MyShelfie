@@ -4,6 +4,7 @@ import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.LoginEventData;
+import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.view.tui.terminal.drawable.BlurrableDrawable;
 import it.polimi.ingsw.view.tui.terminal.drawable.DrawableSize;
 import it.polimi.ingsw.view.tui.terminal.drawable.Fill;
@@ -34,10 +35,10 @@ public class LoginMenuLayout extends AppLayout {
             usernameEntry.center().weight(1),
             passwordEntry.center().weight(1),
             new OrientedLayout(Orientation.HORIZONTAL,
-                new Fill(PrimitiveSymbol.EMPTY).weight(1),
+                new Fill(PrimitiveSymbol.EMPTY).weight(2),
                 loginButton.center().weight(1),
                 exitButton.center().weight(1),
-                new Fill(PrimitiveSymbol.EMPTY).weight(1)
+                new Fill(PrimitiveSymbol.EMPTY).weight(2)
             ).weight(1)
         ).center().scrollable().blurrable();
 
@@ -84,11 +85,15 @@ public class LoginMenuLayout extends AppLayout {
                 }, 2000);
             }
         });
-        exitButton.onpress(this::mustExit);
+
+        exitButton.onpress(() -> {
+            transceiver.disconnect();
+            mustExit();
+        });
     }
 
-    private NetworkEventTransceiver  transceiver;
-    private Requester<Response, LoginEventData> loginRequester;
+    private NetworkEventTransceiver transceiver = null;
+    private Requester<Response, LoginEventData> loginRequester = null;
 
     @Override
     public void setup(String previousLayoutName) {
@@ -97,6 +102,15 @@ public class LoginMenuLayout extends AppLayout {
                 appDataProvider.get(ConnectionMenuLayout.NAME, "transceiver");
 
             loginRequester = Response.requester(transceiver, transceiver, getLock());
+
+            PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
+                transceiver = null;
+                loginRequester = null;
+
+                if (isCurrentLayout()) {
+                    switchAppLayout(ConnectionMenuLayout.NAME);
+                }
+            });
         }
     }
 

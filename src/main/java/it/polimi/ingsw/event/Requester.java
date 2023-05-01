@@ -52,6 +52,8 @@ public class Requester<R extends EventData, S extends EventData> {
 
         transmitter.broadcast(new SyncEventDataWrapper<S>(count, data));
 
+        // TODO: Handle disconnections
+
         synchronized (responsesLock) {
             while (responses.get(count) == null) {
                 try {

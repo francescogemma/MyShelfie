@@ -16,6 +16,10 @@ public class Client {
 
         AppLayoutData data = terminal.start(new App(InitialMenuLayout::new));
 
+        if (data.getBoolean("exit")) {
+            return;
+        }
+
         if (data.getString("interface").equals("GUI")) {
             GuiApplication.main(args);
         } else {

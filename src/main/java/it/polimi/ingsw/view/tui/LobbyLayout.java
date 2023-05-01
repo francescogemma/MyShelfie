@@ -7,6 +7,7 @@ import it.polimi.ingsw.event.data.client.JoinGameEventData;
 import it.polimi.ingsw.event.data.client.StartGameEventData;
 import it.polimi.ingsw.event.data.game.GameHasStartedEventData;
 import it.polimi.ingsw.event.data.game.PlayerHasJoinEventData;
+import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
@@ -71,9 +72,9 @@ public class LobbyLayout extends AppLayout {
 
     private List<String> playerNames;
     private String gameName;
-    private NetworkEventTransceiver transceiver;
-    private Requester<Response, JoinGameEventData> joinGameRequester;
-    private Requester<Response, StartGameEventData> startGameRequester;
+    private NetworkEventTransceiver transceiver = null;
+    private Requester<Response, JoinGameEventData> joinGameRequester = null;
+    private Requester<Response, StartGameEventData> startGameRequester = null;
 
     @Override
     public void setup(String previousLayoutName) {
@@ -112,6 +113,16 @@ public class LobbyLayout extends AppLayout {
 
             GameHasStartedEventData.castEventReceiver(transceiver).registerListener(data -> {
                 switchAppLayout(GameLayout.NAME);
+            });
+
+            PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
+                transceiver = null;
+                joinGameRequester = null;
+                startGameRequester = null;
+
+                if (isCurrentLayout()) {
+                    switchAppLayout(ConnectionMenuLayout.NAME);
+                }
             });
 
             displayServerResponse(joinGameRequester.request(new JoinGameEventData(gameName)));

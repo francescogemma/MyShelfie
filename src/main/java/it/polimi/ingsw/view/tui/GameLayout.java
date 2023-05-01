@@ -8,6 +8,7 @@ import it.polimi.ingsw.event.data.client.InsertTileEventData;
 import it.polimi.ingsw.event.data.client.JoinStartedGameEventData;
 import it.polimi.ingsw.event.data.client.SelectTileEventData;
 import it.polimi.ingsw.event.data.game.*;
+import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.model.board.BoardView;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
@@ -521,10 +522,10 @@ public class GameLayout extends AppLayout {
         return playerDisplays;
     }
 
-    private NetworkEventTransceiver transceiver;
-    private Requester<Response, SelectTileEventData> selectTileRequester;
-    private Requester<Response, DeselectTileEventData> deselectTileRequester;
-    private Requester<Response, InsertTileEventData> insertTileRequester;
+    private NetworkEventTransceiver transceiver = null;
+    private Requester<Response, SelectTileEventData> selectTileRequester = null;
+    private Requester<Response, DeselectTileEventData> deselectTileRequester = null;
+    private Requester<Response, InsertTileEventData> insertTileRequester = null;
 
     private boolean displayingFullBookshelf = false;
 
@@ -684,6 +685,17 @@ public class GameLayout extends AppLayout {
                         }
                     }
                 }, 2000);
+            });
+
+            PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
+                transceiver = null;
+                selectTileRequester = null;
+                deselectTileRequester = null;
+                insertTileRequester = null;
+
+                if (isCurrentLayout()) {
+                    switchAppLayout(ConnectionMenuLayout.NAME);
+                }
             });
 
             transceiver.broadcast(new JoinStartedGameEventData());

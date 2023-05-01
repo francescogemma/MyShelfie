@@ -7,6 +7,7 @@ import it.polimi.ingsw.event.data.client.CreateNewGameEventData;
 import it.polimi.ingsw.event.data.client.LogoutEventData;
 import it.polimi.ingsw.event.data.client.PlayerHasJoinMenu;
 import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
+import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
@@ -94,9 +95,9 @@ public class AvailableGamesMenuLayout extends AppLayout {
         });
     }
 
-    private NetworkEventTransceiver transceiver;
-    private Requester<Response, CreateNewGameEventData> createGameRequester;
-    private Requester<Response, LogoutEventData> logoutRequester;
+    private NetworkEventTransceiver transceiver = null;
+    private Requester<Response, CreateNewGameEventData> createGameRequester = null;
+    private Requester<Response, LogoutEventData> logoutRequester = null;
 
     @Override
     public void setup(String previousLayoutName) {
@@ -119,6 +120,16 @@ public class AvailableGamesMenuLayout extends AppLayout {
                     alternative.second();
                 } else {
                     alternative.first();
+                }
+            });
+
+            PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
+                transceiver = null;
+                createGameRequester = null;
+                logoutRequester = null;
+
+                if (isCurrentLayout()) {
+                    switchAppLayout(ConnectionMenuLayout.NAME);
                 }
             });
 
