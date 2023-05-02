@@ -223,7 +223,9 @@ public class VirtualView implements EventTransmitter{
         this.gameController = gameController;
 
         ForceExitGameEventData.castEventReceiver(gameController.getInternalTransmitter()).registerListener(event -> {
-            this.gameController = null;
+            synchronized (this) {
+                this.gameController = null;
+            }
         });
     }
 

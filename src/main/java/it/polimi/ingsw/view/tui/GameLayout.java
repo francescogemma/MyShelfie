@@ -282,7 +282,14 @@ public class GameLayout extends AppLayout {
 
         exitButton.onpress(() -> {
             try {
-                displayServerResponse(playerExitGameRequester.request(new PlayerExitGame()));
+                Response response = playerExitGameRequester.request(new PlayerExitGame());
+
+                if (!response.isOk()) {
+                    displayServerResponse(response);
+                    return;
+                }
+
+                switchAppLayout(AvailableGamesMenuLayout.NAME);
             } catch (DisconnectedException e) {
                 displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
             }

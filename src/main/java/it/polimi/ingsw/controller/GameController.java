@@ -62,6 +62,7 @@ public class GameController {
 
             if (game.stopGame(username)) {
                 this.clients.clear();
+                transceiver.broadcast(new ForceExitGameEventData());
                 return new Response("Game has been successfully paused", ResponseStatus.SUCCESS);
             }
             return new Response("You are not the owner", ResponseStatus.FAILURE);
@@ -71,7 +72,11 @@ public class GameController {
     protected Response exitGame (String username) {
         synchronized (this) {
             try {
-                game.removePlayer (username);
+                if (!game.isStarted()) {
+                    game.removePlayer (username);
+                } else {
+                    game.disconnectPlayer (username);
+                }
 
                 for (int i = 0; i < this.clients.size(); i++) {
                     if (clients.get(i).getValue().equals(username)) {

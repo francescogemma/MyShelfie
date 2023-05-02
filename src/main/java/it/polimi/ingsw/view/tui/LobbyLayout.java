@@ -77,9 +77,15 @@ public class LobbyLayout extends AppLayout {
 
         backButton.onpress(() -> {
             try {
-                displayServerResponse(playerExitRequester.request(new PlayerExitGame()));
+                Response response = playerExitRequester.request(new PlayerExitGame());
+                displayServerResponse(response);
+
+                if (!response.isOk()) {
+                    return;
+                }
             } catch (DisconnectedException e) {
                 displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                return;
             }
 
             switchAppLayout(AvailableGamesMenuLayout.NAME);
