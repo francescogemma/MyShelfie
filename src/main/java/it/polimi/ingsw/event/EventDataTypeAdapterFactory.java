@@ -9,7 +9,7 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.data.EventData;
-import it.polimi.ingsw.event.data.LoginEventData;
+import it.polimi.ingsw.event.data.client.LoginEventData;
 import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;

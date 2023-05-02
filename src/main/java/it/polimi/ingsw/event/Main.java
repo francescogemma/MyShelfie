@@ -1,18 +1,5 @@
 package it.polimi.ingsw.event;
 
-import it.polimi.ingsw.controller.Response;
-import it.polimi.ingsw.controller.ResponseStatus;
-import it.polimi.ingsw.event.data.LoginEventData;
-import it.polimi.ingsw.event.data.client.InsertTileEventData;
-import it.polimi.ingsw.model.game.Game;
-import it.polimi.ingsw.model.tile.Tile;
-import it.polimi.ingsw.model.tile.TileColor;
-import it.polimi.ingsw.model.tile.TileVersion;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 /*
 public class Main {
     public static void main(String[] args) {

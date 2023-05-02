@@ -4,7 +4,7 @@ import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
-import it.polimi.ingsw.event.data.LoginEventData;
+import it.polimi.ingsw.event.data.client.LoginEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.view.tui.terminal.drawable.BlurrableDrawable;

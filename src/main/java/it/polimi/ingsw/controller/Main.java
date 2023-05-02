@@ -1,10 +1,5 @@
 package it.polimi.ingsw.controller;
 
-import it.polimi.ingsw.controller.db.DBManager;
-import it.polimi.ingsw.event.LocalEventTransceiver;
-import it.polimi.ingsw.event.Requester;
-import it.polimi.ingsw.event.data.LoginEventData;
-
 public class Main {
     public static void main(String []arg) {
         /*LocalEventTransceiver transceiver = new LocalEventTransceiver();
