@@ -4,6 +4,8 @@ import it.polimi.ingsw.controller.db.DBManager;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.game.*;
+import it.polimi.ingsw.event.data.internal.ForceExitGameEventData;
+import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
@@ -19,12 +21,13 @@ import java.util.*;
 public class GameController {
     private final Game game;
     private final List<Pair<EventTransmitter, String>> clients;
+    private final LocalEventTransceiver transceiver = new LocalEventTransceiver();
 
     public GameController(Game game) {
         this.game = game;
         this.clients = new ArrayList<>();
 
-        final LocalEventTransceiver transceiver = new LocalEventTransceiver();
+
         game.setTransceiver(transceiver);
 
         transceiver.registerListener(event ->
@@ -200,9 +203,16 @@ public class GameController {
                 }
             }
 
+            if (game.isStopped())
+                transceiver.broadcast(new ForceExitGameEventData());
+
             if (shouldThrow)
                 throw new NoPlayerConnectedException();
         }
+    }
+
+    public EventReceiver<EventData> getInternalTransmitter() {
+        return this.transceiver;
     }
 
     /**

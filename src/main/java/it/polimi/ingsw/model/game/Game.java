@@ -86,8 +86,7 @@ public class Game extends GameView {
         }
 
         if (username.equals(playerOnline)) {
-            broadcast(new GameHasBeenStoppedEventData());
-            this.isStopped = true;
+            setStopped();
             return true;
         }
 

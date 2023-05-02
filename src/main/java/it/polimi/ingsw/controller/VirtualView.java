@@ -6,6 +6,7 @@ import it.polimi.ingsw.event.data.client.LoginEventData;
 import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.InitialGameEventData;
 import it.polimi.ingsw.event.data.game.PersonalGoalSetEventData;
+import it.polimi.ingsw.event.data.internal.ForceExitGameEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.game.GameView;
@@ -219,6 +220,9 @@ public class VirtualView implements EventTransmitter{
         assert Thread.holdsLock(this);
 
         this.gameController = gameController;
+        ForceExitGameEventData.castEventReceiver(gameController.getInternalTransmitter()).registerListener(event -> {
+            this.gameController = null;
+        });
     }
 
     public boolean isAuthenticated () {
