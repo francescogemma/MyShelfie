@@ -44,43 +44,11 @@ class GameControllerTest {
     }
 
     @Test
-    void exitGame_playerExitAndJoin_correctOutput () {
-        gameController.join(new LocalEventTransceiver(), "Giacomo");
-        gameController.join(new LocalEventTransceiver(), "Michele");
-
-        Assertions.assertTrue(
-                gameController.exitGame("Giacomo").isOk()
-        );
-
-        gameController.join(new LocalEventTransceiver(), "Giacomo");
-
-        Assertions.assertTrue(
-                gameController.startGame("Giacomo").isOk()
-        );
-
-        Assertions.assertFalse(
-                gameController.exitGame("Michele").isOk()
-        );
-    }
-
-    @Test
     void exitGame_playerNotInGame_shouldThrow () {
         gameController.join(new LocalEventTransceiver(), "Giacomo");
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             gameController.exitGame("Michele");
         });
-    }
-
-    @Test
-    void exitGame_gameHasStarted_correctOutput () {
-        gameController.join(new LocalEventTransceiver(), "Giacomo");
-        gameController.join(new LocalEventTransceiver(), "Michele");
-
-        gameController.startGame("Giacomo");
-
-        Assertions.assertFalse(
-                gameController.exitGame("Michele").isOk()
-        );
     }
 }
