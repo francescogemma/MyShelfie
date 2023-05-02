@@ -7,10 +7,8 @@ import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.InitialGameEventData;
 import it.polimi.ingsw.event.data.game.PersonalGoalSetEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
-import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.game.GameView;
-import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
 

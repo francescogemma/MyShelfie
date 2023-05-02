@@ -189,6 +189,7 @@ public class Game extends GameView {
                 personalGoalIndexes.add(personalGoals.get(i).getIndex());
                 personalGoals.remove(i);
                 players.remove(i);
+                broadcast(new PlayerHasDisconnectedEventData(username));
                 return;
             }
         }
