@@ -2,7 +2,7 @@ package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.event.EventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
-import it.polimi.ingsw.event.data.LoginEventData;
+import it.polimi.ingsw.event.data.client.LoginEventData;
 import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.InitialGameEventData;
 import it.polimi.ingsw.event.data.game.PersonalGoalSetEventData;
@@ -14,7 +14,6 @@ import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
 
-import java.awt.*;
 import java.util.Optional;
 
 public class VirtualView implements EventTransmitter{
@@ -33,16 +32,16 @@ public class VirtualView implements EventTransmitter{
         this.transceiver = transceiver;
         gameController = null;
 
-        LoginEventData.responder(transceiver, transceiver,          event -> login(event.getUsername(), event.getPassword()));
-        StartGameEventData.responder(transceiver, transceiver,      event -> startGame());
-        InsertTileEventData.responder(transceiver, transceiver,     event -> insertTile(event.column()));
-        SelectTileEventData.responder(transceiver, transceiver,     event -> selectTile(event.coordinate()));
-        DeselectTileEventData.responder(transceiver, transceiver,   event -> deselectTile(event.coordinate()));
-        JoinGameEventData.responder(transceiver, transceiver,       event -> joinGame(event.gameName()));
-        CreateNewGameEventData.responder(transceiver, transceiver,  event -> createNewGame(event.gameName()));
-        PlayerExitGame.responder(transceiver, transceiver,          event -> exitGame());
-        PauseGameEventData.responder(transceiver, transceiver,      event -> pauseGame());
-        LogoutEventData.responder(transceiver, transceiver,         event -> logout());
+        LoginEventData          .responder(transceiver, transceiver, this::login);
+        StartGameEventData      .responder(transceiver, transceiver, this::startGame);
+        InsertTileEventData     .responder(transceiver, transceiver, this::insertTile);
+        SelectTileEventData     .responder(transceiver, transceiver, this::selectTile);
+        DeselectTileEventData   .responder(transceiver, transceiver, this::deselectTile);
+        JoinGameEventData       .responder(transceiver, transceiver, this::joinGame);
+        CreateNewGameEventData  .responder(transceiver, transceiver, this::createNewGame);
+        PlayerExitGame          .responder(transceiver, transceiver, this::exitGame);
+        PauseGameEventData      .responder(transceiver, transceiver, this::pauseGame);
+        LogoutEventData         .responder(transceiver, transceiver, this::logout);
 
         PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(event -> disconnect());
 
@@ -50,7 +49,7 @@ public class VirtualView implements EventTransmitter{
         PlayerHasJoinMenu       .castEventReceiver(transceiver).registerListener(event -> this.playerHasJoinMenu());
     }
 
-    private synchronized Response logout () {
+    private synchronized Response logout (LogoutEventData eventData) {
         if (isInGame()) {
             Logger.writeWarning("The client has asked to log out but is in game");
             return new Response("You are in a game...", ResponseStatus.FAILURE);
@@ -76,7 +75,7 @@ public class VirtualView implements EventTransmitter{
         this.gameController = null;
     }
 
-    private synchronized Response pauseGame () {
+    private synchronized Response pauseGame (PauseGameEventData eventData) {
         if (isInGame()) {
             Response response = MenuController.getInstance().stopGame(username);
 
@@ -90,7 +89,7 @@ public class VirtualView implements EventTransmitter{
         }
     }
 
-    private synchronized Response exitGame () {
+    private synchronized Response exitGame (PlayerExitGame exitGame) {
         if (isInGame()) {
             Response response = MenuController.INSTANCE.exitGame(username);
 
@@ -121,10 +120,10 @@ public class VirtualView implements EventTransmitter{
         }
     }
 
-    private synchronized Response createNewGame (String gameName) {
+    private synchronized Response createNewGame (CreateNewGameEventData eventData) {
         if (this.isAuthenticated()) {
             if (!isInGame()) {
-                return MenuController.INSTANCE.createNewGame(gameName, username);
+                return MenuController.INSTANCE.createNewGame(eventData.gameName(), username);
             } else {
                 return DEFAULT_MESSAGE_ALREADY_IN_GAME;
             }
@@ -133,10 +132,10 @@ public class VirtualView implements EventTransmitter{
         }
     }
 
-    private synchronized Response joinGame (String gameName) {
+    private synchronized Response joinGame (JoinGameEventData eventData) {
         if (this.isAuthenticated()) {
             if (!this.isInGame()) {
-                Pair<Response, GameController> res = MenuController.INSTANCE.joinGame(this.transceiver, this.username, gameName);
+                Pair<Response, GameController> res = MenuController.INSTANCE.joinGame(this.transceiver, this.username, eventData.gameName());
 
                 if (res.getKey().isOk()) {
                     this.gameController = res.getValue();
@@ -150,12 +149,16 @@ public class VirtualView implements EventTransmitter{
             return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
     }
 
-    private synchronized Response login (String username, String password) {
+    private synchronized Response login(LoginEventData event) {
         if (!isAuthenticated()) {
-            Response response = MenuController.INSTANCE.authenticated(transceiver, username, password);
+            Response response = MenuController.INSTANCE.authenticated(
+                    transceiver,
+                    event.getUsername(),
+                    event.getPassword()
+            );
 
             if (response.isOk()) {
-                this.username = username;
+                this.username = event.getUsername();
             }
 
             return response;
@@ -164,31 +167,31 @@ public class VirtualView implements EventTransmitter{
         }
     }
 
-    private synchronized Response deselectTile (Coordinate coordinate) {
+    private synchronized Response deselectTile (DeselectTileEventData eventData) {
         if (isInGame()) {
-            return gameController.deselectTile(username, coordinate);
+            return gameController.deselectTile(username, eventData.coordinate());
         } else {
             return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
         }
     }
 
-    private synchronized Response insertTile (int col) {
+    private synchronized Response insertTile (InsertTileEventData eventData) {
         if (isInGame()) {
-            return gameController.insertSelectedTilesInBookshelf(username, col);
+            return gameController.insertSelectedTilesInBookshelf(username, eventData.column());
         } else {
             return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
         }
     }
 
-    private synchronized Response selectTile(Coordinate coordinate) {
+    private synchronized Response selectTile(SelectTileEventData eventData) {
         if (isAuthenticated()) {
-            return this.gameController.selectTile(username, coordinate);
+            return this.gameController.selectTile(username, eventData.coordinate());
         } else {
             return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
         }
     }
 
-    private synchronized Response startGame () {
+    private synchronized Response startGame (StartGameEventData ignore) {
         if (this.isAuthenticated()) {
             return this.gameController.startGame(this.username);
         } else {
