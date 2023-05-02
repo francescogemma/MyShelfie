@@ -92,7 +92,13 @@ public class AvailableGamesMenuLayout extends AppLayout {
 
         backToLoginButton.onpress(() -> {
             try {
-                displayServerResponse(logoutRequester.request(new LogoutEventData()));
+                Response response = logoutRequester.request(new LogoutEventData());
+
+                displayServerResponse(response);
+
+                if (!response.isOk()) {
+                    return;
+                }
             } catch (DisconnectedException e) {
                 displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
                 return;
