@@ -18,6 +18,7 @@ import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.utils.Coordinate;
+import it.polimi.ingsw.view.tui.terminal.Terminal;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
@@ -779,6 +780,8 @@ public class GameLayout extends AppLayout {
                                 displayingPopUp = false;
 
                                 getLock().notifyAll();
+
+                                switchAppLayout(AvailableGamesMenuLayout.NAME);
                             }
                         }
                     }, 2000);
