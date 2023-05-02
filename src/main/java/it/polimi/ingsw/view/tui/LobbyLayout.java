@@ -7,6 +7,7 @@ import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.client.JoinGameEventData;
 import it.polimi.ingsw.event.data.client.StartGameEventData;
 import it.polimi.ingsw.event.data.game.GameHasStartedEventData;
+import it.polimi.ingsw.event.data.game.PlayerHasDisconnectedEventData;
 import it.polimi.ingsw.event.data.game.PlayerHasJoinEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.networking.DisconnectedException;
@@ -82,6 +83,24 @@ public class LobbyLayout extends AppLayout {
     private Requester<Response, JoinGameEventData> joinGameRequester = null;
     private Requester<Response, StartGameEventData> startGameRequester = null;
 
+    private void populatePlayersList() {
+        recyclerPlayersList.populate(playerNames);
+
+        boolean isOwner = true;
+
+        if (isOwner) {
+            startButtonLayoutElement.setWeight(1);
+
+            if (playerNames.size() >= 2) {
+                startButton.focusable(true);
+            } else {
+                startButton.focusable(false);
+            }
+        } else {
+            startButtonLayoutElement.setWeight(0);
+        }
+    }
+
     @Override
     public void setup(String previousLayoutName) {
         if (previousLayoutName.equals(AvailableGamesMenuLayout.NAME)) {
@@ -101,25 +120,17 @@ public class LobbyLayout extends AppLayout {
                 PlayerHasJoinEventData.castEventReceiver(transceiver).registerListener(data -> {
                     playerNames.add(data.username());
 
-                    recyclerPlayersList.populate(playerNames);
-
-                    boolean isOwner = true;
-
-                    if (isOwner) {
-                        startButtonLayoutElement.setWeight(1);
-
-                        if (playerNames.size() >= 2) {
-                            startButton.focusable(true);
-                        } else {
-                            startButton.focusable(false);
-                        }
-                    } else {
-                        startButtonLayoutElement.setWeight(0);
-                    }
+                    populatePlayersList();
                 });
 
                 GameHasStartedEventData.castEventReceiver(transceiver).registerListener(data -> {
                     switchAppLayout(GameLayout.NAME);
+                });
+
+                PlayerHasDisconnectedEventData.castEventReceiver(transceiver).registerListener(data -> {
+                    playerNames.remove(data.username());
+
+                    populatePlayersList();
                 });
 
                 PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {

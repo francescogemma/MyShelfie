@@ -214,8 +214,11 @@ public class Game extends GameView {
 
         player.setConnectionState(false);
 
-        if (!isStarted())
+        if (!isStarted()) {
+            this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
+
             return false;
+        }
 
         if (numberOfPlayerOnline() < 2) {
             setStopped();
