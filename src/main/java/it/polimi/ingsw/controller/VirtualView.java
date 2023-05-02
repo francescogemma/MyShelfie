@@ -137,7 +137,7 @@ public class VirtualView implements EventTransmitter{
                 Pair<Response, GameController> res = MenuController.INSTANCE.joinGame(this.transceiver, this.username, eventData.gameName());
 
                 if (res.getKey().isOk()) {
-                    this.gameController = res.getValue();
+                    setGameController(res.getValue());
                 }
 
                 return res.getKey();
