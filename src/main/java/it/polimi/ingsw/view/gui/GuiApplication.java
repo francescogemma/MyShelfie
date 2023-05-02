@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
@@ -20,8 +21,9 @@ public class GuiApplication extends Application {
         Scene scene = new Scene(connectionMenu);
 
         primaryStage.setTitle("My Shelfie");
-        primaryStage.setMaximized(true);
+        primaryStage.getIcons().add(new Image("/Publisher material/Icon 50x50px.png"));
         primaryStage.setScene(scene);
+        primaryStage.setMaximized(true);
 
         primaryStage.show();
     }
