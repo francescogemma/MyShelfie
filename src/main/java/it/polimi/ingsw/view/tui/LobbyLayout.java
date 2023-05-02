@@ -5,6 +5,7 @@ import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.client.JoinGameEventData;
+import it.polimi.ingsw.event.data.client.PlayerExitGame;
 import it.polimi.ingsw.event.data.client.StartGameEventData;
 import it.polimi.ingsw.event.data.game.GameHasStartedEventData;
 import it.polimi.ingsw.event.data.game.PlayerHasDisconnectedEventData;
@@ -74,7 +75,15 @@ public class LobbyLayout extends AppLayout {
             }
         });
 
-        backButton.onpress(() -> switchAppLayout(AvailableGamesMenuLayout.NAME));
+        backButton.onpress(() -> {
+            try {
+                displayServerResponse(playerExitRequester.request(new PlayerExitGame()));
+            } catch (DisconnectedException e) {
+                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+            }
+
+            switchAppLayout(AvailableGamesMenuLayout.NAME);
+        });
     }
 
     private List<String> playerNames;
@@ -82,6 +91,7 @@ public class LobbyLayout extends AppLayout {
     private NetworkEventTransceiver transceiver = null;
     private Requester<Response, JoinGameEventData> joinGameRequester = null;
     private Requester<Response, StartGameEventData> startGameRequester = null;
+    private Requester<Response, PlayerExitGame> playerExitRequester = null;
 
     private void populatePlayersList() {
         recyclerPlayersList.populate(playerNames);
@@ -116,6 +126,7 @@ public class LobbyLayout extends AppLayout {
 
                 joinGameRequester = Response.requester(transceiver, transceiver, getLock());
                 startGameRequester = Response.requester(transceiver, transceiver, getLock());
+                playerExitRequester = Response.requester(transceiver, transceiver, getLock());
 
                 PlayerHasJoinEventData.castEventReceiver(transceiver).registerListener(data -> {
                     playerNames.add(data.username());
@@ -137,6 +148,7 @@ public class LobbyLayout extends AppLayout {
                     transceiver = null;
                     joinGameRequester = null;
                     startGameRequester = null;
+                    playerExitRequester = null;
 
                     if (isCurrentLayout()) {
                         switchAppLayout(ConnectionMenuLayout.NAME);
