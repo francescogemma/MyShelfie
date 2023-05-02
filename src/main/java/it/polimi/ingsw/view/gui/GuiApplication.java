@@ -18,7 +18,6 @@ public class GuiApplication extends Application {
 
         Parent connectionMenu = FXMLLoader.load(getClass().getResource("/ConnectionMenuLayout.fxml"));
         Scene scene = new Scene(connectionMenu);
-        scene.getStylesheets().add(getClass().getResource("/ConnectionMenuStylesheet.css").toExternalForm());
 
         primaryStage.setTitle("My Shelfie");
         primaryStage.setMaximized(true);

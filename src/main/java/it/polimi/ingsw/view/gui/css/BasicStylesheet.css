@@ -35,6 +35,7 @@
     -fx-border-radius: 100;
     -fx-border-width: 2;
     -fx-background-color: almost-white;
+    -fx-border-color: almost-white;
 }
 
 .text-field:focused {
