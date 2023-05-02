@@ -116,6 +116,8 @@ public class LobbyLayout extends AppLayout {
         if (previousLayoutName.equals(AvailableGamesMenuLayout.NAME)) {
             playerNames = new ArrayList<>();
 
+            populatePlayersList();
+
             gameName = appDataProvider.getString(AvailableGamesMenuLayout.NAME, "selectedgame");
 
             gameTextBox.text(gameName);
