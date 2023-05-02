@@ -4,10 +4,7 @@ import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
-import it.polimi.ingsw.event.data.client.DeselectTileEventData;
-import it.polimi.ingsw.event.data.client.InsertTileEventData;
-import it.polimi.ingsw.event.data.client.JoinStartedGameEventData;
-import it.polimi.ingsw.event.data.client.SelectTileEventData;
+import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.model.board.BoardView;
@@ -96,10 +93,10 @@ public class GameLayout extends AppLayout {
     private final TextBox turnTextBox = new TextBox().unfocusable();
     private final BoardDrawable boardDrawable = new BoardDrawable();
     private final BlurrableDrawable blurrableBoard = boardDrawable.center().scrollable().blurrable();
-    private final TextBox completedCommonGoalPopUpTextBox = new TextBox().hideCursor();
+    private final TextBox popUpTextBox = new TextBox().hideCursor();
     private final TwoLayersDrawable twoLayersBoard = new TwoLayersDrawable(
         blurrableBoard,
-        completedCommonGoalPopUpTextBox.center().crop()
+        popUpTextBox.center().crop()
             .fixSize(new DrawableSize(10, 25)).addBorderBox().center()
     );
     private final Button exitButton = new Button("Exit");
@@ -272,6 +269,22 @@ public class GameLayout extends AppLayout {
                 }
             });
         }
+
+        stopGameButton.onpress(() -> {
+            try {
+                displayServerResponse(pauseGameRequester.request(new PauseGameEventData()));
+            } catch (DisconnectedException e) {
+                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+            }
+        });
+
+        exitButton.onpress(() -> {
+            try {
+                displayServerResponse(playerExitGameRequester.request(new PlayerExitGame()));
+            } catch (DisconnectedException e) {
+                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+            }
+        });
     }
 
     private void populateBookshelfMenu() {
@@ -373,7 +386,7 @@ public class GameLayout extends AppLayout {
             case PERSONAL -> "personal";
             case ADJACENCY -> "final";
         };
-        completedCommonGoalPopUpTextBox.text(completedGoal.playerName + " completed\n" +
+        popUpTextBox.text(completedGoal.playerName + " completed\n" +
             (completedGoal.type == CompletedGoal.GoalType.COMMON ? "a " : "the ") +
             goalType + " goal");
         blurrableBoard.blur(true);
@@ -424,6 +437,8 @@ public class GameLayout extends AppLayout {
         } else {
             completedGoalTimer = null;
 
+            displayingPopUp = false;
+
             getLock().notifyAll();
 
             if (gameOver) {
@@ -433,13 +448,15 @@ public class GameLayout extends AppLayout {
     }
 
     private void addCompletedGoalToDisplayQueue(CompletedGoal completedGoal) {
-        while (displayingFullBookshelf) {
+        while (displayingPopUp) {
             try {
                 getLock().wait();
             } catch (InterruptedException e) {
 
             }
         }
+
+        displayingPopUp = true;
 
         if (completedGoal.type == CompletedGoal.GoalType.COMMON) {
             int i = 1;
@@ -559,8 +576,10 @@ public class GameLayout extends AppLayout {
     private Requester<Response, SelectTileEventData> selectTileRequester = null;
     private Requester<Response, DeselectTileEventData> deselectTileRequester = null;
     private Requester<Response, InsertTileEventData> insertTileRequester = null;
+    private Requester<Response, PauseGameEventData> pauseGameRequester = null;
+    private Requester<Response, PlayerExitGame> playerExitGameRequester = null;
 
-    private boolean displayingFullBookshelf = false;
+    private boolean displayingPopUp = false;
 
     @Override
     public void setup(String previousLayoutName) {
@@ -570,6 +589,8 @@ public class GameLayout extends AppLayout {
                 selectTileRequester = Response.requester(transceiver, transceiver, getLock());
                 deselectTileRequester = Response.requester(transceiver, transceiver, getLock());
                 insertTileRequester = Response.requester(transceiver, transceiver, getLock());
+                pauseGameRequester = Response.requester(transceiver, transceiver, getLock());
+                playerExitGameRequester = Response.requester(transceiver, transceiver, getLock());
 
                 InitialGameEventData.castEventReceiver(transceiver).registerListener(data -> {
                     playingPlayerIndex = 0;
@@ -659,7 +680,7 @@ public class GameLayout extends AppLayout {
                 });
 
                 FirstFullBookshelfEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    while (completedGoalTimer != null) {
+                    while (displayingPopUp) {
                         try {
                             getLock().wait();
                         } catch (InterruptedException e) {
@@ -667,7 +688,7 @@ public class GameLayout extends AppLayout {
                         }
                     }
 
-                    displayingFullBookshelf = true;
+                    displayingPopUp = true;
 
                     playerDisplayRecyclerDrawable.populate(craftPlayerDisplayListWithAdditionalPoints(
                         data.username(),
@@ -675,7 +696,7 @@ public class GameLayout extends AppLayout {
                     ));
 
                     blurrableBoard.blur(true);
-                    completedCommonGoalPopUpTextBox.text(data.username() + " filled\nthe bookshelf");
+                    popUpTextBox.text(data.username() + " filled\nthe bookshelf");
                     twoLayersBoard.showForeground();
 
                     new Timer().schedule(new TimerTask() {
@@ -690,7 +711,67 @@ public class GameLayout extends AppLayout {
                                 blurrableBoard.blur(false);
                                 twoLayersBoard.hideForeground();
 
-                                displayingFullBookshelf = false;
+                                displayingPopUp = false;
+
+                                getLock().notifyAll();
+                            }
+                        }
+                    }, 2000);
+                });
+
+                PlayerHasDisconnectedEventData.castEventReceiver(transceiver).registerListener(data -> {
+                    while (displayingPopUp) {
+                        try {
+                            getLock().wait();
+                        } catch (InterruptedException e) {
+
+                        }
+                    }
+
+                    displayingPopUp = true;
+
+                    blurrableBoard.blur(true);
+                    popUpTextBox.text(data.username() + " has\ndisconnected");
+                    twoLayersBoard.showForeground();
+
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            synchronized (getLock()) {
+                                blurrableBoard.blur(false);
+                                twoLayersBoard.hideForeground();
+
+                                displayingPopUp = false;
+
+                                getLock().notifyAll();
+                            }
+                        }
+                    }, 2000);
+                });
+
+                GameHasBeenStoppedEventData.castEventReceiver(transceiver).registerListener(data -> {
+                    while (displayingPopUp) {
+                        try {
+                            getLock().wait();
+                        } catch (InterruptedException e) {
+
+                        }
+                    }
+
+                    displayingPopUp = true;
+
+                    blurrableBoard.blur(true);
+                    popUpTextBox.text("Game has been\nstopped");
+                    twoLayersBoard.showForeground();
+
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            synchronized (getLock()) {
+                                blurrableBoard.blur(false);
+                                twoLayersBoard.hideForeground();
+
+                                displayingPopUp = false;
 
                                 getLock().notifyAll();
                             }
@@ -703,6 +784,8 @@ public class GameLayout extends AppLayout {
                     selectTileRequester = null;
                     deselectTileRequester = null;
                     insertTileRequester = null;
+                    pauseGameRequester = null;
+                    playerExitGameRequester = null;
 
                     if (isCurrentLayout()) {
                         switchAppLayout(ConnectionMenuLayout.NAME);

@@ -79,16 +79,18 @@ public class GameOverLayout extends AppLayout {
             playerDisplayRecyclerDrawable.populate((List<GameLayout.PlayerDisplay>) appDataProvider
                 .get(GameLayout.NAME, "scoreboard"));
 
-            transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
+            if (transceiver == null) {
+                transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
                 "transceiver");
 
-            PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
-                transceiver = null;
+                PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
+                    transceiver = null;
 
-                if (isCurrentLayout()) {
-                    switchAppLayout(ConnectionMenuLayout.NAME);
-                }
-            });
+                    if (isCurrentLayout()) {
+                        switchAppLayout(ConnectionMenuLayout.NAME);
+                    }
+                });
+            }
         }
     }
 
