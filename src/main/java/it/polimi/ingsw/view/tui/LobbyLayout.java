@@ -91,45 +91,47 @@ public class LobbyLayout extends AppLayout {
 
             gameTextBox.text(gameName);
 
-            transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
-                "transceiver");
+            if (transceiver == null) {
+                transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
+                    "transceiver");
 
-            joinGameRequester = Response.requester(transceiver, transceiver, getLock());
-            startGameRequester = Response.requester(transceiver, transceiver, getLock());
+                joinGameRequester = Response.requester(transceiver, transceiver, getLock());
+                startGameRequester = Response.requester(transceiver, transceiver, getLock());
 
-            PlayerHasJoinEventData.castEventReceiver(transceiver).registerListener(data -> {
-                playerNames.add(data.username());
+                PlayerHasJoinEventData.castEventReceiver(transceiver).registerListener(data -> {
+                    playerNames.add(data.username());
 
-                recyclerPlayersList.populate(playerNames);
+                    recyclerPlayersList.populate(playerNames);
 
-                boolean isOwner = true;
+                    boolean isOwner = true;
 
-                if (isOwner) {
-                    startButtonLayoutElement.setWeight(1);
+                    if (isOwner) {
+                        startButtonLayoutElement.setWeight(1);
 
-                    if (playerNames.size() >= 2) {
-                        startButton.focusable(true);
+                        if (playerNames.size() >= 2) {
+                            startButton.focusable(true);
+                        } else {
+                            startButton.focusable(false);
+                        }
                     } else {
-                        startButton.focusable(false);
+                        startButtonLayoutElement.setWeight(0);
                     }
-                } else {
-                    startButtonLayoutElement.setWeight(0);
-                }
-            });
+                });
 
-            GameHasStartedEventData.castEventReceiver(transceiver).registerListener(data -> {
-                switchAppLayout(GameLayout.NAME);
-            });
+                GameHasStartedEventData.castEventReceiver(transceiver).registerListener(data -> {
+                    switchAppLayout(GameLayout.NAME);
+                });
 
-            PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
-                transceiver = null;
-                joinGameRequester = null;
-                startGameRequester = null;
+                PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
+                    transceiver = null;
+                    joinGameRequester = null;
+                    startGameRequester = null;
 
-                if (isCurrentLayout()) {
-                    switchAppLayout(ConnectionMenuLayout.NAME);
-                }
-            });
+                    if (isCurrentLayout()) {
+                        switchAppLayout(ConnectionMenuLayout.NAME);
+                    }
+                });
+            }
 
             try {
                 displayServerResponse(joinGameRequester.request(new JoinGameEventData(gameName)));

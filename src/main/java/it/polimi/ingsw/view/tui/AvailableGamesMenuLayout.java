@@ -118,32 +118,34 @@ public class AvailableGamesMenuLayout extends AppLayout {
 
             usernameTextBox.text(appDataProvider.getString(LoginMenuLayout.NAME, "username"));
 
-            transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
+            if (transceiver == null) {
+                transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
                 "transceiver");
-            createGameRequester = Response.requester(transceiver, transceiver, getLock());
-            logoutRequester = Response.requester(transceiver, transceiver, getLock());
+                createGameRequester = Response.requester(transceiver, transceiver, getLock());
+                logoutRequester = Response.requester(transceiver, transceiver, getLock());
 
-            GameHasBeenCreatedEventData.castEventReceiver(transceiver).registerListener(data -> {
-                availableGames.addAll(data.getNames());
+                GameHasBeenCreatedEventData.castEventReceiver(transceiver).registerListener(data -> {
+                    availableGames.addAll(data.getNames());
 
-                if (availableGames.size() > 0) {
-                    recyclerGamesList.populate(availableGames);
+                    if (availableGames.size() > 0) {
+                        recyclerGamesList.populate(availableGames);
 
-                    alternative.second();
-                } else {
-                    alternative.first();
-                }
-            });
+                        alternative.second();
+                    } else {
+                        alternative.first();
+                    }
+                });
 
-            PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
-                transceiver = null;
-                createGameRequester = null;
-                logoutRequester = null;
+                PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
+                    transceiver = null;
+                    createGameRequester = null;
+                    logoutRequester = null;
 
-                if (isCurrentLayout()) {
-                    switchAppLayout(ConnectionMenuLayout.NAME);
-                }
-            });
+                    if (isCurrentLayout()) {
+                        switchAppLayout(ConnectionMenuLayout.NAME);
+                    }
+                });
+            }
 
             transceiver.broadcast(new PlayerHasJoinMenu());
         }
