@@ -7,8 +7,7 @@ import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
-import it.polimi.ingsw.model.game.PlayerView;
-import it.polimi.ingsw.utils.Logger;
+import it.polimi.ingsw.model.game.Player;
 import it.polimi.ingsw.utils.Pair;
 
 import java.util.ArrayList;
@@ -16,12 +15,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
-public record GameOverEventData(List<PlayerView> winners,
+public record GameOverEventData(List<Player> winners,
                                 List<Pair<Integer, BookshelfMaskSet>> personalGoal,
                                 List<Pair<Integer, BookshelfMaskSet>> adjacencyGoal) implements EventData {
     public static final String ID = "GAME_OVER";
 
-    public GameOverEventData(List<PlayerView> winners, List<Pair<Integer, BookshelfMaskSet>> personalGoal, List<Pair<Integer, BookshelfMaskSet>> adjacencyGoal) {
+    public GameOverEventData(List<Player> winners, List<Pair<Integer, BookshelfMaskSet>> personalGoal, List<Pair<Integer, BookshelfMaskSet>> adjacencyGoal) {
         assert personalGoal.size() == adjacencyGoal.size();
         this.winners = new ArrayList<>(winners);
         this.personalGoal = new ArrayList<>(personalGoal);
@@ -34,7 +33,7 @@ public record GameOverEventData(List<PlayerView> winners,
     }
 
     @Override
-    public List<PlayerView> winners() {
+    public List<Player> winners() {
         return Collections.unmodifiableList(this.winners);
     }
 
@@ -58,7 +57,7 @@ public record GameOverEventData(List<PlayerView> winners,
     public List<String> getWinnersUsername() {
         return this.winners
                 .stream()
-                .map(PlayerView::getUsername)
+                .map(Player::getUsername)
                 .toList();
     }
 

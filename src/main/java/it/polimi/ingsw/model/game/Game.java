@@ -29,15 +29,12 @@ public class Game extends GameView {
     private transient EventTransmitter transceiver;
 
     /**
-     * List of all players
-     * */
-    private final List<Player> players;
-
-    /**
      * List of all personal goals available
      * This value can be null if the game is loaded from disk
      * */
     protected final transient List<Integer> personalGoalIndexes;
+
+    private List<PersonalGoal> personalGoals;
 
     /**
      * Creates a new game with the given name.
@@ -49,13 +46,13 @@ public class Game extends GameView {
         super(name, username);
 
         this.personalGoalIndexes = new ArrayList<>(Arrays.asList( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ));
-        this.players = new ArrayList<>();
+        this.personalGoals = new ArrayList<>();
         Collections.shuffle(this.personalGoalIndexes);
     }
 
     public void forceStop () {
         this.isStopped = true;
-        players.forEach(p-> p.setConnectionState(false));
+        players.forEach(p -> p.setConnectionState(false));
     }
 
     private int getIndex (String username) {
@@ -81,7 +78,7 @@ public class Game extends GameView {
             if (getPlayer(creator).isConnected()) {
                 playerOnline = creator;
             } else {
-                playerOnline = players.get(this.getNextPlayerOnline(0)).getUsername();
+                playerOnline = super.players.get(this.getNextPlayerOnline(0)).getUsername();
             }
         } catch (NoPlayerConnectedException ignored) {
             // there is no player except [username]
@@ -164,11 +161,10 @@ public class Game extends GameView {
 
         Player player = new Player(username);
 
-        player.setPersonalGoal(PersonalGoal.fromIndex(personalGoalIndexes.get(0)));
-        personalGoalIndexes.remove(0);
+        this.personalGoals.add(PersonalGoal.fromIndex(personalGoalIndexes.get(0)));
+        this.personalGoalIndexes.remove(0);
 
-        players.add(player);
-        super.addPlayerView(player);
+        super.players.add(player);
 
         this.transceiver.broadcast(new PlayerHasJoinEventData(username));
 
@@ -190,8 +186,9 @@ public class Game extends GameView {
 
         for (int i = 0; i < players.size(); i++) {
             if (players.get(i).is(username)) {
+                personalGoalIndexes.add(personalGoals.get(i).getIndex());
+                personalGoals.remove(i);
                 players.remove(i);
-                super.removePlayerView(i);
                 return;
             }
         }
@@ -355,11 +352,14 @@ public class Game extends GameView {
             List<Pair<Integer, BookshelfMaskSet>> pointsAchievePersonal = new ArrayList<>();
             List<Pair<Integer, BookshelfMaskSet>> pointsAchieveAdjacency = new ArrayList<>();
 
-            for (Player player : players) {
-                final int personalGoalPoints = player.getPersonalGoal().calculatePoints(player.getBookshelf());
+            for (int i = 0; i < players.size(); i++) {
+                final Player player = players.get(i);
+                final PersonalGoal personalGoal = personalGoals.get(i);
+
+                final int personalGoalPoints = personalGoal.calculatePoints(player.getBookshelf());
 
                 if (personalGoalPoints > 0) {
-                    pointsAchievePersonal.add(new Pair<>(personalGoalPoints, player.getPersonalGoal().getPointMasks()));
+                    pointsAchievePersonal.add(new Pair<>(personalGoalPoints, personalGoal.getPointMasks()));
                     player.addPoints(personalGoalPoints);
                 } else pointsAchievePersonal.add(new Pair<>(0, null));
 
@@ -415,7 +415,7 @@ public class Game extends GameView {
             // set new turn
             this.currentPlayerIndex = index;
 
-            this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex).createView()));
+            this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex)));
         }
     }
 
@@ -470,7 +470,7 @@ public class Game extends GameView {
 
                 broadcast(
                         new CommonGoalCompletedEventData(
-                            player.createView(),
+                            player,
                             points,
                             commonGoals[i].getPointMasks(),
                             commonGoals[i].getIndex()
@@ -506,9 +506,12 @@ public class Game extends GameView {
      * @throws IllegalArgumentException iff username is not in this game.
      * */
     public int getPersonalGoal(String username) {
-        for (Player player: players) {
+        for (int i = 0; i < players.size(); i++){
+            final Player player = this.players.get(i);
+            final PersonalGoal personalGoal = this.personalGoals.get(i);
+
             if (player.is(username)) {
-                return player.getPersonalGoal().getIndex();
+                return personalGoal.getIndex();
             }
         }
         throw new IllegalArgumentException("Player is not in this game");

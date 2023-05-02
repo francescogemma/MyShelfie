@@ -114,7 +114,7 @@ public class MenuController {
             synchronized (authenticated) {
                 authenticated.add(transmitter);
             }
-            System.out.println(user.getName() + " authenticated correctly");
+            Logger.writeMessage(user.getName() + " authenticated correctly");
 
             return true;
         } else {
@@ -146,7 +146,7 @@ public class MenuController {
         }
 
         synchronized (notAuthenticated) {
-            if (this.notAuthenticated.contains(virtualView))
+            if (notAuthenticated.contains(virtualView))
                 throw new IllegalArgumentException("Already present in notAuthenticated");
             notAuthenticated.add(virtualView);
         }

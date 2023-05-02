@@ -211,7 +211,6 @@ public class GameController {
     public boolean isAvailableForJoin (String username) {
         synchronized (this) {
             return game.isAvailableForJoin(username);
-            //return !this.game.isStarted() || this.game.hasPlayerDisconnected() || game.isStopped();
         }
     }
 

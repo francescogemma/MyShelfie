@@ -64,14 +64,6 @@ class PlayerTest {
     }
 
     @Test
-    @DisplayName("Set the personal goal of the player")
-    void setPersonalGoal_personalGoal_correctOutput() {
-        PersonalGoal personalGoal = PersonalGoal.fromIndex(0);
-        player.setPersonalGoal(personalGoal);
-        Assertions.assertEquals(personalGoal, player.getPersonalGoal());
-    }
-
-    @Test
     @DisplayName("set connection state")
     void setConnectionState_connectionState_correctOutput() {
         Assertions.assertTrue(player.isConnected());

@@ -76,7 +76,7 @@ public class GameView implements Identifiable {
     protected int currentPlayerIndex;
 
     // TODO: Write custom GSON adapter for Game to remove players redundancy
-    private final List<PlayerView> playerViews;
+    protected final List<Player> players;
 
     /**
      * Constructs a new GameView with the given game name and username of the creator.
@@ -100,7 +100,7 @@ public class GameView implements Identifiable {
         this.winners = new ArrayList<>();
         this.currentPlayerIndex = -1;
         this.isStarted = false;
-        this.playerViews = new ArrayList<>();
+        this.players = new ArrayList<>();
         this.creator = username;
         this.isStopped = false;
     }
@@ -116,7 +116,7 @@ public class GameView implements Identifiable {
         this.winners = new ArrayList<>(other.winners);
         this.isStarted = other.isStarted;
         this.name = other.name;
-        this.playerViews = new ArrayList<>(other.playerViews);
+        this.players = new ArrayList<>(other.players);
         this.creator = other.creator;
         this.isStopped = other.isStopped;
         this.firstPlayerCompleteBookshelf = other.firstPlayerCompleteBookshelf;
@@ -139,19 +139,19 @@ public class GameView implements Identifiable {
      * @return the starting player
      * @throws IllegalFlowException if there are no players in the game
      */
-    public PlayerView getStartingPlayer() throws IllegalFlowException {
-        if (playerViews.isEmpty()) {
+    public Player getStartingPlayer() throws IllegalFlowException {
+        if (players.isEmpty()) {
             throw new IllegalFlowException("There is no starting player until someone joins the game");
         }
 
-        return playerViews.get(FIRST_PLAYER_INDEX);
+        return players.get(FIRST_PLAYER_INDEX);
     }
 
     /**
      * @return true iff there is one player online
      * */
     public boolean hasPlayerDisconnected () {
-        return playerViews.stream().anyMatch(PlayerView::isDisconnected);
+        return players.stream().anyMatch(Player::isDisconnected);
     }
 
     /**
@@ -160,8 +160,8 @@ public class GameView implements Identifiable {
      * */
     protected int getNextPlayerOnline(String username) throws NoPlayerConnectedException {
         int index = -1;
-        for (int i = 0; i < playerViews.size(); i++) {
-            if (playerViews.get(i).is(username))
+        for (int i = 0; i < players.size(); i++) {
+            if (players.get(i).is(username))
                 index = i;
         }
 
@@ -172,9 +172,9 @@ public class GameView implements Identifiable {
     }
 
     protected int getNextPlayerOnline (int currentPlayerIndex) throws NoPlayerConnectedException {
-        for (int i = 1; i < this.playerViews.size(); i++) {
-            final int index = (currentPlayerIndex + i) % this.playerViews.size();
-            if (this.playerViews.get(index).isConnected()) {
+        for (int i = 1; i < this.players.size(); i++) {
+            final int index = (currentPlayerIndex + i) % this.players.size();
+            if (this.players.get(index).isConnected()) {
                 return index;
             }
         }
@@ -185,7 +185,7 @@ public class GameView implements Identifiable {
      * @return Number of players online
      * */
     public int numberOfPlayerOnline () {
-        return (int) this.playerViews.stream().filter(PlayerView::isConnected).count();
+        return (int) this.players.stream().filter(Player::isConnected).count();
     }
 
     /**
@@ -210,10 +210,10 @@ public class GameView implements Identifiable {
             throw new IllegalFlowException();
 
         // it is stop, and it can't start with only 1 player connected
-        if (isStarted() && isStopped() && playerViews.size() < 2)
+        if (isStarted() && isStopped() && players.size() < 2)
             throw new IllegalFlowException();
 
-        if (playerViews.isEmpty())
+        if (players.isEmpty())
             throw new IllegalFlowException();
 
         return username.equals(creator);
@@ -241,7 +241,7 @@ public class GameView implements Identifiable {
      * @throws IllegalFlowException if the game is not started or if the game is over.
      * @return the current player of the game.
      */
-    public PlayerView getCurrentPlayer() throws IllegalFlowException {
+    public Player getCurrentPlayer() throws IllegalFlowException {
         if (!isStarted) {
             throw new IllegalFlowException("There is no current player until you start the game");
         }
@@ -253,53 +253,44 @@ public class GameView implements Identifiable {
         if (isStopped())
             throw new IllegalFlowException("Game is stopped");
 
-        return playerViews.get(currentPlayerIndex);
+        return players.get(currentPlayerIndex);
     }
 
     public boolean isAvailableForJoin(String username) {
         if (isStopped()) {
-            return playerViews.stream().anyMatch(p -> p.is(username)) || creator.equals(username);
+            return players.stream().anyMatch(p -> p.is(username)) || creator.equals(username);
         }
-        return !isStarted() || numberOfPlayerOnline() != playerViews.size();
+        return !isStarted() || numberOfPlayerOnline() != players.size();
     }
 
     /**
      * @return true iff at least one bookshelf is full
      * */
     public boolean atLeastOneBookshelfIsFull() {
-        return playerViews.stream().anyMatch(p -> p.getBookshelf().isFull());
+        return players.stream().anyMatch(p -> p.getBookshelf().isFull());
     }
 
     /**
      * @return whether the game is over or not.
      */
-    public List<PlayerView> getWinners() throws IllegalFlowException {
+    public List<Player> getWinners() throws IllegalFlowException {
         if (!isOver()) {
             throw new IllegalFlowException("There is no winner until the game is over");
         }
 
-        return winners.stream().map(PlayerView::createView).toList();
+        return winners.stream().map(Player::new).toList();
     }
 
     /**
      * @throws IllegalFlowException iff the game hasn't started yet.
      * @return the last player in the list of players
      * */
-    public PlayerView getLastPlayer() throws IllegalFlowException {
+    public Player getLastPlayer() throws IllegalFlowException {
         if (!isStarted) {
             throw new IllegalFlowException("There is no last player until you start the game");
         }
 
-        return playerViews.get(playerViews.size() - 1);
-    }
-
-    protected void addPlayerView (PlayerView playerView) {
-        assert playerView.getClass() == Player.class;
-        this.playerViews.add(playerView);
-    }
-
-    protected void removePlayerView(int index) {
-        playerViews.remove(index);
+        return players.get(players.size() - 1);
     }
 
     /**
@@ -342,8 +333,8 @@ public class GameView implements Identifiable {
      * Returns a new immutable list of player views.
      * @return a new list of immutable player view instances
      * */
-    public List<PlayerView> getPlayers () {
-        return new ArrayList<>(playerViews);
+    public List<Player> getPlayers () {
+        return new ArrayList<>(players);
     }
 
     @Override

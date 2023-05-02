@@ -13,7 +13,6 @@ import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.model.board.BoardView;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
-import it.polimi.ingsw.model.game.PlayerView;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
 import it.polimi.ingsw.model.tile.Tile;
@@ -30,6 +29,7 @@ import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayoutE
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Color;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.PrimitiveSymbol;
 import it.polimi.ingsw.view.tui.terminal.drawable.twolayers.TwoLayersDrawable;
+import it.polimi.ingsw.model.game.Player;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -573,7 +573,7 @@ public class GameLayout extends AppLayout {
             InitialGameEventData.castEventReceiver(transceiver).registerListener(data -> {
                 playingPlayerIndex = 0;
 
-                playerNames = data.gameView().getPlayers().stream().map(PlayerView::getUsername)
+                playerNames = data.gameView().getPlayers().stream().map(Player::getUsername)
                     .toList();
 
                 clientPlayerIndex = playerNameToIndex(appDataProvider.getString(
@@ -583,10 +583,10 @@ public class GameLayout extends AppLayout {
 
                 selectedBookshelfIndex = clientPlayerIndex;
 
-                playerPoints = new ArrayList<>(data.gameView().getPlayers().stream().map(PlayerView::getPoints)
+                playerPoints = new ArrayList<>(data.gameView().getPlayers().stream().map(Player::getPoints)
                     .toList());
 
-                bookshelves = new ArrayList<>(data.gameView().getPlayers().stream().map(PlayerView::getBookshelf)
+                bookshelves = new ArrayList<>(data.gameView().getPlayers().stream().map(Player::getBookshelf)
                     .toList());
 
                 commonGoals = data.gameView().getCommonGoals();

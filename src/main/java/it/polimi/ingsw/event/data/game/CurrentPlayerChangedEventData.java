@@ -6,8 +6,7 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
-import it.polimi.ingsw.model.game.PlayerView;
-import it.polimi.ingsw.utils.Logger;
+import it.polimi.ingsw.model.game.Player;
 
 import java.util.function.Function;
 
@@ -15,7 +14,7 @@ public class CurrentPlayerChangedEventData implements EventData {
     private final String username;
     public static final String ID = "CURRENT_PLAYER_CHANGED";
 
-    public CurrentPlayerChangedEventData(PlayerView player) {
+    public CurrentPlayerChangedEventData(Player player) {
         this.username = player.getUsername();
     }
 

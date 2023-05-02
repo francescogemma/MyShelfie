@@ -8,9 +8,7 @@ import it.polimi.ingsw.model.goal.PersonalGoal;
  * It contains the username of the player, his {@link Player#points}, his {@link Bookshelf bookshelf} and his personal goal.
  * @author Francesco Gemma
  */
-public class Player extends PlayerView {
-    private PersonalGoal personalGoal;
-
+public class Player {
     /**
      * Constructor of the class.
      * Sets the name of the player, his points to 0 and creates a new {@link Bookshelf bookshelf}.
@@ -22,21 +20,6 @@ public class Player extends PlayerView {
         this.points = 0;
         this.isConnected = true;
         this.achievedCommonGoals = new boolean[]{ false, false };
-    }
-
-    /**
-     * @return {@link Player#bookshelf}
-     */
-    @Override
-    public Bookshelf getBookshelf() {
-        return bookshelf;
-    }
-
-    /**
-     * @return {@link Player#personalGoal} of the player.
-     */
-    public PersonalGoal getPersonalGoal() {
-        return this.personalGoal;
     }
 
     /**
@@ -52,12 +35,8 @@ public class Player extends PlayerView {
         }
     }
 
-    /**
-     * This method sets the personal goal to the player.
-     * @param personalGoal the personal goal to set to the player.
-     */
-    public void setPersonalGoal(PersonalGoal personalGoal) {
-        this.personalGoal = personalGoal;
+    public Bookshelf getBookshelf () {
+        return this.bookshelf;
     }
 
     /**
@@ -74,6 +53,104 @@ public class Player extends PlayerView {
      */
     public void achievedCommonGoal(int index) {
         achievedCommonGoals[index] = true;
+    }
+
+    /*
+     * username of the player
+     */
+    protected String username;
+
+    /*
+     * bookshelf of the player
+     */
+    protected Bookshelf bookshelf;
+
+    /*
+     * points earned so far
+     */
+    protected int points;
+
+    /*
+     * true iff player is connected
+     */
+    protected boolean isConnected;
+
+    /**
+     * Indicates whether the common goal in the game has been achieved.
+     * The i-th position is true if the i-th common goal has been satisfied.
+     * */
+    protected boolean[] achievedCommonGoals;
+
+    /**
+     * Create a new instance of PlayerView equals to other
+     * */
+    protected Player(Player other) {
+        this.username = other.username;
+        this.bookshelf = new Bookshelf(other.bookshelf);
+
+        this.points = other.points;
+        this.isConnected = other.isConnected;
+
+        this.achievedCommonGoals = new boolean[2];
+        System.arraycopy(other.achievedCommonGoals, 0, this.achievedCommonGoals, 0, 2);
+    }
+
+    /**
+     * Sets the specified common goal as achieved.
+     * @param index the index of the common goal to be set as achieved
+     * @throws AssertionError if the index is negative or greater than or equal to the length of the achievedCommonGoals array
+     * */
+    public void setAchievedCommonGoals(int index) {
+        assert index >= 0 && index < achievedCommonGoals.length;
+        achievedCommonGoals[index] = true;
+    }
+
+    /**
+     * @return {@link Player#isConnected} the connection state of the player.
+     */
+    public boolean isConnected() {
+        return isConnected;
+    }
+
+    /**
+     * Returns true if the player is disconnected, false otherwise.
+     * @return true if the player is disconnected, false otherwise
+     * @see #isConnected()
+     */
+    public boolean isDisconnected () {
+        return !isConnected();
+    }
+
+    /**
+     * This method checks if the common goal at the given index has been achieved.
+     * @param index the index of the {@link it.polimi.ingsw.model.goal.CommonGoal CommonGoal} to check.
+     * @return true if the common goal at the given index has been achieved, false otherwise.
+     */
+    public boolean hasAchievedCommonGoal(int index) {
+        return achievedCommonGoals[index];
+    }
+
+    /**
+     * @return {@link Player#username}
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Returns true if the given username matches the player's username, false otherwise.
+     * @param username the username to compare with the player's username
+     * @return true if the given username matches the player's username, false otherwise
+     */
+    public boolean is(String username) {
+        return this.username.equals(username);
+    }
+
+    /**
+     * @return {@link Player#points}
+     */
+    public int getPoints() {
+        return points;
     }
 
     @Override
