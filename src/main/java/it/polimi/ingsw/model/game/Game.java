@@ -139,7 +139,7 @@ public class Game extends GameView {
 
         // Allows for reconnection of disconnected players
         for (Player otherPlayer : players) {
-            if (otherPlayer.getUsername().equals(username)) {
+            if (otherPlayer.is(username)) {
                 if (otherPlayer.isConnected()) {
                     throw new PlayerAlreadyInGameException(username);
                 }
@@ -198,6 +198,7 @@ public class Game extends GameView {
 
     private void setStopped () {
         isStopped = true;
+        players.forEach(p -> p.setConnectionState(false));
         broadcast(new GameHasBeenStoppedEventData());
     }
 

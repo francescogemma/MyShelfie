@@ -44,6 +44,7 @@ public class VirtualView implements EventTransmitter{
 
         PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(event -> disconnect());
 
+
         JoinStartedGameEventData.castEventReceiver(transceiver).registerListener(event -> this.sendGameState());
         PlayerHasJoinMenu       .castEventReceiver(transceiver).registerListener(event -> this.playerHasJoinMenu());
     }
@@ -220,6 +221,7 @@ public class VirtualView implements EventTransmitter{
         assert Thread.holdsLock(this);
 
         this.gameController = gameController;
+
         ForceExitGameEventData.castEventReceiver(gameController.getInternalTransmitter()).registerListener(event -> {
             this.gameController = null;
         });

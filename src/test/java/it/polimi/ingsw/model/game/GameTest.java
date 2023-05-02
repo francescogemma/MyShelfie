@@ -327,6 +327,7 @@ class GameTest {
 
         game.addPlayer("Giacomo");
 
+        game.addPlayer("Michele");
         game.startGame("Giacomo");
 
         Assertions.assertEquals("Michele", game.getCurrentPlayer().getUsername());
@@ -896,6 +897,7 @@ class GameTest {
 
         Assertions.assertEquals(0, gameHasStartedEventData.size());
 
+        game.addPlayer(username2);
         game.startGame(username1);
 
         Assertions.assertEquals(1, gameHasStartedEventData.size());
@@ -926,6 +928,7 @@ class GameTest {
         game.disconnectPlayer(username1);
 
         game.addPlayer(username1);
+        game.addPlayer(username3);
         game.startGame(username1);
         Assertions.assertEquals(username1, game.getCurrentPlayer().getUsername());
 
