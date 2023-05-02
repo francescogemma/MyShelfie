@@ -798,9 +798,6 @@ public class GameLayout extends AppLayout {
                 });
             }
 
-            // Retrieving current player index
-            playingPlayerIndex = 0;
-
             gameOver = false;
 
             transceiver.broadcast(new JoinStartedGameEventData());
