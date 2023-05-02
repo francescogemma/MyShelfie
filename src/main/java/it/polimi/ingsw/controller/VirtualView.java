@@ -205,7 +205,7 @@ public class VirtualView implements EventTransmitter{
     public boolean isInGame() {
         /*
          * this method is not synchronized, and you need to
-         * synchronized on this!!
+         * synchronize on this!!
          */
         assert Thread.holdsLock(this);
 
@@ -215,7 +215,7 @@ public class VirtualView implements EventTransmitter{
     public void setGameController(GameController gameController) {
         /*
          * this method is not synchronized, and you need to
-         * synchronized on this!!
+         * synchronize on this!!
          */
         assert Thread.holdsLock(this);
 
@@ -228,7 +228,7 @@ public class VirtualView implements EventTransmitter{
     public boolean isAuthenticated () {
         /*
          * this method is not synchronized, and you need to
-         * synchronized on this!!
+         * synchronize on this!!
          */
         assert Thread.holdsLock(this);
 

@@ -120,6 +120,7 @@ public class GameView implements Identifiable {
         this.creator = other.creator;
         this.isStopped = other.isStopped;
         this.firstPlayerCompleteBookshelf = other.firstPlayerCompleteBookshelf;
+        this.currentPlayerIndex = other.currentPlayerIndex;
 
         this.commonGoals = new CommonGoal[other.commonGoals.length];
         for (int i = 0; i < other.commonGoals.length; i++) {
