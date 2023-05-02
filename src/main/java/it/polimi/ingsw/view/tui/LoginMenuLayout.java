@@ -1,10 +1,12 @@
 package it.polimi.ingsw.view.tui;
 
 import it.polimi.ingsw.controller.Response;
+import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.LoginEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
+import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.view.tui.terminal.drawable.BlurrableDrawable;
 import it.polimi.ingsw.view.tui.terminal.drawable.DrawableSize;
 import it.polimi.ingsw.view.tui.terminal.drawable.Fill;
@@ -61,8 +63,14 @@ public class LoginMenuLayout extends AppLayout {
         ));
 
         loginButton.onpress(() -> {
-            Response response = loginRequester
-                .request(new LoginEventData(usernameEntry.getValue(), passwordEntry.getValue()));
+            Response response;
+            try {
+                response = loginRequester
+                    .request(new LoginEventData(usernameEntry.getValue(), passwordEntry.getValue()));
+            } catch (DisconnectedException e) {
+                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                return;
+            }
 
             displayServerResponse(response);
 

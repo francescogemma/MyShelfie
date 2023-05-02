@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.tui;
 
 import it.polimi.ingsw.controller.Response;
+import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.client.DeselectTileEventData;
@@ -17,6 +18,7 @@ import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
+import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
@@ -538,20 +540,33 @@ public class GameLayout extends AppLayout {
             insertTileRequester = Response.requester(transceiver, transceiver, getLock());
 
             boardDrawable.getNonFillTileDrawables().forEach(tileDrawable -> tileDrawable.onselect(
-                (rowInBoard, columnInBoard) -> displayServerResponse(selectTileRequester.request(new SelectTileEventData(
-                    new Coordinate(rowInBoard, columnInBoard)
-                )))
-            ));
+                (rowInBoard, columnInBoard) -> {
+                    try {
+                        displayServerResponse(selectTileRequester.request(new SelectTileEventData(
+                            new Coordinate(rowInBoard, columnInBoard))));
+                    } catch (DisconnectedException e) {
+                        displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                    }
+                }));
 
             boardDrawable.getNonFillTileDrawables().forEach(tileDrawable -> tileDrawable.ondeselect(
-                (rowInBoard, columnInBoard) -> displayServerResponse(deselectTileRequester.request(new DeselectTileEventData(
-                    new Coordinate(rowInBoard, columnInBoard)
-                )))
-            ));
+                (rowInBoard, columnInBoard) -> {
+                    try {
+                        displayServerResponse(deselectTileRequester.request(new DeselectTileEventData(
+                            new Coordinate(rowInBoard, columnInBoard)
+                        )));
+                    } catch (DisconnectedException e) {
+                        displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                    }
+                }));
 
             for (int column = 0; column < Bookshelf.COLUMNS; column++) {
                 bookshelfDrawable.getColumn(column).onselect(c -> {
-                   displayServerResponse(insertTileRequester.request(new InsertTileEventData(c)));
+                    try {
+                        displayServerResponse(insertTileRequester.request(new InsertTileEventData(c)));
+                    } catch (DisconnectedException e) {
+                        displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                    }
                 });
             }
 

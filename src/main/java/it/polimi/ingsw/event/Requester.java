@@ -1,10 +1,12 @@
 package it.polimi.ingsw.event;
 
 import it.polimi.ingsw.event.data.EventData;
+import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.data.wrapper.SyncEventDataWrapper;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
+import it.polimi.ingsw.networking.DisconnectedException;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +23,8 @@ public class Requester<R extends EventData, S extends EventData> {
     private final Set<Integer> waitingFor = new HashSet<>();
     private final Map<Integer, R> responses = new HashMap<>();
 
+    private boolean disconnected = false;
+
     public Requester(String responseEventId, EventTransmitter transmitter, EventReceiver<EventData> receiver, Object responsesLock) {
         this.transmitter = transmitter;
         this.responsesLock = responsesLock;
@@ -36,9 +40,17 @@ public class Requester<R extends EventData, S extends EventData> {
                     }
                 }
         });
+
+        PlayerDisconnectedInternalEventData.castEventReceiver(receiver).registerListener(data -> {
+            synchronized (this.responsesLock) {
+                disconnected = true;
+
+                this.responsesLock.notifyAll();
+            }
+        });
     }
 
-    public R request(S data) {
+    public R request(S data) throws DisconnectedException {
         int count;
 
         synchronized (nextRequestCountLock) {
@@ -52,10 +64,12 @@ public class Requester<R extends EventData, S extends EventData> {
 
         transmitter.broadcast(new SyncEventDataWrapper<S>(count, data));
 
-        // TODO: Handle disconnections
-
         synchronized (responsesLock) {
             while (responses.get(count) == null) {
+                if (disconnected) {
+                    throw new DisconnectedException();
+                }
+
                 try {
                     responsesLock.wait();
                 } catch (InterruptedException e) { }

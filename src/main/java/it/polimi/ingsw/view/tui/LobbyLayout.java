@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.tui;
 
 import it.polimi.ingsw.controller.Response;
+import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.client.JoinGameEventData;
@@ -8,6 +9,7 @@ import it.polimi.ingsw.event.data.client.StartGameEventData;
 import it.polimi.ingsw.event.data.game.GameHasStartedEventData;
 import it.polimi.ingsw.event.data.game.PlayerHasJoinEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
+import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
@@ -64,7 +66,11 @@ public class LobbyLayout extends AppLayout {
         ));
 
         startButton.onpress(() -> {
-            displayServerResponse(startGameRequester.request(new StartGameEventData()));
+            try {
+                displayServerResponse(startGameRequester.request(new StartGameEventData()));
+            } catch (DisconnectedException e) {
+                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+            }
         });
 
         backButton.onpress(() -> switchAppLayout(AvailableGamesMenuLayout.NAME));
@@ -125,7 +131,11 @@ public class LobbyLayout extends AppLayout {
                 }
             });
 
-            displayServerResponse(joinGameRequester.request(new JoinGameEventData(gameName)));
+            try {
+                displayServerResponse(joinGameRequester.request(new JoinGameEventData(gameName)));
+            } catch (DisconnectedException e) {
+                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+            }
         }
     }
 
