@@ -78,7 +78,9 @@ public class Game extends GameView {
             if (getPlayer(creator).isConnected()) {
                 playerOnline = creator;
             } else {
-                playerOnline = super.players.get(this.getNextPlayerOnline(0)).getUsername();
+                playerOnline = super.players
+                        .get(this.getNextPlayerOnline(0))
+                        .getUsername();
             }
         } catch (NoPlayerConnectedException ignored) {
             // there is no player except [username]

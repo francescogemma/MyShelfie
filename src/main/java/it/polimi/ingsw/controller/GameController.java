@@ -12,6 +12,7 @@ import it.polimi.ingsw.model.board.IllegalExtractionException;
 import it.polimi.ingsw.model.board.RemoveNotLastSelectedException;
 import it.polimi.ingsw.model.bookshelf.NotEnoughSpaceInColumnException;
 import it.polimi.ingsw.model.game.*;
+import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
@@ -22,24 +23,27 @@ public class GameController {
     private final Game game;
     private final List<Pair<EventTransmitter, String>> clients;
     private final LocalEventTransceiver transceiver = new LocalEventTransceiver();
+    private final List<String> eventIgnored = new ArrayList<>();
 
     public GameController(Game game) {
         this.game = game;
         this.clients = new ArrayList<>();
 
+        eventIgnored.add(PlayerHasJoinEventData.ID);
+        eventIgnored.add(PlayerHasDisconnectedEventData.ID);
+        eventIgnored.add(CommonGoalCompletedEventData.ID);
 
         game.setTransceiver(transceiver);
 
-        transceiver.registerListener(event ->
-                clients.forEach(
+        transceiver.registerListener(event -> {
+            clients.forEach(
                         client -> {
                             client.getKey().broadcast(event);
-                            synchronized (this) {
-                                if (this.game.isStarted())
-                                    DBManager.getGamesDBManager().save(game);
-                            }
                         }
-                )
+                    );
+            if (this.game.isStarted() && !eventIgnored.contains(event.getId()))
+                DBManager.getGamesDBManager().save(game);
+        }
         );
     }
 
@@ -62,7 +66,7 @@ public class GameController {
 
             if (game.stopGame(username)) {
                 this.clients.clear();
-                transceiver.broadcast(new ForceExitGameEventData());
+                transceiver.broadcast(new ForceExitGameEventData(username));
                 return new Response("Game has been successfully paused", ResponseStatus.SUCCESS);
             }
             return new Response("You are not the owner", ResponseStatus.FAILURE);
@@ -70,6 +74,7 @@ public class GameController {
     }
 
     protected Response exitGame (String username) {
+        Logger.writeMessage("Call for username: %s".formatted(username));
         synchronized (this) {
             try {
                 if (!game.isStarted()) {
@@ -127,8 +132,9 @@ public class GameController {
 
     public Response selectTile(String username, Coordinate coordinate) {
         assert username != null;
+        Logger.writeMessage(username + " trying to select tile at " + coordinate + " in " + gameName());
+
         synchronized (this) {
-            Logger.writeMessage(username + " trying to select tile at " + coordinate + " in " + gameName());
             try {
                 this.game.selectTile(username, coordinate);
             } catch (IllegalExtractionException | FullSelectionException | IllegalFlowException e) {
@@ -143,6 +149,7 @@ public class GameController {
     public Response deselectTile(String username, Coordinate coordinate) {
         assert username != null;
         Logger.writeMessage(username + " trying to deselect " + coordinate + " in " + gameName());
+
         synchronized (this) {
             try {
                 this.game.forgetLastSelection(username, coordinate);
@@ -194,7 +201,6 @@ public class GameController {
         synchronized (this) {
             if (this.game.disconnectPlayer(username)) {
                 // game has been stopped
-                assert this.clients.size() == 1;
                 shouldThrow = true;
                 assert game.isStopped();
             } else {
@@ -204,12 +210,12 @@ public class GameController {
             for (int i = 0; i < clients.size(); i++) {
                 if (this.clients.get(i).getValue().equals(username)) {
                     this.clients.remove(i);
-                    return;
+                    break;
                 }
             }
 
             if (game.isStopped())
-                transceiver.broadcast(new ForceExitGameEventData());
+                transceiver.broadcast(new ForceExitGameEventData(username));
 
             if (shouldThrow)
                 throw new NoPlayerConnectedException();

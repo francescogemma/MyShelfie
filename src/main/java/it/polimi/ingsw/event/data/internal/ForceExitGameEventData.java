@@ -6,13 +6,20 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
+import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 
 public class ForceExitGameEventData implements EventData {
     public static final String ID = "FORCE_EXIT_GAME";
+    private final String username;
 
-    public ForceExitGameEventData() {
+    public ForceExitGameEventData(String username) {
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return this.username;
     }
 
     public static CastEventReceiver<ForceExitGameEventData> castEventReceiver(EventReceiver<EventData> receiver) {

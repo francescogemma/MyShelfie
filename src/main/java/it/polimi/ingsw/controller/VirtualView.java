@@ -44,7 +44,6 @@ public class VirtualView implements EventTransmitter{
 
         PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(event -> disconnect());
 
-
         JoinStartedGameEventData.castEventReceiver(transceiver).registerListener(event -> this.sendGameState());
         PlayerHasJoinMenu       .castEventReceiver(transceiver).registerListener(event -> this.playerHasJoinMenu());
     }
@@ -76,6 +75,7 @@ public class VirtualView implements EventTransmitter{
     }
 
     private synchronized Response pauseGame (PauseGameEventData eventData) {
+        Logger.writeMessage("Call");
         if (isInGame()) {
             Response response = MenuController.getInstance().stopGame(username);
 
@@ -90,6 +90,7 @@ public class VirtualView implements EventTransmitter{
     }
 
     private synchronized Response exitGame (PlayerExitGame exitGame) {
+        Logger.writeMessage("Call");
         if (isInGame()) {
             Response response = MenuController.INSTANCE.exitGame(username);
 
@@ -184,7 +185,7 @@ public class VirtualView implements EventTransmitter{
     }
 
     private synchronized Response selectTile(SelectTileEventData eventData) {
-        if (isAuthenticated()) {
+        if (isInGame()) {
             return this.gameController.selectTile(username, eventData.coordinate());
         } else {
             return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
@@ -222,7 +223,13 @@ public class VirtualView implements EventTransmitter{
 
         this.gameController = gameController;
 
+        assert gameController != null;
+
         ForceExitGameEventData.castEventReceiver(gameController.getInternalTransmitter()).registerListener(event -> {
+            if (event.getUsername().equals(username)) {
+                return;
+            }
+
             synchronized (this) {
                 this.gameController = null;
             }
