@@ -10,6 +10,7 @@ import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.model.board.BoardView;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
+import it.polimi.ingsw.model.game.IllegalFlowException;
 import it.polimi.ingsw.model.game.Player;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
@@ -593,10 +594,14 @@ public class GameLayout extends AppLayout {
                 playerExitGameRequester = Response.requester(transceiver, transceiver, getLock());
 
                 InitialGameEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    playingPlayerIndex = 0;
-
                     playerNames = data.gameView().getPlayers().stream().map(Player::getUsername)
                         .toList();
+
+                    try {
+                        playingPlayerIndex = playerNameToIndex(data.gameView().getCurrentPlayer().getUsername());
+                    } catch (IllegalFlowException e) {
+                        throw new IllegalStateException("It should be always possible to retrieve playing player");
+                    }
 
                     clientPlayerIndex = playerNameToIndex(appDataProvider.getString(
                         LoginMenuLayout.NAME,
