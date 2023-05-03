@@ -203,7 +203,6 @@ public class GameController {
 
     /**
      * @throws IllegalArgumentException iff the player is not in this game.
-     * @throws NoPlayerConnectedException iff there are no player connected
      * */
     public void disconnect(String username) {
         boolean shouldThrow = false;
