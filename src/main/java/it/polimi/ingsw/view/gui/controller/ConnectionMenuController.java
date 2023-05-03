@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 public class ConnectionMenuController {
+    @FXML private TextField serverIPTextField;
     @FXML private TextField serverPortTextField;
     @FXML private Button connectionMenuNextButton;
 
