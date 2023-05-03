@@ -35,7 +35,7 @@ public class ConnectionMenuLayoutController {
     private void switchLayout() {
         Parent nextMenu;
         try {
-            nextMenu = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/AvailableGamesMenuLayout.fxml")));
+            nextMenu = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/UserLoginMenuLayout.fxml")));
         } catch (IOException e) {
             throw new LoaderException("couldn't load resource", e);
         }

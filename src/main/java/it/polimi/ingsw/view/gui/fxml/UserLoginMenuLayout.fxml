@@ -9,7 +9,8 @@
 <VBox fx:id="userLoginVBox" prefHeight="400" prefWidth="600"
       stylesheets="/UserLoginMenuStylesheet.css"
       xmlns="http://javafx.com/javafx/17.0.2-ea"
-      xmlns:fx="http://javafx.com/fxml/1">
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.polimi.ingsw.view.gui.UserLoginMenuLayoutController">
 
    <HBox fx:id="userLoginImageHBox" alignment="CENTER" VBox.vgrow="ALWAYS">
       <ImageView fx:id="userLoginImageView"
@@ -33,13 +34,13 @@
    <HBox VBox.vgrow="ALWAYS">
       <HBox fx:id="passwordBackground" alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
          <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Password" />
-         <PasswordField fx:id="PasswordTextField" promptText="Password" HBox.hgrow="ALWAYS" />
+         <PasswordField fx:id="passwordTextField" promptText="Password" HBox.hgrow="ALWAYS" />
          <padding> <Insets left="20.0" right="20.0" /> </padding>
       </HBox>
       <padding> <Insets bottom="10" left="90.0" right="90.0" top="10" /> </padding>
    </HBox>
 
    <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
-      <Button fx:id="connectionMenuNextButton" mnemonicParsing="false" text="NEXT" />
+      <Button fx:id="userLoginNextButton" mnemonicParsing="false" text="NEXT" onAction="#switchLayout"/>
    </HBox>
 </VBox>
