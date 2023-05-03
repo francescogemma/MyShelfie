@@ -8,6 +8,7 @@ import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.receiver.EventListener;
+import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.model.board.BoardView;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
@@ -582,11 +583,23 @@ public class GameLayout extends AppLayout {
     }
 
     private NetworkEventTransceiver transceiver = null;
+
     private Requester<Response, SelectTileEventData> selectTileRequester = null;
     private Requester<Response, DeselectTileEventData> deselectTileRequester = null;
     private Requester<Response, InsertTileEventData> insertTileRequester = null;
     private Requester<Response, PauseGameEventData> pauseGameRequester = null;
     private Requester<Response, PlayerExitGame> playerExitGameRequester = null;
+
+    private EventReceiver<InitialGameEventData> initialGameReceiver = null;
+    private EventReceiver<CurrentPlayerChangedEventData> currentPlayerChangedReceiver = null;
+    private EventReceiver<PersonalGoalSetEventData> personalGoalSetReceiver = null;
+    private EventReceiver<BoardChangedEventData> boardChangedReceiver = null;
+    private EventReceiver<BookshelfHasChangedEventData> bookshelfHasChangedReceiver = null;
+    private EventReceiver<CommonGoalCompletedEventData> commonGoalCompletedReceiver = null;
+    private EventReceiver<GameOverEventData> gameOverReceiver = null;
+    private EventReceiver<FirstFullBookshelfEventData> firstFullBookshelfReceiver = null;
+    private EventReceiver<PlayerHasDisconnectedEventData> playerHasDisconnectedReceiver = null;
+    private EventReceiver<GameHasBeenStoppedEventData> stoppedGameReceiver = null;
 
     private boolean displayingPopUp = false;
 
@@ -624,6 +637,10 @@ public class GameLayout extends AppLayout {
         populateBookshelfMenu();
         playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList());
         populateBoard(data.gameView().getBoard());
+
+        if (data.gameView().isStopped()) {
+            stopGame();
+        }
     };
 
     private final EventListener<CurrentPlayerChangedEventData> currentPlayerListener = data -> {
@@ -751,7 +768,7 @@ public class GameLayout extends AppLayout {
         }, 2000);
     };
 
-    private final EventListener<GameHasBeenStoppedEventData> gameStoppedListener = data -> {
+    private void stopGame() {
         while (displayingPopUp) {
             try {
                 getLock().wait();
@@ -781,6 +798,10 @@ public class GameLayout extends AppLayout {
                 }
             }
         }, 2000);
+    }
+
+    private final EventListener<GameHasBeenStoppedEventData> gameStoppedListener = data -> {
+        stopGame();
     };
 
     @Override
@@ -794,6 +815,17 @@ public class GameLayout extends AppLayout {
                 pauseGameRequester = Response.requester(transceiver, transceiver, getLock());
                 playerExitGameRequester = Response.requester(transceiver, transceiver, getLock());
 
+                initialGameReceiver = InitialGameEventData.castEventReceiver(transceiver);
+                currentPlayerChangedReceiver = CurrentPlayerChangedEventData.castEventReceiver(transceiver);
+                personalGoalSetReceiver = PersonalGoalSetEventData.castEventReceiver(transceiver);
+                boardChangedReceiver = BoardChangedEventData.castEventReceiver(transceiver);
+                bookshelfHasChangedReceiver = BookshelfHasChangedEventData.castEventReceiver(transceiver);
+                commonGoalCompletedReceiver = CommonGoalCompletedEventData.castEventReceiver(transceiver);
+                gameOverReceiver = GameOverEventData.castEventReceiver(transceiver);
+                firstFullBookshelfReceiver = FirstFullBookshelfEventData.castEventReceiver(transceiver);
+                playerHasDisconnectedReceiver = PlayerHasDisconnectedEventData.castEventReceiver(transceiver);
+                stoppedGameReceiver = GameHasBeenStoppedEventData.castEventReceiver(transceiver);
+
                 PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
                     transceiver = null;
                     selectTileRequester = null;
@@ -802,31 +834,33 @@ public class GameLayout extends AppLayout {
                     pauseGameRequester = null;
                     playerExitGameRequester = null;
 
+                    initialGameReceiver = null;
+                    currentPlayerChangedReceiver = null;
+                    personalGoalSetReceiver = null;
+                    boardChangedReceiver = null;
+                    bookshelfHasChangedReceiver = null;
+                    commonGoalCompletedReceiver = null;
+                    gameOverReceiver = null;
+                    firstFullBookshelfReceiver = null;
+                    playerHasDisconnectedReceiver = null;
+                    stoppedGameReceiver = null;
+
                     if (isCurrentLayout()) {
                         switchAppLayout(ConnectionMenuLayout.NAME);
                     }
                 });
             }
 
-            InitialGameEventData.castEventReceiver(transceiver).registerListener(initialGameListener);
-
-            CurrentPlayerChangedEventData.castEventReceiver(transceiver).registerListener(currentPlayerListener);
-
-            PersonalGoalSetEventData.castEventReceiver(transceiver).registerListener(personalGoalSetListener);
-
-            BoardChangedEventData.castEventReceiver(transceiver).registerListener(boardChangedListener);
-
-            BookshelfHasChangedEventData.castEventReceiver(transceiver).registerListener(bookshelfChangedListener);
-
-            CommonGoalCompletedEventData.castEventReceiver(transceiver).registerListener(commonGoalCompletedListener);
-
-            GameOverEventData.castEventReceiver(transceiver).registerListener(gameOverListener);
-
-            FirstFullBookshelfEventData.castEventReceiver(transceiver).registerListener(firstFullBookshelfListener);
-
-            PlayerHasDisconnectedEventData.castEventReceiver(transceiver).registerListener(playerDisconnectedListener);
-
-            GameHasBeenStoppedEventData.castEventReceiver(transceiver).registerListener(gameStoppedListener);
+            initialGameReceiver.registerListener(initialGameListener);
+            currentPlayerChangedReceiver.registerListener(currentPlayerListener);
+            personalGoalSetReceiver.registerListener(personalGoalSetListener);
+            boardChangedReceiver.registerListener(boardChangedListener);
+            bookshelfHasChangedReceiver.registerListener(bookshelfChangedListener);
+            commonGoalCompletedReceiver.registerListener(commonGoalCompletedListener);
+            gameOverReceiver.registerListener(gameOverListener);
+            firstFullBookshelfReceiver.registerListener(firstFullBookshelfListener);
+            playerHasDisconnectedReceiver.registerListener(playerDisconnectedListener);
+            stoppedGameReceiver.registerListener(gameStoppedListener);
 
             gameOver = false;
 
@@ -837,25 +871,16 @@ public class GameLayout extends AppLayout {
     @Override
     public void beforeSwitch() {
         if (transceiver != null) {
-            InitialGameEventData.castEventReceiver(transceiver).unregisterListener(initialGameListener);
-
-            CurrentPlayerChangedEventData.castEventReceiver(transceiver).unregisterListener(currentPlayerListener);
-
-            PersonalGoalSetEventData.castEventReceiver(transceiver).unregisterListener(personalGoalSetListener);
-
-            BoardChangedEventData.castEventReceiver(transceiver).unregisterListener(boardChangedListener);
-
-            BookshelfHasChangedEventData.castEventReceiver(transceiver).unregisterListener(bookshelfChangedListener);
-
-            CommonGoalCompletedEventData.castEventReceiver(transceiver).unregisterListener(commonGoalCompletedListener);
-
-            GameOverEventData.castEventReceiver(transceiver).unregisterListener(gameOverListener);
-
-            FirstFullBookshelfEventData.castEventReceiver(transceiver).unregisterListener(firstFullBookshelfListener);
-
-            PlayerHasDisconnectedEventData.castEventReceiver(transceiver).unregisterListener(playerDisconnectedListener);
-
-            GameHasBeenStoppedEventData.castEventReceiver(transceiver).unregisterListener(gameStoppedListener);
+            initialGameReceiver.unregisterListener(initialGameListener);
+            currentPlayerChangedReceiver.unregisterListener(currentPlayerListener);
+            personalGoalSetReceiver.unregisterListener(personalGoalSetListener);
+            boardChangedReceiver.unregisterListener(boardChangedListener);
+            bookshelfHasChangedReceiver.unregisterListener(bookshelfChangedListener);
+            commonGoalCompletedReceiver.unregisterListener(commonGoalCompletedListener);
+            gameOverReceiver.unregisterListener(gameOverListener);
+            firstFullBookshelfReceiver.unregisterListener(firstFullBookshelfListener);
+            playerHasDisconnectedReceiver.unregisterListener(playerDisconnectedListener);
+            stoppedGameReceiver.unregisterListener(gameStoppedListener);
         }
     }
 
