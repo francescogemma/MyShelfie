@@ -165,7 +165,13 @@ public class LobbyLayout extends AppLayout {
             }
 
             try {
-                displayServerResponse(joinGameRequester.request(new JoinGameEventData(gameName)));
+                Response response = joinGameRequester.request(new JoinGameEventData(gameName));
+
+                displayServerResponse(response);
+
+                if (!response.isOk()) {
+                    switchAppLayout(AvailableGamesMenuLayout.NAME);
+                }
             } catch (DisconnectedException e) {
                 displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
             }
