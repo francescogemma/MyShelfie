@@ -139,6 +139,13 @@ public class Game extends GameView {
         if (username == null || username.length() == 0)
             throw new NullPointerException("username is null or has length 0");
 
+        System.out.println("Situazione attuale iniziale: ");
+        players.stream().forEach(player ->
+                System.out.print(player.getUsername() + " " + player.isConnected() + " ")
+        );
+
+        System.out.println("\n");
+
         // Allows for reconnection of disconnected players
         for (Player otherPlayer : players) {
             if (otherPlayer.is(username)) {
@@ -148,6 +155,12 @@ public class Game extends GameView {
 
                 otherPlayer.setConnectionState(true);
                 this.transceiver.broadcast(new PlayerHasJoinEventData(otherPlayer.getUsername()));
+
+                System.out.println("Situazione attuale dopo aver riconnesso il player: ");
+                players.stream().forEach(player ->
+                    System.out.print(player.getUsername() + " " + player.isConnected() + " ")
+                );
+
                 return otherPlayer;
             }
         }
@@ -201,6 +214,7 @@ public class Game extends GameView {
     private void setStopped () {
         isStopped = true;
         players.forEach(p -> p.setConnectionState(false));
+        Logger.writeMessage("Game is stopped!!!");
         broadcast(new GameHasBeenStoppedEventData());
     }
 
@@ -217,7 +231,7 @@ public class Game extends GameView {
 
         player.setConnectionState(false);
 
-        if (!isStarted()) {
+        if (!isStarted() || isStopped()) {
             this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
 
             return false;
@@ -256,6 +270,8 @@ public class Game extends GameView {
 
         if (!this.canStartGame(username))
             throw new IllegalFlowException("you can't start the game");
+
+        Logger.writeMessage("Number of player online:"  + numberOfPlayerOnline());
 
         if (numberOfPlayerOnline() < 2)
             throw new IllegalFlowException("Player online can't be 1 or 0");

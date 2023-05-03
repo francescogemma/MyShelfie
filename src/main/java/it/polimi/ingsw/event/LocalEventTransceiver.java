@@ -18,6 +18,13 @@ public class LocalEventTransceiver implements EventTransceiver {
     }
 
     @Override
+    public void unregisterListener(EventListener<EventData> listener) {
+        synchronized (lock) {
+            listeners.remove(listener);
+        }
+    }
+
+    @Override
     public void broadcast(EventData data) {
         synchronized (lock) {
             for (EventListener<EventData> listener : listeners) {

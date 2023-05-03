@@ -41,6 +41,7 @@ public class GameController {
                             client.getKey().broadcast(event);
                         }
                     );
+            Logger.writeMessage(event.getId());
             if (this.game.isStarted() && !eventIgnored.contains(event.getId()))
                 DBManager.getGamesDBManager().save(game);
         }

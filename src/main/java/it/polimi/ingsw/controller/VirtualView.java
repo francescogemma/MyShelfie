@@ -8,6 +8,7 @@ import it.polimi.ingsw.event.data.game.InitialGameEventData;
 import it.polimi.ingsw.event.data.game.PersonalGoalSetEventData;
 import it.polimi.ingsw.event.data.internal.ForceExitGameEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
+import it.polimi.ingsw.event.receiver.EventListener;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.game.GameView;
 import it.polimi.ingsw.utils.Logger;
@@ -23,6 +24,16 @@ public class VirtualView implements EventTransmitter{
     private static final Response DEFAULT_MESSAGE_NOT_AUTHENTICATED = new Response("You are not login", ResponseStatus.FAILURE);
     private static final Response DEFAULT_MESSAGE_ALREADY_IN_GAME = new Response("You are in a game...", ResponseStatus.FAILURE);
     private static final Response DEFAULT_MESSAGE_NOT_IN_GAME = new Response("You are not in a game...", ResponseStatus.FAILURE);
+
+    private final EventListener<ForceExitGameEventData> listener = (event -> {
+        if (event.getUsername().equals(username)) {
+            return;
+        }
+
+        synchronized (this) {
+            this.gameController = null;
+        }
+    });
 
     public VirtualView(EventTransceiver transceiver) {
         if (transceiver == null)
@@ -69,17 +80,22 @@ public class VirtualView implements EventTransmitter{
     }
 
     private synchronized void disconnect() {
+        Logger.writeMessage("user %s disconnected".formatted(username));
         MenuController.getInstance().forceDisconnect(this, username);
+
+        if (gameController != null)
+            removeListener();
 
         this.gameController = null;
     }
 
     private synchronized Response pauseGame (PauseGameEventData eventData) {
-        Logger.writeMessage("Call");
+        Logger.writeMessage("Call for username: %s".formatted(username));
         if (isInGame()) {
             Response response = MenuController.getInstance().stopGame(username);
 
             if (response.isOk()) {
+                removeListener();
                 this.gameController = null;
             }
 
@@ -89,12 +105,17 @@ public class VirtualView implements EventTransmitter{
         }
     }
 
+    private void removeListener () {
+        ForceExitGameEventData.castEventReceiver(gameController.getInternalTransmitter()).unregisterListener(listener);
+    }
+
     private synchronized Response exitGame (PlayerExitGame exitGame) {
-        Logger.writeMessage("Call");
+        Logger.writeMessage("Call for username %s".formatted(username));
         if (isInGame()) {
             Response response = MenuController.INSTANCE.exitGame(username);
 
             if (response.isOk()) {
+                removeListener();
                 this.gameController = null;
             }
             return response;
@@ -225,15 +246,7 @@ public class VirtualView implements EventTransmitter{
 
         assert gameController != null;
 
-        ForceExitGameEventData.castEventReceiver(gameController.getInternalTransmitter()).registerListener(event -> {
-            if (event.getUsername().equals(username)) {
-                return;
-            }
-
-            synchronized (this) {
-                this.gameController = null;
-            }
-        });
+        ForceExitGameEventData.castEventReceiver(gameController.getInternalTransmitter()).registerListener(this.listener);
     }
 
     public boolean isAuthenticated () {

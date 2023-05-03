@@ -24,4 +24,9 @@ public class CastEventReceiver<T extends EventData> implements EventReceiver<T> 
             }
         });
     }
+
+    @Override
+    public void unregisterListener(EventListener<T> listener) {
+        receiver.unregisterListener((EventListener<EventData>) listener);
+    }
 }
