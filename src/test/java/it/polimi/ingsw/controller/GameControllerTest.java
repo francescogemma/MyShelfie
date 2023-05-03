@@ -75,12 +75,7 @@ class GameControllerTest {
                 );
 
         gameController.startGame("Giacomo");
-        try {
-            gameController.disconnect("Giacomo");
-            Assertions.fail();
-        } catch (NoPlayerConnectedException ignore) {
-
-        }
+        gameController.disconnect("Giacomo");
 
         Assertions.assertTrue(gameController.isStopped());
         Assertions.assertEquals(1, eventDataList.size());

@@ -44,6 +44,12 @@ public class Player {
      * @param isConnected the new connection state of the player.
      */
     public void setConnectionState(boolean isConnected) {
+        if (isConnected){
+            for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
+                System.out.println(username + "  " + element.toString());
+            }
+        }
+
         this.isConnected = isConnected;
     }
 
@@ -58,28 +64,28 @@ public class Player {
     /*
      * username of the player
      */
-    protected String username;
+    private String username;
 
     /*
      * bookshelf of the player
      */
-    protected Bookshelf bookshelf;
+    private Bookshelf bookshelf;
 
     /*
      * points earned so far
      */
-    protected int points;
+    private int points;
 
     /*
      * true iff player is connected
      */
-    protected boolean isConnected;
+    private boolean isConnected;
 
     /**
      * Indicates whether the common goal in the game has been achieved.
      * The i-th position is true if the i-th common goal has been satisfied.
      * */
-    protected boolean[] achievedCommonGoals;
+    private boolean[] achievedCommonGoals;
 
     /**
      * Create a new instance of PlayerView equals to other

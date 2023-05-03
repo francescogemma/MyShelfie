@@ -41,6 +41,7 @@ public class GameController {
                             client.getKey().broadcast(event);
                         }
                     );
+
             Logger.writeMessage(event.getId());
             if (this.game.isStarted() && !eventIgnored.contains(event.getId()))
                 DBManager.getGamesDBManager().save(game);
@@ -78,10 +79,18 @@ public class GameController {
         Logger.writeMessage("Call for username: %s".formatted(username));
         synchronized (this) {
             try {
+                final boolean wasStopped = game.isStopped();
+
                 if (!game.isStarted()) {
                     game.removePlayer (username);
                 } else {
                     game.disconnectPlayer (username);
+                }
+
+                if (wasStopped != game.isStopped()) {
+                    this.transceiver.broadcast(new ForceExitGameEventData(username));
+                    clients.clear();
+                    return new Response("You have book remove from this game", ResponseStatus.SUCCESS);
                 }
 
                 for (int i = 0; i < this.clients.size(); i++) {
@@ -196,7 +205,7 @@ public class GameController {
      * @throws IllegalArgumentException iff the player is not in this game.
      * @throws NoPlayerConnectedException iff there are no player connected
      * */
-    public void disconnect(String username) throws NoPlayerConnectedException {
+    public void disconnect(String username) {
         boolean shouldThrow = false;
 
         synchronized (this) {
@@ -219,9 +228,6 @@ public class GameController {
                 transceiver.broadcast(new ForceExitGameEventData(username));
                 clients.clear();
             }
-
-            if (shouldThrow)
-                throw new NoPlayerConnectedException();
         }
     }
 

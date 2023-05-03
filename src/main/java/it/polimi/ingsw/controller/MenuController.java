@@ -54,21 +54,6 @@ public class MenuController {
         return INSTANCE;
     }
 
-    public Response stopGame (String username) {
-        synchronized (gameControllerList) {
-            for (GameController game: gameControllerList) {
-                try {
-                    return game.stopGame(username);
-                } catch (IllegalArgumentException e) {
-                    // [username] is not in this game
-                }
-            }
-        }
-
-        Logger.writeCritical("Username is in no game");
-        return new Response(null, ResponseStatus.FAILURE);
-    }
-
     /**
      * password is required in case of player not existing
      * */
@@ -186,26 +171,6 @@ public class MenuController {
         }
     }
 
-    public Response exitGame (String username) {
-        assert username != null;
-
-        Optional<GameController> selectedGame = Optional.empty();
-
-        synchronized (gameControllerList) {
-            for (GameController gameController: gameControllerList) {
-                if (gameController.containerPlayer(username)) {
-                    selectedGame = Optional.of(gameController);
-                }
-            }
-        }
-
-        if (selectedGame.isPresent()) {
-            return selectedGame.get().exitGame(username);
-        } else {
-            return new Response("This player is in no game", ResponseStatus.FAILURE);
-        }
-    }
-
     /**
      * Let's assume that the player is not in any game.
      * */
@@ -223,7 +188,7 @@ public class MenuController {
         return new Response("You are now logout", ResponseStatus.SUCCESS);
     }
 
-    public void forceDisconnect(EventTransmitter transmitter, String username) {
+    public void forceDisconnect(EventTransmitter transmitter, Optional<GameController> gameController, Optional<String> username) {
         synchronized (notAuthenticated) {
             notAuthenticated.remove(transmitter);
         }
@@ -232,22 +197,9 @@ public class MenuController {
             authenticated.remove(transmitter);
         }
 
-        if (username != null) {
+        if (username.isPresent() && gameController.isPresent()) {
             synchronized (gameControllerList) {
-                for (GameController controller: gameControllerList) {
-
-                    try {
-                        controller.disconnect(username);
-                    } catch (NoPlayerConnectedException e) {
-                        assert controller.isStopped();
-                        /*
-                         * We don't have to remove the controller as the game is not finished yet
-                         * */
-                        return;
-                    } catch (IllegalArgumentException e) {
-                        // player is not in this controller.
-                    }
-                }
+                gameController.get().disconnect(username.get());
             }
         }
     }

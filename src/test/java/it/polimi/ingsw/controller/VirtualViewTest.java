@@ -6,6 +6,7 @@ import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.networking.TCP.TCPConnection;
+import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +31,7 @@ class VirtualViewTest {
 
     @BeforeEach
     void setUp () {
+        Logger.setShouldPrint(false);
         transceiver1 = new MockNetworkEventTransceiver();
         transceiver2 = new MockNetworkEventTransceiver();
         transceiver3 = new MockNetworkEventTransceiver();
@@ -255,6 +257,34 @@ class VirtualViewTest {
 
         thread2.join();
         thread3.join();
+    }
+
+    @RepeatedTest(1)
+    void testStopOwner() throws DisconnectedException {
+        authenticate(virtualView1, transceiver1, username1);
+        authenticate(virtualView2, transceiver2, username2);
+
+        createNewGame(virtualView1, transceiver1, "Prova");
+
+        joinGame(virtualView1, transceiver1, "Prova");
+        joinGame(virtualView2, transceiver2, "Prova");
+
+        startGame(virtualView1, transceiver1);
+
+        pauseGame(virtualView1, transceiver1, username1);
+
+        joinGame(virtualView1, transceiver1, "Prova");
+        joinGame(virtualView2, transceiver2, "Prova");
+
+        startGame(virtualView1, transceiver1);
+
+        Requester<Response, PauseGameEventData> requester = Response.requester(transceiver2, transceiver2, new Object());
+        Response request = requester.request(new PauseGameEventData());
+        Assertions.assertFalse(request.isOk());
+        synchronized (virtualView2) {
+            Assertions.assertTrue(virtualView2.isAuthenticated());
+            Assertions.assertTrue(virtualView2.isInGame());
+        }
     }
 }
 

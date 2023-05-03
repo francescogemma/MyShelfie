@@ -84,7 +84,11 @@ public class VirtualView implements EventTransmitter{
 
     private synchronized void disconnect() {
         Logger.writeMessage("user %s disconnected".formatted(username));
-        MenuController.getInstance().forceDisconnect(this, username);
+        MenuController.getInstance().forceDisconnect(
+                this,
+                Optional.of(gameController),
+                Optional.of(username)
+        );
 
         if (gameController != null)
             removeListener();
@@ -94,8 +98,9 @@ public class VirtualView implements EventTransmitter{
 
     private synchronized Response pauseGame (PauseGameEventData eventData) {
         Logger.writeMessage("Call for username: %s".formatted(username));
+
         if (isInGame()) {
-            Response response = MenuController.getInstance().stopGame(username);
+            Response response = gameController.stopGame(username);
 
             if (response.isOk()) {
                 removeListener();
@@ -116,7 +121,7 @@ public class VirtualView implements EventTransmitter{
     private synchronized Response exitGame (PlayerExitGame exitGame) {
         Logger.writeMessage("Call for username %s".formatted(username));
         if (isInGame()) {
-            Response response = MenuController.INSTANCE.exitGame(username);
+            Response response = gameController.exitGame(username);
 
             if (response.isOk()) {
                 removeListener();

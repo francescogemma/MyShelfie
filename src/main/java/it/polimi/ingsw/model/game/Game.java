@@ -72,6 +72,8 @@ public class Game extends GameView {
     public boolean stopGame (String username) {
         String playerOnline;
 
+        Logger.writeMessage("Game name: %s Prima %s".formatted(this.name, username));
+
         try {
             // If the creator has disconnected, the possibility of stopping the game should be
             // given in the order of entry into the game.
