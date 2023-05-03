@@ -11,8 +11,9 @@
       xmlns="http://javafx.com/javafx/17.0.2-ea"
       xmlns:fx="http://javafx.com/fxml/1">
 
-    <HBox VBox.vgrow="ALWAYS" alignment="CENTER" spacing="10">
-        <Label text="Logged in as:"/>
+    <HBox VBox.vgrow="ALWAYS" alignment="CENTER">
+        <Label text="Logged in as: " />
+        <Label fx:id="loggedUsername" />
     </HBox>
 
     <HBox fx:id="availableGamesListHBox" VBox.vgrow="ALWAYS">

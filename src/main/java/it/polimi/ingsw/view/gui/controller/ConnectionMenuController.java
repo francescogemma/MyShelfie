@@ -17,7 +17,8 @@ public class ConnectionMenuController {
     @FXML private TextField serverPortTextField;
     @FXML private Button connectionMenuNextButton;
 
-    public void initialize() {
+    @FXML
+    private void initialize() {
         setServerPortTextFieldToDecimalOnly();
     }
 

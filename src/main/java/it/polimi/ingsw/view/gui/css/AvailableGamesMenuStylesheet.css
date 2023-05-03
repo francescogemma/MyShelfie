@@ -14,3 +14,7 @@
     -fx-background-color: form-background;
     -fx-background-radius: 30;
 }
+
+#loggedUsername {
+    -fx-text-fill: palette-red;
+}
