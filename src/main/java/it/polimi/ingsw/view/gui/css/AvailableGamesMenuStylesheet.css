@@ -1,0 +1,6 @@
+@import "BasicStylesheet.css";
+
+
+#availableGamesVBox {
+    -fx-background-color: background;
+}

@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
-<?import javafx.scene.Cursor?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
 
 <VBox fx:id="connectionVBox" fx:controller="it.polimi.ingsw.view.gui.ConnectionMenuLayoutController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="/ConnectionMenuStylesheet.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
    <children>
@@ -54,11 +52,7 @@
 
       <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
          <children>
-            <Button fx:id="connectionMenuNextButton" mnemonicParsing="false" text="NEXT">
-               <cursor>
-                  <Cursor fx:constant="HAND"/>
-               </cursor>
-            </Button>
+            <Button fx:id="connectionMenuNextButton" mnemonicParsing="false" text="NEXT" onAction="#switchLayout" />
          </children>
       </HBox>
    </children>

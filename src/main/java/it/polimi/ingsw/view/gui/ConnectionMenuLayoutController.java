@@ -1,23 +1,44 @@
 package it.polimi.ingsw.view.gui;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
+
+import java.io.IOException;
+import java.util.Objects;
+import java.util.function.UnaryOperator;
 
 public class ConnectionMenuLayoutController {
-    public Button connectionMenuNextButton = null;
-    public TextField serverPortTextField = null;
+    @FXML private TextField serverPortTextField;
+    @FXML private Button connectionMenuNextButton;
 
     public void initialize() {
-        serverPortTextField.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue,
-                                String newValue) {
-                if (!newValue.matches("\\d*")) {
-                    serverPortTextField.setText(newValue.replaceAll("[^\\d]", ""));
-                }
+        setServerPortTextFieldToDecimalOnly();
+    }
+
+    private void setServerPortTextFieldToDecimalOnly() {
+        UnaryOperator<TextFormatter.Change> integerFilter = change -> {
+            String input = change.getText();
+            if (input.matches("\\d*")) {
+                return change;
             }
-        });
+            return null;
+        };
+
+        serverPortTextField.setTextFormatter(new TextFormatter<>(integerFilter));
+    }
+
+    @FXML
+    private void switchLayout() {
+        Parent nextMenu;
+        try {
+            nextMenu = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/AvailableGamesMenuLayout.fxml")));
+        } catch (IOException e) {
+            throw new LoaderException("couldn't load resource", e);
+        }
+        connectionMenuNextButton.getScene().setRoot(nextMenu);
     }
 }

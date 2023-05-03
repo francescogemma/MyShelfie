@@ -8,6 +8,8 @@ import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class GuiApplication extends Application {
     public static void main(String[] args) {
         launch(args);
@@ -15,9 +17,9 @@ public class GuiApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Font.loadFont(getClass().getResource("/ESKARGOT.ttf").toExternalForm(), 10);
+        Font.loadFont(Objects.requireNonNull(getClass().getResource("/ESKARGOT.ttf")).toExternalForm(), 10);
 
-        Parent connectionMenu = FXMLLoader.load(getClass().getResource("/ConnectionMenuLayout.fxml"));
+        Parent connectionMenu = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/ConnectionMenuLayout.fxml")));
         Scene scene = new Scene(connectionMenu);
 
         primaryStage.setTitle("My Shelfie");
