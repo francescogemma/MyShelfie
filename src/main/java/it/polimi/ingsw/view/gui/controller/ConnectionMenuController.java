@@ -1,5 +1,6 @@
-package it.polimi.ingsw.view.gui;
+package it.polimi.ingsw.view.gui.controller;
 
+import it.polimi.ingsw.view.gui.LoaderException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -11,7 +12,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 
-public class ConnectionMenuLayoutController {
+public class ConnectionMenuController {
     @FXML private TextField serverPortTextField;
     @FXML private Button connectionMenuNextButton;
 

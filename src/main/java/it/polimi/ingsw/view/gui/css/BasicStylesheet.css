@@ -12,7 +12,6 @@
     palette-green: #51a93e;
 }
 
-
 * {
     -fx-text-fill: dark-grey;
 }
@@ -45,6 +44,10 @@
 }
 
 .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
     -fx-background-color: transparent;
 }
 

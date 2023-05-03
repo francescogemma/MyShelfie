@@ -10,7 +10,7 @@
       stylesheets="/UserLoginMenuStylesheet.css"
       xmlns="http://javafx.com/javafx/17.0.2-ea"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="it.polimi.ingsw.view.gui.UserLoginMenuLayoutController">
+      fx:controller="it.polimi.ingsw.view.gui.controller.UserLoginMenuController">
 
    <HBox fx:id="userLoginImageHBox" alignment="CENTER" VBox.vgrow="ALWAYS">
       <ImageView fx:id="userLoginImageView"

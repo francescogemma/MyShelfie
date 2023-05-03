@@ -1,27 +1,27 @@
-package it.polimi.ingsw.view.gui;
+package it.polimi.ingsw.view.gui.controller;
 
+import it.polimi.ingsw.view.gui.LoaderException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.function.UnaryOperator;
 
-public class UserLoginMenuLayoutController {
+public class UserLoginMenuController {
     @FXML private TextField usernameTextField;
     @FXML private TextField passwordTextField;
     @FXML private Button userLoginNextButton;
+
     @FXML
     private void switchLayout() {
         Parent nextMenu;
         try {
             nextMenu = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/AvailableGamesMenuLayout.fxml")));
         } catch (IOException e) {
-            throw new LoaderException(e.getMessage());
+            throw new LoaderException("couldn't load resource", e);
         }
         userLoginNextButton.getScene().setRoot(nextMenu);
     }
