@@ -290,6 +290,7 @@ public class GameLayout extends AppLayout {
                     return;
                 }
 
+                unregisterListeners();
                 switchAppLayout(AvailableGamesMenuLayout.NAME);
             } catch (DisconnectedException e) {
                 displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
@@ -452,6 +453,7 @@ public class GameLayout extends AppLayout {
             getLock().notifyAll();
 
             if (gameOver) {
+                unregisterListeners();
                 switchAppLayout(GameOverLayout.NAME);
             }
         }
@@ -778,6 +780,7 @@ public class GameLayout extends AppLayout {
 
                     getLock().notifyAll();
 
+                    unregisterListeners();
                     switchAppLayout(AvailableGamesMenuLayout.NAME);
                 }
             }
@@ -840,8 +843,7 @@ public class GameLayout extends AppLayout {
         return NAME;
     }
 
-    @Override
-    protected void switchAppLayout(String nextName) {
+    private void unregisterListeners() {
         InitialGameEventData.castEventReceiver(transceiver).unregisterListener(initialGameListener);
 
         CurrentPlayerChangedEventData.castEventReceiver(transceiver).unregisterListener(currentPlayerListener);
@@ -861,7 +863,5 @@ public class GameLayout extends AppLayout {
         PlayerHasDisconnectedEventData.castEventReceiver(transceiver).unregisterListener(playerDisconnectedListener);
 
         GameHasBeenStoppedEventData.castEventReceiver(transceiver).unregisterListener(gameStoppedListener);
-
-        super.switchAppLayout(nextName);
     }
 }
