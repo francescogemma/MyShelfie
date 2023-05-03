@@ -290,7 +290,12 @@ public class GameLayout extends AppLayout {
                     return;
                 }
 
-                switchAppLayout(AvailableGamesMenuLayout.NAME);
+                /* If the game gets stopped in between the synchronous call (i.e. there are 2 players and one
+                 * disconnects) the layout has already been switched by the stop game event.
+                 */
+                if (isCurrentLayout()) {
+                    switchAppLayout(AvailableGamesMenuLayout.NAME);
+                }
             } catch (DisconnectedException e) {
                 displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
             }
