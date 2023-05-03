@@ -160,6 +160,7 @@ public class Game extends GameView {
                 players.stream().forEach(player ->
                     System.out.print(player.getUsername() + " " + player.isConnected() + " ")
                 );
+                System.out.println("");
 
                 return otherPlayer;
             }

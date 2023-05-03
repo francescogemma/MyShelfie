@@ -275,19 +275,23 @@ public class MenuController {
     }
 
     public Pair<Response, GameController> joinGame(EventTransmitter transmitter, String username, String gameName) {
+        GameController g = null;
+
         synchronized (gameControllerList) {
             for (GameController gameController: this.gameControllerList) {
                 if (gameController.gameName().equals(gameName)) {
-
-                    Response response = gameController.join(transmitter, username);
-
-                    if (response.isOk()) {
-                        return Pair.of(response, gameController);
-                    } else {
-                        return Pair.of(response, null);
-                    }
-
+                    g = gameController;
                 }
+            }
+        }
+
+        if (g != null) {
+            Response response = g.join(transmitter, username);
+
+            if (response.isOk()) {
+                return Pair.of(response, g);
+            } else {
+                return Pair.of(response, null);
             }
         }
 

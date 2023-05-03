@@ -15,28 +15,32 @@ public class MockNetworkEventTransceiver implements EventTransceiver {
 
     private final Gson gson;
 
-
     private boolean disconnect = false;
 
     public MockNetworkEventTransceiver() {
         gson = new GsonBuilder().registerTypeAdapterFactory(new EventDataTypeAdapterFactory()).create();
 
         new Thread(() -> {
-            synchronized (lock) {
-                while (true) {
+            while (true) {
+                List<String> serializedEventsCopy;
+                synchronized (serializedEvents) {
                     while (serializedEvents.isEmpty()) {
                         try {
-                            lock.wait();
-                        } catch (InterruptedException e) { }
+                            serializedEvents.wait();
+                        } catch (InterruptedException e) {
+                        }
 
                         if (disconnect) {
                             return;
                         }
                     }
 
-                    List<String> serializedEventsCopy = new ArrayList<>(serializedEvents);
-                    serializedEvents.clear();
+                    serializedEventsCopy = new ArrayList<>(serializedEvents);
 
+                    serializedEvents.clear();
+                }
+
+                synchronized (lock) {
                     for (String eventJSON : serializedEventsCopy) {
                         EventData data = gson.fromJson(eventJSON, EventData.class);
 
@@ -66,17 +70,17 @@ public class MockNetworkEventTransceiver implements EventTransceiver {
 
     @Override
     public void broadcast(EventData data) {
-        synchronized (lock) {
+        synchronized (serializedEvents) {
             serializedEvents.add(gson.toJson(data, EventData.class));
 
-            lock.notifyAll();
+            serializedEvents.notifyAll();
         }
     }
 
     public void disconnect() {
-        synchronized (lock) {
+        synchronized (serializedEvents) {
             disconnect = true;
-            lock.notifyAll();
+            serializedEvents.notifyAll();
         }
     }
 }

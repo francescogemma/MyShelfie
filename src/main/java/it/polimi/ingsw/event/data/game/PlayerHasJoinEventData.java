@@ -14,6 +14,7 @@ public record PlayerHasJoinEventData(String username) implements EventData {
     public static final String ID = "PLAYER_HAS_JOIN";
 
     public PlayerHasJoinEventData {
+        Logger.writeMessage("Event: %s".formatted(username));
     }
 
     public static CastEventReceiver<PlayerHasJoinEventData> castEventReceiver(EventReceiver<EventData> receiver) {

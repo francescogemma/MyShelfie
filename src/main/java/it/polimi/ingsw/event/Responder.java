@@ -5,6 +5,7 @@ import it.polimi.ingsw.event.data.wrapper.SyncEventDataWrapper;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
+import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 
@@ -13,8 +14,11 @@ public class Responder<R extends EventData, S extends EventData> {
                      Function<R, S> response) {
         new CastEventReceiver<SyncEventDataWrapper<R>>(
             SyncEventDataWrapper.WRAPPER_ID + "_" + requestEventId,
-            receiver).registerListener(data ->
+            receiver).registerListener(data -> {
                 transmitter.broadcast(new SyncEventDataWrapper<S>(data.getCount(),
-                    response.apply(data.getWrappedData()))));
+                            response.apply(data.getWrappedData())
+                        )
+                );}
+        );
     }
 }

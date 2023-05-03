@@ -215,8 +215,10 @@ public class GameController {
                 }
             }
 
-            if (game.isStopped())
+            if (game.isStopped()) {
                 transceiver.broadcast(new ForceExitGameEventData(username));
+                clients.clear();
+            }
 
             if (shouldThrow)
                 throw new NoPlayerConnectedException();

@@ -8,6 +8,7 @@ import it.polimi.ingsw.event.data.game.InitialGameEventData;
 import it.polimi.ingsw.event.data.game.PersonalGoalSetEventData;
 import it.polimi.ingsw.event.data.internal.ForceExitGameEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
+import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventListener;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.game.GameView;
@@ -24,6 +25,8 @@ public class VirtualView implements EventTransmitter{
     private static final Response DEFAULT_MESSAGE_NOT_AUTHENTICATED = new Response("You are not login", ResponseStatus.FAILURE);
     private static final Response DEFAULT_MESSAGE_ALREADY_IN_GAME = new Response("You are in a game...", ResponseStatus.FAILURE);
     private static final Response DEFAULT_MESSAGE_NOT_IN_GAME = new Response("You are not in a game...", ResponseStatus.FAILURE);
+
+    private CastEventReceiver<ForceExitGameEventData> castEventReceiver = null;
 
     private final EventListener<ForceExitGameEventData> listener = (event -> {
         if (event.getUsername().equals(username)) {
@@ -106,7 +109,8 @@ public class VirtualView implements EventTransmitter{
     }
 
     private void removeListener () {
-        ForceExitGameEventData.castEventReceiver(gameController.getInternalTransmitter()).unregisterListener(listener);
+        assert this.castEventReceiver != null;
+        this.castEventReceiver.unregisterListener(this.listener);
     }
 
     private synchronized Response exitGame (PlayerExitGame exitGame) {
@@ -242,11 +246,13 @@ public class VirtualView implements EventTransmitter{
          */
         assert Thread.holdsLock(this);
 
+        assert this.gameController == null;
         this.gameController = gameController;
 
         assert gameController != null;
 
-        ForceExitGameEventData.castEventReceiver(gameController.getInternalTransmitter()).registerListener(this.listener);
+        castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalTransmitter());
+        castEventReceiver.registerListener(this.listener);
     }
 
     public boolean isAuthenticated () {

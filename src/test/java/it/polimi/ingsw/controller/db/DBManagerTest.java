@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Set;
 
-class DBManagerTest {
+public class DBManagerTest {
     private static void deleteDirectoryRecursively(Path directoryPath) {
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directoryPath)) {
             directoryStream.forEach(path -> {
@@ -185,7 +185,7 @@ class DBManagerTest {
             return null;
         }
 
-        void setUp () throws IllegalAccessException, NoSuchFieldException {
+        public static void setUp () throws IllegalAccessException, NoSuchFieldException {
             Field instanceGameController = MenuController.class.getDeclaredField("gameControllerList");
             Field instanceAuthenticated = MenuController.class.getDeclaredField("authenticated");
             Field instanceNotAuthenticated = MenuController.class.getDeclaredField("notAuthenticated");
