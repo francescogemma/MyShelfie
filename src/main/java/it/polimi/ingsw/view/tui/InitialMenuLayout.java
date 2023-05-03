@@ -87,6 +87,11 @@ public class InitialMenuLayout extends AppLayout {
     }
 
     @Override
+    public void beforeSwitch() {
+
+    }
+
+    @Override
     public String getName() {
         return NAME;
     }

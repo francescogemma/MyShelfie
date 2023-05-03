@@ -179,6 +179,11 @@ public class LobbyLayout extends AppLayout {
     }
 
     @Override
+    public void beforeSwitch() {
+
+    }
+
+    @Override
     public String getName() {
         return NAME;
     }

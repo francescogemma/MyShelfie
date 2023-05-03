@@ -19,7 +19,6 @@ import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.utils.Coordinate;
-import it.polimi.ingsw.view.tui.terminal.Terminal;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
@@ -290,7 +289,6 @@ public class GameLayout extends AppLayout {
                     return;
                 }
 
-                unregisterListeners();
                 switchAppLayout(AvailableGamesMenuLayout.NAME);
             } catch (DisconnectedException e) {
                 displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
@@ -453,7 +451,6 @@ public class GameLayout extends AppLayout {
             getLock().notifyAll();
 
             if (gameOver) {
-                unregisterListeners();
                 switchAppLayout(GameOverLayout.NAME);
             }
         }
@@ -780,7 +777,6 @@ public class GameLayout extends AppLayout {
 
                     getLock().notifyAll();
 
-                    unregisterListeners();
                     switchAppLayout(AvailableGamesMenuLayout.NAME);
                 }
             }
@@ -839,29 +835,32 @@ public class GameLayout extends AppLayout {
     }
 
     @Override
-    public String getName() {
-        return NAME;
+    public void beforeSwitch() {
+        if (transceiver != null) {
+            InitialGameEventData.castEventReceiver(transceiver).unregisterListener(initialGameListener);
+
+            CurrentPlayerChangedEventData.castEventReceiver(transceiver).unregisterListener(currentPlayerListener);
+
+            PersonalGoalSetEventData.castEventReceiver(transceiver).unregisterListener(personalGoalSetListener);
+
+            BoardChangedEventData.castEventReceiver(transceiver).unregisterListener(boardChangedListener);
+
+            BookshelfHasChangedEventData.castEventReceiver(transceiver).unregisterListener(bookshelfChangedListener);
+
+            CommonGoalCompletedEventData.castEventReceiver(transceiver).unregisterListener(commonGoalCompletedListener);
+
+            GameOverEventData.castEventReceiver(transceiver).unregisterListener(gameOverListener);
+
+            FirstFullBookshelfEventData.castEventReceiver(transceiver).unregisterListener(firstFullBookshelfListener);
+
+            PlayerHasDisconnectedEventData.castEventReceiver(transceiver).unregisterListener(playerDisconnectedListener);
+
+            GameHasBeenStoppedEventData.castEventReceiver(transceiver).unregisterListener(gameStoppedListener);
+        }
     }
 
-    private void unregisterListeners() {
-        InitialGameEventData.castEventReceiver(transceiver).unregisterListener(initialGameListener);
-
-        CurrentPlayerChangedEventData.castEventReceiver(transceiver).unregisterListener(currentPlayerListener);
-
-        PersonalGoalSetEventData.castEventReceiver(transceiver).unregisterListener(personalGoalSetListener);
-
-        BoardChangedEventData.castEventReceiver(transceiver).unregisterListener(boardChangedListener);
-
-        BookshelfHasChangedEventData.castEventReceiver(transceiver).unregisterListener(bookshelfChangedListener);
-
-        CommonGoalCompletedEventData.castEventReceiver(transceiver).unregisterListener(commonGoalCompletedListener);
-
-        GameOverEventData.castEventReceiver(transceiver).unregisterListener(gameOverListener);
-
-        FirstFullBookshelfEventData.castEventReceiver(transceiver).unregisterListener(firstFullBookshelfListener);
-
-        PlayerHasDisconnectedEventData.castEventReceiver(transceiver).unregisterListener(playerDisconnectedListener);
-
-        GameHasBeenStoppedEventData.castEventReceiver(transceiver).unregisterListener(gameStoppedListener);
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

@@ -58,6 +58,7 @@ public class App {
         } else {
             Optional<String> nextAppLayoutName = currentAppLayout.nextAppLayoutName();
             if (nextAppLayoutName.isPresent()) {
+                currentAppLayout.beforeSwitch();
                 currentAppLayout.setIsCurrentLayout(false);
                 if (nextAppLayoutName.get().equals(EXIT_NAME)) {
                     mustExit = true;

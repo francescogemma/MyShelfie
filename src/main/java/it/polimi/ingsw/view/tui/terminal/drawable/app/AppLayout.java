@@ -64,6 +64,7 @@ public abstract class AppLayout extends FixedLayoutDrawable<FullyResizableDrawab
     }
 
     public abstract void setup(String previousLayoutName);
+    public abstract void beforeSwitch();
 
     public abstract String getName();
 
