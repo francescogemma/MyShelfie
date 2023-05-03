@@ -27,7 +27,9 @@ public class LocalEventTransceiver implements EventTransceiver {
     @Override
     public void broadcast(EventData data) {
         synchronized (lock) {
-            for (EventListener<EventData> listener : listeners) {
+            List<EventListener<EventData>> listenersCopy = new ArrayList<>(listeners);
+
+            for (EventListener<EventData> listener : listenersCopy) {
                 listener.handle(data);
             }
         }

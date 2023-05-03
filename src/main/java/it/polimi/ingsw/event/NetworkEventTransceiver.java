@@ -13,6 +13,7 @@ import it.polimi.ingsw.model.goal.PersonalGoal;
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.utils.Logger;
+import jdk.jfr.Event;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +56,8 @@ public class NetworkEventTransceiver implements EventTransceiver {
                 }
 
                 synchronized (this.lock) {
-                    for (EventListener<EventData> listener : listeners) {
+                    List<EventListener<EventData>> listenersCopy = new ArrayList<>(listeners);
+                    for (EventListener<EventData> listener : listenersCopy) {
                         listener.handle(eventData);
                     }
                 }
@@ -65,7 +67,9 @@ public class NetworkEventTransceiver implements EventTransceiver {
 
     private void notifyDisconnection () {
         synchronized (lock) {
-            listeners
+            List<EventListener<EventData>> listenersCopy = new ArrayList<>(listeners);
+
+            listenersCopy
                     .forEach(l ->
                             l.handle(new PlayerDisconnectedInternalEventData())
                     );

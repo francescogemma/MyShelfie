@@ -40,7 +40,8 @@ public class MockNetworkEventTransceiver implements EventTransceiver {
                     for (String eventJSON : serializedEventsCopy) {
                         EventData data = gson.fromJson(eventJSON, EventData.class);
 
-                        for (EventListener<EventData> listener : listeners) {
+                        List<EventListener<EventData>> listenersCopy = new ArrayList<>(listeners);
+                        for (EventListener<EventData> listener : listenersCopy) {
                             listener.handle(data);
                         }
                     }
