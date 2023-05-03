@@ -298,6 +298,7 @@ public class TextBox extends ValueDrawable<String> {
 
     public TextBox unfocusable() {
         focusable = false;
+        onFocus = false;
 
         return this;
     }

@@ -7,6 +7,7 @@ import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
+import it.polimi.ingsw.event.receiver.EventListener;
 import it.polimi.ingsw.model.board.BoardView;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
@@ -590,6 +591,199 @@ public class GameLayout extends AppLayout {
 
     private boolean displayingPopUp = false;
 
+    private final EventListener<InitialGameEventData> initialGameListener = data -> {
+        playerNames = data.gameView().getPlayers().stream().map(Player::getUsername)
+            .toList();
+
+        try {
+            playingPlayerIndex = playerNameToIndex(data.gameView().getCurrentPlayer().getUsername());
+        } catch (IllegalFlowException e) {
+            throw new IllegalStateException("It should be always possible to retrieve playing player");
+        }
+
+        clientPlayerIndex = playerNameToIndex(appDataProvider.getString(
+            LoginMenuLayout.NAME,
+            "username"
+        ));
+
+        selectedBookshelfIndex = clientPlayerIndex;
+
+        playerPoints = new ArrayList<>(data.gameView().getPlayers().stream().map(Player::getPoints)
+            .toList());
+
+        bookshelves = new ArrayList<>(data.gameView().getPlayers().stream().map(Player::getBookshelf)
+            .toList());
+
+        commonGoals = data.gameView().getCommonGoals();
+
+        gameName = data.gameView().getName();
+
+        gameNameTextBox.text("Game: " + gameName);
+
+        populateTurnTextBox();
+
+        populateBookshelfMenu();
+        playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList());
+        populateBoard(data.gameView().getBoard());
+    };
+
+    private final EventListener<CurrentPlayerChangedEventData> currentPlayerListener = data -> {
+        playingPlayerIndex = playerNameToIndex(data.getUsername());
+        populateBoard(board);
+
+        populateTurnTextBox();
+
+        if (completedGoalTimer == null) {
+            populateBookshelfMenu();
+        }
+    };
+
+    private final EventListener<PersonalGoalSetEventData> personalGoalSetListener = data -> {
+        personalGoal = PersonalGoal.fromIndex(data.personalGoal());
+        populateGoalsMenu();
+    };
+
+    private final EventListener<BoardChangedEventData> boardChangedListener = data -> {
+        board = data.board();
+        populateBoard(board);
+    };
+
+    private final EventListener<BookshelfHasChangedEventData> bookshelfChangedListener = data -> {
+        bookshelves.set(playerNameToIndex(data.getUsername()), data.getBookshelf());
+
+        if (completedGoalTimer == null) {
+            populateBookshelfMenu();
+        }
+    };
+
+    private final EventListener<CommonGoalCompletedEventData> commonGoalCompletedListener = data -> {
+        CompletedGoal completedGoal = new CompletedGoal(CompletedGoal.GoalType.COMMON,
+            data.getCommonGoalCompleted(), data.getPlayer().getUsername(),
+            data.getPoints(), data.getBookshelfMaskSet());
+        addCompletedGoalToDisplayQueue(completedGoal);
+    };
+
+    private final EventListener<GameOverEventData> gameOverListener = data -> {
+        // Add final goal
+        for (int i = 0; i < playerNames.size(); i++) {
+            if (data.personalGoal().get(i).getKey() > 0) {
+                addCompletedGoalToDisplayQueue(new CompletedGoal(CompletedGoal.GoalType.PERSONAL,
+                    0, playerNames.get(i), data.personalGoal().get(i).getKey(),
+                    data.personalGoal().get(i).getValue()));
+            }
+
+            if (data.adjacencyGoal().get(i).getKey() > 0) {
+                addCompletedGoalToDisplayQueue(new CompletedGoal(CompletedGoal.GoalType.ADJACENCY,
+                    0, playerNames.get(i), data.adjacencyGoal().get(i).getKey(),
+                    data.adjacencyGoal().get(i).getValue()));
+            }
+        }
+
+        gameOver = true;
+    };
+
+    private final EventListener<FirstFullBookshelfEventData> firstFullBookshelfListener = data -> {
+        while (displayingPopUp) {
+            try {
+                getLock().wait();
+            } catch (InterruptedException e) {
+
+            }
+        }
+
+        displayingPopUp = true;
+
+        playerDisplayRecyclerDrawable.populate(craftPlayerDisplayListWithAdditionalPoints(
+            data.username(),
+            1
+        ));
+
+        blurrableBoard.blur(true);
+        popUpTextBox.text(data.username() + " filled\nthe bookshelf");
+        twoLayersBoard.showForeground();
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (getLock()) {
+                    playerPoints.set(playerNameToIndex(data.username()),
+                        playerPoints.get(playerNameToIndex(data.username())) + 1);
+
+                    playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList());
+
+                    blurrableBoard.blur(false);
+                    twoLayersBoard.hideForeground();
+
+                    displayingPopUp = false;
+
+                    getLock().notifyAll();
+                }
+            }
+        }, 2000);
+    };
+
+    private final EventListener<PlayerHasDisconnectedEventData> playerDisconnectedListener = data -> {
+        while (displayingPopUp) {
+            try {
+                getLock().wait();
+            } catch (InterruptedException e) {
+
+            }
+        }
+
+        displayingPopUp = true;
+
+        blurrableBoard.blur(true);
+        popUpTextBox.text(data.username() + " has\ndisconnected");
+        twoLayersBoard.showForeground();
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (getLock()) {
+                    blurrableBoard.blur(false);
+                    twoLayersBoard.hideForeground();
+
+                    displayingPopUp = false;
+
+                    getLock().notifyAll();
+                }
+            }
+        }, 2000);
+    };
+
+    private final EventListener<GameHasBeenStoppedEventData> gameStoppedListener = data -> {
+        while (displayingPopUp) {
+            try {
+                getLock().wait();
+            } catch (InterruptedException e) {
+
+            }
+        }
+
+        displayingPopUp = true;
+
+        blurrableBoard.blur(true);
+        popUpTextBox.text("Game has been\nstopped");
+        twoLayersBoard.showForeground();
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (getLock()) {
+                    blurrableBoard.blur(false);
+                    twoLayersBoard.hideForeground();
+
+                    displayingPopUp = false;
+
+                    getLock().notifyAll();
+
+                    switchAppLayout(AvailableGamesMenuLayout.NAME);
+                }
+            }
+        }, 2000);
+    };
+
     @Override
     public void setup(String previousLayoutName) {
         if (previousLayoutName.equals(LobbyLayout.NAME)) {
@@ -600,199 +794,6 @@ public class GameLayout extends AppLayout {
                 insertTileRequester = Response.requester(transceiver, transceiver, getLock());
                 pauseGameRequester = Response.requester(transceiver, transceiver, getLock());
                 playerExitGameRequester = Response.requester(transceiver, transceiver, getLock());
-
-                InitialGameEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    playerNames = data.gameView().getPlayers().stream().map(Player::getUsername)
-                        .toList();
-
-                    try {
-                        playingPlayerIndex = playerNameToIndex(data.gameView().getCurrentPlayer().getUsername());
-                    } catch (IllegalFlowException e) {
-                        throw new IllegalStateException("It should be always possible to retrieve playing player");
-                    }
-
-                    clientPlayerIndex = playerNameToIndex(appDataProvider.getString(
-                        LoginMenuLayout.NAME,
-                        "username"
-                    ));
-
-                    selectedBookshelfIndex = clientPlayerIndex;
-
-                    playerPoints = new ArrayList<>(data.gameView().getPlayers().stream().map(Player::getPoints)
-                        .toList());
-
-                    bookshelves = new ArrayList<>(data.gameView().getPlayers().stream().map(Player::getBookshelf)
-                        .toList());
-
-                    commonGoals = data.gameView().getCommonGoals();
-
-                    gameName = data.gameView().getName();
-
-                    gameNameTextBox.text("Game: " + gameName);
-
-                    populateTurnTextBox();
-
-                    populateBookshelfMenu();
-                    playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList());
-                    populateBoard(data.gameView().getBoard());
-                });
-
-                CurrentPlayerChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    playingPlayerIndex = playerNameToIndex(data.getUsername());
-                    populateBoard(board);
-
-                    populateTurnTextBox();
-
-                    if (completedGoalTimer == null) {
-                        populateBookshelfMenu();
-                    }
-                });
-
-                PersonalGoalSetEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    personalGoal = PersonalGoal.fromIndex(data.personalGoal());
-                    populateGoalsMenu();
-                });
-
-                BoardChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    board = data.board();
-                    populateBoard(board);
-                });
-
-                BookshelfHasChangedEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    bookshelves.set(playerNameToIndex(data.getUsername()), data.getBookshelf());
-
-                    if (completedGoalTimer == null) {
-                        populateBookshelfMenu();
-                    }
-                });
-
-                CommonGoalCompletedEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    CompletedGoal completedGoal = new CompletedGoal(CompletedGoal.GoalType.COMMON,
-                        data.getCommonGoalCompleted(), data.getPlayer().getUsername(),
-                        data.getPoints(), data.getBookshelfMaskSet());
-                    addCompletedGoalToDisplayQueue(completedGoal);
-                });
-
-                GameOverEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    // Add final goal
-                    for (int i = 0; i < playerNames.size(); i++) {
-                        if (data.personalGoal().get(i).getKey() > 0) {
-                            addCompletedGoalToDisplayQueue(new CompletedGoal(CompletedGoal.GoalType.PERSONAL,
-                                0, playerNames.get(i), data.personalGoal().get(i).getKey(),
-                                data.personalGoal().get(i).getValue()));
-                        }
-
-                        if (data.adjacencyGoal().get(i).getKey() > 0) {
-                            addCompletedGoalToDisplayQueue(new CompletedGoal(CompletedGoal.GoalType.ADJACENCY,
-                                0, playerNames.get(i), data.adjacencyGoal().get(i).getKey(),
-                                data.adjacencyGoal().get(i).getValue()));
-                        }
-                    }
-
-                    gameOver = true;
-                });
-
-                FirstFullBookshelfEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    while (displayingPopUp) {
-                        try {
-                            getLock().wait();
-                        } catch (InterruptedException e) {
-
-                        }
-                    }
-
-                    displayingPopUp = true;
-
-                    playerDisplayRecyclerDrawable.populate(craftPlayerDisplayListWithAdditionalPoints(
-                        data.username(),
-                        1
-                    ));
-
-                    blurrableBoard.blur(true);
-                    popUpTextBox.text(data.username() + " filled\nthe bookshelf");
-                    twoLayersBoard.showForeground();
-
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            synchronized (getLock()) {
-                                playerPoints.set(playerNameToIndex(data.username()),
-                                    playerPoints.get(playerNameToIndex(data.username())) + 1);
-
-                                playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList());
-
-                                blurrableBoard.blur(false);
-                                twoLayersBoard.hideForeground();
-
-                                displayingPopUp = false;
-
-                                getLock().notifyAll();
-                            }
-                        }
-                    }, 2000);
-                });
-
-                PlayerHasDisconnectedEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    while (displayingPopUp) {
-                        try {
-                            getLock().wait();
-                        } catch (InterruptedException e) {
-
-                        }
-                    }
-
-                    displayingPopUp = true;
-
-                    blurrableBoard.blur(true);
-                    popUpTextBox.text(data.username() + " has\ndisconnected");
-                    twoLayersBoard.showForeground();
-
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            synchronized (getLock()) {
-                                blurrableBoard.blur(false);
-                                twoLayersBoard.hideForeground();
-
-                                displayingPopUp = false;
-
-                                getLock().notifyAll();
-                            }
-                        }
-                    }, 2000);
-                });
-
-                GameHasBeenStoppedEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    while (displayingPopUp) {
-                        try {
-                            getLock().wait();
-                        } catch (InterruptedException e) {
-
-                        }
-                    }
-
-                    displayingPopUp = true;
-
-                    blurrableBoard.blur(true);
-                    popUpTextBox.text("Game has been\nstopped");
-                    twoLayersBoard.showForeground();
-
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            synchronized (getLock()) {
-                                blurrableBoard.blur(false);
-                                twoLayersBoard.hideForeground();
-
-                                displayingPopUp = false;
-
-                                getLock().notifyAll();
-
-                                switchAppLayout(AvailableGamesMenuLayout.NAME);
-                            }
-                        }
-                    }, 2000);
-                });
 
                 PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
                     transceiver = null;
@@ -808,6 +809,26 @@ public class GameLayout extends AppLayout {
                 });
             }
 
+            InitialGameEventData.castEventReceiver(transceiver).registerListener(initialGameListener);
+
+            CurrentPlayerChangedEventData.castEventReceiver(transceiver).registerListener(currentPlayerListener);
+
+            PersonalGoalSetEventData.castEventReceiver(transceiver).registerListener(personalGoalSetListener);
+
+            BoardChangedEventData.castEventReceiver(transceiver).registerListener(boardChangedListener);
+
+            BookshelfHasChangedEventData.castEventReceiver(transceiver).registerListener(bookshelfChangedListener);
+
+            CommonGoalCompletedEventData.castEventReceiver(transceiver).registerListener(commonGoalCompletedListener);
+
+            GameOverEventData.castEventReceiver(transceiver).registerListener(gameOverListener);
+
+            FirstFullBookshelfEventData.castEventReceiver(transceiver).registerListener(firstFullBookshelfListener);
+
+            PlayerHasDisconnectedEventData.castEventReceiver(transceiver).registerListener(playerDisconnectedListener);
+
+            GameHasBeenStoppedEventData.castEventReceiver(transceiver).registerListener(gameStoppedListener);
+
             gameOver = false;
 
             transceiver.broadcast(new JoinStartedGameEventData());
@@ -817,5 +838,30 @@ public class GameLayout extends AppLayout {
     @Override
     public String getName() {
         return NAME;
+    }
+
+    @Override
+    protected void switchAppLayout(String nextName) {
+        InitialGameEventData.castEventReceiver(transceiver).unregisterListener(initialGameListener);
+
+        CurrentPlayerChangedEventData.castEventReceiver(transceiver).unregisterListener(currentPlayerListener);
+
+        PersonalGoalSetEventData.castEventReceiver(transceiver).unregisterListener(personalGoalSetListener);
+
+        BoardChangedEventData.castEventReceiver(transceiver).unregisterListener(boardChangedListener);
+
+        BookshelfHasChangedEventData.castEventReceiver(transceiver).unregisterListener(bookshelfChangedListener);
+
+        CommonGoalCompletedEventData.castEventReceiver(transceiver).unregisterListener(commonGoalCompletedListener);
+
+        GameOverEventData.castEventReceiver(transceiver).unregisterListener(gameOverListener);
+
+        FirstFullBookshelfEventData.castEventReceiver(transceiver).unregisterListener(firstFullBookshelfListener);
+
+        PlayerHasDisconnectedEventData.castEventReceiver(transceiver).unregisterListener(playerDisconnectedListener);
+
+        GameHasBeenStoppedEventData.castEventReceiver(transceiver).unregisterListener(gameStoppedListener);
+
+        super.switchAppLayout(nextName);
     }
 }
