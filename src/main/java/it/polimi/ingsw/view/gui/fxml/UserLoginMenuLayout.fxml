@@ -2,47 +2,44 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="userLoginVBox"
-      prefHeight="400" prefWidth="600"
+<VBox fx:id="userLoginVBox" prefHeight="400" prefWidth="600"
       stylesheets="/UserLoginMenuStylesheet.css"
       xmlns="http://javafx.com/javafx/17.0.2-ea"
       xmlns:fx="http://javafx.com/fxml/1">
 
-   <GridPane alignment="center" VBox.vgrow="ALWAYS" minWidth="400" vgap="20">
-      <rowConstraints>
-         <RowConstraints vgrow="ALWAYS" minHeight="30" percentHeight="25" />
-         <RowConstraints vgrow="ALWAYS" minHeight="30" percentHeight="25" />
-         <RowConstraints vgrow="ALWAYS" minHeight="30" percentHeight="10" />
-      </rowConstraints>
+   <HBox fx:id="userLoginImageHBox" alignment="CENTER" VBox.vgrow="ALWAYS">
+      <ImageView fx:id="userLoginImageView"
+                 fitHeight="${userLoginImageHBox.height * 0.8}"
+                 fitWidth="${userLoginImageHBox.width * 0.8}"
+                 preserveRatio="true" >
 
-      <columnConstraints>
-         <ColumnConstraints hgrow="ALWAYS" percentWidth="75" />
-      </columnConstraints>
+         <Image url="/Publisher material/Title 2000x618px.png"/>
+      </ImageView>
+   </HBox>
 
-      <HBox VBox.vgrow="ALWAYS" GridPane.rowIndex="0">
-         <HBox fx:id="usernameBackground" alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
-            <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Username" />
-            <TextField fx:id="serverIPTextField" promptText="your username" text="" HBox.hgrow="ALWAYS" />
-            <padding>
-               <Insets left="20.0" right="20.0" />
-            </padding>
-         </HBox>
+   <HBox VBox.vgrow="ALWAYS">
+      <HBox fx:id="usernameBackground" alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+         <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Username" />
+         <TextField fx:id="usernameTextField" promptText="Username" HBox.hgrow="ALWAYS" />
+         <padding> <Insets left="20.0" right="20.0" /> </padding>
       </HBox>
+      <padding> <Insets bottom="10" left="90.0" right="90.0" top="10" /> </padding>
+   </HBox>
 
-      <HBox VBox.vgrow="ALWAYS" GridPane.rowIndex="1">
-         <HBox fx:id="passwordBackground" alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
-            <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Password" />
-            <PasswordField fx:id="serverPortTextField" promptText="********" text="" HBox.hgrow="ALWAYS" />
-            <padding>
-               <Insets left="20.0" right="20.0" />
-            </padding>
-         </HBox>
+   <HBox VBox.vgrow="ALWAYS">
+      <HBox fx:id="passwordBackground" alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+         <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Password" />
+         <PasswordField fx:id="PasswordTextField" promptText="Password" HBox.hgrow="ALWAYS" />
+         <padding> <Insets left="20.0" right="20.0" /> </padding>
       </HBox>
+      <padding> <Insets bottom="10" left="90.0" right="90.0" top="10" /> </padding>
+   </HBox>
 
-      <HBox VBox.vgrow="ALWAYS" GridPane.rowIndex="2" alignment="CENTER">
-         <Button fx:id="userLoginMenuNextButton" mnemonicParsing="false" text="Next" alignment="CENTER"/>
-      </HBox>
-   </GridPane>
+   <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+      <Button fx:id="connectionMenuNextButton" mnemonicParsing="false" text="NEXT" />
+   </HBox>
 </VBox>
