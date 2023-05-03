@@ -48,6 +48,10 @@ public abstract class AppLayout extends FixedLayoutDrawable<FullyResizableDrawab
     }
 
     protected void switchAppLayout(String nextName) {
+        if (!isCurrentLayout) {
+            throw new IllegalStateException("Trying to switch layout when you're not the current one");
+        }
+
         this.nextName = nextName;
     }
 
