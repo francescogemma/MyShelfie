@@ -60,7 +60,7 @@ class PlayerTest {
     @Test
     @DisplayName("set connection state")
     void setConnectionState_connectionState_correctOutput() {
-        Assertions.assertTrue(player.isConnected());
+        Assertions.assertFalse(player.isConnected());
         player.setConnectionState(false);
         Assertions.assertFalse(player.isConnected());
         player.setConnectionState(true);

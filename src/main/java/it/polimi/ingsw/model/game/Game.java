@@ -32,7 +32,7 @@ public class Game extends GameView {
      * */
     protected final transient List<Integer> personalGoalIndexes;
 
-    private Timer timer;
+    private transient Timer timer;
 
     private final List<PersonalGoal> personalGoals;
 
@@ -315,9 +315,6 @@ public class Game extends GameView {
             throw new IllegalFlowException("you can't start the game");
 
         Logger.writeMessage("Number of player online:"  + numberOfPlayerOnline());
-
-        if (numberOfPlayerOnline() < 2)
-            throw new IllegalFlowException("Player online can't be 1 or 0");
 
         this.isStarted = true;
 
