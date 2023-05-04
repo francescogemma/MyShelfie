@@ -242,9 +242,6 @@ public class Game extends GameView {
         broadcast(new GameHasBeenStoppedEventData());
     }
 
-    /**
-     * @return true iff there are no player connected
-     * */
     public synchronized void disconnectPlayer (String username) {
         Player player = this.getPlayer(username);
 
