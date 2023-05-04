@@ -610,6 +610,7 @@ public class GameLayout extends AppLayout {
     private Requester<Response, InsertTileEventData> insertTileRequester = null;
     private Requester<Response, PauseGameEventData> pauseGameRequester = null;
     private Requester<Response, PlayerExitGame> playerExitGameRequester = null;
+    private Requester<Response, JoinGameEventData> joinGameRequester = null;
 
     private EventReceiver<InitialGameEventData> initialGameReceiver = null;
     private EventReceiver<CurrentPlayerChangedEventData> currentPlayerChangedReceiver = null;
@@ -894,6 +895,7 @@ public class GameLayout extends AppLayout {
                 insertTileRequester = Response.requester(transceiver, transceiver, getLock());
                 pauseGameRequester = Response.requester(transceiver, transceiver, getLock());
                 playerExitGameRequester = Response.requester(transceiver, transceiver, getLock());
+                joinGameRequester = Response.requester(transceiver, transceiver, getLock());
 
                 initialGameReceiver = InitialGameEventData.castEventReceiver(transceiver);
                 currentPlayerChangedReceiver = CurrentPlayerChangedEventData.castEventReceiver(transceiver);
@@ -915,6 +917,7 @@ public class GameLayout extends AppLayout {
                     insertTileRequester = null;
                     pauseGameRequester = null;
                     playerExitGameRequester = null;
+                    joinGameRequester = null;
 
                     initialGameReceiver = null;
                     currentPlayerChangedReceiver = null;
@@ -952,8 +955,20 @@ public class GameLayout extends AppLayout {
 
             gameOver = false;
 
-            transceiver.broadcast(new JoinGameEventData(appDataProvider.getString(AvailableGamesMenuLayout.NAME,
+            Response response;
+
+            try {
+                response = joinGameRequester.request(new JoinGameEventData(appDataProvider.getString(AvailableGamesMenuLayout.NAME,
                 "selectedgame")));
+
+                displayServerResponse(response);
+
+                if (!response.isOk()) {
+                    switchAppLayout(AvailableGamesMenuLayout.NAME);
+                }
+            } catch (DisconnectedException e) {
+                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+            }
         }
     }
 
