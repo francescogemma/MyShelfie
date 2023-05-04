@@ -28,7 +28,7 @@ public class Player {
      * @throws IllegalArgumentException if the points to add are negative.
      */
     public void addPoints(int points) {
-        if(points <= 0) {
+        if(points < 0) {
             throw new IllegalArgumentException("Points to add must be positive");
         } else {
             this.points += points;
@@ -64,12 +64,12 @@ public class Player {
     /*
      * username of the player
      */
-    private String username;
+    private final String username;
 
     /*
      * bookshelf of the player
      */
-    private Bookshelf bookshelf;
+    private final Bookshelf bookshelf;
 
     /*
      * points earned so far
@@ -85,7 +85,7 @@ public class Player {
      * Indicates whether the common goal in the game has been achieved.
      * The i-th position is true if the i-th common goal has been satisfied.
      * */
-    private boolean[] achievedCommonGoals;
+    private final boolean[] achievedCommonGoals;
 
     /**
      * Create a new instance of PlayerView equals to other

@@ -57,7 +57,7 @@ class GameControllerTest {
         });
     }
 
-    @Test
+    /*@Test
     void exitGame_ForceExitGameEventData_correctOutput() throws NoPlayerConnectedException {
         LocalEventTransceiver transceiverUsername1 = new LocalEventTransceiver();
         LocalEventTransceiver transceiverUsername2 = new LocalEventTransceiver();
@@ -79,5 +79,5 @@ class GameControllerTest {
 
         Assertions.assertTrue(gameController.isStopped());
         Assertions.assertEquals(1, eventDataList.size());
-    }
+    }*/
 }

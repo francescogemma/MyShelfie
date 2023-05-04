@@ -205,16 +205,9 @@ public class GameController {
      * @throws IllegalArgumentException iff the player is not in this game.
      * */
     public void disconnect(String username) {
-        boolean shouldThrow = false;
 
         synchronized (this) {
-            if (this.game.disconnectPlayer(username)) {
-                // game has been stopped
-                shouldThrow = true;
-                assert game.isStopped();
-            } else {
-                assert !game.isStopped();
-            }
+            this.game.disconnectPlayer(username);
 
             for (int i = 0; i < clients.size(); i++) {
                 if (this.clients.get(i).getValue().equals(username)) {

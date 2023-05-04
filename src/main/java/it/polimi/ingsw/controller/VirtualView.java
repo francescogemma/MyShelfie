@@ -86,8 +86,8 @@ public class VirtualView implements EventTransmitter{
         Logger.writeMessage("user %s disconnected".formatted(username));
         MenuController.getInstance().forceDisconnect(
                 this,
-                Optional.of(gameController),
-                Optional.of(username)
+                gameController,
+                username
         );
 
         if (gameController != null)

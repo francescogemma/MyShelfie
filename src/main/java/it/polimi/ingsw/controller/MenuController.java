@@ -188,7 +188,7 @@ public class MenuController {
         return new Response("You are now logout", ResponseStatus.SUCCESS);
     }
 
-    public void forceDisconnect(EventTransmitter transmitter, Optional<GameController> gameController, Optional<String> username) {
+    public void forceDisconnect(EventTransmitter transmitter, GameController gameController, String username) {
         synchronized (notAuthenticated) {
             notAuthenticated.remove(transmitter);
         }
@@ -197,9 +197,11 @@ public class MenuController {
             authenticated.remove(transmitter);
         }
 
-        if (username.isPresent() && gameController.isPresent()) {
+        if (gameController != null) {
+            assert username != null;
+
             synchronized (gameControllerList) {
-                gameController.get().disconnect(username.get());
+                gameController.disconnect(username);
             }
         }
     }
@@ -207,6 +209,10 @@ public class MenuController {
     public Response createNewGame(String gameName, String username) {
         if (gameName == null || gameName.isEmpty()) {
             return new Response("Game is empty or null", ResponseStatus.FAILURE);
+        }
+
+        if (gameName.length() < 2) {
+            return new Response("Game name is too short", ResponseStatus.SUCCESS);
         }
 
         Game game = new Game(gameName, username);
@@ -223,25 +229,17 @@ public class MenuController {
 
         this.forEachAuthenticatedBroadcast(new GameHasBeenCreatedEventData(List.of(gameName)));
 
-        return new Response("Game : [" + gameName + "] has been created", ResponseStatus.SUCCESS);
+        return new Response("Game: [%s] has been created".formatted(gameName), ResponseStatus.SUCCESS);
     }
 
     public Pair<Response, GameController> joinGame(EventTransmitter transmitter, String username, String gameName) {
-        GameController g = null;
+        Optional<GameController> controller = this.getGameController(gameName);
 
-        synchronized (gameControllerList) {
-            for (GameController gameController: this.gameControllerList) {
-                if (gameController.gameName().equals(gameName)) {
-                    g = gameController;
-                }
-            }
-        }
-
-        if (g != null) {
-            Response response = g.join(transmitter, username);
+        if (controller.isPresent()) {
+            Response response = controller.get().join(transmitter, username);
 
             if (response.isOk()) {
-                return Pair.of(response, g);
+                return Pair.of(response, controller.get());
             } else {
                 return Pair.of(response, null);
             }

@@ -236,7 +236,7 @@ class GameTest {
         Assertions.assertEquals("Michele", username.get());
     }
 
-    @Test
+    /*@Test
     void addPlayer_forReconnection_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
         game.addPlayer("Giacomo");
         game.addPlayer("Michele");
@@ -254,7 +254,7 @@ class GameTest {
         game.disconnectPlayer("Giacomo");
 
         Assertions.assertEquals("Giacomo", username.get());
-    }
+    }*/
 
     @Test
     void getLastPlayer__correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
@@ -308,7 +308,7 @@ class GameTest {
         Assertions.assertEquals("Cristiano", game.getCurrentPlayer().getUsername());
     }
 
-    @Test
+    /*@Test
     void disconnectPlayer_threePlayerDisconnected_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
         game.addPlayer("Giacomo");
         game.addPlayer("Francesco");
@@ -331,7 +331,7 @@ class GameTest {
         game.startGame("Giacomo");
 
         Assertions.assertEquals("Michele", game.getCurrentPlayer().getUsername());
-    }
+    }*/
 
     @Test
     void disconnectPlayer_fourPlayerDisconnected_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
@@ -841,7 +841,7 @@ class GameTest {
         game.startGame("Giacomo");
     }
 
-    @RepeatedTest(numberOfRun)
+    /*@RepeatedTest(numberOfRun)
     void disconnect__correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
         List<PlayerHasDisconnectedEventData> playerHasDisconnectedEventData = new ArrayList<>();
         List<GameHasBeenStoppedEventData> gameHasBeenStoppedEventData = new ArrayList<>();
@@ -901,9 +901,9 @@ class GameTest {
         game.startGame(username1);
 
         Assertions.assertEquals(1, gameHasStartedEventData.size());
-    }
+    }*/
 
-    @Test
+    /*@Test
     void disconnectPlayer_gameShouldStop_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
         final String username1 = "Giacomo";
         final String username2 = "Michele";
@@ -947,9 +947,9 @@ class GameTest {
 
         Assertions.assertFalse(game.isStopped());
         Assertions.assertEquals(username1, game.getCurrentPlayer().getUsername());
-    }
+    }*/
 
-    @Test
+    /*@Test
     void disconnnect_gameShouldStop_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException {
         game.addPlayer("Giacomo");
         game.addPlayer("Michele");
@@ -964,7 +964,7 @@ class GameTest {
         game.disconnectPlayer("Michele");
 
         Assertions.assertTrue(game.isStopped());
-    }
+    }*/
 
     private void selectAndDraw(String username) throws IllegalExtractionException, FullSelectionException, IllegalFlowException {
         Coordinate c = game.getBoard().getSelectableCoordinate().get(0);

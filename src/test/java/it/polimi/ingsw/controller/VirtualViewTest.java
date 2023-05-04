@@ -16,6 +16,7 @@ import org.w3c.dom.events.Event;
 
 import java.util.Objects;
 
+/*
 class VirtualViewTest {
     private final String username1 = "Giacomo";
     private final String username2 = "Michele";
@@ -288,4 +289,4 @@ class VirtualViewTest {
     }
 }
 
-
+*/

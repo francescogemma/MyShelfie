@@ -65,6 +65,11 @@ public class GameView implements Identifiable {
      */
     protected boolean isStopped;
 
+    /**
+     *
+     * */
+    protected boolean isPause;
+
     /*
      * Index of the first player who completed the bookshelf
      */
@@ -97,6 +102,7 @@ public class GameView implements Identifiable {
         this.name = nameGame;
         this.bag = new Bag();
         this.board = new Board();
+        this.isPause = false;
         this.winners = new ArrayList<>();
         this.currentPlayerIndex = -1;
         this.isStarted = false;
@@ -121,11 +127,16 @@ public class GameView implements Identifiable {
         this.isStopped = other.isStopped;
         this.firstPlayerCompleteBookshelf = other.firstPlayerCompleteBookshelf;
         this.currentPlayerIndex = other.currentPlayerIndex;
+        this.isPause = other.isPause;
 
         this.commonGoals = new CommonGoal[other.commonGoals.length];
         for (int i = 0; i < other.commonGoals.length; i++) {
             this.commonGoals[i] = other.commonGoals[i];
         }
+    }
+
+    public boolean isPause() {
+        return this.isPause;
     }
 
     /**

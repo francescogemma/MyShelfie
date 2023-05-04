@@ -8,11 +8,9 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
 import it.polimi.ingsw.model.board.RemoveNotLastSelectedException;
+import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
-import it.polimi.ingsw.model.goal.AdjacencyGoal;
-import it.polimi.ingsw.model.goal.CommonGoal;
-import it.polimi.ingsw.model.goal.Goal;
-import it.polimi.ingsw.model.goal.PersonalGoal;
+import it.polimi.ingsw.model.goal.*;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Logger;
@@ -20,7 +18,9 @@ import it.polimi.ingsw.utils.Pair;
 import it.polimi.ingsw.event.data.client.StartGameEventData;
 import it.polimi.ingsw.model.board.Board;
 
+import java.awt.print.Book;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Game extends GameView {
     /**
@@ -34,7 +34,9 @@ public class Game extends GameView {
      * */
     protected final transient List<Integer> personalGoalIndexes;
 
-    private List<PersonalGoal> personalGoals;
+    private Timer timer;
+
+    private final List<PersonalGoal> personalGoals;
 
     /**
      * Creates a new game with the given name.
@@ -50,12 +52,16 @@ public class Game extends GameView {
         Collections.shuffle(this.personalGoalIndexes);
     }
 
-    public void forceStop () {
+    public synchronized void resetTimer() {
+        timer = new Timer();
+    }
+
+    public synchronized void forceStop () {
         this.isStopped = true;
         players.forEach(p -> p.setConnectionState(false));
     }
 
-    private int getIndex (String username) {
+    private synchronized int getIndex (String username) {
         for (int i = 0; i < players.size(); i++) {
             if (players.get(i).is(username))
                 return i;
@@ -69,7 +75,7 @@ public class Game extends GameView {
      * @param username The player that wants to stop the game
      * @see StartGameEventData
      * */
-    public boolean stopGame (String username) {
+    public synchronized boolean stopGame (String username) {
         String playerOnline;
 
         Logger.writeMessage("Game name: %s Prima %s".formatted(this.name, username));
@@ -106,7 +112,7 @@ public class Game extends GameView {
      * @see EventTransceiver
      * @see LocalEventTransceiver
      */
-    public void setTransceiver (EventTransmitter transceiver) {
+    public synchronized void setTransceiver (EventTransmitter transceiver) {
         assert this.transceiver == null;
 
         if (transceiver == null)
@@ -115,7 +121,7 @@ public class Game extends GameView {
         this.transceiver = transceiver;
     }
 
-    public void forceDisconnectAllPlayer() {
+    public synchronized void forceDisconnectAllPlayer() {
         for (Player player: players) {
             player.setConnectionState(false);
         }
@@ -137,16 +143,9 @@ public class Game extends GameView {
      *  </ul>
      * @return {@link Player player} added
      */
-    public Player addPlayer(String username) throws IllegalFlowException, PlayerAlreadyInGameException {
+    public synchronized Player addPlayer(String username) throws IllegalFlowException, PlayerAlreadyInGameException {
         if (username == null || username.length() == 0)
             throw new NullPointerException("username is null or has length 0");
-
-        System.out.println("Situazione attuale iniziale: ");
-        players.stream().forEach(player ->
-                System.out.print(player.getUsername() + " " + player.isConnected() + " ")
-        );
-
-        System.out.println("\n");
 
         // Allows for reconnection of disconnected players
         for (Player otherPlayer : players) {
@@ -158,17 +157,11 @@ public class Game extends GameView {
                 otherPlayer.setConnectionState(true);
                 this.transceiver.broadcast(new PlayerHasJoinEventData(otherPlayer.getUsername()));
 
-                System.out.println("Situazione attuale dopo aver riconnesso il player: ");
-                players.stream().forEach(player ->
-                    System.out.print(player.getUsername() + " " + player.isConnected() + " ")
-                );
-                System.out.println("");
-
                 return otherPlayer;
             }
         }
 
-        if (isStarted() || isStopped()) {
+        if (isStarted() || isStopped() || isPause()) {
             throw new IllegalFlowException("You can't add players when the game has already started");
         }
 
@@ -188,16 +181,16 @@ public class Game extends GameView {
         return player;
     }
 
-    private Player getPlayer (String username) {
+    private synchronized Player getPlayer (String username) {
         final int index = getIndex(username);
         return players.get(index);
     }
 
-    public boolean containPlayer (String username) {
+    public synchronized boolean containPlayer (String username) {
         return players.stream().anyMatch(p -> p.getUsername().equals(username));
     }
 
-    public void removePlayer (String username) throws IllegalFlowException {
+    public synchronized void removePlayer (String username) throws IllegalFlowException {
         if (isStarted())
             throw new IllegalFlowException("Game has already started");
 
@@ -214,7 +207,35 @@ public class Game extends GameView {
         throw new IllegalArgumentException("Player not in this game");
     }
 
-    private void setStopped () {
+    private synchronized void awardTimeWinner() {
+        if (isPause()) {
+            assert numberOfPlayerOnline() == 1;
+            Player onlyOnline = players.stream().filter(Player::isConnected).toList().get(0);
+            winners.add(onlyOnline);
+            broadcast(
+                    new GameOverEventData(
+                            winners,
+                            calculatePoints((List) personalGoals),
+                            calculatePoints(players.stream().map(p -> (Goal) new AdjacencyGoal()).toList())
+                    )
+            );
+        }
+    }
+
+    private synchronized void setPause() {
+        assert players.stream().filter(Player::isConnected).toList().size() == 1;
+        isPause = true;
+        broadcast(new GameHasBeenPauseEventData());
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                awardTimeWinner();
+            }
+        }, 10000);
+    }
+
+    private synchronized void setStopped () {
         isStopped = true;
         players.forEach(p -> p.setConnectionState(false));
         Logger.writeMessage("Game is stopped!!!");
@@ -224,12 +245,11 @@ public class Game extends GameView {
     /**
      * @return true iff there are no player connected
      * */
-    public boolean disconnectPlayer (String username) {
-        boolean res = false;
+    public synchronized void disconnectPlayer (String username) {
         Player player = this.getPlayer(username);
 
         if (player.isDisconnected()) {
-            return false;
+            return;
         }
 
         player.setConnectionState(false);
@@ -237,12 +257,13 @@ public class Game extends GameView {
         if (!isStarted() || isStopped()) {
             this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
 
-            return false;
+            return;
         }
 
-        if (numberOfPlayerOnline() < 2) {
+        if (numberOfPlayerOnline() == 1) {
+            setPause();
+        } else if (numberOfPlayerOnline() < 2) {
             setStopped();
-            res = true;
         } else if (isStarted() && (this.players.get(currentPlayerIndex).equals(player))) {
             try {
                 calculateNextPlayer();
@@ -251,14 +272,12 @@ public class Game extends GameView {
                 assert false;
             } catch (NoPlayerConnectedException e) {
                 setStopped();
-                res = true;
             }
 
             this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex)));
         }
 
         this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
-        return res;
     }
 
     /**
@@ -267,7 +286,7 @@ public class Game extends GameView {
      * @param username Name of the user who wants to start the game
      * @throws IllegalFlowException if there are less than two players.
      */
-    public void startGame(String username) throws IllegalFlowException {
+    public synchronized void startGame(String username) throws IllegalFlowException {
         if (players.size() < 2)
             throw new IllegalFlowException("You need at least two players in order to start the game");
 
@@ -281,7 +300,9 @@ public class Game extends GameView {
 
         this.isStarted = true;
 
-        if (isStopped()) {
+        if (isPause()) {
+            broadcast(new GameHasResumeEventData());
+        } else if (isStopped()) {
             isStopped = false;
             if (players.get(currentPlayerIndex).isDisconnected()) {
                 try {
@@ -295,6 +316,7 @@ public class Game extends GameView {
             this.commonGoals = CommonGoal.getTwoRandomCommonGoals(players.size());
         }
 
+        this.isPause = false;
         this.isStopped = false;
 
         this.refillBoardIfNecessary();
@@ -311,8 +333,8 @@ public class Game extends GameView {
      * @throws RemoveNotLastSelectedException iff you can't deselect coordinate
      * @throws IllegalArgumentException iff coordinate is not selected
      */
-    public void forgetLastSelection(String username, Coordinate coordinate) throws IllegalFlowException {
-        if (!isStarted() || isStopped()) throw new IllegalFlowException("Game is not started or is stopped");
+    public synchronized void forgetLastSelection(String username, Coordinate coordinate) throws IllegalFlowException {
+        if (!isStarted() || isStopped() || isPause()) throw new IllegalFlowException("Game is not started or is stopped");
         if (isOver()) throw new IllegalFlowException("Game has ended");
         if (!players.get(currentPlayerIndex).getUsername().equals(username)) throw new IllegalFlowException("It's not your turn");
 
@@ -321,7 +343,7 @@ public class Game extends GameView {
         this.transceiver.broadcast(new PlayerHasDeselectTile(coordinate));
     }
 
-    private void refillBoardIfNecessary () {
+    private synchronized void refillBoardIfNecessary () {
         if (!this.board.needsRefill())
             return;
 
@@ -344,11 +366,11 @@ public class Game extends GameView {
         }
     }
 
-    private void broadcast(EventData eventData) {
+    private synchronized void broadcast(EventData eventData) {
         this.transceiver.broadcast(eventData);
     }
 
-    private boolean isLastPlayerSelected() throws NoPlayerConnectedException {
+    private synchronized boolean isLastPlayerSelected() throws NoPlayerConnectedException {
         Player lastConnected = null;
 
         for (Player player : players) {
@@ -362,10 +384,26 @@ public class Game extends GameView {
         return players.get(currentPlayerIndex).equals(lastConnected);
     }
 
+    private List<Pair<Integer, BookshelfMaskSet>> calculatePoints(List<Goal> goals) {
+        List<Pair<Integer, BookshelfMaskSet>> res = new ArrayList<>();
+        assert goals.size() == players.size();
+
+        for (int i = 0; i < players.size(); i++) {
+            Bookshelf bookshelf = players.get(i).getBookshelf();
+            final int points = goals.get(i).calculatePoints(bookshelf);
+
+            res.add(new Pair<>(points, points > 0 ? goals.get(i).getPointMasks() : null));
+
+            players.get(i).addPoints(points);
+        }
+
+        return res;
+    }
+
     /*
      * @throws NoPlayerConnectedException iff there are no other connected players besides the current one.
      * */
-    private void calculateNextPlayer() throws IllegalFlowException, NoPlayerConnectedException {
+    private synchronized void calculateNextPlayer() throws IllegalFlowException, NoPlayerConnectedException {
         assert this.players.size() >= 2 && this.players.size() <= 4;
         assert this.isStarted() && !isStopped();
         assert currentPlayerIndex >=  0 && currentPlayerIndex < players.size();
@@ -374,28 +412,8 @@ public class Game extends GameView {
 
         if (atLeastOneBookshelfIsFull() && isLastPlayerSelected()) {
             // Game ending logic:
-            List<Pair<Integer, BookshelfMaskSet>> pointsAchievePersonal = new ArrayList<>();
-            List<Pair<Integer, BookshelfMaskSet>> pointsAchieveAdjacency = new ArrayList<>();
-
-            for (int i = 0; i < players.size(); i++) {
-                final Player player = players.get(i);
-                final PersonalGoal personalGoal = personalGoals.get(i);
-
-                final int personalGoalPoints = personalGoal.calculatePoints(player.getBookshelf());
-
-                if (personalGoalPoints > 0) {
-                    pointsAchievePersonal.add(new Pair<>(personalGoalPoints, personalGoal.getPointMasks()));
-                    player.addPoints(personalGoalPoints);
-                } else pointsAchievePersonal.add(new Pair<>(0, null));
-
-                Goal adjacencyGoal = new AdjacencyGoal();
-                int adjacencyGoalPoints = adjacencyGoal.calculatePoints(player.getBookshelf());
-
-                if (adjacencyGoalPoints > 0) {
-                    pointsAchieveAdjacency.add(new Pair<>(adjacencyGoalPoints, adjacencyGoal.getPointMasks()));
-                    player.addPoints(adjacencyGoalPoints);
-                } else pointsAchieveAdjacency.add(new Pair<>(0, null));
-            }
+            List<Pair<Integer, BookshelfMaskSet>> pointsAchievePersonal = calculatePoints((List) this.personalGoals);
+            List<Pair<Integer, BookshelfMaskSet>> pointsAchieveAdjacency = calculatePoints(this.players.stream().map(p -> (Goal) new AdjacencyGoal()).toList());
 
             for (Player player : players) {
                 int max = this.winners.isEmpty() ? 0 : winners.get(0).getPoints();
@@ -459,10 +477,10 @@ public class Game extends GameView {
      *
      * @see Board
      * */
-    public void insertTile (String username, int col) throws IllegalFlowException, IllegalExtractionException {
+    public synchronized void insertTile (String username, int col) throws IllegalFlowException, IllegalExtractionException {
         final Player player = getPlayer(username);
 
-        if (isStopped())
+        if (isStopped() || isPause())
             throw new IllegalFlowException("Game is stopped");
 
         if (!this.players.get(currentPlayerIndex).equals(player))
@@ -530,7 +548,7 @@ public class Game extends GameView {
      * @return Index the player's personal goal
      * @throws IllegalArgumentException iff username is not in this game.
      * */
-    public int getPersonalGoal(String username) {
+    public synchronized int getPersonalGoal(String username) {
         for (int i = 0; i < players.size(); i++){
             final Player player = this.players.get(i);
             final PersonalGoal personalGoal = this.personalGoals.get(i);
@@ -550,8 +568,8 @@ public class Game extends GameView {
      *
      * @see Board
      */
-    public void selectTile (String username, Coordinate coordinate) throws IllegalFlowException, IllegalExtractionException, FullSelectionException {
-        if (!this.isStarted() || isStopped())
+    public synchronized void selectTile (String username, Coordinate coordinate) throws IllegalFlowException, IllegalExtractionException, FullSelectionException {
+        if (!this.isStarted() || isStopped() || isPause())
             throw new IllegalFlowException("Game is not started");
         if (isOver())
             throw new IllegalFlowException("Game is over");

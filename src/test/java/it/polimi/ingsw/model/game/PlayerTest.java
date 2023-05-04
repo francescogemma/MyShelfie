@@ -37,12 +37,6 @@ class PlayerTest {
     }
 
     @Test
-    @DisplayName("Add zero points to the player")
-    void addPoints_zeroPoints_exceptionThrown() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> player.addPoints(0));
-    }
-
-    @Test
     @DisplayName("Get 0 points from the player at the beginning")
     void getPoints_zeroPointsAtTheBeginning_zeroPoints() {
         Assertions.assertEquals(0, player.getPoints());
