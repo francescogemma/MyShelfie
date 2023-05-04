@@ -25,7 +25,7 @@ public class GuiApplication extends Application {
         primaryStage.setTitle("My Shelfie");
         primaryStage.getIcons().add(new Image("/Publisher material/Icon 50x50px.png"));
         primaryStage.setScene(scene);
-        primaryStage.setMaximized(true);
+        primaryStage.setFullScreen(true);
 
         primaryStage.show();
     }

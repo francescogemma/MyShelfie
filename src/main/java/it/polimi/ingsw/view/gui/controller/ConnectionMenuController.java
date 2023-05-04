@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.gui.controller;
 
 import it.polimi.ingsw.view.gui.LoaderException;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -43,5 +44,10 @@ public class ConnectionMenuController {
             throw new LoaderException("couldn't load resource", e);
         }
         connectionMenuNextButton.getScene().setRoot(nextMenu);
+    }
+
+    @FXML
+    private void exit() {
+        Platform.exit();
     }
 }

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.gui.controller;
 
 import it.polimi.ingsw.view.gui.LoaderException;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -31,5 +32,10 @@ public class UserLoginMenuController {
         loggedUsernameLabel.setText(usernameTextField.getText());
 
         userLoginNextButton.getScene().setRoot(nextMenu);
+    }
+
+    @FXML
+    private void exit() {
+        Platform.exit();
     }
 }

@@ -41,6 +41,10 @@
    </HBox>
 
    <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+      <Region HBox.hgrow="ALWAYS"/>
       <Button fx:id="userLoginNextButton" mnemonicParsing="false" text="NEXT" onAction="#switchLayout"/>
+      <Region HBox.hgrow="ALWAYS"/>
+      <Button mnemonicParsing="false" text="EXIT" onAction="#exit"/>
+      <Region HBox.hgrow="ALWAYS"/>
    </HBox>
 </VBox>

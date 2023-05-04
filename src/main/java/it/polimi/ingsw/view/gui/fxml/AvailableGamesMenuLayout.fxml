@@ -1,39 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<?import javafx.geometry.Insets?>
 <VBox fx:id="availableGamesVBox"
-      fx:controller="it.polimi.ingsw.view.gui.controller.AvailableGamesMenuController"
       maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
       stylesheets="/AvailableGamesMenuStylesheet.css"
-      xmlns="http://javafx.com/javafx/17.0.2-ea"
-      xmlns:fx="http://javafx.com/fxml/1">
+      xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.polimi.ingsw.view.gui.controller.AvailableGamesMenuController">
 
-    <HBox VBox.vgrow="ALWAYS" alignment="CENTER">
+    <HBox>
+        <padding>
+            <Insets bottom="10" left="10" right="10" top="10" />
+        </padding>
         <Label text="Logged in as: " />
         <Label fx:id="loggedUsername" />
     </HBox>
 
     <HBox fx:id="availableGamesListHBox" VBox.vgrow="ALWAYS">
         <padding>
-            <Insets bottom="10" left="50" right="50" top="10"/>
+            <Insets bottom="10" left="90" right="90" top="10" />
         </padding>
         <ScrollPane fitToHeight="true" fitToWidth="true" HBox.hgrow="ALWAYS">
             <AnchorPane>
-                <VBox fx:id="availableGamesList" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                      AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" spacing="10"/>
+                <VBox fx:id="availableGamesList" spacing="10" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <padding>
+                        <Insets bottom="10" left="20" right="20" top="10" />
+                    </padding>
+                </VBox>
             </AnchorPane>
         </ScrollPane>
     </HBox>
 
-    <HBox VBox.vgrow="ALWAYS" alignment="CENTER" spacing="10">
+    <HBox alignment="CENTER" spacing="10">
         <padding>
-            <Insets left="20" right="20"/>
+            <Insets bottom="10" left="20" right="20" top="10" />
         </padding>
-        <Button fx:id="backToLoginButton" mnemonicParsing="false" text="BACK TO LOGIN" onAction="#backToLogin"/>
-        <TextField fx:id="gameNameTextField" promptText="Game name" HBox.hgrow="ALWAYS"/>
-        <Button fx:id="createNewGameButton" mnemonicParsing="false" text="CREATE NEW GAME"/>
+        <Button mnemonicParsing="false" text="EXIT" onAction="#exit"/>
+        <Button fx:id="backToLoginButton" mnemonicParsing="false" onAction="#backToLogin" text="BACK TO LOGIN" />
+        <TextField fx:id="gameNameTextField" promptText="Game name" HBox.hgrow="ALWAYS" />
+        <Button fx:id="createNewGameButton" mnemonicParsing="false" text="CREATE NEW GAME" />
     </HBox>
 </VBox>
