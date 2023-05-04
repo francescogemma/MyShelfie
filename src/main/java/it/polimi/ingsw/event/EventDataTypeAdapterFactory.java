@@ -30,9 +30,9 @@ public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
             Map.entry(CurrentPlayerChangedEventData.ID, CurrentPlayerChangedEventData.class),
             Map.entry(GameHasStartedEventData.ID, GameHasStartedEventData.class),
             Map.entry(PlayerHasDisconnectedEventData.ID, PlayerHasDisconnectedEventData.class),
-            Map.entry(PlayerHasJoinEventData.ID, PlayerHasJoinEventData.class),
+            Map.entry(PlayerHasJoinGameEventData.ID, PlayerHasJoinGameEventData.class),
             Map.entry(Response.ID, Response.class),
-            Map.entry(JoinGameEventData.ID, JoinGameEventData.class),
+            Map.entry(JoinLobbyEventData.ID, JoinLobbyEventData.class),
             Map.entry(GameIsNoLongerAvailableEventData.ID, GameIsNoLongerAvailableEventData.class),
             Map.entry(StartGameEventData.ID, StartGameEventData.class),
             Map.entry(CreateNewGameEventData.ID, CreateNewGameEventData.class),
@@ -42,7 +42,7 @@ public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
             Map.entry(GameHasBeenCreatedEventData.ID, GameHasBeenCreatedEventData.class),
             Map.entry(PlayerHasJoinMenu.ID, PlayerHasJoinMenu.class),
             Map.entry(InitialGameEventData.ID, InitialGameEventData.class),
-            Map.entry(JoinStartedGameEventData.ID, JoinStartedGameEventData.class),
+            Map.entry(JoinGameEventData.ID, JoinGameEventData.class),
             Map.entry(PlayerHasDeselectTile.ID, PlayerHasDeselectTile.class),
             Map.entry(BookshelfHasChangedEventData.ID, BookshelfHasChangedEventData.class),
             Map.entry(PersonalGoalSetEventData.ID, PersonalGoalSetEventData.class),
@@ -54,7 +54,11 @@ public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
             Map.entry(LogoutEventData.ID, LogoutEventData.class),
             Map.entry(ForceExitGameEventData.ID, ForceExitGameEventData.class),
             Map.entry(GameHasBeenPauseEventData.ID, GameHasBeenPauseEventData.class),
-            Map.entry(GameHasResumeEventData.ID, GameHasResumeEventData.class)
+            Map.entry(GameHasResumeEventData.ID, GameHasResumeEventData.class),
+            Map.entry(ExitLobbyEventData.ID, ExitLobbyEventData.class),
+            Map.entry(PlayerHasExitLobbyEventData.ID, PlayerHasExitLobbyEventData.class),
+            Map.entry(PlayerHasJoinLobbyEventData.ID, PlayerHasJoinLobbyEventData.class),
+            Map.entry(RestartGameEventData.ID, RestartGameEventData.class)
     );
 
     private static final Map<String, Type> WRAPPER_DATA_TYPES = Map.of(

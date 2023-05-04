@@ -18,9 +18,7 @@ import it.polimi.ingsw.utils.Pair;
 import it.polimi.ingsw.event.data.client.StartGameEventData;
 import it.polimi.ingsw.model.board.Board;
 
-import java.awt.print.Book;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Game extends GameView {
     /**
@@ -92,7 +90,9 @@ public class Game extends GameView {
             }
         } catch (NoPlayerConnectedException ignored) {
             // there is no player except [username]
-            playerOnline = username;
+            Logger.writeCritical("This exception should not be throw");
+            assert false;
+            return false;
         }
 
         if (username.equals(playerOnline)) {
@@ -121,16 +121,9 @@ public class Game extends GameView {
         this.transceiver = transceiver;
     }
 
-    public synchronized void forceDisconnectAllPlayer() {
-        for (Player player: players) {
-            player.setConnectionState(false);
-        }
-    }
-
     /**
      * Adds a player to the game with the given username or reconnects that player.
      * @param username the username of the player to add
-     * @throws PlayerAlreadyInGameException if the player is already in the game
      * @throws NullPointerException
      *  <ul>
      *      <li> username is null </li>
@@ -143,25 +136,11 @@ public class Game extends GameView {
      *  </ul>
      * @return {@link Player player} added
      */
-    public synchronized Player addPlayer(String username) throws IllegalFlowException, PlayerAlreadyInGameException {
+    public synchronized Player addPlayer(String username) throws IllegalFlowException {
         if (username == null || username.length() == 0)
             throw new NullPointerException("username is null or has length 0");
 
-        // Allows for reconnection of disconnected players
-        for (Player otherPlayer : players) {
-            if (otherPlayer.is(username)) {
-                if (otherPlayer.isConnected()) {
-                    throw new PlayerAlreadyInGameException(username);
-                }
-
-                otherPlayer.setConnectionState(true);
-                this.transceiver.broadcast(new PlayerHasJoinEventData(otherPlayer.getUsername()));
-
-                return otherPlayer;
-            }
-        }
-
-        if (isStarted() || isStopped() || isPause()) {
+        if (isStarted()) {
             throw new IllegalFlowException("You can't add players when the game has already started");
         }
 
@@ -171,12 +150,13 @@ public class Game extends GameView {
 
         Player player = new Player(username);
 
-        this.personalGoals.add(PersonalGoal.fromIndex(personalGoalIndexes.get(0)));
-        this.personalGoalIndexes.remove(0);
+        this.personalGoals.add(
+                PersonalGoal.fromIndex(
+                        personalGoalIndexes.remove(0)
+                )
+        );
 
         super.players.add(player);
-
-        this.transceiver.broadcast(new PlayerHasJoinEventData(username));
 
         return player;
     }
@@ -199,7 +179,8 @@ public class Game extends GameView {
                 personalGoalIndexes.add(personalGoals.get(i).getIndex());
                 personalGoals.remove(i);
                 players.remove(i);
-                broadcast(new PlayerHasDisconnectedEventData(username));
+
+                Collections.shuffle(personalGoalIndexes);
                 return;
             }
         }
@@ -208,18 +189,19 @@ public class Game extends GameView {
     }
 
     private synchronized void awardTimeWinner() {
-        if (isPause()) {
-            assert numberOfPlayerOnline() == 1;
-            Player onlyOnline = players.stream().filter(Player::isConnected).toList().get(0);
-            winners.add(onlyOnline);
-            broadcast(
-                    new GameOverEventData(
-                            winners,
-                            calculatePoints((List) personalGoals),
-                            calculatePoints(players.stream().map(p -> (Goal) new AdjacencyGoal()).toList())
-                    )
-            );
-        }
+        assert isPause();
+        assert numberOfPlayerOnline() == 1;
+
+        Player onlyOnline = players.stream().filter(Player::isConnected).toList().get(0);
+        winners.add(onlyOnline);
+        broadcast(
+                new GameOverEventData(
+                        winners,
+                        players,
+                        calculatePoints((List) personalGoals),
+                        calculatePoints(players.stream().map(p -> (Goal) new AdjacencyGoal()).toList())
+                )
+        );
     }
 
     private synchronized void setPause() {
@@ -227,7 +209,8 @@ public class Game extends GameView {
         isPause = true;
         broadcast(new GameHasBeenPauseEventData());
 
-        new Timer().schedule(new TimerTask() {
+        this.timer = new Timer();
+        this.timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 awardTimeWinner();
@@ -236,17 +219,23 @@ public class Game extends GameView {
     }
 
     private synchronized void setStopped () {
-        isStopped = true;
-        players.forEach(p -> p.setConnectionState(false));
+        // isStopped = true;
+        // players.forEach(p -> p.setConnectionState(false));
+        forceStop();
+
+        if (timer != null)
+            this.timer.cancel();
+        timer = null;
+
         Logger.writeMessage("Game is stopped!!!");
         broadcast(new GameHasBeenStoppedEventData());
     }
 
-    public synchronized void disconnectPlayer (String username) {
+    public synchronized void disconnectPlayer (String username) throws IllegalFlowException {
         Player player = this.getPlayer(username);
 
         if (player.isDisconnected()) {
-            return;
+            throw new IllegalFlowException("player already disconnected");
         }
 
         player.setConnectionState(false);
@@ -267,14 +256,53 @@ public class Game extends GameView {
             } catch (IllegalFlowException e) {
                 Logger.writeCritical("This function should not be throw IllegalFlowException");
                 assert false;
-            } catch (NoPlayerConnectedException e) {
-                setStopped();
             }
 
             this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex)));
         }
 
         this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
+    }
+
+    public synchronized void restartGame(String username) throws IllegalFlowException {
+        if (!this.creator.equals(username))
+            throw new IllegalFlowException("Game can't be restart");
+
+        isStopped = false;
+        broadcast(new GameHasStartedEventData());
+    }
+
+    public synchronized void connectPlayer(String username) throws PlayerAlreadyInGameException, IllegalFlowException {
+        // Allows for reconnection of disconnected players
+        if (isStopped()) {
+            Logger.writeWarning("View ask to reconnect while stopped");
+            throw new IllegalFlowException("Game is stopped you need to restart it!");
+        }
+
+        for (Player otherPlayer : players) {
+            if (otherPlayer.is(username)) {
+                if (otherPlayer.isConnected()) {
+                    throw new PlayerAlreadyInGameException(username);
+                }
+
+                otherPlayer.setConnectionState(true);
+                this.transceiver.broadcast(new PlayerHasJoinGameEventData(otherPlayer.getUsername()));
+
+                if (numberOfPlayerOnline() == 0) {
+                    setPause();
+                } else if (isPause()) {
+                    assert timer != null;
+                    assert numberOfPlayerOnline() == 2;
+
+                    this.isPause = false;
+                    timer.cancel();
+                    timer = null;
+                }
+
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Player not in this game...");
     }
 
     /**
@@ -284,6 +312,9 @@ public class Game extends GameView {
      * @throws IllegalFlowException if there are less than two players.
      */
     public synchronized void startGame(String username) throws IllegalFlowException {
+        if (isStarted())
+            throw new IllegalFlowException("Game already started...");
+
         if (players.size() < 2)
             throw new IllegalFlowException("You need at least two players in order to start the game");
 
@@ -297,27 +328,11 @@ public class Game extends GameView {
 
         this.isStarted = true;
 
-        if (isPause()) {
-            broadcast(new GameHasResumeEventData());
-        } else if (isStopped()) {
-            isStopped = false;
-            if (players.get(currentPlayerIndex).isDisconnected()) {
-                try {
-                    calculateNextPlayer();
-                } catch (IllegalFlowException | NoPlayerConnectedException e) {
-                    Logger.writeCritical("This method should not fail here");
-                }
-            }
-        } else {
-            this.currentPlayerIndex = FIRST_PLAYER_INDEX;
-            this.commonGoals = CommonGoal.getTwoRandomCommonGoals(players.size());
-        }
+        this.currentPlayerIndex = FIRST_PLAYER_INDEX;
+        this.commonGoals = CommonGoal.getTwoRandomCommonGoals(players.size());
 
-        this.isPause = false;
-        this.isStopped = false;
 
         this.refillBoardIfNecessary();
-        this.transceiver.broadcast(new GameHasStartedEventData());
     }
 
     /**
@@ -367,7 +382,7 @@ public class Game extends GameView {
         this.transceiver.broadcast(eventData);
     }
 
-    private synchronized boolean isLastPlayerSelected() throws NoPlayerConnectedException {
+    private synchronized boolean isLastPlayerSelected() {
         Player lastConnected = null;
 
         for (Player player : players) {
@@ -375,8 +390,7 @@ public class Game extends GameView {
                 lastConnected = player;
         }
 
-        if (lastConnected == null)
-            throw new NoPlayerConnectedException();
+        assert lastConnected != null: "isLastPlayerSelected fail";
 
         return players.get(currentPlayerIndex).equals(lastConnected);
     }
@@ -400,12 +414,10 @@ public class Game extends GameView {
     /*
      * @throws NoPlayerConnectedException iff there are no other connected players besides the current one.
      * */
-    private synchronized void calculateNextPlayer() throws IllegalFlowException, NoPlayerConnectedException {
+    private synchronized void calculateNextPlayer() throws IllegalFlowException {
         assert this.players.size() >= 2 && this.players.size() <= 4;
-        assert this.isStarted() && !isStopped();
+        assert this.isStarted() && !isStopped() && !isPause();
         assert currentPlayerIndex >=  0 && currentPlayerIndex < players.size();
-
-        refillBoardIfNecessary();
 
         if (atLeastOneBookshelfIsFull() && isLastPlayerSelected()) {
             // Game ending logic:
@@ -426,6 +438,7 @@ public class Game extends GameView {
             broadcast(
                     new GameOverEventData(
                             this.getWinners(),
+                            players,
                             pointsAchievePersonal,
                             pointsAchieveAdjacency
                     )
@@ -438,18 +451,8 @@ public class Game extends GameView {
             try {
                 index = getNextPlayerOnline(this.currentPlayerIndex);
             } catch (NoPlayerConnectedException e) {
-                // there are no players connected
-                this.currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-
-                // we need to notify internally that game is stopped
-                this.isStopped = true;
-
-                throw e;
-            }
-
-            if (players.get(index).equals(players.get(currentPlayerIndex))) {
-                // there is only one player connected
-                index = (currentPlayerIndex + 1) % players.size();
+                Logger.writeCritical("Call");
+                throw new IllegalStateException("No player connected");
             }
 
             // set new turn
@@ -477,8 +480,11 @@ public class Game extends GameView {
     public synchronized void insertTile (String username, int col) throws IllegalFlowException, IllegalExtractionException {
         final Player player = getPlayer(username);
 
-        if (isStopped() || isPause())
-            throw new IllegalFlowException("Game is stopped");
+        if (!isStarted() || isStopped() || isPause())
+            throw new IllegalFlowException("Game is stopped or pause");
+
+        if (isOver())
+            throw new IllegalFlowException("Game is over!");
 
         if (!this.players.get(currentPlayerIndex).equals(player))
             throw new IllegalFlowException();
@@ -525,19 +531,7 @@ public class Game extends GameView {
             broadcast(new FirstFullBookshelfEventData(player.getUsername()));
         }
 
-        /**
-         * In theory, this method should be called with at least 2 players online,
-         * so the method calculateNextPlayer() should never fail.
-         * This is because if the disconnection of the second-to-last player online occurs,
-         * the game will automatically stop.
-         */
-        try {
-            this.calculateNextPlayer();
-        } catch (NoPlayerConnectedException e) {
-            // there is no other player online, we need to stop this game.
-            Logger.writeCritical("calculateNextPlayer failed.");
-            assert false: "check log";
-        }
+        this.calculateNextPlayer();
     }
 
     /**
@@ -566,7 +560,7 @@ public class Game extends GameView {
      * @see Board
      */
     public synchronized void selectTile (String username, Coordinate coordinate) throws IllegalFlowException, IllegalExtractionException, FullSelectionException {
-        if (!this.isStarted() || isStopped() || isPause())
+        if (!isStarted() || isStopped() || isPause())
             throw new IllegalFlowException("Game is not started");
         if (isOver())
             throw new IllegalFlowException("Game is over");

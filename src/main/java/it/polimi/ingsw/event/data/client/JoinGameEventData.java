@@ -9,8 +9,12 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
-public record JoinGameEventData(String gameName) implements EventData {
+public class JoinGameEventData implements EventData {
     public static final String ID = "JOIN_GAME";
+
+    public JoinGameEventData() {
+
+    }
 
     public static CastEventReceiver<JoinGameEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);

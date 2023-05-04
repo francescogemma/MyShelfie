@@ -16,9 +16,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.Execution;
 
-import java.awt.print.Book;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -218,7 +216,7 @@ class GameTest {
         AtomicBoolean called = new AtomicBoolean(false);
         AtomicReference<String> username = new AtomicReference<>("");
 
-        PlayerHasJoinEventData.castEventReceiver(transceiver).registerListener(
+        PlayerHasJoinGameEventData.castEventReceiver(transceiver).registerListener(
                 event -> {
                     assert !called.get();
                     called.set(true);
@@ -456,8 +454,8 @@ class GameTest {
     @Test
     void addPlayer_signalsEmitted_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
         transceiver.registerListener(event -> {
-            Assertions.assertEquals(PlayerHasJoinEventData.ID, event.getId());
-            Assertions.assertEquals("Giacomo", ((PlayerHasJoinEventData) event).username());
+            Assertions.assertEquals(PlayerHasJoinGameEventData.ID, event.getId());
+            Assertions.assertEquals("Giacomo", ((PlayerHasJoinGameEventData) event).username());
         });
 
         game.addPlayer("Giacomo");
@@ -472,8 +470,8 @@ class GameTest {
 
         transceiver.registerListener(event -> {
             if (set.get()) {
-                Assertions.assertEquals(PlayerHasJoinEventData.ID, event.getId());
-                Assertions.assertEquals("Giacomo", ((PlayerHasJoinEventData) event).username());
+                Assertions.assertEquals(PlayerHasJoinGameEventData.ID, event.getId());
+                Assertions.assertEquals("Giacomo", ((PlayerHasJoinGameEventData) event).username());
             }
         });
 

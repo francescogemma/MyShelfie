@@ -68,8 +68,8 @@ class VirtualViewTest {
     }
 
     private void joinGame(VirtualView view, EventTransceiver transceiver, String gameName) throws DisconnectedException {
-        Requester<Response, JoinGameEventData> responseJoinGameResponse = Response.requester(transceiver, transceiver, new Object());
-        Assertions.assertTrue(responseJoinGameResponse.request(new JoinGameEventData(gameName)).isOk());
+        Requester<Response, JoinLobbyEventData> responseJoinGameResponse = Response.requester(transceiver, transceiver, new Object());
+        Assertions.assertTrue(responseJoinGameResponse.request(new JoinLobbyEventData(gameName)).isOk());
         synchronized (view) {
             Assertions.assertTrue(view.isAuthenticated());
             Assertions.assertTrue(view.isInGame());
@@ -138,8 +138,8 @@ class VirtualViewTest {
         }
 
         // richiedo di entrare in partita per virtualView1
-        Requester<Response, JoinGameEventData> responseJoinGameResponse = Response.requester(transceiver1, transceiver1, new Object());
-        Assertions.assertTrue(responseJoinGameResponse.request(new JoinGameEventData("Prova")).isOk());
+        Requester<Response, JoinLobbyEventData> responseJoinGameResponse = Response.requester(transceiver1, transceiver1, new Object());
+        Assertions.assertTrue(responseJoinGameResponse.request(new JoinLobbyEventData("Prova")).isOk());
         synchronized (virtualView1) {
             Assertions.assertTrue(virtualView1.isAuthenticated());
             Assertions.assertTrue(virtualView1.isInGame());
@@ -147,7 +147,7 @@ class VirtualViewTest {
 
         // richiedo di entrare in partita per virtualView2
         responseJoinGameResponse = Response.requester(transceiver2, transceiver2, new Object());
-        Assertions.assertTrue(responseJoinGameResponse.request(new JoinGameEventData("Prova")).isOk());
+        Assertions.assertTrue(responseJoinGameResponse.request(new JoinLobbyEventData("Prova")).isOk());
         synchronized (virtualView1) {
             Assertions.assertTrue(virtualView1.isAuthenticated());
             Assertions.assertTrue(virtualView1.isInGame());

@@ -6,18 +6,22 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
-import it.polimi.ingsw.utils.Logger;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
 public class GameHasBeenCreatedEventData implements EventData {
-    private final List<String> games;
+    private final List<AvailableGame> games;
     public static final String ID = "GAME_HAS_BEEN_CREATED";
 
-    public GameHasBeenCreatedEventData(List<String> games) {
-        this.games = new ArrayList<>(games);
+    public record AvailableGame(String owner, String name, boolean isStarted, boolean isPause, boolean isStopped,
+                                int numberOfPlayerInLobby, int numberOfPlayerOnline) {
+    }
+
+    public GameHasBeenCreatedEventData(List<AvailableGame> games) {
+        this.games = Collections.unmodifiableList(games);
     }
 
     public static CastEventReceiver<GameHasBeenCreatedEventData> castEventReceiver(EventReceiver<EventData> receiver) {
@@ -36,8 +40,8 @@ public class GameHasBeenCreatedEventData implements EventData {
         return new Responder<>(ID, transmitter, receiver, response);
     }
 
-    public List<String> getNames () {
-        return new ArrayList<>(games);
+    public List<AvailableGame> getNames () {
+        return games;
     }
 
     @Override

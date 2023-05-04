@@ -25,14 +25,12 @@ public class VirtualView implements EventTransmitter{
     private static final Response DEFAULT_MESSAGE_NOT_AUTHENTICATED = new Response("You are not login", ResponseStatus.FAILURE);
     private static final Response DEFAULT_MESSAGE_ALREADY_IN_GAME = new Response("You are in a game...", ResponseStatus.FAILURE);
     private static final Response DEFAULT_MESSAGE_NOT_IN_GAME = new Response("You are not in a game...", ResponseStatus.FAILURE);
+    private static final Response DEFAULT_IN_LOBBY = new Response("You are in lobby...", ResponseStatus.FAILURE);
+    private static final Response DEFAULT_NOT_IN_LOBBY = new Response("You are not in lobby...", ResponseStatus.FAILURE);
 
     private CastEventReceiver<ForceExitGameEventData> castEventReceiver = null;
 
     private final EventListener<ForceExitGameEventData> listener = (event -> {
-        if (event.getUsername().equals(username)) {
-            return;
-        }
-
         synchronized (this) {
             this.gameController = null;
         }
@@ -51,21 +49,49 @@ public class VirtualView implements EventTransmitter{
         SelectTileEventData     .responder(transceiver, transceiver, this::selectTile);
         DeselectTileEventData   .responder(transceiver, transceiver, this::deselectTile);
         JoinGameEventData       .responder(transceiver, transceiver, this::joinGame);
+        RestartGameEventData    .responder(transceiver, transceiver, this::restartGame);
+        JoinLobbyEventData      .responder(transceiver, transceiver, this::joinLobby);
+
         CreateNewGameEventData  .responder(transceiver, transceiver, this::createNewGame);
         PlayerExitGame          .responder(transceiver, transceiver, this::exitGame);
         PauseGameEventData      .responder(transceiver, transceiver, this::pauseGame);
         LogoutEventData         .responder(transceiver, transceiver, this::logout);
+        ExitLobbyEventData      .responder(transceiver, transceiver, this::exitLobby);
 
         PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(event -> disconnect());
 
-        JoinStartedGameEventData.castEventReceiver(transceiver).registerListener(event -> this.sendGameState());
         PlayerHasJoinMenu       .castEventReceiver(transceiver).registerListener(event -> this.playerHasJoinMenu());
     }
 
+    private synchronized Response joinLobby (JoinLobbyEventData event) {
+        if (isAuthenticated() && !isInGame() && !isInLobby()) {
+            Pair<Response, GameController> res = MenuController
+                    .getInstance()
+                    .joinLobby(this, username, event.gameName());
+
+            if (res.getKey().isOk()) {
+                this.gameController = res.getValue();
+            }
+
+            return res.getKey();
+        } else {
+            return DEFAULT_IN_LOBBY;
+        }
+    }
+
+    private synchronized Response exitLobby(ExitLobbyEventData event) {
+        if (isInLobby()) {
+            assert this.isAuthenticated();
+            return this.gameController.exitLobby(username);
+        } else {
+            return DEFAULT_NOT_IN_LOBBY;
+        }
+    }
+
     private synchronized Response logout (LogoutEventData eventData) {
-        if (isInGame()) {
+        if (isInGame() || isInLobby()) {
             Logger.writeWarning("The client has asked to log out but is in game");
-            return new Response("You are in a game...", ResponseStatus.FAILURE);
+            return new Response("You are in a game or lobby...", ResponseStatus.FAILURE);
         }
 
         if (isAuthenticated()) {
@@ -133,16 +159,6 @@ public class VirtualView implements EventTransmitter{
         }
     }
 
-    private synchronized void sendGameState() {
-        if (this.isInGame()) {
-            GameView view = gameController.getGameView();
-            final int personalGoal = gameController.getPersonalGoal(username);
-
-            broadcast(new InitialGameEventData(view));
-            broadcast(new PersonalGoalSetEventData(personalGoal));
-        }
-    }
-
     private synchronized void playerHasJoinMenu () {
         if (this.isAuthenticated()) {
             MenuController.getInstance().playerHasJoinMenu(this.transceiver, username);
@@ -153,8 +169,8 @@ public class VirtualView implements EventTransmitter{
 
     private synchronized Response createNewGame (CreateNewGameEventData eventData) {
         if (this.isAuthenticated()) {
-            if (!isInGame()) {
-                return MenuController.INSTANCE.createNewGame(eventData.gameName(), username);
+            if (!isInGame() && !isInLobby()) {
+                return MenuController.getInstance().createNewGame(eventData.gameName(), username);
             } else {
                 return DEFAULT_MESSAGE_ALREADY_IN_GAME;
             }
@@ -163,18 +179,40 @@ public class VirtualView implements EventTransmitter{
         }
     }
 
+    private synchronized Response restartGame (RestartGameEventData event) {
+        if (isInLobby()) {
+            assert isAuthenticated();
+
+            Response res = gameController.restartGame(username);
+
+            if (res.isOk()) {
+                castEventReceiver.registerListener(this.listener);
+            }
+
+            return res;
+        } else {
+            return DEFAULT_NOT_IN_LOBBY;
+        }
+    }
+
     private synchronized Response joinGame (JoinGameEventData eventData) {
         if (this.isAuthenticated()) {
-            if (!this.isInGame()) {
-                Pair<Response, GameController> res = MenuController.INSTANCE.joinGame(this.transceiver, this.username, eventData.gameName());
+            if (isInLobby()) {
+                Response res = gameController.joinGame(username);
+                if (res.isOk()) {
+                    GameView view = gameController.getGameView();
+                    final int personalGoal = gameController.getPersonalGoal(username);
 
-                if (res.getKey().isOk()) {
-                    setGameController(res.getValue());
+                    broadcast(new InitialGameEventData(view));
+                    broadcast(new PersonalGoalSetEventData(personalGoal));
+                    
+                    castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalReceiver());
+                    castEventReceiver.registerListener(this.listener);
                 }
 
-                return res.getKey();
+                return res;
             } else {
-                return DEFAULT_MESSAGE_ALREADY_IN_GAME;
+                return DEFAULT_NOT_IN_LOBBY;
             }
         } else
             return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
@@ -182,8 +220,8 @@ public class VirtualView implements EventTransmitter{
 
     private synchronized Response login(LoginEventData event) {
         if (!isAuthenticated()) {
-            Response response = MenuController.INSTANCE.authenticated(
-                    transceiver,
+            Response response = MenuController.getInstance().authenticated(
+                    this,
                     event.getUsername(),
                     event.getPassword()
             );
@@ -234,14 +272,8 @@ public class VirtualView implements EventTransmitter{
         return Optional.of(username);
     }
 
-    public boolean isInGame() {
-        /*
-         * this method is not synchronized, and you need to
-         * synchronize on this!!
-         */
-        assert Thread.holdsLock(this);
-
-        return this.gameController != null;
+    public synchronized boolean isInGame() {
+        return gameController != null && gameController.isInGame(username);
     }
 
     public void setGameController(GameController gameController) {
@@ -256,18 +288,16 @@ public class VirtualView implements EventTransmitter{
 
         assert gameController != null;
 
-        castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalTransmitter());
+        castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalReceiver());
         castEventReceiver.registerListener(this.listener);
     }
 
-    public boolean isAuthenticated () {
-        /*
-         * this method is not synchronized, and you need to
-         * synchronize on this!!
-         */
-        assert Thread.holdsLock(this);
-
+    public synchronized boolean isAuthenticated () {
         return username != null;
+    }
+
+    public synchronized boolean isInLobby() {
+        return this.gameController != null && !isInGame();
     }
 
     @Override

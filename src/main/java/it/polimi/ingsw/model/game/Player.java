@@ -18,7 +18,7 @@ public class Player {
         this.username = username;
         this.bookshelf = new Bookshelf();
         this.points = 0;
-        this.isConnected = true;
+        this.isConnected = false;
         this.achievedCommonGoals = new boolean[]{ false, false };
     }
 

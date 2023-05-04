@@ -208,8 +208,8 @@ public class DBManagerTest {
             VirtualView view1 = new VirtualView(new LocalEventTransceiver());
             VirtualView view2 = new VirtualView(new LocalEventTransceiver());
 
-            MenuController.getInstance().join(view1);
-            MenuController.getInstance().join(view2);
+            MenuController.getInstance().joinMenu(view1);
+            MenuController.getInstance().joinMenu(view2);
 
             MenuController.getInstance().authenticated(view1, "Giacomo", getPassword("Giacomo"));
             MenuController.getInstance().authenticated(view2, "Michele", getPassword("Michele"));

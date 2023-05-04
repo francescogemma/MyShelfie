@@ -869,7 +869,7 @@ public class GameLayout extends AppLayout {
 
             gameOver = false;
 
-            transceiver.broadcast(new JoinStartedGameEventData());
+            transceiver.broadcast(new JoinGameEventData());
         }
     }
 

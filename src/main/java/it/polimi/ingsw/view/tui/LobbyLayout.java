@@ -4,12 +4,12 @@ import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
-import it.polimi.ingsw.event.data.client.JoinGameEventData;
+import it.polimi.ingsw.event.data.client.JoinLobbyEventData;
 import it.polimi.ingsw.event.data.client.PlayerExitGame;
 import it.polimi.ingsw.event.data.client.StartGameEventData;
 import it.polimi.ingsw.event.data.game.GameHasStartedEventData;
 import it.polimi.ingsw.event.data.game.PlayerHasDisconnectedEventData;
-import it.polimi.ingsw.event.data.game.PlayerHasJoinEventData;
+import it.polimi.ingsw.event.data.game.PlayerHasJoinGameEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
@@ -95,7 +95,7 @@ public class LobbyLayout extends AppLayout {
     private List<String> playerNames;
     private String gameName;
     private NetworkEventTransceiver transceiver = null;
-    private Requester<Response, JoinGameEventData> joinGameRequester = null;
+    private Requester<Response, JoinLobbyEventData> joinGameRequester = null;
     private Requester<Response, StartGameEventData> startGameRequester = null;
     private Requester<Response, PlayerExitGame> playerExitRequester = null;
 
@@ -136,7 +136,7 @@ public class LobbyLayout extends AppLayout {
                 startGameRequester = Response.requester(transceiver, transceiver, getLock());
                 playerExitRequester = Response.requester(transceiver, transceiver, getLock());
 
-                PlayerHasJoinEventData.castEventReceiver(transceiver).registerListener(data -> {
+                PlayerHasJoinGameEventData.castEventReceiver(transceiver).registerListener(data -> {
                     playerNames.add(data.username());
 
                     populatePlayersList();
@@ -165,7 +165,7 @@ public class LobbyLayout extends AppLayout {
             }
 
             try {
-                Response response = joinGameRequester.request(new JoinGameEventData(gameName));
+                Response response = joinGameRequester.request(new JoinLobbyEventData(gameName));
 
                 displayServerResponse(response);
 

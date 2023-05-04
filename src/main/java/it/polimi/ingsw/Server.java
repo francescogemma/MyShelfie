@@ -34,7 +34,7 @@ public class Server {
 
             VirtualView virtualView = new VirtualView(transceiver);
 
-            menuController.join(virtualView);
+            menuController.joinMenu(virtualView);
         }
     }
 }

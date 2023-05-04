@@ -16,13 +16,15 @@ import java.util.List;
 import java.util.function.Function;
 
 public record GameOverEventData(List<Player> winners,
+                                List<Player> allPlayer,
                                 List<Pair<Integer, BookshelfMaskSet>> personalGoal,
                                 List<Pair<Integer, BookshelfMaskSet>> adjacencyGoal) implements EventData {
     public static final String ID = "GAME_OVER";
 
-    public GameOverEventData(List<Player> winners, List<Pair<Integer, BookshelfMaskSet>> personalGoal, List<Pair<Integer, BookshelfMaskSet>> adjacencyGoal) {
+    public GameOverEventData(List<Player> winners, List<Player> allPlayer, List<Pair<Integer, BookshelfMaskSet>> personalGoal, List<Pair<Integer, BookshelfMaskSet>> adjacencyGoal) {
         assert personalGoal.size() == adjacencyGoal.size();
         this.winners = new ArrayList<>(winners);
+        this.allPlayer = new ArrayList<>(allPlayer);
         this.personalGoal = new ArrayList<>(personalGoal);
         this.adjacencyGoal = new ArrayList<>(adjacencyGoal);
     }

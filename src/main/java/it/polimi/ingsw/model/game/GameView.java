@@ -135,14 +135,14 @@ public class GameView implements Identifiable {
         }
     }
 
-    public boolean isPause() {
+    public synchronized boolean isPause() {
         return this.isPause;
     }
 
     /**
      * @return The index of the first player that completed the bookshelf
      * */
-    public int getFirstPlayerCompleteBookshelf() {
+    public synchronized int getFirstPlayerCompleteBookshelf() {
         return this.firstPlayerCompleteBookshelf;
     }
 
@@ -151,7 +151,7 @@ public class GameView implements Identifiable {
      * @return the starting player
      * @throws IllegalFlowException if there are no players in the game
      */
-    public Player getStartingPlayer() throws IllegalFlowException {
+    public synchronized Player getStartingPlayer() throws IllegalFlowException {
         if (players.isEmpty()) {
             throw new IllegalFlowException("There is no starting player until someone joins the game");
         }
@@ -162,7 +162,7 @@ public class GameView implements Identifiable {
     /**
      * @return true iff there is one player online
      * */
-    public boolean hasPlayerDisconnected () {
+    public synchronized boolean hasPlayerDisconnected () {
         return players.stream().anyMatch(Player::isDisconnected);
     }
 
@@ -170,7 +170,7 @@ public class GameView implements Identifiable {
      * @return The next player online from username
      * @throws NoPlayerConnectedException iff there is no player online except username
      * */
-    protected int getNextPlayerOnline(String username) throws NoPlayerConnectedException {
+    protected synchronized int getNextPlayerOnline(String username) throws NoPlayerConnectedException {
         int index = -1;
         for (int i = 0; i < players.size(); i++) {
             if (players.get(i).is(username))
@@ -183,7 +183,7 @@ public class GameView implements Identifiable {
         return getNextPlayerOnline(index);
     }
 
-    protected int getNextPlayerOnline (int currentPlayerIndex) throws NoPlayerConnectedException {
+    protected synchronized int getNextPlayerOnline (int currentPlayerIndex) throws NoPlayerConnectedException {
         for (int i = 1; i < this.players.size(); i++) {
             final int index = (currentPlayerIndex + i) % this.players.size();
             if (this.players.get(index).isConnected()) {
@@ -196,37 +196,26 @@ public class GameView implements Identifiable {
     /**
      * @return Number of players online
      * */
-    public int numberOfPlayerOnline () {
+    public synchronized int numberOfPlayerOnline () {
         return (int) this.players.stream().filter(Player::isConnected).count();
     }
 
     /**
      * This method is call to understand if one player can start or resume one game
      * @throws NullPointerException iff username is null
-     * @throws IllegalFlowException
+     * @throws IllegalStateException
      * <ul>
-     *     <li> Game is over </li>
-     *     <li> Game is started and it's not stopped </li>
+     *     <li> Game is started </li>
      *     <li> Game is started, it's stopped, and there are less then 2 player online </li>
      * </ul>
      * @return true iff username can start or resume this game.
      * */
-    public boolean canStartGame (String username) throws IllegalFlowException {
+    public synchronized boolean canStartGame (String username) {
         if (username == null)
             throw new NullPointerException();
 
-        if (isOver())
-            throw new IllegalFlowException();
-
-        if (isStarted() && !isStopped())
-            throw new IllegalFlowException();
-
-        // it is stop, and it can't start with only 1 player connected
-        if (isStarted() && isStopped() && players.size() < 2)
-            throw new IllegalFlowException();
-
-        if (players.isEmpty())
-            throw new IllegalFlowException();
+        if (isStarted() || players.isEmpty())
+            throw new IllegalStateException();
 
         return username.equals(creator);
     }
@@ -235,7 +224,7 @@ public class GameView implements Identifiable {
      * Returns a boolean indicating whether the game has been stopped.
      * @return true if the game has been stopped, false otherwise
      */
-    public boolean isStopped() {
+    public synchronized boolean isStopped() {
         return isStopped;
     }
 
@@ -243,7 +232,7 @@ public class GameView implements Identifiable {
      * Checks if the game is over.
      * @return true iff the game is over, false otherwise
      */
-    public boolean isOver () {
+    public synchronized boolean isOver () {
         return !winners.isEmpty();
     }
 
@@ -253,8 +242,8 @@ public class GameView implements Identifiable {
      * @throws IllegalFlowException if the game is not started or if the game is over.
      * @return the current player of the game.
      */
-    public Player getCurrentPlayer() throws IllegalFlowException {
-        if (!isStarted) {
+    public synchronized Player getCurrentPlayer() throws IllegalFlowException {
+        if (!isStarted()) {
             throw new IllegalFlowException("There is no current player until you start the game");
         }
 
@@ -262,30 +251,30 @@ public class GameView implements Identifiable {
             throw new IllegalFlowException("There is no current player when the game is over");
         }
 
-        if (isStopped())
+        if (isStopped() || isPause())
             throw new IllegalFlowException("Game is stopped");
 
         return players.get(currentPlayerIndex);
     }
 
-    public boolean isAvailableForJoin(String username) {
-        if (isStopped()) {
-            return players.stream().anyMatch(p -> p.is(username)) || creator.equals(username);
+    public synchronized boolean isAvailableForJoin(String username) {
+        if (isStarted()) {
+            return players.stream().anyMatch(p -> p.is(username));
         }
-        return !isStarted() || numberOfPlayerOnline() != players.size();
+        return players.size() < 4;
     }
 
     /**
      * @return true iff at least one bookshelf is full
      * */
-    public boolean atLeastOneBookshelfIsFull() {
+    public synchronized boolean atLeastOneBookshelfIsFull() {
         return players.stream().anyMatch(p -> p.getBookshelf().isFull());
     }
 
     /**
      * @return whether the game is over or not.
      */
-    public List<Player> getWinners() throws IllegalFlowException {
+    public synchronized List<Player> getWinners() throws IllegalFlowException {
         if (!isOver()) {
             throw new IllegalFlowException("There is no winner until the game is over");
         }
@@ -297,8 +286,8 @@ public class GameView implements Identifiable {
      * @throws IllegalFlowException iff the game hasn't started yet.
      * @return the last player in the list of players
      * */
-    public Player getLastPlayer() throws IllegalFlowException {
-        if (!isStarted) {
+    public synchronized Player getLastPlayer() throws IllegalFlowException {
+        if (!isStarted()) {
             throw new IllegalFlowException("There is no last player until you start the game");
         }
 
@@ -310,15 +299,19 @@ public class GameView implements Identifiable {
      * can't be modified by anyone.
      * @return a new immutable GameView
      * */
-    public GameView createView () {
+    public synchronized GameView createView () {
         return new GameView(this);
+    }
+
+    public synchronized String getOwner () {
+        return this.creator;
     }
 
     /**
      * @return The array of all common goals
      * @see CommonGoal
      * */
-    public CommonGoal[] getCommonGoals() {
+    public synchronized CommonGoal[] getCommonGoals() {
         return commonGoals;
     }
 
@@ -329,7 +322,7 @@ public class GameView implements Identifiable {
      * @see Board
      * @see BoardView
      */
-    public BoardView getBoard () {
+    public synchronized BoardView getBoard () {
         return board.createView();
     }
 
@@ -337,7 +330,7 @@ public class GameView implements Identifiable {
      * Returns a boolean indicating whether the game has been started.
      * @return true if the game has been started, false otherwise
      */
-    public boolean isStarted() {
+    public synchronized boolean isStarted() {
         return this.isStarted;
     }
 
@@ -345,7 +338,7 @@ public class GameView implements Identifiable {
      * Returns a new immutable list of player views.
      * @return a new list of immutable player view instances
      * */
-    public List<Player> getPlayers () {
+    public synchronized List<Player> getPlayers () {
         return new ArrayList<>(players);
     }
 
