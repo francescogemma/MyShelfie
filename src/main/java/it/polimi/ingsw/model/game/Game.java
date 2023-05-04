@@ -249,9 +249,7 @@ public class Game extends GameView {
                 timer.cancel();
             isPause = false;
             setStopped();
-        }
-
-        if (numberOfPlayerOnline() == 1) {
+        } else if (numberOfPlayerOnline() == 1) {
             setPause();
         } else if (isStarted() && (this.players.get(currentPlayerIndex).equals(player))) {
             calculateNextPlayer();
@@ -295,7 +293,7 @@ public class Game extends GameView {
                     calculateNextPlayer();
                 }
             } catch (IllegalFlowException e) {
-
+                Logger.writeCritical("sto");
             }
         }
     }

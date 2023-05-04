@@ -215,9 +215,9 @@ public class GameController {
 
     public synchronized Response restartGame (String username) {
         try {
-            //if (clientsInLobby.size() < 2) {
-            //    return new Response("You can't restart a game with only one player connected", ResponseStatus.FAILURE);
-            //}
+            if (clientsInLobby.size() < 2) {
+                return new Response("You can't restart a game with only one player connected", ResponseStatus.FAILURE);
+            }
 
             game.setPlayersToWait(clientsInLobby.stream().map(Pair::getValue).toList());
             game.restartGame(username);
@@ -232,34 +232,57 @@ public class GameController {
         return this.clientsInLobby.size();
     }
 
-    public synchronized Response joinGame (String username) {
+    /**
+     * transmitter va passato null se la virtualview è nella lobby
+     * */
+    public synchronized Response joinGame (String username, EventTransmitter transmitter) {
         try {
             // dobbiamo inviargli gli eventi qua dentro altrimenti possiamo perdere delle informazioni
             // su game rilasciando il lock e riprendendolo
 
-            if (!game.isStarted() || game.isStopped() || !game.containPlayer(username) || game.isPlayerConnected(username))
-                return new Response("[4] Game is stopped!", ResponseStatus.FAILURE);
+            /**
+             * per riconnettere senza passare dalla lobby
+             * */
+            if (transmitter != null)
+                clientsInLobby.add(Pair.of(transmitter, username));
 
-            for (int i = 0; i < clientsInLobby.size(); i++) {
-                if (clientsInLobby.get(i).getValue().equals(username)) {
-                    Pair<EventTransmitter, String> client = clientsInLobby.remove(i);
-                    clientsInGame.add(client);
+            Logger.writeMessage(clientsInLobby.stream().map(Pair::getValue).toList().toString());
 
-                    GameView view = getGameView();
-                    final int personalGoal = getPersonalGoal(username);
+            synchronized (game) {
+                if (!game.isStarted() || game.isStopped() || !game.containPlayer(username) || game.isPlayerConnected(username))
+                    return new Response("[4] Game is stopped!", ResponseStatus.FAILURE);
 
-                    client.getKey().broadcast(new InitialGameEventData(view));
-                    client.getKey().broadcast(new PersonalGoalSetEventData(personalGoal));
+                for (int i = 0; i < clientsInLobby.size(); i++) {
+                    if (clientsInLobby.get(i).getValue().equals(username)) {
+                        Pair<EventTransmitter, String> client = clientsInLobby.remove(i);
+                        clientsInGame.add(client);
 
+                        Logger.writeMessage("Added new user %s; new size: %d".formatted(username, clientsInGame.size()));
 
-                    break;
+                        GameView view = getGameView();
+                        final int personalGoal = getPersonalGoal(username);
+
+                        client.getKey().broadcast(new InitialGameEventData(view));
+                        client.getKey().broadcast(new PersonalGoalSetEventData(personalGoal));
+
+                        break;
+                    }
                 }
-            }
 
-            game.connectPlayer(username);
+                game.connectPlayer(username);
+            }
 
         } catch (IllegalFlowException | PlayerAlreadyInGameException | PlayerNotInGameException e) {
             throw new IllegalStateException("[5]");
+        } finally {
+            if (transmitter != null) {
+                for (int i = 0; i < clientsInLobby.size(); i++) {
+                    if (clientsInLobby.get(i).getValue().equals(username)) {
+                        clientsInLobby.remove(i);
+                        break;
+                    }
+                }
+            }
         }
 
         if (isInLobby(username)) {

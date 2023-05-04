@@ -272,7 +272,7 @@ public class MenuController {
         Optional<GameController> controller = this.getGameController(gameName);
 
         if (controller.isPresent()) {
-            Response response = controller.get().joinGame(username);
+            Response response = controller.get().joinGame(username, virtualView);
 
             if (response.isOk()) {
                 return Pair.of(response, controller.get());

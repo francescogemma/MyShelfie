@@ -214,7 +214,7 @@ public class VirtualView implements EventTransmitter{
             Response response;
 
             if (isInLobby()) {
-                response = gameController.joinGame(username);
+                response = gameController.joinGame(username, null);
             } else {
                 Pair<Response, GameController> pair = MenuController
                     .getInstance().joinGame(this, username, eventData.getGameName());
