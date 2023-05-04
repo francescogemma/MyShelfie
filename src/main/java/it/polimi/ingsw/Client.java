@@ -21,7 +21,7 @@ public class Client {
         }
 
         if (data.getString("interface").equals("GUI")) {
-            GuiApplication.main(args);
+            GuiApplication.main(new String[]{data.getString("connection")});
         } else {
             terminal.start(new App(data, ConnectionMenuLayout::new, LoginMenuLayout::new,
                 AvailableGamesMenuLayout::new, LobbyLayout::new, GameLayout::new,

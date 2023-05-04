@@ -32,5 +32,6 @@ public class AvailableGamesMenuController {
     @FXML
     private void exit() {
         Platform.exit();
+        System.exit(0);
     }
 }

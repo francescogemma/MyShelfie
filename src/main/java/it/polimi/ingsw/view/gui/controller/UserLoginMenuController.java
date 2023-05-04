@@ -37,5 +37,6 @@ public class UserLoginMenuController {
     @FXML
     private void exit() {
         Platform.exit();
+        System.exit(0);
     }
 }
