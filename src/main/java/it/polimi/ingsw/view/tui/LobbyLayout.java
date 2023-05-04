@@ -54,6 +54,7 @@ public class LobbyLayout extends AppLayout {
             new OrientedLayout(Orientation.HORIZONTAL,
                 new Fill(PrimitiveSymbol.EMPTY).weight(1),
                 startButtonLayoutElement,
+                restartButton.weight(1),
                 backButton.center().weight(1),
                 new Fill(PrimitiveSymbol.EMPTY).weight(1)
             ).weight(1)
