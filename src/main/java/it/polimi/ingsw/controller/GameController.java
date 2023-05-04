@@ -45,7 +45,7 @@ public class GameController {
                         }
                     );
 
-            Logger.writeMessage(event.getId());
+            Logger.writeMessage(event.getId() + clientsInGame.size());
             if (this.game.isStarted() && !eventIgnored.contains(event.getId()))
                 DBManager.getGamesDBManager().save(game);
         });
@@ -102,36 +102,38 @@ public class GameController {
         }
     }
 
-    protected Response exitGame (String username) {
+    private synchronized void removePlayer(String username) {
+        for (int i = 0; i < clientsInGame.size(); i++) {
+            if (clientsInGame.get(i).getValue().equals(username)){
+                clientsInGame.remove(i);
+                return;
+            }
+        }
+        assert false;
+    }
+
+    protected synchronized Response exitGame (String username) {
         Logger.writeMessage("Call for username: %s".formatted(username));
-        synchronized (this) {
-            if (!isInGame(username)) {
-                return new Response("You are in the lobby", ResponseStatus.FAILURE);
+
+        if (!isInGame(username)) {
+            return new Response("You are in the lobby", ResponseStatus.FAILURE);
+        }
+
+        removePlayer(username);
+
+        try {
+            game.disconnectPlayer(username);
+
+            if (game.isStopped()) {
+                this.transceiver.broadcast(new ForceExitGameEventData(username));
+                clientsInGame.clear();
+                return new Response("You have book remove from this game", ResponseStatus.SUCCESS);
             }
 
-            try {
-                game.disconnectPlayer(username);
-
-                if (game.isStopped()) {
-                    this.transceiver.broadcast(new ForceExitGameEventData(username));
-                    clientsInGame.clear();
-                    return new Response("You have book remove from this game", ResponseStatus.SUCCESS);
-                }
-
-                for (int i = 0; i < this.clientsInGame.size(); i++) {
-                    if (clientsInGame.get(i).getValue().equals(username)) {
-                        clientsInGame.remove(i);
-                        return new Response("You have been remove from this game", ResponseStatus.SUCCESS);
-                    }
-                }
-                Logger.writeCritical("Game has this player but i don't");
-                assert false;
-            } catch (IllegalFlowException e) {
-                Logger.writeCritical("call " + e.getMessage());
-                throw new IllegalStateException("Player already disconnected " + e.getMessage());
-            }
-
-            throw new IllegalStateException("Player not in this game!!!");
+            return new Response("You have been remove from this game", ResponseStatus.SUCCESS);
+        } catch (IllegalFlowException e) {
+            Logger.writeCritical("call " + e.getMessage());
+            throw new IllegalStateException("Player already disconnected " + e.getMessage());
         }
     }
 
@@ -141,14 +143,18 @@ public class GameController {
         }
 
         synchronized (this) {
+            if (game.isStarted() && !game.isStopped())
+                return new Response("This game is being playing", ResponseStatus.FAILURE);
+
             if (!game.isAvailableForJoin(username))
                 return new Response("You can't join this game", ResponseStatus.FAILURE);
 
+            clientsInLobby.forEach(c -> c.getKey().broadcast(new PlayerHasJoinLobbyEventData(username)));
+
             clientsInLobby.add(Pair.of(newClient, username));
 
-            for (int i = 0; i < clientsInLobby.size() - 1; i++) {
-                newClient.broadcast(new PlayerHasJoinLobbyEventData(clientsInLobby.get(i).getValue()));
-            }
+            for (Pair<EventTransmitter, String> eventTransmitterStringPair : clientsInLobby)
+                newClient.broadcast(new PlayerHasJoinLobbyEventData(eventTransmitterStringPair.getValue()));
         }
 
         return new Response("You've joined the game", ResponseStatus.SUCCESS);
@@ -209,6 +215,11 @@ public class GameController {
 
     public synchronized Response restartGame (String username) {
         try {
+            //if (clientsInLobby.size() < 2) {
+            //    return new Response("You can't restart a game with only one player connected", ResponseStatus.FAILURE);
+            //}
+
+            game.setPlayersToWait(clientsInLobby.stream().map(Pair::getValue).toList());
             game.restartGame(username);
             forEachInLobby(new GameHasStartedEventData());
             return new Response("ok", ResponseStatus.SUCCESS);
@@ -223,18 +234,32 @@ public class GameController {
 
     public synchronized Response joinGame (String username) {
         try {
-            game.connectPlayer(username);
+            // dobbiamo inviargli gli eventi qua dentro altrimenti possiamo perdere delle informazioni
+            // su game rilasciando il lock e riprendendolo
+
+            if (!game.isStarted() || game.isStopped() || !game.containPlayer(username) || game.isPlayerConnected(username))
+                return new Response("[4] Game is stopped!", ResponseStatus.FAILURE);
 
             for (int i = 0; i < clientsInLobby.size(); i++) {
                 if (clientsInLobby.get(i).getValue().equals(username)) {
-                    clientsInGame.add(clientsInLobby.remove(i));
+                    Pair<EventTransmitter, String> client = clientsInLobby.remove(i);
+                    clientsInGame.add(client);
+
+                    GameView view = getGameView();
+                    final int personalGoal = getPersonalGoal(username);
+
+                    client.getKey().broadcast(new InitialGameEventData(view));
+                    client.getKey().broadcast(new PersonalGoalSetEventData(personalGoal));
+
+
                     break;
                 }
             }
-        } catch (IllegalFlowException | PlayerAlreadyInGameException e) {
-            return new Response("You can't reconnect to this game", ResponseStatus.FAILURE);
-        } catch (PlayerNotInGameException e) {
-            return new Response(e.getMessage(), ResponseStatus.FAILURE);
+
+            game.connectPlayer(username);
+
+        } catch (IllegalFlowException | PlayerAlreadyInGameException | PlayerNotInGameException e) {
+            throw new IllegalStateException("[5]");
         }
 
         if (isInLobby(username)) {
@@ -249,8 +274,7 @@ public class GameController {
         return new Response("You have joined the game", ResponseStatus.SUCCESS);
     }
 
-    public Response startGame(String username) {
-        synchronized (this) {
+    public synchronized Response startGame(String username) {
             try {
                 for (Pair<EventTransmitter, String> client: clientsInLobby) {
                     game.addPlayer(client.getValue());
@@ -277,7 +301,6 @@ public class GameController {
             forEachInLobby(new GameHasStartedEventData());
 
             return new Response("The game has started", ResponseStatus.SUCCESS);
-        }
     }
 
     public synchronized boolean isStopped() {

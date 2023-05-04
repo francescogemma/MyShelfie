@@ -33,8 +33,11 @@ public class Game extends GameView {
     protected final transient List<Integer> personalGoalIndexes;
 
     private transient Timer timer;
+    private transient Timer playTimer;
 
     private final List<PersonalGoal> personalGoals;
+
+    private transient List<String> playersToWait;
 
     /**
      * Creates a new game with the given name.
@@ -50,12 +53,9 @@ public class Game extends GameView {
         Collections.shuffle(this.personalGoalIndexes);
     }
 
-    public synchronized void resetTimer() {
-        timer = new Timer();
-    }
-
     public synchronized void forceStop () {
         this.isStopped = true;
+        this.isPause = false;
         players.forEach(p -> p.setConnectionState(false));
     }
 
@@ -119,6 +119,10 @@ public class Game extends GameView {
             throw new NullPointerException();
 
         this.transceiver = transceiver;
+    }
+
+    public synchronized void setPlayersToWait(List<String> usernames) {
+        this.playersToWait = new ArrayList<>(usernames);
     }
 
     /**
@@ -215,12 +219,10 @@ public class Game extends GameView {
             public void run() {
                 awardTimeWinner();
             }
-        }, 10000);
+        }, 60000);
     }
 
     private synchronized void setStopped () {
-        // isStopped = true;
-        // players.forEach(p -> p.setConnectionState(false));
         forceStop();
 
         if (timer != null)
@@ -240,32 +242,67 @@ public class Game extends GameView {
 
         player.setConnectionState(false);
 
+        this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
+
+        if (numberOfPlayerOnline() == 0) {
+            if (timer != null)
+                timer.cancel();
+            isPause = false;
+            setStopped();
+        }
+
         if (numberOfPlayerOnline() == 1) {
             setPause();
         } else if (isStarted() && (this.players.get(currentPlayerIndex).equals(player))) {
-            try {
-                calculateNextPlayer();
-            } catch (IllegalFlowException e) {
-                Logger.writeCritical("This function should not be throw IllegalFlowException");
-                assert false;
-            }
+            calculateNextPlayer();
 
             this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex)));
         }
-
-        this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
     }
 
     public synchronized void restartGame(String username) throws IllegalFlowException {
         if (!this.creator.equals(username))
-            throw new IllegalFlowException("Game can't be restart");
+            throw new IllegalFlowException("You can't restart this game");
+
+        if (!isStarted())
+            throw new IllegalFlowException("Game is not started");
+
+        for (int i = 0; i < players.size(); i++) {
+            if (this.playersToWait.contains(players.get(currentPlayerIndex).getUsername())) {
+                break;
+            } else {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+            }
+        }
 
         isStopped = false;
         broadcast(new GameHasStartedEventData());
     }
 
+    public synchronized boolean isPlayerConnected(String username) throws PlayerNotInGameException {
+        for (Player player: players) {
+            if (player.is(username))
+                return player.isConnected();
+        }
+
+        throw new PlayerNotInGameException(username, name);
+    }
+
+    private synchronized void timerEndForTurn () {
+        if (!isStopped()) {
+            try {
+                if (getCurrentPlayer().isDisconnected()) {
+                    calculateNextPlayer();
+                }
+            } catch (IllegalFlowException e) {
+
+            }
+        }
+    }
+
     public synchronized void connectPlayer(String username) throws PlayerAlreadyInGameException, IllegalFlowException,
-        PlayerNotInGameException {
+        PlayerNotInGameException
+    {
         // Allows for reconnection of disconnected players
         if (isStopped()) {
             Logger.writeWarning("View ask to reconnect while stopped");
@@ -281,7 +318,15 @@ public class Game extends GameView {
                 otherPlayer.setConnectionState(true);
                 this.transceiver.broadcast(new PlayerHasJoinGameEventData(otherPlayer.getUsername()));
 
-                if (numberOfPlayerOnline() == 0) {
+                if (numberOfPlayerOnline() == 1) {
+                    this.playTimer = new Timer();
+                    this.playTimer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            timerEndForTurn();
+                        }
+                    }, 3000);
+
                     setPause();
                 } else if (isPause()) {
                     assert timer != null;
@@ -319,8 +364,10 @@ public class Game extends GameView {
         this.isStarted = true;
 
         this.currentPlayerIndex = FIRST_PLAYER_INDEX;
-        this.commonGoals = CommonGoal.getTwoRandomCommonGoals(players.size());
 
+        CommonGoal [] c = CommonGoal.getTwoRandomCommonGoals(players.size());
+        this.commonGoals[0] = c[0];
+        this.commonGoals[1] = c[1];
 
         this.refillBoardIfNecessary();
     }
@@ -404,7 +451,7 @@ public class Game extends GameView {
     /*
      * @throws NoPlayerConnectedException iff there are no other connected players besides the current one.
      * */
-    private synchronized void calculateNextPlayer() throws IllegalFlowException {
+    private synchronized void calculateNextPlayer() {
         assert this.players.size() >= 2 && this.players.size() <= 4;
         assert this.isStarted() && !isStopped() && !isPause();
         assert currentPlayerIndex >=  0 && currentPlayerIndex < players.size();
@@ -425,14 +472,19 @@ public class Game extends GameView {
                 }
             }
 
-            broadcast(
-                    new GameOverEventData(
-                            this.getWinners(),
-                            players,
-                            pointsAchievePersonal,
-                            pointsAchieveAdjacency
-                    )
-            );
+            try {
+                broadcast(
+                        new GameOverEventData(
+                                this.getWinners(),
+                                players,
+                                pointsAchievePersonal,
+                                pointsAchieveAdjacency
+                        )
+                );
+            } catch (IllegalFlowException e) {
+                Logger.writeCritical("call " + e);
+                assert false;
+            }
         } else {
             this.refillBoardIfNecessary();
 

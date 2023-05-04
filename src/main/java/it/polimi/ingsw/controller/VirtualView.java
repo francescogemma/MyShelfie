@@ -64,6 +64,7 @@ public class VirtualView implements EventTransmitter{
     }
 
     private synchronized Response joinLobby (JoinLobbyEventData event) {
+        Logger.writeMessage("%s ask to join lobby".formatted(username));
         if (isAuthenticated() && !isInGame() && !isInLobby()) {
             Pair<Response, GameController> res = MenuController
                     .getInstance()
@@ -71,6 +72,7 @@ public class VirtualView implements EventTransmitter{
 
             if (res.getKey().isOk()) {
                 this.gameController = res.getValue();
+                this.castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalReceiver());
             }
 
             return res.getKey();
@@ -80,15 +82,22 @@ public class VirtualView implements EventTransmitter{
     }
 
     private synchronized Response exitLobby(ExitLobbyEventData event) {
+        Logger.writeMessage("%s ask to leave lobby".formatted(username));
         if (isInLobby()) {
-            assert this.isAuthenticated();
-            return this.gameController.exitLobby(username);
+            Response res = this.gameController.exitLobby(username);
+
+            if (res.isOk()) {
+                gameController = null;
+            }
+
+            return res;
         } else {
             return DEFAULT_NOT_IN_LOBBY;
         }
     }
 
     private synchronized Response logout (LogoutEventData eventData) {
+        Logger.writeMessage("%s logout".formatted(username));
         if (isInGame() || isInLobby()) {
             Logger.writeWarning("The client has asked to log out but is in game");
             return new Response("You are in a game or lobby...", ResponseStatus.FAILURE);
@@ -140,8 +149,9 @@ public class VirtualView implements EventTransmitter{
     }
 
     private void removeListener () {
-        assert this.castEventReceiver != null;
-        this.castEventReceiver.unregisterListener(this.listener);
+        if (castEventReceiver != null) {
+            this.castEventReceiver.unregisterListener(this.listener);
+        }
     }
 
     private synchronized Response exitGame (PlayerExitGame exitGame) {
@@ -180,6 +190,7 @@ public class VirtualView implements EventTransmitter{
     }
 
     private synchronized Response restartGame (RestartGameEventData event) {
+        Logger.writeMessage("%s ask for restart game".formatted(username));
         if (isInLobby()) {
             Response res = gameController.restartGame(username);
 
@@ -194,6 +205,7 @@ public class VirtualView implements EventTransmitter{
     }
 
     private synchronized Response joinGame (JoinGameEventData eventData) {
+        Logger.writeMessage("%s ask for join game".formatted(username));
         if (this.isAuthenticated()) {
             if (isInGame()) {
                 return DEFAULT_MESSAGE_ALREADY_IN_GAME;
@@ -210,17 +222,11 @@ public class VirtualView implements EventTransmitter{
                 response = pair.getKey();
 
                 if (pair.getValue() != null) {
-                    setGameController(gameController);
+                    setGameController(pair.getValue());
                 }
             }
 
             if (response.isOk()) {
-                GameView view = gameController.getGameView();
-                final int personalGoal = gameController.getPersonalGoal(username);
-
-                broadcast(new InitialGameEventData(view));
-                broadcast(new PersonalGoalSetEventData(personalGoal));
-
                 castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalReceiver());
                 castEventReceiver.registerListener(this.listener);
             }
@@ -275,7 +281,13 @@ public class VirtualView implements EventTransmitter{
     private synchronized Response startGame (StartGameEventData ignore) {
         if (this.isAuthenticated()) {
             if (this.isInLobby()) {
-                return this.gameController.startGame(this.username);
+                Response response = this.gameController.startGame(this.username);
+
+                if (response.isOk()) {
+                    this.castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalReceiver());
+                }
+
+                return response;
             } else {
                 return DEFAULT_NOT_IN_LOBBY;
             }
@@ -292,13 +304,7 @@ public class VirtualView implements EventTransmitter{
         return gameController != null && gameController.isInGame(username);
     }
 
-    public void setGameController(GameController gameController) {
-        /*
-         * this method is not synchronized, and you need to
-         * synchronize on this!!
-         */
-        assert Thread.holdsLock(this);
-
+    public synchronized void setGameController(GameController gameController) {
         assert this.gameController == null;
         this.gameController = gameController;
 

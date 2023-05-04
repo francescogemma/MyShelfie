@@ -38,7 +38,7 @@ public class GameView implements Identifiable {
     /*
      * The common goals of the game.
      */
-    protected CommonGoal[] commonGoals;
+    protected final CommonGoal[] commonGoals;
 
     /*
      * The bag of tiles in the game.
@@ -109,6 +109,7 @@ public class GameView implements Identifiable {
         this.players = new ArrayList<>();
         this.creator = username;
         this.isStopped = false;
+        this.commonGoals = new CommonGoal[2];
     }
 
     /**
@@ -250,9 +251,6 @@ public class GameView implements Identifiable {
         if (isOver()) {
             throw new IllegalFlowException("There is no current player when the game is over");
         }
-
-        if (isStopped() || isPause())
-            throw new IllegalFlowException("Game is stopped");
 
         return players.get(currentPlayerIndex);
     }

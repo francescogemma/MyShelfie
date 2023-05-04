@@ -44,12 +44,6 @@ public class Player {
      * @param isConnected the new connection state of the player.
      */
     public void setConnectionState(boolean isConnected) {
-        if (isConnected){
-            for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-                System.out.println(username + "  " + element.toString());
-            }
-        }
-
         this.isConnected = isConnected;
     }
 
