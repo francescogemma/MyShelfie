@@ -240,16 +240,8 @@ public class Game extends GameView {
 
         player.setConnectionState(false);
 
-        if (!isStarted() || isStopped()) {
-            this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
-
-            return;
-        }
-
         if (numberOfPlayerOnline() == 1) {
             setPause();
-        } else if (numberOfPlayerOnline() < 2) {
-            setStopped();
         } else if (isStarted() && (this.players.get(currentPlayerIndex).equals(player))) {
             try {
                 calculateNextPlayer();
@@ -272,7 +264,8 @@ public class Game extends GameView {
         broadcast(new GameHasStartedEventData());
     }
 
-    public synchronized void connectPlayer(String username) throws PlayerAlreadyInGameException, IllegalFlowException {
+    public synchronized void connectPlayer(String username) throws PlayerAlreadyInGameException, IllegalFlowException,
+        PlayerNotInGameException {
         // Allows for reconnection of disconnected players
         if (isStopped()) {
             Logger.writeWarning("View ask to reconnect while stopped");
@@ -302,7 +295,7 @@ public class Game extends GameView {
                 return;
             }
         }
-        throw new IllegalArgumentException("Player not in this game...");
+        throw new PlayerNotInGameException(username, name);
     }
 
     /**

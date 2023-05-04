@@ -12,8 +12,14 @@ import java.util.function.Function;
 public class JoinGameEventData implements EventData {
     public static final String ID = "JOIN_GAME";
 
-    public JoinGameEventData() {
+    private final String gameName;
 
+    public JoinGameEventData(String gameName) {
+        this.gameName = gameName;
+    }
+
+    public String getGameName() {
+        return gameName;
     }
 
     public static CastEventReceiver<JoinGameEventData> castEventReceiver(EventReceiver<EventData> receiver) {

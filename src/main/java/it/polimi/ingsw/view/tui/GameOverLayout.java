@@ -37,8 +37,8 @@ public class GameOverLayout extends AppLayout {
             ((playerDisplayDrawable, playerDisplay) -> {
                 playerDisplayDrawable.positionTextBox.text("# " + String.valueOf(playerDisplay.getPosition()));
                 playerDisplayDrawable.playerNameTextBox.text(playerDisplay.getName())
-                    .color(playerDisplay.getPosition() == 1 ? Color.GREEN : (playerDisplay.isClientPlayer()
-                    ? Color.FOCUS : Color.WHITE));
+                    .color(playerDisplay.isWinner() ? Color.GREEN : (playerDisplay.isClientPlayer()
+                    ? Color.FOCUS : (playerDisplay.isConnected() ? Color.WHITE : Color.GREY)));
                 playerDisplayDrawable.playerPointsTextBox.text("Points: " + playerDisplay.getPoints());
             }));
 

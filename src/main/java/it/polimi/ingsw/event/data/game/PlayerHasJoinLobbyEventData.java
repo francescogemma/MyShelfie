@@ -14,6 +14,10 @@ public class PlayerHasJoinLobbyEventData implements EventData {
 
     private final String username;
 
+    public String getUsername() {
+        return username;
+    }
+
     public PlayerHasJoinLobbyEventData(String username) {
         this.username = username;
     }

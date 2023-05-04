@@ -35,22 +35,30 @@ public class AvailableGamesMenuLayout extends AppLayout {
     ).center().crop().fixSize(new DrawableSize(3, 25));
     private final Drawable noAvailableGamesTextBox = new TextBox().text("There aren't available games!")
         .unfocusable().center();
-    private static class JoinableGameDrawable extends FixedLayoutDrawable<Drawable> {
-        private final TextBox textBox = new TextBox();
-        private final Button button = new Button("Join");
+    private static class AvailableGameDrawable extends FixedLayoutDrawable<Drawable> {
+        private final TextBox nameTextBox = new TextBox();
+        private final Button joinGameButton = new Button("Join game");
+        private final Button joinLobbyButton = new Button("Join lobby");
 
-        public JoinableGameDrawable() {
+        public AvailableGameDrawable() {
             setLayout(new FullyResizableOrientedLayout(Orientation.HORIZONTAL,
-                textBox.unfocusable().center().crop().weight(1),
-                button.center().crop().weight(1)
+                nameTextBox.unfocusable().center().crop().weight(1),
+                joinGameButton.center().crop().weight(1),
+                joinLobbyButton.center().crop().weight(1)
             ).fixSize(new DrawableSize(5, 80)).addBorderBox());
         }
     }
-    private final RecyclerDrawable<JoinableGameDrawable, String> recyclerGamesList = new RecyclerDrawable<>(Orientation.VERTICAL,
-        JoinableGameDrawable::new, (joinableGameDrawable, name) -> {
-                    joinableGameDrawable.textBox.text(name);
-                    joinableGameDrawable.button.onpress(() -> {
-                        selectedGameName = name;
+    private final RecyclerDrawable<AvailableGameDrawable, GameHasBeenCreatedEventData.AvailableGame> recyclerGamesList = new RecyclerDrawable<>(Orientation.VERTICAL,
+        AvailableGameDrawable::new, (joinableGameDrawable, name) -> {
+                    joinableGameDrawable.nameTextBox.text(name.name());
+
+                    joinableGameDrawable.joinGameButton.onpress(() -> {
+                        selectedGameName = name.name();
+                        switchAppLayout(GameLayout.NAME);
+                    });
+
+                    joinableGameDrawable.joinLobbyButton.onpress(() -> {
+                        selectedGameName = name.name();
                         switchAppLayout(LobbyLayout.NAME);
                     });
                 });
@@ -61,7 +69,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
     private final Button backToLoginButton = new Button("Back to login");
     private final Button exitButton = new Button("Exit");
 
-    private List<String> availableGames;
+    private List<GameHasBeenCreatedEventData.AvailableGame> availableGames;
     private String selectedGameName;
 
     public AvailableGamesMenuLayout() {

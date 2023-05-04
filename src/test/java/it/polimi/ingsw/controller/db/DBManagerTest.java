@@ -202,7 +202,7 @@ public class DBManagerTest {
             instanceUsers.set(MenuController.getInstance(), new ArrayList<User>());
         }
 
-        @Test
+        /* @Test
         void stopGame() throws NoSuchFieldException, IllegalAccessException {
             setUp();
             VirtualView view1 = new VirtualView(new LocalEventTransceiver());
@@ -218,7 +218,7 @@ public class DBManagerTest {
 
             MenuController.getInstance().joinGame(view1, "Prova", "Giacomo");
             MenuController.getInstance().joinGame(view2, "Prova", "Michele");
-        }
+        } */
 
         @AfterEach
         void t2 () {

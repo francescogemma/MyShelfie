@@ -181,8 +181,6 @@ public class VirtualView implements EventTransmitter{
 
     private synchronized Response restartGame (RestartGameEventData event) {
         if (isInLobby()) {
-            assert isAuthenticated();
-
             Response res = gameController.restartGame(username);
 
             if (res.isOk()) {
@@ -197,23 +195,37 @@ public class VirtualView implements EventTransmitter{
 
     private synchronized Response joinGame (JoinGameEventData eventData) {
         if (this.isAuthenticated()) {
-            if (isInLobby()) {
-                Response res = gameController.joinGame(username);
-                if (res.isOk()) {
-                    GameView view = gameController.getGameView();
-                    final int personalGoal = gameController.getPersonalGoal(username);
-
-                    broadcast(new InitialGameEventData(view));
-                    broadcast(new PersonalGoalSetEventData(personalGoal));
-                    
-                    castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalReceiver());
-                    castEventReceiver.registerListener(this.listener);
-                }
-
-                return res;
-            } else {
-                return DEFAULT_NOT_IN_LOBBY;
+            if (isInGame()) {
+                return DEFAULT_MESSAGE_ALREADY_IN_GAME;
             }
+
+            Response response;
+
+            if (isInLobby()) {
+                response = gameController.joinGame(username);
+            } else {
+                Pair<Response, GameController> pair = MenuController
+                    .getInstance().joinGame(this, username, eventData.getGameName());
+
+                response = pair.getKey();
+
+                if (pair.getValue() != null) {
+                    setGameController(gameController);
+                }
+            }
+
+            if (response.isOk()) {
+                GameView view = gameController.getGameView();
+                final int personalGoal = gameController.getPersonalGoal(username);
+
+                broadcast(new InitialGameEventData(view));
+                broadcast(new PersonalGoalSetEventData(personalGoal));
+
+                castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalReceiver());
+                castEventReceiver.registerListener(this.listener);
+            }
+
+            return response;
         } else
             return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
     }
@@ -262,7 +274,11 @@ public class VirtualView implements EventTransmitter{
 
     private synchronized Response startGame (StartGameEventData ignore) {
         if (this.isAuthenticated()) {
-            return this.gameController.startGame(this.username);
+            if (this.isInLobby()) {
+                return this.gameController.startGame(this.username);
+            } else {
+                return DEFAULT_NOT_IN_LOBBY;
+            }
         } else {
             return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
         }
@@ -287,9 +303,6 @@ public class VirtualView implements EventTransmitter{
         this.gameController = gameController;
 
         assert gameController != null;
-
-        castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalReceiver());
-        castEventReceiver.registerListener(this.listener);
     }
 
     public synchronized boolean isAuthenticated () {

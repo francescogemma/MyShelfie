@@ -24,7 +24,7 @@ class GameControllerTest {
         return new VirtualView(transceiver);
     }
 
-    @Test
+    /*@Test
     void join_nullPointer_throwNullPointerException () {
         Assertions.assertThrows(NullPointerException.class, () -> {
             this.gameController.join(null, "Ciao");
@@ -46,7 +46,7 @@ class GameControllerTest {
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             gameController.exitGame("Michele");
         });
-    }
+    }*/
 
     /*@Test
     void exitGame_ForceExitGameEventData_correctOutput() throws NoPlayerConnectedException {

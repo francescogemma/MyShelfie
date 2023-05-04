@@ -6,10 +6,9 @@ import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.client.JoinLobbyEventData;
 import it.polimi.ingsw.event.data.client.PlayerExitGame;
+import it.polimi.ingsw.event.data.client.RestartGameEventData;
 import it.polimi.ingsw.event.data.client.StartGameEventData;
-import it.polimi.ingsw.event.data.game.GameHasStartedEventData;
-import it.polimi.ingsw.event.data.game.PlayerHasDisconnectedEventData;
-import it.polimi.ingsw.event.data.game.PlayerHasJoinGameEventData;
+import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
@@ -44,6 +43,7 @@ public class LobbyLayout extends AppLayout {
     private final RecyclerDrawable<PlayerDrawable, String> recyclerPlayersList = new RecyclerDrawable<>(Orientation.VERTICAL,
         PlayerDrawable::new, (playerDrawable, player) -> playerDrawable.textBox.text(player));
     private final Button startButton = new Button("Start game");
+    private final Button restartButton = new Button("Restart game");
     private final OrientedLayoutElement startButtonLayoutElement = startButton.center().weight(1);
     private final Button backButton = new Button("Back");
 
@@ -75,6 +75,14 @@ public class LobbyLayout extends AppLayout {
             }
         });
 
+        restartButton.onpress(() -> {
+            try {
+                displayServerResponse(restartGameRequester.request(new RestartGameEventData()));
+            } catch (DisconnectedException e) {
+                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+            }
+        });
+
         backButton.onpress(() -> {
             try {
                 Response response = playerExitRequester.request(new PlayerExitGame());
@@ -95,8 +103,9 @@ public class LobbyLayout extends AppLayout {
     private List<String> playerNames;
     private String gameName;
     private NetworkEventTransceiver transceiver = null;
-    private Requester<Response, JoinLobbyEventData> joinGameRequester = null;
+    private Requester<Response, JoinLobbyEventData> joinLobbyRequester = null;
     private Requester<Response, StartGameEventData> startGameRequester = null;
+    private Requester<Response, RestartGameEventData> restartGameRequester = null;
     private Requester<Response, PlayerExitGame> playerExitRequester = null;
 
     private void populatePlayersList() {
@@ -132,12 +141,13 @@ public class LobbyLayout extends AppLayout {
                 transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
                     "transceiver");
 
-                joinGameRequester = Response.requester(transceiver, transceiver, getLock());
+                joinLobbyRequester = Response.requester(transceiver, transceiver, getLock());
                 startGameRequester = Response.requester(transceiver, transceiver, getLock());
                 playerExitRequester = Response.requester(transceiver, transceiver, getLock());
+                restartGameRequester = Response.requester(transceiver, transceiver, getLock());
 
-                PlayerHasJoinGameEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    playerNames.add(data.username());
+                PlayerHasJoinLobbyEventData.castEventReceiver(transceiver).registerListener(data -> {
+                    playerNames.add(data.getUsername());
 
                     populatePlayersList();
                 });
@@ -146,7 +156,7 @@ public class LobbyLayout extends AppLayout {
                     switchAppLayout(GameLayout.NAME);
                 });
 
-                PlayerHasDisconnectedEventData.castEventReceiver(transceiver).registerListener(data -> {
+                PlayerHasExitLobbyEventData.castEventReceiver(transceiver).registerListener(data -> {
                     playerNames.remove(data.username());
 
                     populatePlayersList();
@@ -154,9 +164,10 @@ public class LobbyLayout extends AppLayout {
 
                 PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
                     transceiver = null;
-                    joinGameRequester = null;
+                    joinLobbyRequester = null;
                     startGameRequester = null;
                     playerExitRequester = null;
+                    restartGameRequester = null;
 
                     if (isCurrentLayout()) {
                         switchAppLayout(ConnectionMenuLayout.NAME);
@@ -165,7 +176,7 @@ public class LobbyLayout extends AppLayout {
             }
 
             try {
-                Response response = joinGameRequester.request(new JoinLobbyEventData(gameName));
+                Response response = joinLobbyRequester.request(new JoinLobbyEventData(gameName));
 
                 displayServerResponse(response);
 

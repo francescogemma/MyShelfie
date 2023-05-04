@@ -267,4 +267,20 @@ public class MenuController {
 
         return Pair.of(new Response("There is no game with this name...", ResponseStatus.FAILURE), null);
     }
+
+    public Pair<Response, GameController> joinGame(VirtualView virtualView, String username, String gameName) {
+        Optional<GameController> controller = this.getGameController(gameName);
+
+        if (controller.isPresent()) {
+            Response response = controller.get().joinGame(username);
+
+            if (response.isOk()) {
+                return Pair.of(response, controller.get());
+            } else {
+                return Pair.of(response, null);
+            }
+        }
+
+        return Pair.of(new Response("There is no game with this name...", ResponseStatus.FAILURE), null);
+    }
 }

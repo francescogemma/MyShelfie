@@ -222,8 +222,6 @@ public class GameController {
     }
 
     public synchronized Response joinGame (String username) {
-        assert isInLobby(username);
-
         try {
             game.connectPlayer(username);
 
@@ -233,11 +231,22 @@ public class GameController {
                     break;
                 }
             }
-
-            return new Response("You have reconnect", ResponseStatus.SUCCESS);
         } catch (IllegalFlowException | PlayerAlreadyInGameException e) {
             return new Response("You can't reconnect to this game", ResponseStatus.FAILURE);
+        } catch (PlayerNotInGameException e) {
+            return new Response(e.getMessage(), ResponseStatus.FAILURE);
         }
+
+        if (isInLobby(username)) {
+            for (int i = 0; i < clientsInLobby.size(); i++) {
+                if (clientsInLobby.get(i).getValue().equals(username)) {
+                    clientsInLobby.remove(i);
+                    break;
+                }
+            }
+        }
+
+        return new Response("You have joined the game", ResponseStatus.SUCCESS);
     }
 
     public Response startGame(String username) {

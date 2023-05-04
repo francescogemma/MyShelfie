@@ -112,12 +112,15 @@ public class GameLayout extends AppLayout {
     public static class PlayerDisplay {
         public PlayerDisplay(String name, int points, int position,
                              boolean isClientPlayer,
-                             boolean blurred) {
+                             boolean blurred, boolean isConnected,
+                             boolean isWinner) {
             this.position = position;
             this.name = name;
             this.points = points;
             this.isClientPlayer = isClientPlayer;
             this.blurred = blurred;
+            this.isConnected = isConnected;
+            this.isWinner = isWinner;
         }
 
         public int getPosition() {
@@ -136,12 +139,22 @@ public class GameLayout extends AppLayout {
             return isClientPlayer;
         }
 
+        public boolean isConnected() {
+            return isConnected;
+        }
+
+        public boolean isWinner() {
+            return isWinner;
+        }
+
         private String name;
         private int points;
         private int additionalPoints;
         private int position;
         private boolean isClientPlayer;
         private boolean blurred;
+        private boolean isConnected;
+        private boolean isWinner;
     }
 
     private static class PlayerDisplayDrawable extends FixedLayoutDrawable<BlurrableDrawable> {
@@ -171,7 +184,8 @@ public class GameLayout extends AppLayout {
             (playerDisplayDrawable, playerDisplay) -> {
                 playerDisplayDrawable.positionTextBox.text("# " + String.valueOf(playerDisplay.position));
                 playerDisplayDrawable.playerNameTextBox.text(playerDisplay.name)
-                    .color(playerDisplay.isClientPlayer ? Color.FOCUS : Color.WHITE);
+                    .color(playerDisplay.isClientPlayer ? Color.FOCUS
+                        : (playerDisplay.isConnected ? Color.WHITE : Color.GREY));
                 playerDisplayDrawable.playerPointsTextBox.text("Points: " + playerDisplay.points);
 
                 if (playerDisplay.additionalPoints > 0) {
@@ -509,6 +523,8 @@ public class GameLayout extends AppLayout {
     private int playingPlayerIndex;
     private List<String> playerNames;
     private List<Integer> playerPoints;
+    private List<Boolean> connectedPlayers;
+    private List<Boolean> winners;
     private int clientPlayerIndex;
     private List<Bookshelf> bookshelves;
     private PersonalGoal personalGoal = null;
@@ -532,13 +548,13 @@ public class GameLayout extends AppLayout {
 
         for (int i = 0; i < playerNames.size(); i++) {
             int j = 0;
-            while (j < playerDisplays.size() && playerDisplays.get(j).points >
-                    playerPoints.get(i)) {
+            while (j < playerDisplays.size() && (playerDisplays.get(j).points >
+                    playerPoints.get(i) || !connectedPlayers.get(i))) {
                 j++;
             }
 
             playerDisplays.add(j, new PlayerDisplay(playerNames.get(i), playerPoints.get(i), j + 1,
-                i == clientPlayerIndex, false));
+                i == clientPlayerIndex, false, connectedPlayers.get(i), winners.get(i)));
 
             for (j++; j < playerDisplays.size(); j++) {
                 if (playerDisplays.get(i).points < playerPoints.get(i)) {
@@ -605,6 +621,8 @@ public class GameLayout extends AppLayout {
     private EventReceiver<FirstFullBookshelfEventData> firstFullBookshelfReceiver = null;
     private EventReceiver<PlayerHasDisconnectedEventData> playerHasDisconnectedReceiver = null;
     private EventReceiver<GameHasBeenStoppedEventData> stoppedGameReceiver = null;
+    private EventReceiver<GameHasBeenPauseEventData> gameHasBeenPauseReceiver = null;
+    private EventReceiver<PlayerHasJoinGameEventData> playerHasJoinReceiver = null;
 
     private boolean displayingPopUp = false;
 
@@ -627,6 +645,14 @@ public class GameLayout extends AppLayout {
 
         playerPoints = new ArrayList<>(data.gameView().getPlayers().stream().map(Player::getPoints)
             .toList());
+
+        connectedPlayers = new ArrayList<>(data.gameView().getPlayers().stream().map(Player::isConnected)
+            .toList());
+
+        winners = new ArrayList<>();
+        for (int i = 0; i < playerNames.size(); i++) {
+            winners.add(false);
+        }
 
         bookshelves = new ArrayList<>(data.gameView().getPlayers().stream().map(Player::getBookshelf)
             .toList());
@@ -684,7 +710,20 @@ public class GameLayout extends AppLayout {
         addCompletedGoalToDisplayQueue(completedGoal);
     };
 
+    private boolean waitingForReconnections;
+
     private final EventListener<GameOverEventData> gameOverListener = data -> {
+        gameOver = true;
+
+        if (waitingForReconnections) {
+            for (int i = 0; i < playerNames.size(); i++) {
+                winners.set(i, data.winners().contains(playerNames.get(i)));
+            }
+
+            switchAppLayout(GameOverLayout.NAME);
+            return;
+        }
+
         // Add final goal
         for (int i = 0; i < playerNames.size(); i++) {
             if (data.personalGoal().get(i).getKey() > 0) {
@@ -699,8 +738,6 @@ public class GameLayout extends AppLayout {
                     data.adjacencyGoal().get(i).getValue()));
             }
         }
-
-        gameOver = true;
     };
 
     private final EventListener<FirstFullBookshelfEventData> firstFullBookshelfListener = data -> {
@@ -754,6 +791,9 @@ public class GameLayout extends AppLayout {
 
         displayingPopUp = true;
 
+        connectedPlayers.set(playerNameToIndex(data.username()), false);
+        playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList());
+
         blurrableBoard.blur(true);
         popUpTextBox.text(data.username() + " has\ndisconnected");
         twoLayersBoard.showForeground();
@@ -771,6 +811,38 @@ public class GameLayout extends AppLayout {
                 }
             }
         }, 2000);
+    };
+
+    private final EventListener<GameHasBeenPauseEventData> gameHasBeenPauseListener = data -> {
+        while (displayingPopUp) {
+            try {
+                getLock().wait();
+            } catch (InterruptedException e) {
+
+            }
+        }
+
+        displayingPopUp = true;
+
+        waitingForReconnections = true;
+        blurrableBoard.blur(true);
+        popUpTextBox.text("Waiting for reconnections");
+        twoLayersBoard.showForeground();
+    };
+
+    private final EventListener<PlayerHasJoinGameEventData> playerHasJoinListener = data -> {
+        connectedPlayers.set(playerNameToIndex(data.username()), true);
+        playerDisplayRecyclerDrawable.populate(craftPlayerDisplayList());
+
+        if (waitingForReconnections) {
+            waitingForReconnections = false;
+
+            blurrableBoard.blur(false);
+            twoLayersBoard.hideForeground();
+
+            displayingPopUp = false;
+            getLock().notifyAll();
+        }
     };
 
     private void stopGame() {
@@ -811,9 +883,12 @@ public class GameLayout extends AppLayout {
 
     @Override
     public void setup(String previousLayoutName) {
-        if (previousLayoutName.equals(LobbyLayout.NAME)) {
+        if (previousLayoutName.equals(LobbyLayout.NAME) ||
+            previousLayoutName.equals(AvailableGamesMenuLayout.NAME)) {
+
             if (transceiver == null) {
                 transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME, "transceiver");
+
                 selectTileRequester = Response.requester(transceiver, transceiver, getLock());
                 deselectTileRequester = Response.requester(transceiver, transceiver, getLock());
                 insertTileRequester = Response.requester(transceiver, transceiver, getLock());
@@ -830,6 +905,8 @@ public class GameLayout extends AppLayout {
                 firstFullBookshelfReceiver = FirstFullBookshelfEventData.castEventReceiver(transceiver);
                 playerHasDisconnectedReceiver = PlayerHasDisconnectedEventData.castEventReceiver(transceiver);
                 stoppedGameReceiver = GameHasBeenStoppedEventData.castEventReceiver(transceiver);
+                gameHasBeenPauseReceiver = GameHasBeenPauseEventData.castEventReceiver(transceiver);
+                playerHasJoinReceiver = PlayerHasJoinGameEventData.castEventReceiver(transceiver);
 
                 PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
                     transceiver = null;
@@ -849,6 +926,8 @@ public class GameLayout extends AppLayout {
                     firstFullBookshelfReceiver = null;
                     playerHasDisconnectedReceiver = null;
                     stoppedGameReceiver = null;
+                    gameHasBeenPauseReceiver = null;
+                    playerHasJoinReceiver = null;
 
                     if (isCurrentLayout()) {
                         switchAppLayout(ConnectionMenuLayout.NAME);
@@ -866,10 +945,15 @@ public class GameLayout extends AppLayout {
             firstFullBookshelfReceiver.registerListener(firstFullBookshelfListener);
             playerHasDisconnectedReceiver.registerListener(playerDisconnectedListener);
             stoppedGameReceiver.registerListener(gameStoppedListener);
+            gameHasBeenPauseReceiver.registerListener(gameHasBeenPauseListener);
+            playerHasJoinReceiver.registerListener(playerHasJoinListener);
+
+            waitingForReconnections = false;
 
             gameOver = false;
 
-            transceiver.broadcast(new JoinGameEventData());
+            transceiver.broadcast(new JoinGameEventData(appDataProvider.getString(AvailableGamesMenuLayout.NAME,
+                "selectedgame")));
         }
     }
 
@@ -886,6 +970,8 @@ public class GameLayout extends AppLayout {
             firstFullBookshelfReceiver.unregisterListener(firstFullBookshelfListener);
             playerHasDisconnectedReceiver.unregisterListener(playerDisconnectedListener);
             stoppedGameReceiver.unregisterListener(gameStoppedListener);
+            gameHasBeenPauseReceiver.unregisterListener(gameHasBeenPauseListener);
+            playerHasJoinReceiver.unregisterListener(playerHasJoinListener);
         }
     }
 
