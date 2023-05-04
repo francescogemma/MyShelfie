@@ -4,10 +4,7 @@ import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
-import it.polimi.ingsw.event.data.client.JoinLobbyEventData;
-import it.polimi.ingsw.event.data.client.PlayerExitGame;
-import it.polimi.ingsw.event.data.client.RestartGameEventData;
-import it.polimi.ingsw.event.data.client.StartGameEventData;
+import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.networking.DisconnectedException;
@@ -85,7 +82,7 @@ public class LobbyLayout extends AppLayout {
 
         backButton.onpress(() -> {
             try {
-                Response response = playerExitRequester.request(new PlayerExitGame());
+                Response response = playerExitRequester.request(new ExitLobbyEventData());
                 displayServerResponse(response);
 
                 if (!response.isOk()) {
@@ -106,7 +103,7 @@ public class LobbyLayout extends AppLayout {
     private Requester<Response, JoinLobbyEventData> joinLobbyRequester = null;
     private Requester<Response, StartGameEventData> startGameRequester = null;
     private Requester<Response, RestartGameEventData> restartGameRequester = null;
-    private Requester<Response, PlayerExitGame> playerExitRequester = null;
+    private Requester<Response, ExitLobbyEventData> playerExitRequester = null;
 
     private void populatePlayersList() {
         recyclerPlayersList.populate(playerNames);
