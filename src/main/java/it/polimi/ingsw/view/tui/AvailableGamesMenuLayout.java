@@ -17,6 +17,7 @@ import it.polimi.ingsw.view.tui.terminal.drawable.menu.Button;
 import it.polimi.ingsw.view.tui.terminal.drawable.menu.value.TextBox;
 import it.polimi.ingsw.view.tui.terminal.drawable.menu.value.ValueMenuEntry;
 import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.FullyResizableOrientedLayout;
+import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.FullyResizableOrientedLayoutElement;
 import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Color;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.PrimitiveSymbol;
@@ -39,28 +40,41 @@ public class AvailableGamesMenuLayout extends AppLayout {
         private final TextBox nameTextBox = new TextBox();
         private final Button joinGameButton = new Button("Join game");
         private final Button joinLobbyButton = new Button("Join lobby");
+        private final FullyResizableOrientedLayoutElement joinGameButtonElement =
+            joinGameButton.center().crop().weight(0);
+        private final FullyResizableOrientedLayoutElement joinLobbyButtonElement =
+            joinLobbyButton.center().crop().weight(0);
 
         public AvailableGameDrawable() {
             setLayout(new FullyResizableOrientedLayout(Orientation.HORIZONTAL,
                 nameTextBox.unfocusable().center().crop().weight(1),
-                joinGameButton.center().crop().weight(1),
-                joinLobbyButton.center().crop().weight(1)
+                joinGameButtonElement,
+                joinLobbyButtonElement
             ).fixSize(new DrawableSize(5, 80)).addBorderBox());
         }
     }
     private final RecyclerDrawable<AvailableGameDrawable, GameHasBeenCreatedEventData.AvailableGame> recyclerGamesList = new RecyclerDrawable<>(Orientation.VERTICAL,
-        AvailableGameDrawable::new, (joinableGameDrawable, name) -> {
-                    joinableGameDrawable.nameTextBox.text(name.name());
+        AvailableGameDrawable::new, (joinableGameDrawable, availableGame) -> {
+                    joinableGameDrawable.nameTextBox.text(availableGame.name());
 
                     joinableGameDrawable.joinGameButton.onpress(() -> {
-                        selectedGameName = name.name();
+                        selectedGameName = availableGame.name();
                         switchAppLayout(GameLayout.NAME);
                     });
 
                     joinableGameDrawable.joinLobbyButton.onpress(() -> {
-                        selectedGameName = name.name();
+                        selectedGameName = availableGame.name();
                         switchAppLayout(LobbyLayout.NAME);
                     });
+
+                    joinableGameDrawable.joinGameButtonElement.setWeight(0);
+                    joinableGameDrawable.joinLobbyButtonElement.setWeight(0);
+
+                    if (availableGame.isStarted() && !availableGame.isStopped()) {
+                        joinableGameDrawable.joinGameButtonElement.setWeight(1);
+                    } else {
+                        joinableGameDrawable.joinLobbyButtonElement.setWeight(1);
+                    }
                 });
     private final AlternativeDrawable alternative = new AlternativeDrawable(noAvailableGamesTextBox, recyclerGamesList.center()
                 .scrollable());
