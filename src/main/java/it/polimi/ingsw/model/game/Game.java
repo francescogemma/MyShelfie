@@ -140,17 +140,18 @@ public class Game extends GameView {
      *  </ul>
      * @return {@link Player player} added
      */
-    public synchronized Player addPlayer(String username) throws IllegalFlowException {
+    public synchronized Player addPlayer(String username) throws IllegalFlowException, PlayerAlreadyInGameException {
         if (username == null || username.length() == 0)
             throw new NullPointerException("username is null or has length 0");
 
-        if (isStarted()) {
+        if (isStarted())
             throw new IllegalFlowException("You can't add players when the game has already started");
-        }
 
-        if (players.size() == 4) {
+        if (players.size() == 4)
             throw new IllegalFlowException("You can't have more than 4 players in the same game");
-        }
+
+        if (players.stream().anyMatch(p -> p.is(username)))
+            throw new PlayerAlreadyInGameException(username);
 
         Player player = new Player(username);
 
@@ -293,7 +294,7 @@ public class Game extends GameView {
                     calculateNextPlayer();
                 }
             } catch (IllegalFlowException e) {
-                Logger.writeCritical("sto");
+                Logger.writeCritical("call");
             }
         }
     }
@@ -600,7 +601,11 @@ public class Game extends GameView {
      * @see Board
      */
     public synchronized void selectTile (String username, Coordinate coordinate) throws IllegalFlowException, IllegalExtractionException, FullSelectionException {
-        if (!isStarted() || isStopped() || isPause())
+        if (isPause())
+            throw new IllegalFlowException("Game is pause");
+        if (isStopped())
+            throw new IllegalFlowException("Game is stopped");
+        if (!isStarted())
             throw new IllegalFlowException("Game is not started");
         if (isOver())
             throw new IllegalFlowException("Game is over");

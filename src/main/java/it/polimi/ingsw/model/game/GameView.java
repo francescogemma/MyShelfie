@@ -164,7 +164,7 @@ public class GameView implements Identifiable {
      * @return true iff there is one player online
      * */
     public synchronized boolean hasPlayerDisconnected () {
-        return players.stream().anyMatch(Player::isDisconnected);
+        return numberOfPlayerOnline() != players.size();
     }
 
     /**

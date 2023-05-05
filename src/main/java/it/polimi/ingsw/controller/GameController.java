@@ -302,7 +302,7 @@ public class GameController {
                 for (Pair<EventTransmitter, String> client: clientsInLobby) {
                     game.addPlayer(client.getValue());
                 }
-            } catch (IllegalFlowException e) {
+            } catch (IllegalFlowException | PlayerAlreadyInGameException e) {
                 assert game.isStarted();
                 return new Response(e.getMessage(), ResponseStatus.FAILURE);
             }
