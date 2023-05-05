@@ -13,8 +13,8 @@ import java.rmi.RemoteException;
 public class Server {
     public static void main(String[] args) {
         MenuController menuController = MenuController.getInstance();
-
         ConnectionAcceptor connectionAcceptor;
+
         try {
             connectionAcceptor = new ConnectionAcceptor(args[0], 8080, 8081);
         } catch (RemoteException | ConnectionException e) {

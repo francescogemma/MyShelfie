@@ -308,14 +308,14 @@ public class Game extends GameView {
             throw new IllegalFlowException("Game is stopped you need to restart it!");
         }
 
-        for (Player otherPlayer : players) {
-            if (otherPlayer.is(username)) {
-                if (otherPlayer.isConnected()) {
+        for (Player player : players) {
+            if (player.is(username)) {
+                if (player.isConnected()) {
                     throw new PlayerAlreadyInGameException(username);
                 }
 
-                otherPlayer.setConnectionState(true);
-                this.transceiver.broadcast(new PlayerHasJoinGameEventData(otherPlayer.getUsername()));
+                player.setConnectionState(true);
+                this.transceiver.broadcast(new PlayerHasJoinGameEventData(player.getUsername()));
 
                 if (numberOfPlayerOnline() == 1) {
                     this.playTimer = new Timer();

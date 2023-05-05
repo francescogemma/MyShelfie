@@ -70,7 +70,7 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements RemoteSer
      */
 
     public ConnectionAcceptor(String hostName, int TCPPort, int RMIPort) throws RemoteException, ConnectionException {
-        System.setProperty("java.rmi.server.hostname",hostName);
+        System.setProperty("java.rmi.server.hostname", hostName);
 
         this.RMIPort = RMIPort;
         registry = LocateRegistry.createRegistry(RMIPort);

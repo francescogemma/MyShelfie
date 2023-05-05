@@ -6,7 +6,6 @@ import it.polimi.ingsw.event.data.client.LoginEventData;
 import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.GameHasBeenStoppedEventData;
 import it.polimi.ingsw.event.data.game.GameOverEventData;
-import it.polimi.ingsw.event.data.internal.ForceExitGameEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventListener;
@@ -14,6 +13,7 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
 
+import javax.swing.plaf.basic.BasicPanelUI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -29,23 +29,10 @@ public class VirtualView implements EventTransmitter{
     private static final Response DEFAULT_IN_LOBBY = new Response("You are in lobby...", ResponseStatus.FAILURE);
     private static final Response DEFAULT_NOT_IN_LOBBY = new Response("You are not in lobby...", ResponseStatus.FAILURE);
 
-    private CastEventReceiver<ForceExitGameEventData> castEventReceiver = null;
-
     private static final List<String> idForceExit = Arrays.asList(
             GameOverEventData.ID,
             GameHasBeenStoppedEventData.ID
     );
-
-    private final EventListener<ForceExitGameEventData> listener = (event -> {
-        synchronized (this) {
-            if (gameController == null) {
-                Logger.writeCritical("call");
-            }
-
-            this.castEventReceiver = null;
-            this.gameController = null;
-        }
-    });
 
     public VirtualView(EventTransceiver transceiver) {
         if (transceiver == null)
@@ -83,7 +70,6 @@ public class VirtualView implements EventTransmitter{
 
             if (res.getKey().isOk()) {
                 this.gameController = res.getValue();
-                this.castEventReceiver = null;
             }
 
             return res.getKey();
@@ -119,6 +105,7 @@ public class VirtualView implements EventTransmitter{
 
             if (response.isOk()) {
                 this.username = null;
+                this.gameController = null;
             }
 
             return response;
@@ -136,10 +123,6 @@ public class VirtualView implements EventTransmitter{
                 username
         );
 
-        if (gameController != null)
-            removeListener();
-
-        this.castEventReceiver = null;
         this.gameController = null;
     }
 
@@ -150,7 +133,6 @@ public class VirtualView implements EventTransmitter{
             Response response = gameController.stopGame(username);
 
             if (response.isOk()) {
-                removeListener();
                 this.gameController = null;
             }
 
@@ -160,21 +142,12 @@ public class VirtualView implements EventTransmitter{
         }
     }
 
-    private void removeListener () {
-        if (castEventReceiver != null) {
-            this.castEventReceiver.unregisterListener(this.listener);
-        }
-
-        castEventReceiver = null;
-    }
-
     private synchronized Response exitGame (PlayerExitGame exitGame) {
         Logger.writeMessage("Call for username %s".formatted(username));
         if (isInGame()) {
             Response response = gameController.exitGame(username);
 
             if (response.isOk()) {
-                removeListener();
                 this.gameController = null;
             }
             return response;
@@ -210,9 +183,6 @@ public class VirtualView implements EventTransmitter{
 
             if (res.isOk()) {
                 Logger.writeMessage("registerListener");
-                assert castEventReceiver == null;
-                /*castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalReceiver());
-                castEventReceiver.registerListener(this.listener);*/
             }
 
             return res;
@@ -231,7 +201,7 @@ public class VirtualView implements EventTransmitter{
             Response response;
 
             if (isInLobby()) {
-                response = gameController.joinGame(username, null);
+                response = gameController.joinGame(username);
             } else {
                 Pair<Response, GameController> pair = MenuController
                     .getInstance().joinGame(this, username, eventData.getGameName());
@@ -239,14 +209,9 @@ public class VirtualView implements EventTransmitter{
                 response = pair.getKey();
 
                 if (pair.getValue() != null) {
+                    assert pair.getKey().isOk();
                     setGameController(pair.getValue());
                 }
-            }
-
-            if (response.isOk()) {
-                assert castEventReceiver == null;
-                castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalReceiver());
-                castEventReceiver.registerListener(this.listener);
             }
 
             return response;
@@ -302,9 +267,6 @@ public class VirtualView implements EventTransmitter{
                 Response response = this.gameController.startGame(this.username);
 
                 if (response.isOk()) {
-                    assert castEventReceiver == null;
-                    this.castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalReceiver());
-                    castEventReceiver.registerListener(listener);
                 }
 
                 return response;
@@ -320,23 +282,36 @@ public class VirtualView implements EventTransmitter{
         return Optional.of(username);
     }
 
-    public synchronized boolean isInGame() {
-        return gameController != null && gameController.isInGame(username);
-    }
-
     public synchronized void setGameController(GameController gameController) {
         assert this.gameController == null;
         assert gameController != null;
+        assert isAuthenticated();
 
         this.gameController = gameController;
     }
 
     public synchronized boolean isAuthenticated () {
+        assert username != null || (gameController == null);
+
         return username != null;
     }
 
+    public synchronized boolean isInGame() {
+        final boolean res = gameController != null && gameController.isInGame(username);
+
+        // res ==> isAuthenticated
+        assert !res || isAuthenticated();
+
+        return res;
+    }
+
     public synchronized boolean isInLobby() {
-        return this.gameController != null && !isInGame();
+        final boolean res = gameController != null && this.gameController.isInLobby(username);
+
+        // res ==> isAuthenticated
+        assert !res || isAuthenticated();
+
+        return res;
     }
 
     @Override

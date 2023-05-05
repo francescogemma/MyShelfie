@@ -4,7 +4,6 @@ import it.polimi.ingsw.controller.db.DBManager;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.game.*;
-import it.polimi.ingsw.event.data.internal.ForceExitGameEventData;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.board.FullSelectionException;
@@ -24,7 +23,6 @@ public class GameController {
     private final List<Pair<EventTransmitter, String>> clientsInGame;
     private final List<Pair<EventTransmitter, String>> clientsInLobby;
 
-    private final LocalEventTransceiver transceiver = new LocalEventTransceiver();
     private final List<String> eventIgnored = new ArrayList<>();
 
     public GameController(Game game) {
@@ -36,11 +34,13 @@ public class GameController {
         eventIgnored.add(PlayerHasDisconnectedEventData.ID);
         eventIgnored.add(CommonGoalCompletedEventData.ID);
 
+        LocalEventTransceiver transceiver = new LocalEventTransceiver();
+
         game.setTransceiver(transceiver);
 
         transceiver.registerListener(event -> {
                     clientsInGame.forEach(client -> client.getKey().broadcast(event));
-                    
+
                     if (this.game.isStarted() && !eventIgnored.contains(event.getId()))
                         DBManager.getGamesDBManager().save(game);
         });
@@ -57,7 +57,6 @@ public class GameController {
 
             if (game.stopGame(username)) {
                 this.clientsInGame.clear();
-                transceiver.broadcast(new ForceExitGameEventData());
                 return new Response("Game has been successfully paused", ResponseStatus.SUCCESS);
             }
             return new Response("You are not the owner", ResponseStatus.FAILURE);
@@ -120,7 +119,6 @@ public class GameController {
             game.disconnectPlayer(username);
 
             if (game.isStopped()) {
-                this.transceiver.broadcast(new ForceExitGameEventData());
                 clientsInGame.clear();
                 return new Response("You have book remove from this game", ResponseStatus.SUCCESS);
             }
@@ -228,18 +226,12 @@ public class GameController {
     }
 
     /**
-     * transmitter va passato null se la virtualview è nella lobby
+     * utilizzato per joinare senza
      * */
-    public synchronized Response joinGame (String username, EventTransmitter transmitter) {
+    public synchronized Response rejoinGame(String username, EventTransmitter transmitter) {
         try {
             // dobbiamo inviargli gli eventi qua dentro altrimenti possiamo perdere delle informazioni
             // su game rilasciando il lock e riprendendolo
-
-            /**
-             * per riconnettere senza passare dalla lobby
-             * */
-            if (transmitter != null)
-                clientsInLobby.add(Pair.of(transmitter, username));
 
             Logger.writeMessage("Clients in lobby: " + clientsInLobby.stream().map(Pair::getValue).toList().toString());
 
@@ -247,49 +239,46 @@ public class GameController {
                 if (!game.isStarted() || game.isStopped() || !game.containPlayer(username) || game.isPlayerConnected(username))
                     return new Response("[4] Game is stopped!", ResponseStatus.FAILURE);
 
-                for (int i = 0; i < clientsInLobby.size(); i++) {
-                    if (clientsInLobby.get(i).getValue().equals(username)) {
-                        Pair<EventTransmitter, String> client = clientsInLobby.remove(i);
-                        clientsInGame.add(client);
+                clientsInGame.add(Pair.of(transmitter, username));
 
-                        Logger.writeMessage("Added new user %s; new size: %d".formatted(username, clientsInGame.size()));
+                Logger.writeMessage("Added new user %s; new size: %d".formatted(username, clientsInGame.size()));
 
-                        GameView view = getGameView();
-                        final int personalGoal = getPersonalGoal(username);
+                GameView view = getGameView();
+                final int personalGoal = getPersonalGoal(username);
 
-                        client.getKey().broadcast(new InitialGameEventData(view));
-                        client.getKey().broadcast(new PersonalGoalSetEventData(personalGoal));
-
-                        break;
-                    }
-                }
+                transmitter.broadcast(new InitialGameEventData(view));
+                transmitter.broadcast(new PersonalGoalSetEventData(personalGoal));
 
                 game.connectPlayer(username);
             }
-
         } catch (IllegalFlowException | PlayerAlreadyInGameException | PlayerNotInGameException e) {
             throw new IllegalStateException("[5]");
-        } finally {
-            if (transmitter != null) {
-                for (int i = 0; i < clientsInLobby.size(); i++) {
-                    if (clientsInLobby.get(i).getValue().equals(username)) {
-                        clientsInLobby.remove(i);
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (isInLobby(username)) {
-            for (int i = 0; i < clientsInLobby.size(); i++) {
-                if (clientsInLobby.get(i).getValue().equals(username)) {
-                    clientsInLobby.remove(i);
-                    break;
-                }
-            }
         }
 
         return new Response("You have joined the game", ResponseStatus.SUCCESS);
+    }
+
+    /**
+     * transmitter va passato null se la virtualview è nella lobby
+     * */
+    public synchronized Response joinGame (String username) {
+         Logger.writeMessage("Clients in lobby: " + clientsInLobby.stream().map(Pair::getValue).toList().toString());
+
+         for (int i = 0; i < clientsInLobby.size(); i++) {
+             if (clientsInLobby.get(i).getValue().equals(username)) {
+                 Pair<EventTransmitter, String> client = clientsInLobby.get(i);
+
+                 Response response = this.rejoinGame(client.getValue(), client.getKey());
+
+                 if (response.isOk()) {
+                     clientsInLobby.remove(i);
+                 }
+
+                 return response;
+             }
+         }
+
+        return new Response("Player not in lobby", ResponseStatus.FAILURE);
     }
 
     public synchronized Response startGame(String username) {
@@ -355,14 +344,9 @@ public class GameController {
             }
 
             if (game.isStopped()) {
-                transceiver.broadcast(new ForceExitGameEventData());
                 clientsInGame.clear();
             }
         }
-    }
-
-    public EventReceiver<EventData> getInternalReceiver() {
-        return this.transceiver;
     }
 
     /**

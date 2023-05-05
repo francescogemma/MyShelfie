@@ -12,7 +12,6 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.client.LoginEventData;
 import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.*;
-import it.polimi.ingsw.event.data.internal.ForceExitGameEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.data.wrapper.SyncEventDataWrapper;
 
@@ -52,7 +51,6 @@ public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
             Map.entry(PlayerDisconnectedInternalEventData.ID, PlayerDisconnectedInternalEventData.class),
             Map.entry(FirstFullBookshelfEventData.ID, FirstFullBookshelfEventData.class),
             Map.entry(LogoutEventData.ID, LogoutEventData.class),
-            Map.entry(ForceExitGameEventData.ID, ForceExitGameEventData.class),
             Map.entry(GameHasBeenPauseEventData.ID, GameHasBeenPauseEventData.class),
             Map.entry(GameHasResumeEventData.ID, GameHasResumeEventData.class),
             Map.entry(ExitLobbyEventData.ID, ExitLobbyEventData.class),
