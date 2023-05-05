@@ -170,10 +170,22 @@ public class OrientedLayout extends Drawable {
     }
 
     private boolean focusNextElement(int direction) {
+        int previousElementWithNonNullWeightIndex = -1;
+
+        for (int i = elementOnFocusIndex - 1; i >= 0; i--) {
+            if (elements.get(i).getWeight() > 0) {
+                previousElementWithNonNullWeightIndex = i;
+                break;
+            }
+        }
+
+        int desiredParallelComponent = (direction == 1 || previousElementWithNonNullWeightIndex == -1) ? 1
+            : Math.max(elements.get(previousElementWithNonNullWeightIndex)
+                .getDrawable().getSize().getParallelSizeComponent(orientation), 1);
+
         return focusNextElement(direction, elements.get(elementOnFocusIndex).getDrawable().getFocusedCoordinate()
             .map(coordinate -> Coordinate.craftCoordinateByOrientation(orientation,
-                (direction == 1 || elementOnFocusIndex == 0) ? 1 : Math.max(elements.get(elementOnFocusIndex - 1)
-                    .getDrawable().getSize().getParallelSizeComponent(orientation), 1),
+                desiredParallelComponent,
                 coordinate.getPerpendicularComponent(orientation)
             ))
             .orElse(Coordinate.origin()));

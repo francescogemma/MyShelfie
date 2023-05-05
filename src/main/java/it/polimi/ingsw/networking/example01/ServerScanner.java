@@ -15,7 +15,7 @@ public class ServerScanner {
         Scanner scanner = new Scanner(System.in);
 
         try {
-            ConnectionAcceptor serverAcceptor = new ConnectionAcceptor(TCP_PORT, RMI_PORT, "x.x.x.x");
+            ConnectionAcceptor serverAcceptor = new ConnectionAcceptor("x.x.x.x", TCP_PORT, RMI_PORT);
             System.out.println("waiting for connection...");
             connection = serverAcceptor.accept();
             System.out.println("connected");
