@@ -69,9 +69,7 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements RemoteSer
      * @throws ConnectionException will be thrown if a failure occurs in the process of creating a new Connection.
      */
 
-    public ConnectionAcceptor(String hostName, int TCPPort, int RMIPort) throws RemoteException, ConnectionException {
-        System.setProperty("java.rmi.server.hostname", hostName);
-
+    public ConnectionAcceptor(int TCPPort, int RMIPort) throws RemoteException, ConnectionException {
         this.RMIPort = RMIPort;
         registry = LocateRegistry.createRegistry(RMIPort);
 
@@ -81,6 +79,10 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements RemoteSer
         } catch (Exception exception) {
             throw new ConnectionException();
         }
+    }
+
+    public static void initialize(String hostName) {
+        System.setProperty("java.rmi.server.hostname", hostName);
     }
 
     /**
