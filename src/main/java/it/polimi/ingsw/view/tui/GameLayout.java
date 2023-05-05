@@ -304,6 +304,15 @@ public class GameLayout extends AppLayout {
                     return;
                 }
 
+                if (waitingForReconnections) {
+                    waitingForReconnections = false;
+
+                    blurrableBoard.blur(false);
+                    twoLayersBoard.hideForeground();
+
+                    displayingPopUp = false;
+                }
+
                 /* If the game gets stopped in between the synchronous call (i.e. there are 2 players and one
                  * disconnects) the layout has already been switched by the stop game event.
                  */
