@@ -127,42 +127,44 @@ public class AvailableGamesMenuLayout extends AppLayout {
 
     @Override
     public void setup(String previousLayoutName) {
-        if (previousLayoutName.equals(LoginMenuLayout.NAME)) {
-            availableGames = new ArrayList<>();
-
-            usernameTextBox.text(appDataProvider.getString(LoginMenuLayout.NAME, "username"));
-
-            if (transceiver == null) {
-                transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
-                "transceiver");
-                createGameRequester = Response.requester(transceiver, transceiver, getLock());
-                logoutRequester = Response.requester(transceiver, transceiver, getLock());
-
-                GameHasBeenCreatedEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    availableGames.addAll(data.getNames());
-
-                    if (availableGames.size() > 0) {
-                        recyclerGamesList.populate(availableGames);
-
-                        alternative.second();
-                    } else {
-                        alternative.first();
-                    }
-                });
-
-                PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    transceiver = null;
-                    createGameRequester = null;
-                    logoutRequester = null;
-
-                    if (isCurrentLayout()) {
-                        switchAppLayout(ConnectionMenuLayout.NAME);
-                    }
-                });
-            }
-
-            transceiver.broadcast(new PlayerHasJoinMenu());
+        if (previousLayoutName.equals(ConnectionMenuLayout.NAME)) {
+            throw new IllegalStateException("You can't switch to available games menu from connection menu");
         }
+
+        availableGames = new ArrayList<>();
+
+        usernameTextBox.text(appDataProvider.getString(LoginMenuLayout.NAME, "username"));
+
+        if (transceiver == null) {
+            transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
+            "transceiver");
+            createGameRequester = Response.requester(transceiver, transceiver, getLock());
+            logoutRequester = Response.requester(transceiver, transceiver, getLock());
+
+            GameHasBeenCreatedEventData.castEventReceiver(transceiver).registerListener(data -> {
+                availableGames.addAll(data.getNames());
+
+                if (availableGames.size() > 0) {
+                    recyclerGamesList.populate(availableGames);
+
+                    alternative.second();
+                } else {
+                    alternative.first();
+                }
+            });
+
+            PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
+                transceiver = null;
+                createGameRequester = null;
+                logoutRequester = null;
+
+                if (isCurrentLayout()) {
+                    switchAppLayout(ConnectionMenuLayout.NAME);
+                }
+            });
+        }
+
+        transceiver.broadcast(new PlayerHasJoinMenu());
     }
 
     @Override
