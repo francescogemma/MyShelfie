@@ -15,10 +15,7 @@ public abstract class AppLayout extends FixedLayoutDrawable<FullyResizableDrawab
 
     private Coordinate lastFocusedCoordinate = Coordinate.origin();
 
-    @Override
-    public void askForSize(DrawableSize desiredSize) {
-        super.askForSize(desiredSize);
-
+    private void refocus() {
         if (getFocusedCoordinate().isEmpty()) {
             unfocus();
             focus(lastFocusedCoordinate);
@@ -28,13 +25,29 @@ public abstract class AppLayout extends FixedLayoutDrawable<FullyResizableDrawab
     }
 
     @Override
+    public void askForSize(DrawableSize desiredSize) {
+        super.askForSize(desiredSize);
+
+        refocus();
+    }
+
+    @Override
     public boolean handleInput(String key) {
-        if (!super.handleInput(key) && key.equals("\t")) {
-            unfocus();
-            focus(Coordinate.origin());
+        // When there is no focusable element in the layout, we can't handle input.
+        if (getFocusedCoordinate().isEmpty()) {
+            return false;
         }
 
-        return true;
+        boolean inputHasBeenHandled = super.handleInput(key);
+
+        if (!inputHasBeenHandled && key.equals("\t")) {
+            unfocus();
+            focus(Coordinate.origin());
+
+            return true;
+        }
+
+        return inputHasBeenHandled;
     }
 
     @Override

@@ -181,12 +181,6 @@ public class OrientedLayout extends Drawable {
 
     @Override
     public boolean handleInput(String key) {
-        // TODO: Refocus should happen also before handling input
-        if (elementOnFocusIndex == -1 || elements.get(elementOnFocusIndex).getDrawable()
-            .getFocusedCoordinate().isEmpty()) {
-            return false;
-        }
-
         if (elements.get(elementOnFocusIndex).getDrawable().handleInput(key)) {
             return true;
         }
