@@ -4,17 +4,18 @@ import it.polimi.ingsw.event.EventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.client.LoginEventData;
 import it.polimi.ingsw.event.data.client.*;
-import it.polimi.ingsw.event.data.game.InitialGameEventData;
-import it.polimi.ingsw.event.data.game.PersonalGoalSetEventData;
+import it.polimi.ingsw.event.data.game.GameHasBeenStoppedEventData;
+import it.polimi.ingsw.event.data.game.GameOverEventData;
 import it.polimi.ingsw.event.data.internal.ForceExitGameEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventListener;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
-import it.polimi.ingsw.model.game.GameView;
 import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class VirtualView implements EventTransmitter{
@@ -30,8 +31,18 @@ public class VirtualView implements EventTransmitter{
 
     private CastEventReceiver<ForceExitGameEventData> castEventReceiver = null;
 
+    private static final List<String> idForceExit = Arrays.asList(
+            GameOverEventData.ID,
+            GameHasBeenStoppedEventData.ID
+    );
+
     private final EventListener<ForceExitGameEventData> listener = (event -> {
         synchronized (this) {
+            if (gameController == null) {
+                Logger.writeCritical("call");
+            }
+
+            this.castEventReceiver = null;
             this.gameController = null;
         }
     });
@@ -72,7 +83,7 @@ public class VirtualView implements EventTransmitter{
 
             if (res.getKey().isOk()) {
                 this.gameController = res.getValue();
-                this.castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalReceiver());
+                this.castEventReceiver = null;
             }
 
             return res.getKey();
@@ -128,6 +139,7 @@ public class VirtualView implements EventTransmitter{
         if (gameController != null)
             removeListener();
 
+        this.castEventReceiver = null;
         this.gameController = null;
     }
 
@@ -152,6 +164,8 @@ public class VirtualView implements EventTransmitter{
         if (castEventReceiver != null) {
             this.castEventReceiver.unregisterListener(this.listener);
         }
+
+        castEventReceiver = null;
     }
 
     private synchronized Response exitGame (PlayerExitGame exitGame) {
@@ -171,7 +185,7 @@ public class VirtualView implements EventTransmitter{
 
     private synchronized void playerHasJoinMenu () {
         if (this.isAuthenticated()) {
-            MenuController.getInstance().playerHasJoinMenu(this.transceiver, username);
+            MenuController.getInstance().playerHasJoinMenu(this, username);
         } else {
             Logger.writeCritical("View send join menu but he is not authenticated");
         }
@@ -195,7 +209,10 @@ public class VirtualView implements EventTransmitter{
             Response res = gameController.restartGame(username);
 
             if (res.isOk()) {
-                castEventReceiver.registerListener(this.listener);
+                Logger.writeMessage("registerListener");
+                assert castEventReceiver == null;
+                /*castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalReceiver());
+                castEventReceiver.registerListener(this.listener);*/
             }
 
             return res;
@@ -227,6 +244,7 @@ public class VirtualView implements EventTransmitter{
             }
 
             if (response.isOk()) {
+                assert castEventReceiver == null;
                 castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalReceiver());
                 castEventReceiver.registerListener(this.listener);
             }
@@ -284,7 +302,9 @@ public class VirtualView implements EventTransmitter{
                 Response response = this.gameController.startGame(this.username);
 
                 if (response.isOk()) {
+                    assert castEventReceiver == null;
                     this.castEventReceiver = ForceExitGameEventData.castEventReceiver(gameController.getInternalReceiver());
+                    castEventReceiver.registerListener(listener);
                 }
 
                 return response;
@@ -306,9 +326,9 @@ public class VirtualView implements EventTransmitter{
 
     public synchronized void setGameController(GameController gameController) {
         assert this.gameController == null;
-        this.gameController = gameController;
-
         assert gameController != null;
+
+        this.gameController = gameController;
     }
 
     public synchronized boolean isAuthenticated () {
@@ -321,6 +341,11 @@ public class VirtualView implements EventTransmitter{
 
     @Override
     public void broadcast(EventData data) {
+        if (idForceExit.contains(data.getId()) && isInGame())
+            gameController = null;
+
+        Logger.writeMessage("%s player receive %s".formatted(username, data.getId()));
+
         this.transceiver.broadcast(data);
     }
 }

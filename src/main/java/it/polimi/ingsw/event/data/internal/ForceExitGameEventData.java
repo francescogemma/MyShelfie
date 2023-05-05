@@ -12,14 +12,8 @@ import java.util.function.Function;
 
 public class ForceExitGameEventData implements EventData {
     public static final String ID = "FORCE_EXIT_GAME";
-    private final String username;
 
-    public ForceExitGameEventData(String username) {
-        this.username = username;
-    }
-
-    public String getUsername() {
-        return this.username;
+    public ForceExitGameEventData() {
     }
 
     public static CastEventReceiver<ForceExitGameEventData> castEventReceiver(EventReceiver<EventData> receiver) {

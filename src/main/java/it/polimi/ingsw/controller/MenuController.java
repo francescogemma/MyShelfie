@@ -135,7 +135,7 @@ public class MenuController {
         }
     }
 
-    public void playerHasJoinMenu (EventTransceiver transceiver, String username) {
+    public void playerHasJoinMenu (EventTransmitter transceiver, String username) {
         List<GameHasBeenCreatedEventData.AvailableGame> gamePresent = new ArrayList<>();
 
         synchronized (this.gameControllerList) {

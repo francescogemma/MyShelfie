@@ -39,15 +39,10 @@ public class GameController {
         game.setTransceiver(transceiver);
 
         transceiver.registerListener(event -> {
-                    clientsInGame.forEach(
-                        client -> {
-                            client.getKey().broadcast(event);
-                        }
-                    );
-
-            Logger.writeMessage(event.getId() + clientsInGame.size());
-            if (this.game.isStarted() && !eventIgnored.contains(event.getId()))
-                DBManager.getGamesDBManager().save(game);
+                    clientsInGame.forEach(client -> client.getKey().broadcast(event));
+                    
+                    if (this.game.isStarted() && !eventIgnored.contains(event.getId()))
+                        DBManager.getGamesDBManager().save(game);
         });
     }
 
@@ -62,7 +57,7 @@ public class GameController {
 
             if (game.stopGame(username)) {
                 this.clientsInGame.clear();
-                transceiver.broadcast(new ForceExitGameEventData(username));
+                transceiver.broadcast(new ForceExitGameEventData());
                 return new Response("Game has been successfully paused", ResponseStatus.SUCCESS);
             }
             return new Response("You are not the owner", ResponseStatus.FAILURE);
@@ -125,7 +120,7 @@ public class GameController {
             game.disconnectPlayer(username);
 
             if (game.isStopped()) {
-                this.transceiver.broadcast(new ForceExitGameEventData(username));
+                this.transceiver.broadcast(new ForceExitGameEventData());
                 clientsInGame.clear();
                 return new Response("You have book remove from this game", ResponseStatus.SUCCESS);
             }
@@ -246,7 +241,7 @@ public class GameController {
             if (transmitter != null)
                 clientsInLobby.add(Pair.of(transmitter, username));
 
-            Logger.writeMessage(clientsInLobby.stream().map(Pair::getValue).toList().toString());
+            Logger.writeMessage("Clients in lobby: " + clientsInLobby.stream().map(Pair::getValue).toList().toString());
 
             synchronized (game) {
                 if (!game.isStarted() || game.isStopped() || !game.containPlayer(username) || game.isPlayerConnected(username))
@@ -360,7 +355,7 @@ public class GameController {
             }
 
             if (game.isStopped()) {
-                transceiver.broadcast(new ForceExitGameEventData(username));
+                transceiver.broadcast(new ForceExitGameEventData());
                 clientsInGame.clear();
             }
         }
