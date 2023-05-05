@@ -13,7 +13,7 @@ public class Server {
         try {
             // create and export our acceptor.
             System.out.println("Starting server...");
-            ConnectionAcceptor serverAcceptor = new ConnectionAcceptor(1234, 5678);
+            ConnectionAcceptor serverAcceptor = new ConnectionAcceptor(1234, 5678, "x.x.x.x");
             System.out.println("Server started.");
 
             // from here on, we can use the serverAcceptor.

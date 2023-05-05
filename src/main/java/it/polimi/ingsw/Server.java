@@ -16,7 +16,7 @@ public class Server {
 
         ConnectionAcceptor connectionAcceptor;
         try {
-            connectionAcceptor = new ConnectionAcceptor(8080, 8081);
+            connectionAcceptor = new ConnectionAcceptor(8080, 8081, "x.x.x.x");
         } catch (RemoteException | ConnectionException e) {
             Logger.writeCritical(e.toString());
 
