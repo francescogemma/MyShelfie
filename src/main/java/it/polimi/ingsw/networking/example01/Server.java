@@ -13,9 +13,9 @@ public class Server {
         try {
             // create and export our acceptor.
             System.out.println("Starting server...");
-            ConnectionAcceptor serverAcceptor = new ConnectionAcceptor("x.x.x.x", 1234, 5678);
+            ConnectionAcceptor.initialize("x.x.x.x");
+            ConnectionAcceptor serverAcceptor = new ConnectionAcceptor(1234, 5678);
             System.out.println("Server started.");
-
             // from here on, we can use the serverAcceptor.
             while (true) {
                 System.out.println("Now accepting new connection requests...");
