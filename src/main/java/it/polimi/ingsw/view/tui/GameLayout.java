@@ -723,8 +723,6 @@ public class GameLayout extends AppLayout {
     private boolean waitingForReconnections;
 
     private final EventListener<GameOverEventData> gameOverListener = data -> {
-        gameOver = true;
-
         if (waitingForReconnections) {
             for (int i = 0; i < playerNames.size(); i++) {
                 winners.set(i, data.winners().contains(playerNames.get(i)));
@@ -748,6 +746,8 @@ public class GameLayout extends AppLayout {
                     data.adjacencyGoal().get(i).getValue()));
             }
         }
+
+        gameOver = true;
     };
 
     private final EventListener<FirstFullBookshelfEventData> firstFullBookshelfListener = data -> {
