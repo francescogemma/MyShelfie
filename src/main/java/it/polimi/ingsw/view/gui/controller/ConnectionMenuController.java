@@ -9,14 +9,13 @@ import it.polimi.ingsw.networking.TCP.SocketCreationException;
 import it.polimi.ingsw.networking.TCP.TCPConnection;
 import it.polimi.ingsw.view.gui.LoaderException;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
-import javafx.scene.layout.HBox;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -46,26 +45,37 @@ public class ConnectionMenuController {
 
     @FXML
     private void switchLayout() {
-        // Connection connection = null;
+        Task<Void> connect = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                // Connection connection = null;
 
-        try {
-            /*String ipAddress = serverIPTextField.getText();
-            int port = Integer.parseInt(serverPortTextField.getText());
+                try {
+                    /*String ipAddress = serverIPTextField.getText();
+                    int port = Integer.parseInt(serverPortTextField.getText());
 
-            if (serverIPTextField.getScene().getProperties().get("connection").equals("TCP")) {
-                connection = new TCPConnection(ipAddress, port);
-            } else {
-                connection = new RMIConnection(ipAddress, port);
-            }*/
+                    if (serverIPTextField.getScene().getProperties().get("connection").equals("TCP")) {
+                        connection = new TCPConnection(ipAddress, port);
+                    } else {
+                        connection = new RMIConnection(ipAddress, port);
+                    }*/
 
-            Parent nextMenu = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/UserLoginMenuLayout.fxml")));
-            connectionMenuNextButton.getScene().setRoot(nextMenu);
-        } /*catch (NumberFormatException | BadPortException e) {
-        } catch (BadHostException e) {
-        } catch (ServerNotFoundException | SocketCreationException e) {
-        }*/ catch (IOException e) {
-            throw new LoaderException("Couldn't load resource", e);
-        }
+                    Parent nextMenu = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/UserLoginMenuLayout.fxml")));
+                    connectionMenuNextButton.getScene().setRoot(nextMenu);
+                } /*catch (NumberFormatException | BadPortException e) {
+                    System.out.println("Invalid port");
+                } catch (BadHostException e) {
+                    System.out.println("Invalid host");
+                } catch (ServerNotFoundException | SocketCreationException e) {
+                    System.out.println("Couldn't connect to server");
+                }*/ catch (IOException e) {
+                    throw new LoaderException("Couldn't load resource", e);
+                }
+                return null;
+            }
+        };
+
+        new Thread(connect).start();
     }
 
     @FXML

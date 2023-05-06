@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+
+<HBox fx:id="gameBackgroundHBox"
+      maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
+      stylesheets="/GameStylesheet.css"
+      xmlns="http://javafx.com/javafx/17.0.2-ea"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.polimi.ingsw.view.gui.controller.GameLayoutController">
+
+    <VBox fx:id="gameLeftSide" HBox.hgrow="ALWAYS">
+        <padding>
+            <Insets bottom="10" top="10" />
+        </padding>
+        <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
+            <AnchorPane>
+                <VBox fx:id="gameGoalsList" spacing="10" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <padding>
+                        <Insets bottom="10" left="10" right="10" top="10" />
+                    </padding>
+                    <HBox fx:id="firstCommonGoalHBox" VBox.vgrow="ALWAYS" alignment="CENTER_LEFT" spacing="5">
+                        <ImageView fx:id="firstCommonGoalImageView" fitHeight="${firstCommonGoalHBox.height * 0.8}"
+                                   fitWidth="${firstCommonGoalHBox.width * 0.5}" preserveRatio="true">
+                            <Image url="/common goal cards/1.jpg"/>
+                        </ImageView>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="firstCommonGoalLabel" text="First Common Goal" />
+                    </HBox>
+
+                    <HBox fx:id="secondCommonGoalHBox" VBox.vgrow="ALWAYS" alignment="CENTER_LEFT" spacing="5">
+                        <ImageView fx:id="secondCommonGoalImageView" fitHeight="${secondCommonGoalHBox.height * 0.8}"
+                                   fitWidth="${secondCommonGoalHBox.width * 0.5}" preserveRatio="true">
+                            <Image url="/common goal cards/2.jpg"/>
+                        </ImageView>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="secondCommonGoalLabel" text="Second Common Goal" />
+                    </HBox>
+
+                    <HBox fx:id="personalGoalHBox" VBox.vgrow="ALWAYS" alignment="CENTER_LEFT" spacing="5">
+                        <ImageView fx:id="personalGoalImageView" fitHeight="${personalGoalHBox.height * 0.8}"
+                                   fitWidth="${personalGoalHBox.width * 0.5}" preserveRatio="true">
+                            <Image url="/personal goal cards/Personal_Goals.png"/>
+                        </ImageView>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="personalGoalLabel" text="Personal Goal" />
+                    </HBox>
+                </VBox>
+            </AnchorPane>
+        </ScrollPane>
+    </VBox>
+
+    <VBox fx:id="gameCenter" alignment="CENTER" HBox.hgrow="ALWAYS">
+        <StackPane fx:id="boardStackPane" VBox.vgrow="ALWAYS">
+            <ImageView fx:id="gameBoardImageView" fitHeight="${boardStackPane.height * 0.8}"
+                       fitWidth="${boardStackPane.width * 0.8}" preserveRatio="true">
+                <Image fx:id="gameBoardImage" url="/boards/livingroom.png"/>
+            </ImageView>
+
+            <GridPane fx:id="boardGridPane" gridLinesVisible="true">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                    <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                    <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                    <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                    <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                    <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                    <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                    <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                    <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints percentHeight="${100.0 / 9.0}" />
+                    <RowConstraints percentHeight="${100.0 / 9.0}" />
+                    <RowConstraints percentHeight="${100.0 / 9.0}" />
+                    <RowConstraints percentHeight="${100.0 / 9.0}" />
+                    <RowConstraints percentHeight="${100.0 / 9.0}" />
+                    <RowConstraints percentHeight="${100.0 / 9.0}" />
+                    <RowConstraints percentHeight="${100.0 / 9.0}" />
+                    <RowConstraints percentHeight="${100.0 / 9.0}" />
+                    <RowConstraints percentHeight="${100.0 / 9.0}" />
+                </rowConstraints>
+            </GridPane>
+        </StackPane>
+    </VBox>
+
+    <VBox fx:id="gameRightSide" HBox.hgrow="ALWAYS">
+        <padding>
+            <Insets bottom="10" top="10" />
+        </padding>
+        <HBox fx:id="gameRankingHBox" VBox.vgrow="ALWAYS">
+            <ScrollPane fitToHeight="true" fitToWidth="true" HBox.hgrow="ALWAYS">
+                <AnchorPane>
+                    <VBox fx:id="gameRanking" spacing="10" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <padding>
+                            <Insets bottom="10" left="10" right="10" top="10" />
+                        </padding>
+                    </VBox>
+                </AnchorPane>
+            </ScrollPane>
+        </HBox>
+
+        <HBox fx:id="bookshelfHBox" VBox.vgrow="ALWAYS">
+            <StackPane fx:id="bookshelfStackPane" HBox.hgrow="ALWAYS">
+                <GridPane fx:id="bookshelfGridPane">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                        <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                        <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                        <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                        <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints percentHeight="${100.0 / 6.0}" />
+                        <RowConstraints percentHeight="${100.0 / 6.0}" />
+                        <RowConstraints percentHeight="${100.0 / 6.0}" />
+                        <RowConstraints percentHeight="${100.0 / 6.0}" />
+                        <RowConstraints percentHeight="${100.0 / 6.0}" />
+                        <RowConstraints percentHeight="${100.0 / 6.0}" />
+                    </rowConstraints>
+                </GridPane>
+
+                <ImageView fx:id="bookshelfImageView" fitHeight="${bookshelfStackPane.height * 0.8}"
+                           fitWidth="${bookshelfStackPane.width * 0.8}" preserveRatio="true">
+                    <Image fx:id="bookshelfImage" url="/boards/bookshelf_orth.png"/>
+                </ImageView>
+            </StackPane>
+        </HBox>
+    </VBox>
+</HBox>
