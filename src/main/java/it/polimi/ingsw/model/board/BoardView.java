@@ -70,7 +70,6 @@ public class BoardView {
         return this.tiles[c.getRow()][c.getCol()];
     }
 
-    // TODO: Add testing for this new method
     /**
      * @return all board coordinates selected so far [sorted by selection].
      */

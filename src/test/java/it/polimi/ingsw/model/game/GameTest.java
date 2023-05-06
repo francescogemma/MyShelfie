@@ -882,4 +882,67 @@ class GameTest {
         Assertions.assertTrue(game.isStarted());
         Assertions.assertTrue(game.isStopped());
     }
+
+    @RepeatedTest(numberOfRun)
+    void createView__correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException, PlayerNotInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+
+        game.startGame("Giacomo");
+
+        game.connectPlayer("Giacomo");
+        game.connectPlayer("Michele");
+
+        GameView view = game.createView();
+
+        Assertions.assertEquals(view.getPlayers(), game.getPlayers());
+        Assertions.assertEquals(view.isStarted(), game.isStarted());
+        Assertions.assertEquals(view.getName(), game.getName());
+        Assertions.assertEquals(view.getBoard(), game.getBoard());
+    }
+
+    @Test
+    void hasPlayerDisconnected__correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+
+        game.startGame("Giacomo");
+
+        Assertions.assertTrue(game.hasPlayerDisconnected());
+    }
+
+    @Test
+    void canStartGame_playerNull_throwNullPointerException() {
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            game.canStartGame(null);
+        });
+    }
+
+    @Test
+    void isAvailableForJoin__correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
+        Assertions.assertTrue(game.isAvailableForJoin("Giacomo"));
+
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+
+        game.startGame("Giacomo");
+
+        Assertions.assertFalse(game.isAvailableForJoin("Cristiano"));
+    }
+
+    @Test
+    void getCurrentPlayer_gameOver_throwIllegalFlowException() throws IllegalFlowException, PlayerAlreadyInGameException, PlayerNotInGameException, InterruptedException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+
+        game.startGame("Giacomo");
+
+        game.connectPlayer("Giacomo");
+
+        Thread.sleep(GameView.TIME_PAUSE_BEFORE_WIN + 1000);
+
+        Assertions.assertThrows(IllegalFlowException.class, () -> {
+            game.getCurrentPlayer();
+        });
+    }
 }

@@ -176,23 +176,6 @@ public class GameView implements Identifiable {
         return numberOfPlayerOnline() != players.size();
     }
 
-    /**
-     * @return The next player online from username
-     * @throws NoPlayerConnectedException iff there is no player online except username
-     * */
-    protected synchronized int getNextPlayerOnline(String username) throws NoPlayerConnectedException {
-        int index = -1;
-        for (int i = 0; i < players.size(); i++) {
-            if (players.get(i).is(username))
-                index = i;
-        }
-
-        if (index == -1)
-            throw new IllegalArgumentException("Player not in this game");
-
-        return getNextPlayerOnline(index);
-    }
-
     protected synchronized int getNextPlayerOnline (int currentPlayerIndex) throws NoPlayerConnectedException {
         for (int i = 1; i < this.players.size(); i++) {
             final int index = (currentPlayerIndex + i) % this.players.size();
