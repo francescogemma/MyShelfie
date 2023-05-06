@@ -7,7 +7,8 @@
 <VBox fx:id="gameLobbyVBox"
       prefHeight="400.0" prefWidth="600.0"
       stylesheets="/GameLobbyMenuStylesheet.css"
-      xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+      xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.polimi.ingsw.view.gui.controller.GameLobbyMenuController">
 
     <HBox>
         <padding> <Insets bottom="10" left="10" right="10" top="10" /> </padding>
@@ -34,9 +35,10 @@
     <HBox alignment="CENTER" spacing="10">
         <padding> <Insets bottom="10" left="20" right="20" top="10" /> </padding>
 
-        <Button mnemonicParsing="false" text="Exit"/>
+        <Button mnemonicParsing="false" text="Exit" onAction="#exit"/>
         <Button fx:id="startGameButton" mnemonicParsing="false" text="Start Game" />
         <Button fx:id="restartGameButton" mnemonicParsing="false" text="Restart Game" />
-        <Button fx:id="backToAvailableGamesButton" mnemonicParsing="false" text="Back to Available Games" />
+        <Button fx:id="backToAvailableGamesButton" mnemonicParsing="false"
+                text="Back to Available Games" onAction="#backToAvailableGames" />
     </HBox>
 </VBox>
