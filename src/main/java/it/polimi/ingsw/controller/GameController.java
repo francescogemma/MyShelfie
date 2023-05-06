@@ -79,11 +79,14 @@ public class GameController {
             if (!game.containPlayer(username))
                 throw new IllegalArgumentException();
 
-            if (game.stopGame(username)) {
+            try {
+                game.stopGame(username);
                 this.clientsInGame.clear();
-                return new Response("Game has been successfully paused", ResponseStatus.SUCCESS);
+
+                return new Response("Game has been stopped", ResponseStatus.SUCCESS);
+            } catch (IllegalFlowException e) {
+                return new Response("Game is not stopped", ResponseStatus.FAILURE);
             }
-            return new Response("You are not the owner", ResponseStatus.FAILURE);
         }
     }
 

@@ -32,7 +32,7 @@ public class Game extends GameView {
      * */
     protected final transient List<Integer> personalGoalIndexes;
 
-    private transient Timer timer;
+    private transient Timer timerEndGame;
     private transient Timer playTimer;
 
     private final List<PersonalGoal> personalGoals;
@@ -51,11 +51,13 @@ public class Game extends GameView {
         this.personalGoalIndexes = new ArrayList<>(Arrays.asList( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ));
         this.personalGoals = new ArrayList<>();
         Collections.shuffle(this.personalGoalIndexes);
+        this.playersToWait = new ArrayList<>();
     }
 
     public synchronized void forceStop () {
         this.isStopped = true;
-        this.isPause = false;
+        removeFromPause();
+
         players.forEach(p -> p.setConnectionState(false));
     }
 
@@ -71,9 +73,10 @@ public class Game extends GameView {
     /**
      * This method stops the game. The only way to resume it is
      * @param username The player that wants to stop the game
+     * @throws IllegalFlowException iff username can't stot the game
      * @see StartGameEventData
      * */
-    public synchronized boolean stopGame (String username) {
+    public synchronized void stopGame (String username) throws IllegalFlowException {
         String playerOnline;
 
         Logger.writeMessage("Game name: %s Prima %s".formatted(this.name, username));
@@ -92,15 +95,14 @@ public class Game extends GameView {
             // there is no player except [username]
             Logger.writeCritical("This exception should not be throw");
             assert false;
-            return false;
+            throw new IllegalStateException();
         }
 
-        if (username.equals(playerOnline)) {
-            setStopped();
-            return true;
+        if (!username.equals(playerOnline)) {
+            throw new IllegalFlowException("%s can't stop the game".formatted(username));
         }
 
-        return false;
+        setStopped();
     }
 
     /**
@@ -171,10 +173,6 @@ public class Game extends GameView {
         return players.get(index);
     }
 
-    public synchronized boolean containPlayer (String username) {
-        return players.stream().anyMatch(p -> p.getUsername().equals(username));
-    }
-
     public synchronized void removePlayer (String username) throws IllegalFlowException {
         if (isStarted())
             throw new IllegalFlowException("Game has already started");
@@ -214,21 +212,32 @@ public class Game extends GameView {
         isPause = true;
         broadcast(new GameHasBeenPauseEventData());
 
-        this.timer = new Timer();
-        this.timer.schedule(new TimerTask() {
+        this.timerEndGame = new Timer();
+        this.timerEndGame.schedule(new TimerTask() {
             @Override
             public void run() {
                 awardTimeWinner();
             }
-        }, 60000);
+        }, TIME_PAUSE_BEFORE_WIN);
+    }
+
+    /**
+     * waitingForReconnections
+     * */
+    private synchronized void removeFromPause() {
+        if (timerEndGame != null) {
+            timerEndGame.cancel();
+            timerEndGame = null;
+        }
+        isPause = false;
     }
 
     private synchronized void setStopped () {
         forceStop();
 
-        if (timer != null)
-            this.timer.cancel();
-        timer = null;
+        if (timerEndGame != null)
+            this.timerEndGame.cancel();
+        timerEndGame = null;
 
         Logger.writeMessage("Game is stopped!!!");
         broadcast(new GameHasBeenStoppedEventData());
@@ -246,9 +255,7 @@ public class Game extends GameView {
         this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
 
         if (numberOfPlayerOnline() == 0) {
-            if (timer != null)
-                timer.cancel();
-            isPause = false;
+            removeFromPause();
             setStopped();
         } else if (numberOfPlayerOnline() == 1) {
             setPause();
@@ -294,14 +301,35 @@ public class Game extends GameView {
                     calculateNextPlayer();
                 }
             } catch (IllegalFlowException e) {
+                assert false;
                 Logger.writeCritical("call");
             }
         }
     }
 
+    /**
+     * La funzione connetto un player in partita.
+     * Inizialmente, quando viene startata la partita per la prima volta,
+     * ogni player viene segnato come disconnesso, e appena quest'ultimo si
+     * connette bisogna chiamare {@link Game#connectPlayer(String)} per connetterlo
+     * effettivamente all'interno della partita.
+     *
+     * Quando il primo player della partita si connette la partita viene messa in pausa,
+     * se il secondo utente che si connette non è il giocatore corrente, ossia il primo, dato
+     * che il game è appena partito ed era in pausa, viene lanciato un timer di TIME_FIRST_PLAYER_CONNECT
+     * millisecondi, che al termine cambia il turno al primo giocatore collegato.
+     *
+     * @param username l'username del player che vuole connettersi
+     * @throws NullPointerException iff username is null
+     * @throws PlayerAlreadyInGameException se il player è gia connesso
+     * @throws IllegalFlowException se il game è stoppato
+     * @throws PlayerNotInGameException se il player non è in questa partita.
+     */
     public synchronized void connectPlayer(String username) throws PlayerAlreadyInGameException, IllegalFlowException,
         PlayerNotInGameException
     {
+        Objects.requireNonNull(username);
+
         // Allows for reconnection of disconnected players
         if (isStopped()) {
             Logger.writeWarning("View ask to reconnect while stopped");
@@ -318,22 +346,29 @@ public class Game extends GameView {
                 this.transceiver.broadcast(new PlayerHasJoinGameEventData(player.getUsername()));
 
                 if (numberOfPlayerOnline() == 1) {
-                    this.playTimer = new Timer();
-                    this.playTimer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            timerEndForTurn();
-                        }
-                    }, 3000);
-
                     setPause();
                 } else if (isPause()) {
-                    assert timer != null;
                     assert numberOfPlayerOnline() == 2;
+                    assert playTimer == null;
 
-                    this.isPause = false;
-                    timer.cancel();
-                    timer = null;
+                    removeFromPause();
+
+                    if (players.get(currentPlayerIndex).isDisconnected() && playersToWait.isEmpty()) {
+                        this.playTimer = new Timer();
+                        this.playTimer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                timerEndForTurn();
+                            }
+                        }, TIME_FIRST_PLAYER_CONNECT);
+                    }
+                } else {
+                    if (playTimer != null) {
+                        this.playTimer.cancel();
+                        this.playTimer = null;
+                    }
+
+                    playersToWait = new ArrayList<>();
                 }
 
                 return;
@@ -372,6 +407,7 @@ public class Game extends GameView {
     }
 
     /**
+     * Use this method to remove the last selected tile from the tile selection
      * @throws IllegalFlowException
      * <ul>
      *  <li> Game is not started </li>
@@ -449,7 +485,7 @@ public class Game extends GameView {
 
     /*
      * @throws NoPlayerConnectedException iff there are no other connected players besides the current one.
-     * */
+     */
     private synchronized void calculateNextPlayer() {
         assert this.players.size() >= 2 && this.players.size() <= 4;
         assert this.isStarted() && !isStopped() && !isPause();
@@ -471,19 +507,14 @@ public class Game extends GameView {
                 }
             }
 
-            try {
-                broadcast(
-                        new GameOverEventData(
-                                this.getWinners(),
-                                players,
-                                pointsAchievePersonal,
-                                pointsAchieveAdjacency
-                        )
-                );
-            } catch (IllegalFlowException e) {
-                Logger.writeCritical("call " + e);
-                assert false;
-            }
+            broadcast(
+                    new GameOverEventData(
+                            winners,
+                            players,
+                            pointsAchievePersonal,
+                            pointsAchieveAdjacency
+                    )
+            );
         } else {
             this.refillBoardIfNecessary();
 
@@ -530,16 +561,16 @@ public class Game extends GameView {
         if (!this.players.get(currentPlayerIndex).equals(player))
             throw new IllegalFlowException();
 
-        List<Tile> t = board.getSelectedTiles();
+        List<Tile> selectedTiles = board.getSelectedTiles();
 
-        if (t.isEmpty())
+        if (selectedTiles.isEmpty())
             throw new IllegalExtractionException("You have select 0 tiles");
 
         if (!board.canDraw()) {
             throw new IllegalExtractionException("You can't draw this tiles");
         }
 
-        player.getBookshelf().insertTiles(t, col);
+        player.getBookshelf().insertTiles(selectedTiles, col);
         board.draw();
 
         broadcast(new BoardChangedEventData(board.createView()));
@@ -566,6 +597,10 @@ public class Game extends GameView {
             }
         }
 
+        /*
+         * we need to set one additional point to the first
+         * player that complete the bookshelf
+         */
         if (player.getBookshelf().isFull() && firstPlayerCompleteBookshelf == -1) {
             firstPlayerCompleteBookshelf = currentPlayerIndex;
             player.addPoints(1);

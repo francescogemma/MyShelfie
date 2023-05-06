@@ -1,8 +1,12 @@
 package it.polimi.ingsw.model.game;
 
+import it.polimi.ingsw.controller.GameController;
+import it.polimi.ingsw.controller.MenuController;
+import it.polimi.ingsw.controller.User;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.game.*;
+import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.bag.Bag;
 import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.board.BoardView;
@@ -16,16 +20,22 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT;
 
 /**
  * Test for Game
  * @author Giacomo Groppi
  * */
+@Execution(CONCURRENT)
 class GameTest {
     private Game game;
     private LocalEventTransceiver transceiver;
@@ -628,5 +638,248 @@ class GameTest {
         });
 
         game.startGame("Giacomo");
+    }
+
+    @Test
+    void isPause_onlyOnePlayerConnectedAfterStart_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException, PlayerNotInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        game.startGame("Giacomo");
+
+        game.connectPlayer("Michele");
+
+        Assertions.assertTrue(game.isPause());
+    }
+
+    @Test
+    void isPause_twoPlayerConnectedAfterStart_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException, PlayerNotInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        game.startGame("Giacomo");
+
+        game.connectPlayer("Michele");
+        game.connectPlayer("Cristiano");
+
+        Assertions.assertFalse(game.isPause());
+    }
+
+    @RepeatedTest(4)
+    void isPause_afterTimeFirstPlayerLoseTurn_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException, PlayerNotInGameException, InterruptedException, NoSuchFieldException, IllegalAccessException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        game.startGame("Giacomo");
+
+        game.connectPlayer("Michele");
+        game.connectPlayer("Cristiano");
+
+        Assertions.assertFalse(game.isPause());
+        Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
+
+        Thread.sleep(Game.TIME_FIRST_PLAYER_CONNECT + 1000);
+
+        Assertions.assertEquals("Michele", game.getCurrentPlayer().getUsername());
+    }
+
+    @RepeatedTest(4)
+    void isOver_afterAPause_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException, PlayerNotInGameException, InterruptedException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        game.startGame("Giacomo");
+
+        game.connectPlayer("Giacomo");
+        game.connectPlayer("Michele");
+
+        game.disconnectPlayer("Giacomo");
+
+        Assertions.assertTrue(game.isPause());
+
+        Thread.sleep(GameView.TIME_PAUSE_BEFORE_WIN + 1000);
+
+        Assertions.assertTrue(game.isOver());
+        Assertions.assertEquals(1, game.getWinners().size());
+        Assertions.assertEquals("Michele", game.getWinners().get(0).getUsername());
+    }
+
+    @RepeatedTest(numberOfRun)
+    void stopGame_allPlayerConnected_correctOutput() throws PlayerNotInGameException, IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        game.startGame("Giacomo");
+
+        game.connectPlayer("Giacomo");
+        game.connectPlayer("Michele");
+        game.connectPlayer("Cristiano");
+
+        game.stopGame("Giacomo");
+        Assertions.assertTrue(game.isStopped());
+    }
+
+    @RepeatedTest(numberOfRun)
+    void stopGame_OnePlayerConnected_correctOutput() throws PlayerNotInGameException, IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        game.startGame("Giacomo");
+
+        game.connectPlayer("Michele");
+
+        game.stopGame("Michele");
+        Assertions.assertTrue(game.isStopped());
+    }
+
+    @RepeatedTest(numberOfRun)
+    void stopGame_PlayerAskNotOwner_throwIllegalFlowException() throws PlayerNotInGameException, IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        game.startGame("Giacomo");
+
+        game.connectPlayer("Michele");
+        game.connectPlayer("Giacomo");
+        game.connectPlayer("Cristiano");
+
+        Assertions.assertThrows(IllegalFlowException.class, () -> {
+            game.stopGame("Michele");
+        });
+    }
+
+    @RepeatedTest(numberOfRun)
+    void removePlayer__correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.removePlayer("Giacomo");
+
+        Assertions.assertEquals(0, game.getPlayers().size());
+    }
+
+    @RepeatedTest(numberOfRun)
+    void removePlayer_removeNotInGame_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            game.removePlayer("Cristiano");
+        });
+    }
+
+    @RepeatedTest(numberOfRun)
+    void removePlayer_gameAlreadyStarted_throwsIllegalFlowException() throws IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+
+        game.startGame("Giacomo");
+
+        Assertions.assertThrows(IllegalFlowException.class, () -> {
+            game.addPlayer("Pippo");
+        });
+    }
+
+    @RepeatedTest(numberOfRun)
+    void isPlayerConnected__correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException, PlayerNotInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+
+        game.startGame("Giacomo");
+
+        Assertions.assertFalse(
+                game.isPlayerConnected("Giacomo")
+        );
+
+        game.connectPlayer("Giacomo");
+        game.connectPlayer("Michele");
+
+        Assertions.assertTrue(
+            game.isPlayerConnected("Giacomo")
+        );
+    }
+
+    @RepeatedTest(numberOfRun)
+    void restartGame__correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException, PlayerNotInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+
+        game.startGame("Giacomo");
+
+        game.connectPlayer("Giacomo");
+        game.connectPlayer("Michele");
+
+        game.stopGame("Giacomo");
+
+        Assertions.assertTrue(game.isStopped());
+
+        game.restartGame("Giacomo");
+
+        Assertions.assertTrue(game.isStarted());
+        Assertions.assertFalse(game.isPlayerConnected("Giacomo"));
+        Assertions.assertFalse(game.isPlayerConnected("Michele"));
+    }
+
+    @RepeatedTest(numberOfRun)
+    void restartGame_skipTurnPlayerNotConnected_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException, PlayerNotInGameException, IllegalExtractionException, FullSelectionException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        game.startGame("Giacomo");
+
+        game.connectPlayer("Giacomo");
+        game.connectPlayer("Michele");
+
+        game.selectTile("Giacomo", game.getBoard().getSelectableCoordinate().get(0));
+        game.insertTile("Giacomo", 0);
+
+        game.selectTile("Michele", game.getBoard().getSelectableCoordinate().get(0));
+        game.insertTile("Michele", 0);
+
+        game.stopGame("Giacomo");
+
+        game.setPlayersToWait(Arrays.asList("Giacomo", "Michele"));
+        game.restartGame("Giacomo");
+
+        Assertions.assertTrue(game.isStarted());
+        Assertions.assertFalse(game.isPlayerConnected("Giacomo"));
+        Assertions.assertFalse(game.isPlayerConnected("Michele"));
+
+        Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
+    }
+
+    @RepeatedTest(numberOfRun)
+    void restartGame_playerNotOwner_throwsIllegalFlowException() throws IllegalFlowException, PlayerAlreadyInGameException, PlayerNotInGameException, IllegalExtractionException, FullSelectionException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        game.startGame("Giacomo");
+
+        game.connectPlayer("Giacomo");
+        game.connectPlayer("Michele");
+
+        game.selectTile("Giacomo", game.getBoard().getSelectableCoordinate().get(0));
+        game.insertTile("Giacomo", 0);
+
+        game.selectTile("Michele", game.getBoard().getSelectableCoordinate().get(0));
+        game.insertTile("Michele", 0);
+
+        game.stopGame("Giacomo");
+
+        game.setPlayersToWait(Arrays.asList("Giacomo", "Michele"));
+
+        Assertions.assertThrows(IllegalFlowException.class, () -> {
+            game.restartGame("Michele");
+        });
+
+        Assertions.assertTrue(game.isStarted());
+        Assertions.assertTrue(game.isStopped());
     }
 }

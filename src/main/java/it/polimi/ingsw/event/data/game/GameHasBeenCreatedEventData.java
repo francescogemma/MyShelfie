@@ -15,8 +15,7 @@ public class GameHasBeenCreatedEventData implements EventData {
     private final List<AvailableGame> games;
     public static final String ID = "GAME_HAS_BEEN_CREATED";
 
-    public record AvailableGame(String owner, String name, boolean isStarted, boolean isPause, boolean isStopped,
-                                int numberOfPlayerInLobby, int numberOfPlayerOnline) {
+    public record AvailableGame(String owner, String name, boolean isStarted, boolean isPause, boolean isStopped) {
     }
 
     public GameHasBeenCreatedEventData(List<AvailableGame> games) {

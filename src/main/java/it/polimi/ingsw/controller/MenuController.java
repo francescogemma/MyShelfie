@@ -155,9 +155,7 @@ public class MenuController {
                                     view.getName(),
                                     view.isStarted(),
                                     view.isPause(),
-                                    view.isStopped(),
-                                    g.getNumberOfPlayerInLobby(),
-                                    view.numberOfPlayerOnline()
+                                    view.isStopped()
                             );
                         }).toList()
                     )
@@ -238,9 +236,7 @@ public class MenuController {
                                             gameName,
                                             game.isStarted(),
                                             game.isPause(),
-                                            game.isStopped(),
-                                            0,
-                                            game.numberOfPlayerOnline()
+                                            game.isStopped()
                                     )
                                 )
                             )

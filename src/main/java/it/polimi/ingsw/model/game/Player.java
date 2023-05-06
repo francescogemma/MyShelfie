@@ -1,14 +1,40 @@
 package it.polimi.ingsw.model.game;
 
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
-import it.polimi.ingsw.model.goal.PersonalGoal;
 
 /**
  * This class represents a player of the {@link Game game}.
  * It contains the username of the player, his {@link Player#points}, his {@link Bookshelf bookshelf} and his personal goal.
  * @author Francesco Gemma
+ * @author Giacomo Groppi
  */
 public class Player {
+    /*
+     * username of the player
+     */
+    private final String username;
+
+    /*
+     * bookshelf of the player
+     */
+    private final Bookshelf bookshelf;
+
+    /*
+     * points earned so far
+     */
+    private int points;
+
+    /*
+     * true iff player is connected
+     */
+    private boolean isConnected;
+
+    /**
+     * Indicates whether the common goal in the game has been achieved.
+     * The i-th position is true if the i-th common goal has been satisfied.
+     * */
+    private final boolean[] achievedCommonGoals;
+
     /**
      * Constructor of the class.
      * Sets the name of the player, his points to 0 and creates a new {@link Bookshelf bookshelf}.
@@ -55,32 +81,6 @@ public class Player {
         achievedCommonGoals[index] = true;
     }
 
-    /*
-     * username of the player
-     */
-    private final String username;
-
-    /*
-     * bookshelf of the player
-     */
-    private final Bookshelf bookshelf;
-
-    /*
-     * points earned so far
-     */
-    private int points;
-
-    /*
-     * true iff player is connected
-     */
-    private boolean isConnected;
-
-    /**
-     * Indicates whether the common goal in the game has been achieved.
-     * The i-th position is true if the i-th common goal has been satisfied.
-     * */
-    private final boolean[] achievedCommonGoals;
-
     /**
      * Create a new instance of PlayerView equals to other
      * */
@@ -99,7 +99,9 @@ public class Player {
      * Sets the specified common goal as achieved.
      * @param index the index of the common goal to be set as achieved
      * @throws AssertionError if the index is negative or greater than or equal to the length of the achievedCommonGoals array
-     * */
+     *
+     * @author Giacomo Groppi
+     */
     public void setAchievedCommonGoals(int index) {
         assert index >= 0 && index < achievedCommonGoals.length;
         achievedCommonGoals[index] = true;
@@ -116,6 +118,7 @@ public class Player {
      * Returns true if the player is disconnected, false otherwise.
      * @return true if the player is disconnected, false otherwise
      * @see #isConnected()
+     * @author Giacomo Groppi
      */
     public boolean isDisconnected () {
         return !isConnected();
@@ -125,6 +128,7 @@ public class Player {
      * This method checks if the common goal at the given index has been achieved.
      * @param index the index of the {@link it.polimi.ingsw.model.goal.CommonGoal CommonGoal} to check.
      * @return true if the common goal at the given index has been achieved, false otherwise.
+     * @author Giacomo Groppi
      */
     public boolean hasAchievedCommonGoal(int index) {
         return achievedCommonGoals[index];
@@ -141,6 +145,7 @@ public class Player {
      * Returns true if the given username matches the player's username, false otherwise.
      * @param username the username to compare with the player's username
      * @return true if the given username matches the player's username, false otherwise
+     * @author Giacomo Groppi
      */
     public boolean is(String username) {
         return this.username.equals(username);
@@ -160,5 +165,10 @@ public class Player {
         if (other == null || other.getClass() != this.getClass())
             return false;
         return this.username.equals(((Player) other).getUsername());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.username.hashCode();
     }
 }

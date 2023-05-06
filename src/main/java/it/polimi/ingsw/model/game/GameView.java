@@ -25,6 +25,9 @@ public class GameView implements Identifiable {
      */
     protected static final int FIRST_PLAYER_INDEX = 0;
 
+    protected static final int TIME_PAUSE_BEFORE_WIN = 60 * 1000;
+    protected static final int TIME_FIRST_PLAYER_CONNECT = 10 * 1000;
+
     /*
      * The name of the game.
      */
@@ -80,7 +83,9 @@ public class GameView implements Identifiable {
      */
     protected int currentPlayerIndex;
 
-    // TODO: Write custom GSON adapter for Game to remove players redundancy
+    /*
+     * list of all player in the game
+     */
     protected final List<Player> players;
 
     /**
@@ -134,6 +139,10 @@ public class GameView implements Identifiable {
         for (int i = 0; i < other.commonGoals.length; i++) {
             this.commonGoals[i] = other.commonGoals[i];
         }
+    }
+
+    public synchronized boolean containPlayer (String username) {
+        return players.stream().anyMatch(p -> p.getUsername().equals(username));
     }
 
     public synchronized boolean isPause() {
