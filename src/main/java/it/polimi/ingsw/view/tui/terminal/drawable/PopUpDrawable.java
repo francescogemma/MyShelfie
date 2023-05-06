@@ -18,7 +18,7 @@ public class PopUpDrawable extends FixedLayoutDrawable<TwoLayersDrawable> {
             blurrableBackground,
             popUpTextBox
                 .center().crop()
-                .fixSize(new DrawableSize(8, 20))
+                .fixSize(new DrawableSize(8, 22))
                 .addBorderBox()
                 .center().crop()
         );
@@ -29,7 +29,7 @@ public class PopUpDrawable extends FixedLayoutDrawable<TwoLayersDrawable> {
     public void displayPopUp(String text) {
         blurrableBackground.blur(true);
 
-        StringBuilder justifiedText = new StringBuilder();
+        StringBuilder adaptedText = new StringBuilder();
 
         List<String> line = new ArrayList<>();
         int lineLength = 0;
@@ -42,30 +42,20 @@ public class PopUpDrawable extends FixedLayoutDrawable<TwoLayersDrawable> {
 
             // +1 is needed to account for the space.
             if (i == words.length - 1 || lineLength + 1 + words[i + 1].length() > 20) {
-                // We want at least line.size() - 1 spaces.
-                int remainingSpaces = 20 - line.stream().mapToInt(String::length).sum()
-                    - (line.size() - 1);
-
                 for (int j = 0; j < line.size() - 1; j++) {
-                    int numOfSpaces;
-                    if (j == line.size() - 2) {
-                        numOfSpaces = 1 + remainingSpaces;
-                        remainingSpaces = 0;
-                    } else {
-                        numOfSpaces = 1 + remainingSpaces / (line.size() - 1 - j);
-                        remainingSpaces -= numOfSpaces;
-                    }
-
-                    justifiedText.append(line.get(j)).append(" ".repeat(numOfSpaces));
+                    adaptedText.append(line.get(j)).append(" ");
                 }
-                justifiedText.append(line.get(line.size() - 1)).append("\n");
+
+                adaptedText.append(line.get(line.size() - 1))
+                    .append(" ".repeat(20 -
+                        line.stream().mapToInt(String::length).sum() - (line.size() - 1))).append("\n");
 
                 line.clear();
                 lineLength = 0;
             }
         }
 
-        popUpTextBox.text(justifiedText.toString());
+        popUpTextBox.text(adaptedText.toString());
         twoLayers.showForeground();
     }
 

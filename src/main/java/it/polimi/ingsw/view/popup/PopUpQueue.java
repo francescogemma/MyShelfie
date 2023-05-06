@@ -69,32 +69,34 @@ public class PopUpQueue {
             if (enabled) {
                 return;
             }
-        }
 
-        new Thread(() -> {
-            synchronized (lock) {
-                while (true) {
-                    while (popUps.size() == 0 || popUps.get(0).isToDisplay()) {
-                        if (!enabled) {
-                            return;
+            enabled = true;
+
+            new Thread(() -> {
+                synchronized (lock) {
+                    while (true) {
+                        while (popUps.isEmpty() || popUps.get(0).isToDisplay()) {
+                            if (!enabled) {
+                                return;
+                            }
+
+                            try {
+                                lock.wait();
+                            } catch (InterruptedException e) { }
                         }
 
-                        try {
-                            lock.wait();
-                        } catch (InterruptedException e) { }
-                    }
+                        hidePopUp.run();
+                        popUps.get(0).hide();
+                        popUps.remove(0);
 
-                    hidePopUp.run();
-                    popUps.get(0).hide();
-                    popUps.remove(0);
-
-                    if (popUps.size() > 0) {
-                        displayPopUp.accept(popUps.get(0).getText());
-                        new Thread(popUps.get(0)::show).start();
+                        if (!popUps.isEmpty()) {
+                            displayPopUp.accept(popUps.get(0).getText());
+                            new Thread(popUps.get(0)::show).start();
+                        }
                     }
                 }
-            }
-        }).start();
+            }).start();
+        }
     }
 
     public void disable() {
