@@ -22,7 +22,7 @@ public class GuiApplication extends Application {
         Font.loadFont(Objects.requireNonNull(getClass().getResource("/ESKARGOT.ttf")).toExternalForm(), 10);
 
         // Load the first scene from the FXML file
-        Parent connectionMenu = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/GameLobbyMenuLayout.fxml")));
+        Parent connectionMenu = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/ConnectionMenuLayout.fxml")));
         Scene scene = new Scene(connectionMenu);
 
         // Set the stage

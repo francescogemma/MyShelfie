@@ -1,0 +1,16 @@
+@import "BasicStylesheet.css";
+
+
+#scoreboardVBox {
+    -fx-background-color: background;
+}
+
+#playerListHBox {
+    -fx-background-color: transparent;
+}
+
+#playerList {
+    -fx-effect: innershadow(three-pass-box, dark-grey, 7, 0, 0, 0);
+    -fx-background-color: form-background;
+    -fx-background-radius: 30;
+}
