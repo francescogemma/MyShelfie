@@ -28,6 +28,10 @@ public class RMIConnection implements Connection {
      * A client will poll string from this queue, the server will add them.
      */
     private final RemoteQueue pollQueue;
+
+    /**
+     * Saved messages that are yet to be returned by the "receive" method.
+     */
     private final Queue<String> pendingMessages;
 
     /**
@@ -118,52 +122,11 @@ public class RMIConnection implements Connection {
         reader();
     }
 
-    @Override
-    public void send(String string) throws DisconnectedException {
-        synchronized (lock) {
-            if (disconnected) {
-                throw new DisconnectedException();
-            }
-
-            try {
-                addQueue.add(string);
-            } catch (RemoteException remoteException) {
-                disconnect();
-                throw new DisconnectedException(remoteException.getMessage());
-            }
-        }
-    }
-
-    @Override
-    public String receive() throws DisconnectedException {
-        synchronized(lock) {
-            if(disconnected) {
-                throw new DisconnectedException();
-            }
-
-            while(pendingMessages.isEmpty()) {
-                try {
-                    lock.wait();
-                } catch(InterruptedException e) {
-                    throw new DisconnectedException();
-                }
-                if(disconnected) {
-                    throw new DisconnectedException();
-                }
-            }
-
-            return pendingMessages.poll();
-        }
-    }
-
-    @Override
-    public void disconnect() {
-        synchronized (lock) {
-            disconnected = true;
-            lock.notifyAll();
-        }
-    }
-
+    /**
+     * Should only be called once. This method starts a timer that repeatedly accesses the "send" method,
+     * to check for connectivity. The message's content is the string "heartbeat", which should not create
+     * consistency issues since the "send" method is conventionally used to communicate through json-formatted strings.
+     */
     private void heartbeat() {
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -178,9 +141,14 @@ public class RMIConnection implements Connection {
         }, 0, 2500);
     }
 
+    /**
+     * Should only be called once.
+     * This method creates a thread that checks the remote queue for "heartbeat" messages.
+     * All non-heartbeat messages will be sent to the pendingMessages queue.
+     */
     private void reader() {
         Thread reader = new Thread(() -> {
-            while(true) {
+            while (true) {
                 Callable<String> poller = new Callable<String>() {
                     @Override
                     public String call() {
@@ -215,7 +183,7 @@ public class RMIConnection implements Connection {
                     executor.shutdownNow();
                 }
 
-                if(!read.equals("heartbeat")) {
+                if (!read.equals("heartbeat")) {
                     synchronized(lock) {
                         pendingMessages.add(read);
                         lock.notifyAll();
@@ -224,5 +192,51 @@ public class RMIConnection implements Connection {
             }
         });
         reader.start();
+    }
+
+    @Override
+    public void send(String string) throws DisconnectedException {
+        synchronized (lock) {
+            if (disconnected) {
+                throw new DisconnectedException();
+            }
+
+            try {
+                addQueue.add(string);
+            } catch (RemoteException remoteException) {
+                disconnect();
+                throw new DisconnectedException(remoteException.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public String receive() throws DisconnectedException {
+        synchronized (lock) {
+            if (disconnected) {
+                throw new DisconnectedException();
+            }
+
+            while (pendingMessages.isEmpty()) {
+                try {
+                    lock.wait();
+                } catch(InterruptedException e) {
+                    throw new DisconnectedException();
+                }
+                if (disconnected) {
+                    throw new DisconnectedException();
+                }
+            }
+
+            return pendingMessages.poll();
+        }
+    }
+
+    @Override
+    public void disconnect() {
+        synchronized (lock) {
+            disconnected = true;
+            lock.notifyAll();
+        }
     }
 }

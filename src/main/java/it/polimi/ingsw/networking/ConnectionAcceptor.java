@@ -81,6 +81,10 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements RemoteSer
         }
     }
 
+    /**
+     * Static method to initialize ConnectionAcceptor. Sets the RMI variable "hostname" to the provided string.
+     * @param hostName will be assigned to the "hostname" RMI variable.
+     */
     public static void initialize(String hostName) {
         System.setProperty("java.rmi.server.hostname", hostName);
     }
