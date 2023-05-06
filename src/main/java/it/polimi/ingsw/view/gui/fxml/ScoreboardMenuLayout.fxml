@@ -15,7 +15,7 @@
     </HBox>
 
     <HBox fx:id="playerListHBox" VBox.vgrow="ALWAYS">
-        <padding> <Insets bottom="10" left="290" right="290" top="10" /> </padding>
+        <padding> <Insets bottom="10" left="90" right="90" top="10" /> </padding>
         <ScrollPane fitToHeight="true" fitToWidth="true" HBox.hgrow="ALWAYS">
             <AnchorPane>
                 <VBox fx:id="playerList" spacing="10"
