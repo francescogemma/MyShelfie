@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BoardTest {
     private Board board;
-    private static final int numberOfRun = 1;
+    private static final int numberOfRun = 500;
 
     @BeforeEach
     public void setUp() {
@@ -113,7 +113,22 @@ class BoardTest {
         board.selectTile(5, 0);
 
         Assertions.assertEquals(0, board.getSelectableTiles().size());
+    }
 
+    @Test
+    void selectTile_tileEmpty_throwsIllegalExtractionException() throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 4);
+
+        Coordinate pos = board.getSelectableCoordinate().get(0);
+
+        board.selectTile(pos);
+        board.selectTile(board.getSelectableCoordinate().get(0));
+
+        board.draw();
+
+        Assertions.assertThrows(IllegalExtractionException.class, () -> {
+            board.selectTile(pos);
+        });
     }
 
     @RepeatedTest(numberOfRun)
@@ -525,5 +540,67 @@ class BoardTest {
         Assertions.assertTrue(board.getSelectableCoordinate().contains(new Coordinate(6, 2)));
         Assertions.assertTrue(board.getSelectableCoordinate().contains(new Coordinate(4, 2)));
         Assertions.assertTrue(board.getSelectableCoordinate().contains(new Coordinate(3, 2)));
+    }
+
+    @Test
+    void forgetSelected_coordinateNull_throwNullPointerException () {
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            board.forgetSelected(null);
+        });
+    }
+
+    @Test
+    void forgetSelected_coordinateNotSelected_throwIllegalArgumentException () throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 4);
+
+        board.selectTile(board.getSelectableCoordinate().get(0));
+        board.selectTile(board.getSelectableCoordinate().get(0));
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            board.forgetSelected(new Coordinate(5, 5));
+        });
+    }
+
+    @Test
+    void forgetSelected_coordinateNotLast_throwRemoveNotLastSelectedException() throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 4);
+
+        Coordinate firstSelected = board.getSelectableCoordinate().get(0);
+        board.selectTile(firstSelected);
+        board.selectTile(board.getSelectableCoordinate().get(0));
+
+        Assertions.assertThrows(RemoveNotLastSelectedException.class, () -> {
+            board.forgetSelected(firstSelected);
+        });
+    }
+
+    @Test
+    void forgetSelected__correctOutput() throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 4);
+
+        board.selectTile(board.getSelectableCoordinate().get(0));
+        Coordinate secondSelected = board.getSelectableCoordinate().get(0);
+        board.selectTile(secondSelected);
+
+        board.forgetSelected(secondSelected);
+    }
+
+    @RepeatedTest(numberOfRun)
+    void equals_boardEquals_correctOutput() {
+        fillBoard(board, 4);
+        Board board1 = new Board(board);
+
+        Assertions.assertEquals(board1, board);
+    }
+
+    @Test
+    void equals_objectNull_correctOutput() {
+        Assertions.assertFalse(board.equals(null));
+    }
+
+    @RepeatedTest(numberOfRun)
+    void equals_withView_correctOutput() {
+        fillBoard(board, 4);
+        Assertions.assertNotEquals(board, board.createView());
     }
 }

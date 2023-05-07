@@ -198,10 +198,11 @@ public class Board extends BoardView {
      * @param coordinate the coordinate to deselect
      * @throws IllegalArgumentException iff coordinate is not selected
      * @throws RemoveNotLastSelectedException iff coordinate is not the last Coordinate selected
-     * */
+     * @throws NullPointerException iff coordinate is null
+     */
     public void forgetSelected (Coordinate coordinate) {
-        if (coordinate == null)
-            throw new NullPointerException();
+        Objects.requireNonNull(coordinate);
+
         if (!this.boardSelector.contains(coordinate))
             throw new IllegalArgumentException("Coordinate is not selected");
 
