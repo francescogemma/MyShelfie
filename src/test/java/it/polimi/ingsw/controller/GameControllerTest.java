@@ -1,11 +1,10 @@
 package it.polimi.ingsw.controller;
 
+import it.polimi.ingsw.controller.servercontroller.GameController;
 import it.polimi.ingsw.event.EventTransceiver;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.model.game.Game;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 /**
  * @author Giacomo Groppi

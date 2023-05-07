@@ -91,6 +91,13 @@ public class NetworkEventTransceiver implements EventTransceiver {
     }
 
     @Override
+    public void unregisterAllListeners() {
+        synchronized (lock) {
+            this.listeners.clear();
+        }
+    }
+
+    @Override
     public void broadcast(EventData data) {
         try {
             connection.send(gson.toJson(data, EventData.class));

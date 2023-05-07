@@ -1,9 +1,13 @@
-package it.polimi.ingsw.controller;
+package it.polimi.ingsw.controller.servercontroller;
 
+import it.polimi.ingsw.controller.Response;
+import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.controller.db.DBManager;
+import it.polimi.ingsw.event.EventTransceiver;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.game.*;
+import it.polimi.ingsw.event.data.internal.GameOverInternalEventData;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
@@ -23,16 +27,20 @@ public class GameController {
     private final ArrayList<Pair<EventTransmitter, String>> clientsInGame;
     private final ArrayList<Pair<EventTransmitter, String>> clientsInLobby;
 
-    private final List<String> eventIgnored = new ArrayList<>();
+    private static final List<String> eventIgnored = List.of(
+            PlayerHasJoinLobbyEventData.ID,
+            PlayerHasDisconnectedEventData.ID,
+            GameOverEventData.ID
+    );
+
+    private final EventTransceiver internalTransceiver = new LocalEventTransceiver();
 
     public GameController(Game game) {
+        Objects.requireNonNull(game);
+
         this.game = game;
         this.clientsInGame = new ArrayList<>();
         this.clientsInLobby = new ArrayList<>();
-
-        eventIgnored.add(PlayerHasJoinGameEventData.ID);
-        eventIgnored.add(PlayerHasDisconnectedEventData.ID);
-        eventIgnored.add(CommonGoalCompletedEventData.ID);
 
         LocalEventTransceiver transceiver = new LocalEventTransceiver();
 
@@ -43,7 +51,22 @@ public class GameController {
 
                     if (this.game.isStarted() && !eventIgnored.contains(event.getId()))
                         DBManager.getGamesDBManager().save(game);
+
+                    if (event.getId().equals(GameOverEventData.ID)) {
+                        this.internalTransceiver.broadcast(new GameOverInternalEventData(this));
+                        DBManager.getGamesDBManager().delete(game);
+                    }
         });
+    }
+
+    /**
+     * This function allows you to get the local transceiver,
+     * on which only internal events will be sent.
+     *
+     * @return Internal transceiver
+     */
+    protected EventTransceiver getInternalTransceiver() {
+        return this.internalTransceiver;
     }
 
     /**
@@ -88,6 +111,21 @@ public class GameController {
                 return new Response("Game is not stopped", ResponseStatus.FAILURE);
             }
         }
+    }
+
+    public synchronized boolean isWaitingForReconnections() {
+        return this.game.isWaitingForReconnections();
+    }
+
+    /**
+     * This method should be called if a set of atomic operations needs to be performed.
+     * Since Java has a reentrant lock, if a function is called that acquires the lock
+     * on this object, there is no problem of deadlock.
+     *
+     * @return The lock used internally by GameController.
+     * */
+    protected Object getLock () {
+        return this;
     }
 
     private void forEachInLobby(EventData event) {
@@ -473,7 +511,7 @@ public class GameController {
      *
      * @return a response with the result of the operation. The result is SUCCESS if the game is started, FAILURE otherwise
      */
-    public synchronized Response startGame(String username) {
+    protected synchronized Response startGame(String username) {
         try {
             for (Pair<EventTransmitter, String> client: clientsInLobby) {
                 game.addPlayer(client.getValue());

@@ -1,10 +1,8 @@
 package it.polimi.ingsw.controller.db;
 
-import it.polimi.ingsw.controller.GameController;
-import it.polimi.ingsw.controller.MenuController;
+import it.polimi.ingsw.controller.servercontroller.GameController;
+import it.polimi.ingsw.controller.servercontroller.MenuController;
 import it.polimi.ingsw.controller.User;
-import it.polimi.ingsw.controller.VirtualView;
-import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;

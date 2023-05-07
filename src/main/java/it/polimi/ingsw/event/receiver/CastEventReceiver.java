@@ -42,4 +42,11 @@ public class CastEventReceiver<T extends EventData> implements EventReceiver<T> 
             receiver.unregisterListener(listeners.remove(listener));
         }
     }
+
+    @Override
+    public void unregisterAllListeners() {
+        synchronized (lock) {
+            receiver.unregisterAllListeners();
+        }
+    }
 }

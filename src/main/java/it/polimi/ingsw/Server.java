@@ -1,6 +1,6 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.controller.MenuController;
+import it.polimi.ingsw.controller.servercontroller.MenuController;
 import it.polimi.ingsw.controller.VirtualView;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.networking.Connection;

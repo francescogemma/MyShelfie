@@ -69,6 +69,13 @@ public class MockNetworkEventTransceiver implements EventTransceiver {
     }
 
     @Override
+    public void unregisterAllListeners() {
+        synchronized (lock) {
+            listeners.clear();
+        }
+    }
+
+    @Override
     public void broadcast(EventData data) {
         synchronized (serializedEvents) {
             serializedEvents.add(gson.toJson(data, EventData.class));

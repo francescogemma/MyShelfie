@@ -1,5 +1,7 @@
 package it.polimi.ingsw.controller;
 
+import it.polimi.ingsw.controller.servercontroller.GameController;
+import it.polimi.ingsw.controller.servercontroller.MenuController;
 import it.polimi.ingsw.event.EventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.client.LoginEventData;
@@ -7,15 +9,14 @@ import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.GameHasBeenStoppedEventData;
 import it.polimi.ingsw.event.data.game.GameOverEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
-import it.polimi.ingsw.event.receiver.CastEventReceiver;
-import it.polimi.ingsw.event.receiver.EventListener;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
 
-import javax.swing.plaf.basic.BasicPanelUI;
+import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class VirtualView implements EventTransmitter{
@@ -145,7 +146,7 @@ public class VirtualView implements EventTransmitter{
     private synchronized Response exitGame (PlayerExitGame exitGame) {
         Logger.writeMessage("Call for username %s".formatted(username));
         if (isInGame()) {
-            Response response = gameController.exitGame(username);
+            Response response = MenuController.getInstance().exitGame(gameController, this);
 
             if (response.isOk()) {
                 this.gameController = null;
@@ -264,12 +265,7 @@ public class VirtualView implements EventTransmitter{
     private synchronized Response startGame (StartGameEventData ignore) {
         if (this.isAuthenticated()) {
             if (this.isInLobby()) {
-                Response response = this.gameController.startGame(this.username);
-
-                if (response.isOk()) {
-                }
-
-                return response;
+                return MenuController.getInstance().startGame(gameController, username);
             } else {
                 return DEFAULT_NOT_IN_LOBBY;
             }
@@ -278,8 +274,11 @@ public class VirtualView implements EventTransmitter{
         }
     }
 
-    public synchronized Optional<String> getUsername () {
-        return Optional.of(username);
+    public synchronized String getUsername () {
+        if (username == null)
+            throw new IllegalStateException("You can't call this function if virtualview is not authenticated");
+
+        return username;
     }
 
     public synchronized void setGameController(GameController gameController) {
