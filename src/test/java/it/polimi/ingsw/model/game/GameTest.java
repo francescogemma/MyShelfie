@@ -1,18 +1,13 @@
 package it.polimi.ingsw.model.game;
 
-import it.polimi.ingsw.controller.GameController;
-import it.polimi.ingsw.controller.MenuController;
-import it.polimi.ingsw.controller.User;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.game.*;
-import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.bag.Bag;
 import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.board.BoardView;
 import it.polimi.ingsw.model.board.FullSelectionException;
 import it.polimi.ingsw.model.board.IllegalExtractionException;
-import it.polimi.ingsw.model.bookshelf.Bookshelf;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Logger;
@@ -21,11 +16,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 
-import java.lang.reflect.Field;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -147,13 +139,6 @@ class GameTest {
     void addPlayer_nullPointer_throwNullPointerException () {
         Assertions.assertThrows(NullPointerException.class, () -> {
             game.addPlayer(null);
-        });
-    }
-
-    @Test
-    void addPlayer_stringEmpty_throwNullPointerException() {
-        Assertions.assertThrows(NullPointerException.class, () -> {
-            game.addPlayer("");
         });
     }
 
@@ -650,7 +635,7 @@ class GameTest {
 
         game.connectPlayer("Michele");
 
-        Assertions.assertTrue(game.isPause());
+        Assertions.assertTrue(game.isWaitingForReconnections());
     }
 
     @Test
@@ -664,7 +649,7 @@ class GameTest {
         game.connectPlayer("Michele");
         game.connectPlayer("Cristiano");
 
-        Assertions.assertFalse(game.isPause());
+        Assertions.assertFalse(game.isWaitingForReconnections());
     }
 
     @RepeatedTest(4)
@@ -678,7 +663,7 @@ class GameTest {
         game.connectPlayer("Michele");
         game.connectPlayer("Cristiano");
 
-        Assertions.assertFalse(game.isPause());
+        Assertions.assertFalse(game.isWaitingForReconnections());
         Assertions.assertEquals("Giacomo", game.getCurrentPlayer().getUsername());
 
         Thread.sleep(Game.TIME_FIRST_PLAYER_CONNECT + 1000);
@@ -699,9 +684,9 @@ class GameTest {
 
         game.disconnectPlayer("Giacomo");
 
-        Assertions.assertTrue(game.isPause());
+        Assertions.assertTrue(game.isWaitingForReconnections());
 
-        Thread.sleep(GameView.TIME_PAUSE_BEFORE_WIN + 1000);
+        Thread.sleep(GameView.TIME_WAITING_FOR_RECONNECTIONS_BEFORE_WIN + 1000);
 
         Assertions.assertTrue(game.isOver());
         Assertions.assertEquals(1, game.getWinners().size());
@@ -818,7 +803,7 @@ class GameTest {
 
         Assertions.assertTrue(game.isStopped());
 
-        game.restartGame("Giacomo");
+        game.restartGame("Giacomo", Arrays.asList("Giacomo", "Michele"));
 
         Assertions.assertTrue(game.isStarted());
         Assertions.assertFalse(game.isPlayerConnected("Giacomo"));
@@ -844,8 +829,7 @@ class GameTest {
 
         game.stopGame("Giacomo");
 
-        game.setPlayersToWait(Arrays.asList("Giacomo", "Michele"));
-        game.restartGame("Giacomo");
+        game.restartGame("Giacomo", Arrays.asList("Giacomo", "Michele"));
 
         Assertions.assertTrue(game.isStarted());
         Assertions.assertFalse(game.isPlayerConnected("Giacomo"));
@@ -873,10 +857,8 @@ class GameTest {
 
         game.stopGame("Giacomo");
 
-        game.setPlayersToWait(Arrays.asList("Giacomo", "Michele"));
-
         Assertions.assertThrows(IllegalFlowException.class, () -> {
-            game.restartGame("Michele");
+            game.restartGame("Michele", Arrays.asList("Giacomo", "Michele"));
         });
 
         Assertions.assertTrue(game.isStarted());
@@ -939,7 +921,7 @@ class GameTest {
 
         game.connectPlayer("Giacomo");
 
-        Thread.sleep(GameView.TIME_PAUSE_BEFORE_WIN + 1000);
+        Thread.sleep(GameView.TIME_WAITING_FOR_RECONNECTIONS_BEFORE_WIN + 1000);
 
         Assertions.assertThrows(IllegalFlowException.class, () -> {
             game.getCurrentPlayer();

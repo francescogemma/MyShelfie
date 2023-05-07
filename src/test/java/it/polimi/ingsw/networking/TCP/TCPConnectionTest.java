@@ -5,10 +5,13 @@ import it.polimi.ingsw.networking.BadPortException;
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.ServerNotFoundException;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import java.net.ServerSocket;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Execution(ExecutionMode.SAME_THREAD)
 class TCPConnectionTest {
     private ServerSocket serverSocket;
     private final int PORT = 12345;
@@ -19,7 +22,7 @@ class TCPConnectionTest {
         try {
             serverSocket = new ServerSocket(PORT);
         } catch (Exception e) {
-            Assertions.fail("error while creating server socket");
+            Assertions.fail("error while creating server socket" + e.getMessage());
         }
     }
 

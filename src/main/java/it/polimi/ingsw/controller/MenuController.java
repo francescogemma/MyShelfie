@@ -2,8 +2,6 @@ package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.controller.db.DBManager;
 import it.polimi.ingsw.controller.db.IdentifiableNotFoundException;
-import it.polimi.ingsw.event.EventTransceiver;
-import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.game.Game;
@@ -154,7 +152,7 @@ public class MenuController {
                                     g.getOwner(),
                                     view.getName(),
                                     view.isStarted(),
-                                    view.isPause(),
+                                    view.isWaitingForReconnections(),
                                     view.isStopped()
                             );
                         }).toList()
@@ -235,7 +233,7 @@ public class MenuController {
                                             username,
                                             gameName,
                                             game.isStarted(),
-                                            game.isPause(),
+                                            game.isWaitingForReconnections(),
                                             game.isStopped()
                                     )
                                 )

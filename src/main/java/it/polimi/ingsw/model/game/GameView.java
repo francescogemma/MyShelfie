@@ -25,7 +25,14 @@ public class GameView implements Identifiable {
      */
     protected static final int FIRST_PLAYER_INDEX = 0;
 
-    protected static final int TIME_PAUSE_BEFORE_WIN = 60 * 1000;
+    /*
+     * Time after which, if the game is still waiting for reconnection, it is terminated, assigning the connected player as the winner.
+     */
+    protected static final int TIME_WAITING_FOR_RECONNECTIONS_BEFORE_WIN = 60 * 1000;
+
+    /*
+     * Time after which, if the first player is not connected, he lost his turn
+     */
     protected static final int TIME_FIRST_PLAYER_CONNECT = 10 * 1000;
 
     /*
@@ -71,7 +78,7 @@ public class GameView implements Identifiable {
     /**
      *
      * */
-    protected boolean isPause;
+    protected boolean isWaitingForReconnections;
 
     /*
      * Index of the first player who completed the bookshelf
@@ -107,7 +114,7 @@ public class GameView implements Identifiable {
         this.name = nameGame;
         this.bag = new Bag();
         this.board = new Board();
-        this.isPause = false;
+        this.isWaitingForReconnections = false;
         this.winners = new ArrayList<>();
         this.currentPlayerIndex = -1;
         this.isStarted = false;
@@ -133,7 +140,7 @@ public class GameView implements Identifiable {
         this.isStopped = other.isStopped;
         this.firstPlayerCompleteBookshelf = other.firstPlayerCompleteBookshelf;
         this.currentPlayerIndex = other.currentPlayerIndex;
-        this.isPause = other.isPause;
+        this.isWaitingForReconnections = other.isWaitingForReconnections;
 
         this.commonGoals = new CommonGoal[other.commonGoals.length];
         for (int i = 0; i < other.commonGoals.length; i++) {
@@ -141,12 +148,20 @@ public class GameView implements Identifiable {
         }
     }
 
+    /**
+     * @param username player to search
+     * @return true iff exists a player with username "username"
+     * */
     public synchronized boolean containPlayer (String username) {
         return players.stream().anyMatch(p -> p.getUsername().equals(username));
     }
 
-    public synchronized boolean isPause() {
-        return this.isPause;
+    /**
+     * This method returns the pause state of a game.
+     * @return True iff the game is waitingForReconnections
+     */
+    public synchronized boolean isWaitingForReconnections() {
+        return this.isWaitingForReconnections;
     }
 
     /**

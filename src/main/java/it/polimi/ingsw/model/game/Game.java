@@ -20,6 +20,23 @@ import it.polimi.ingsw.model.board.Board;
 
 import java.util.*;
 
+/**
+ * The class implements all the game mechanics of a match.
+ * It is possible to be notified of changes inside this object by passing an {@link EventTransmitter eventTransmitter}
+ * and registering listeners to it. Each game supports up to 4 players per match and has three possible states:
+ * playing, the game is stopped because there are no connected users or it has been requested to stop,
+ * there is only one connected player and the others are waiting to connect to the game.
+ * Each match has an owner, assigned at its creation and cannot be modified, who has the honor of being able to
+ * stop or start the game at any time.
+ * It is possible to create an immutable object of the instance by calling the function {@link Game#createView()}.
+ * The object is synchronized for each call.
+ *
+ * @see GameView
+ * @see Player
+ * @see Goal
+ * @see EventTransmitter
+ * @author Giacomo Groppi
+ * */
 public class Game extends GameView {
     /**
      * Transceiver on which to broadcast events
@@ -32,11 +49,25 @@ public class Game extends GameView {
      * */
     protected final transient List<Integer> personalGoalIndexes;
 
+    /**
+     * Timer triggered if a player is left alone in the game. At the end of this timer,
+     * the game ends and the remaining player becomes the only winner.
+     * */
     private transient Timer timerEndGame;
+
+    /**
+     * Timer after which the turn is lost.
+     * */
     private transient Timer playTimer;
 
+    /**
+     * This is an instance variable that represents a list of personal goals for each player in the game.
+     */
     private final List<PersonalGoal> personalGoals;
 
+    /**
+     * List of players who want to participate in the game after it has been resumed.
+     */
     private transient List<String> playersToWait;
 
     /**
@@ -54,9 +85,14 @@ public class Game extends GameView {
         this.playersToWait = new ArrayList<>();
     }
 
+    /**
+     * This method forces the game to stop by removing
+     * any possible pause state and marking all players
+     * as disconnected
+     * */
     public synchronized void forceStop () {
         this.isStopped = true;
-        removeFromPause();
+        removeFromWaitingForReconnections();
 
         players.forEach(p -> p.setConnectionState(false));
     }
@@ -75,7 +111,7 @@ public class Game extends GameView {
      * @param username The player that wants to stop the game
      * @throws IllegalFlowException iff username can't stot the game
      * @see StartGameEventData
-     * */
+     */
     public synchronized void stopGame (String username) throws IllegalFlowException {
         String playerOnline;
 
@@ -123,28 +159,21 @@ public class Game extends GameView {
         this.transceiver = transceiver;
     }
 
-    public synchronized void setPlayersToWait(List<String> usernames) {
-        this.playersToWait = new ArrayList<>(usernames);
-    }
-
     /**
-     * Adds a player to the game with the given username or reconnects that player.
-     * @param username the username of the player to add
-     * @throws NullPointerException
-     *  <ul>
-     *      <li> username is null </li>
-     *      <li> a player with the name "username" already exists </li>
-     *  </ul>
+     * Use this method to add a player to the game
+     *
+     * @return The added player
      * @throws IllegalFlowException
-     *  <ul>
-     *      <li> if the game has already started </li>
-     *      <li> if the game is already 4 players </li>
-     *  </ul>
-     * @return {@link Player player} added
+     * <ul>
+     *     <li> The game has already started </li>
+     *     <li> The maximum number of players has already been reached </li>
+     * </ul>
+     *
+     * @throws PlayerAlreadyInGameException iff the player is already in the game
+     * @throws NullPointerException iff the username is null
      */
     public synchronized Player addPlayer(String username) throws IllegalFlowException, PlayerAlreadyInGameException {
-        if (username == null || username.length() == 0)
-            throw new NullPointerException("username is null or has length 0");
+        Objects.requireNonNull(username);
 
         if (isStarted())
             throw new IllegalFlowException("You can't add players when the game has already started");
@@ -173,7 +202,15 @@ public class Game extends GameView {
         return players.get(index);
     }
 
+    /**
+     * La funzione rimuovere il player con username "username" dalla partita.
+     *
+     * @throws IllegalFlowException iff game is already started.
+     * @throws NullPointerException iff username is null.
+     */
     public synchronized void removePlayer (String username) throws IllegalFlowException {
+        Objects.requireNonNull(username);
+
         if (isStarted())
             throw new IllegalFlowException("Game has already started");
 
@@ -192,7 +229,7 @@ public class Game extends GameView {
     }
 
     private synchronized void awardTimeWinner() {
-        assert isPause();
+        assert isWaitingForReconnections();
         assert numberOfPlayerOnline() == 1;
 
         Player onlyOnline = players.stream().filter(Player::isConnected).toList().get(0);
@@ -207,9 +244,9 @@ public class Game extends GameView {
         );
     }
 
-    private synchronized void setPause() {
+    private synchronized void setWaitingForReconnections() {
         assert players.stream().filter(Player::isConnected).toList().size() == 1;
-        isPause = true;
+        isWaitingForReconnections = true;
         broadcast(new GameHasBeenPauseEventData());
 
         this.timerEndGame = new Timer();
@@ -218,18 +255,15 @@ public class Game extends GameView {
             public void run() {
                 awardTimeWinner();
             }
-        }, TIME_PAUSE_BEFORE_WIN);
+        }, TIME_WAITING_FOR_RECONNECTIONS_BEFORE_WIN);
     }
 
-    /**
-     * waitingForReconnections
-     * */
-    private synchronized void removeFromPause() {
+    private synchronized void removeFromWaitingForReconnections() {
         if (timerEndGame != null) {
             timerEndGame.cancel();
             timerEndGame = null;
         }
-        isPause = false;
+        isWaitingForReconnections = false;
     }
 
     private synchronized void setStopped () {
@@ -243,7 +277,19 @@ public class Game extends GameView {
         broadcast(new GameHasBeenStoppedEventData());
     }
 
+    /**
+     * This method disconnects a player from the game.
+     * The method notifies all players that "username" has disconnected.
+     * If the number of remaining players is 0, the game is put in stop.
+     * If the number of remaining players is 1, the game is put in waitingForReconnection.
+     * If the number of remaining players is > 1 and the disconnected player was the current player, they lose their turn.
+     *
+     * @throws NullPointerException iff username is null
+     * @throws IllegalFlowException iff player is already disconnected
+     * */
     public synchronized void disconnectPlayer (String username) throws IllegalFlowException {
+        Objects.requireNonNull(username);
+
         Player player = this.getPlayer(username);
 
         if (player.isDisconnected()) {
@@ -255,10 +301,10 @@ public class Game extends GameView {
         this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
 
         if (numberOfPlayerOnline() == 0) {
-            removeFromPause();
+            removeFromWaitingForReconnections();
             setStopped();
         } else if (numberOfPlayerOnline() == 1) {
-            setPause();
+            setWaitingForReconnections();
         } else if (isStarted() && (this.players.get(currentPlayerIndex).equals(player))) {
             calculateNextPlayer();
 
@@ -266,12 +312,33 @@ public class Game extends GameView {
         }
     }
 
-    public synchronized void restartGame(String username) throws IllegalFlowException {
+    /**
+     * This method allows to remove the stop state from a game.
+     * The method notifies all players that the game has restarted with the {@link GameHasStartedEventData} event.
+     *
+     * @throws NullPointerException iff username is null
+     * @throws IllegalFlowException iff
+     *  <ul>
+     *      <li> username cannot restart the game, because they are not the creator </li>
+     *      <li> the game has not started yet </li>
+     *      <li> the number of players who want to join the game after restarting it is less than 2 </li>
+     *  </ul>
+     */
+    public synchronized void restartGame(String username, List<String> usernameToWait) throws IllegalFlowException {
+        Objects.requireNonNull(username);
+        Objects.requireNonNull(usernameToWait);
+        assert !usernameToWait.contains(null);
+
+        if (usernameToWait.size() < 2)
+            throw new IllegalFlowException("Number of player can't be lower than 2");
+
         if (!this.creator.equals(username))
             throw new IllegalFlowException("You can't restart this game");
 
         if (!isStarted())
             throw new IllegalFlowException("Game is not started");
+
+        this.playersToWait = new ArrayList<>(usernameToWait);
 
         for (int i = 0; i < players.size(); i++) {
             if (this.playersToWait.contains(players.get(currentPlayerIndex).getUsername())) {
@@ -285,6 +352,12 @@ public class Game extends GameView {
         broadcast(new GameHasStartedEventData());
     }
 
+    /**
+     * This method returns the connection status of the player "username".
+     *
+     * @return True iff the player "username" is connected
+     * @throws PlayerNotInGameException iff "username" is not in this game.
+     * */
     public synchronized boolean isPlayerConnected(String username) throws PlayerNotInGameException {
         for (Player player: players) {
             if (player.is(username))
@@ -308,22 +381,21 @@ public class Game extends GameView {
     }
 
     /**
-     * La funzione connetto un player in partita.
-     * Inizialmente, quando viene startata la partita per la prima volta,
-     * ogni player viene segnato come disconnesso, e appena quest'ultimo si
-     * connette bisogna chiamare {@link Game#connectPlayer(String)} per connetterlo
-     * effettivamente all'interno della partita.
+     * This function connects a player to the game.
+     * Initially, when the game is started for the first time, every player is marked as disconnected,
+     * and as soon as a player connects, {@link Game#connectPlayer(String)} must be called to effectively connect
+     * them to the game.
      *
-     * Quando il primo player della partita si connette la partita viene messa in pausa,
-     * se il secondo utente che si connette non è il giocatore corrente, ossia il primo, dato
-     * che il game è appena partito ed era in pausa, viene lanciato un timer di TIME_FIRST_PLAYER_CONNECT
-     * millisecondi, che al termine cambia il turno al primo giocatore collegato.
+     * When the first player of the game connects, the game is waiting for reconnections.
+     * If the second user who connects is not the current player, i.e. the first player, since the game has just started
+     * and was on [waitingForReconnections], a timer of TIME_FIRST_PLAYER_CONNECT milliseconds is launched, which at the end switches
+     * the turn to the first connected player.
      *
-     * @param username l'username del player che vuole connettersi
+     * @param username the username of the player who wants to connect
      * @throws NullPointerException iff username is null
-     * @throws PlayerAlreadyInGameException se il player è gia connesso
-     * @throws IllegalFlowException se il game è stoppato
-     * @throws PlayerNotInGameException se il player non è in questa partita.
+     * @throws PlayerAlreadyInGameException if the player is already connected
+     * @throws IllegalFlowException if the game is stopped
+     * @throws PlayerNotInGameException if the player is not in this game.
      */
     public synchronized void connectPlayer(String username) throws PlayerAlreadyInGameException, IllegalFlowException,
         PlayerNotInGameException
@@ -346,12 +418,12 @@ public class Game extends GameView {
                 this.transceiver.broadcast(new PlayerHasJoinGameEventData(player.getUsername()));
 
                 if (numberOfPlayerOnline() == 1) {
-                    setPause();
-                } else if (isPause()) {
+                    setWaitingForReconnections();
+                } else if (isWaitingForReconnections()) {
                     assert numberOfPlayerOnline() == 2;
                     assert playTimer == null;
 
-                    removeFromPause();
+                    removeFromWaitingForReconnections();
 
                     if (players.get(currentPlayerIndex).isDisconnected() && playersToWait.isEmpty()) {
                         this.playTimer = new Timer();
@@ -418,7 +490,7 @@ public class Game extends GameView {
      * @throws IllegalArgumentException iff coordinate is not selected
      */
     public synchronized void forgetLastSelection(String username, Coordinate coordinate) throws IllegalFlowException {
-        if (!isStarted() || isStopped() || isPause()) throw new IllegalFlowException("Game is not started or is stopped");
+        if (!isStarted() || isStopped() || isWaitingForReconnections()) throw new IllegalFlowException("Game is not started or is stopped");
         if (isOver()) throw new IllegalFlowException("Game has ended");
         if (!players.get(currentPlayerIndex).getUsername().equals(username)) throw new IllegalFlowException("It's not your turn");
 
@@ -488,7 +560,7 @@ public class Game extends GameView {
      */
     private synchronized void calculateNextPlayer() {
         assert this.players.size() >= 2 && this.players.size() <= 4;
-        assert this.isStarted() && !isStopped() && !isPause();
+        assert this.isStarted() && !isStopped() && !isWaitingForReconnections();
         assert currentPlayerIndex >=  0 && currentPlayerIndex < players.size();
 
         if (atLeastOneBookshelfIsFull() && isLastPlayerSelected()) {
@@ -538,7 +610,7 @@ public class Game extends GameView {
      * This method is used for insert a selection of tile in che bookshelf
      * @throws IllegalFlowException
      *  <ul>
-     *      <li> Game is stopped </li>
+     *      <li> Game is stopped or waitingForReconnections </li>
      *      <li> username is not the current player </li>
      *  </ul>
      * @throws IllegalExtractionException
@@ -552,8 +624,8 @@ public class Game extends GameView {
     public synchronized void insertTile (String username, int col) throws IllegalFlowException, IllegalExtractionException {
         final Player player = getPlayer(username);
 
-        if (!isStarted() || isStopped() || isPause())
-            throw new IllegalFlowException("Game is stopped or pause");
+        if (!isStarted() || isStopped() || isWaitingForReconnections())
+            throw new IllegalFlowException("Game is stopped or waitingForReconnections");
 
         if (isOver())
             throw new IllegalFlowException("Game is over!");
@@ -629,15 +701,22 @@ public class Game extends GameView {
 
     /**
      * This method selects a Tile from the board
-     * @throws IllegalFlowException iff game is started or stopped
+     * @throws IllegalFlowException iff
+     * <ul>
+     *     <li> game is not started </li>
+     *     <li> game is stopped </li>
+     *     <li> game is waiting for reconnection </li>
+     *     <li> game is over </li>
+     *     <li> current player is not username </li>
+     * </ul>
      * @throws IllegalExtractionException iff coordinate is invalid
      * @throws FullSelectionException iff it's already selected maximum number of tiles
      *
      * @see Board
      */
     public synchronized void selectTile (String username, Coordinate coordinate) throws IllegalFlowException, IllegalExtractionException, FullSelectionException {
-        if (isPause())
-            throw new IllegalFlowException("Game is pause");
+        if (isWaitingForReconnections())
+            throw new IllegalFlowException("Game is waitingForReconnections");
         if (isStopped())
             throw new IllegalFlowException("Game is stopped");
         if (!isStarted())

@@ -360,16 +360,11 @@ public class GameController {
      */
     public synchronized Response restartGame (String username) {
         try {
-            if (clientsInLobby.size() < 2) {
-                return new Response("You can't restart a game with only one player connected", ResponseStatus.FAILURE);
-            }
-
-            game.setPlayersToWait(clientsInLobby.stream().map(Pair::getValue).toList());
-            game.restartGame(username);
+            game.restartGame(username, clientsInLobby.stream().map(Pair::getValue).toList());
             forEachInLobby(new GameHasStartedEventData());
-            return new Response("ok", ResponseStatus.SUCCESS);
+            return new Response("Ok!", ResponseStatus.SUCCESS);
         } catch (IllegalFlowException e) {
-            return new Response("You can't restart the game", ResponseStatus.FAILURE);
+            return new Response(e.getMessage(), ResponseStatus.FAILURE);
         }
     }
 
