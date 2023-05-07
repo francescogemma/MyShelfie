@@ -7,6 +7,8 @@ import it.polimi.ingsw.controller.VirtualView;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -17,6 +19,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Set;
 
+@Execution(ExecutionMode.SAME_THREAD)
 public class DBManagerTest {
     private static void deleteDirectoryRecursively(Path directoryPath) {
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directoryPath)) {
