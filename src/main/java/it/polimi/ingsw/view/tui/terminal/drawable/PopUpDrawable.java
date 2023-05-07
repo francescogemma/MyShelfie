@@ -18,7 +18,7 @@ public class PopUpDrawable extends FixedLayoutDrawable<TwoLayersDrawable> {
             blurrableBackground,
             popUpTextBox
                 .center().crop()
-                .fixSize(new DrawableSize(8, 22))
+                .fixSize(new DrawableSize(8, 30))
                 .addBorderBox()
                 .center().crop()
         );

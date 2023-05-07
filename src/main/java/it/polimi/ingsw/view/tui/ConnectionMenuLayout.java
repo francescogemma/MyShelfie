@@ -103,8 +103,6 @@ public class ConnectionMenuLayout extends AppLayout {
                         popUp.askToHide();
 
                         if (connection != null) {
-                            popUpQueue.clear();
-
                             synchronized (getLock()) {
                                 transceiver = new NetworkEventTransceiver(connection, getLock());
                                 switchAppLayout(LoginMenuLayout.NAME);

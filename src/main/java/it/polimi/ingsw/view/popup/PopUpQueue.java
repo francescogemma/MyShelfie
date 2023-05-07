@@ -77,6 +77,8 @@ public class PopUpQueue {
                     while (true) {
                         while (popUps.isEmpty() || popUps.get(0).isToDisplay()) {
                             if (!enabled) {
+                                popUps.clear();
+
                                 return;
                             }
 
@@ -100,26 +102,16 @@ public class PopUpQueue {
     }
 
     public void disable() {
-        synchronized (lock) {
-            if (!enabled) {
-                return;
+        new Thread(() -> {
+            synchronized (lock) {
+                if (!enabled) {
+                    return;
+                }
+
+                enabled = false;
+
+                lock.notifyAll();
             }
-
-            clear();
-
-            enabled = false;
-
-            lock.notifyAll();
-        }
-    }
-
-    public void clear() {
-        synchronized (lock) {
-            for (PopUp popUp : popUps) {
-                popUp.hide();
-            }
-
-            popUps.clear();
-        }
+        }).start();
     }
 }
