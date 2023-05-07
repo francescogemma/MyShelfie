@@ -59,7 +59,9 @@ public class GameLayoutController {
     }
 
     private void setTokenImage(int token, ImageView tokenImageView) {
-        if(token == 2) {
+        if(token == 0) {
+            tokenImageView.setVisible(false);
+        } else if(token == 2) {
             tokenImageView.setImage(new Image("/scoring tokens/scoring_2.jpg"));
         } else if(token == 4) {
             tokenImageView.setImage(new Image("/scoring tokens/scoring_4.jpg"));
@@ -67,6 +69,8 @@ public class GameLayoutController {
             tokenImageView.setImage(new Image("/scoring tokens/scoring_6.jpg"));
         } else if(token == 8) {
             tokenImageView.setImage(new Image("/scoring tokens/scoring_8.jpg"));
+        } else {
+            throw new IllegalArgumentException("Invalid token value");
         }
     }
 
@@ -114,58 +118,34 @@ public class GameLayoutController {
     }
 
     private void setBoardImageViewListener() {
-        gameBoardImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> {
-            resizeBoard();
-        });
-        gameBoardImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> {
-            resizeBoard();
-        });
+        gameBoardImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> resizeBoard());
+        gameBoardImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> resizeBoard());
     }
 
     private void setBookshelfImageViewListener() {
-        bookshelfImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> {
-            resizeBookshelf();
-        });
-        bookshelfImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> {
-            resizeBookshelf();
-        });
+        bookshelfImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> resizeBookshelf());
+        bookshelfImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> resizeBookshelf());
     }
 
     private void setCommonGoalImageViewsListeners() {
-        firstCommonGoalImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> {
-            resizeCommonGoalToken(firstScoringToken);
-        });
-        firstCommonGoalImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> {
-            resizeCommonGoalToken(firstScoringToken);
-        });
+        firstCommonGoalImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> resizeCommonGoalToken(firstScoringToken));
+        firstCommonGoalImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> resizeCommonGoalToken(firstScoringToken));
 
-        secondCommonGoalImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> {
-            resizeCommonGoalToken(secondScoringToken);
-        });
-        secondCommonGoalImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> {
-            resizeCommonGoalToken(secondScoringToken);
-        });
+        secondCommonGoalImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> resizeCommonGoalToken(secondScoringToken));
+        secondCommonGoalImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> resizeCommonGoalToken(secondScoringToken));
     }
 
     private void insertButtonInBoard(int row, int column, String url) {
-        Button tileButton = new Button();
-        tileButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        tileButton.setMinSize(0, 0);
-        GridPane.setFillWidth(tileButton, true);
-        GridPane.setFillHeight(tileButton, true);
-
-        Image image = new Image(url);
-        ImageView img = new ImageView(image);
-        img.setPreserveRatio(true);
-        img.fitWidthProperty().bind(tileButton.widthProperty());
-        img.fitHeightProperty().bind(tileButton.heightProperty());
-        tileButton.setGraphic(img);
-        tileButton.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-border-width: 0; -fx-border-radius: 0; -fx-background-radius: 0;");
-
+        Button tileButton = setButtonToInsert(url);
         boardGridPane.add(tileButton, column, row);
     }
 
     private void insertButtonInBookshelf(int row, int column, String url) {
+        Button tileButton = setButtonToInsert(url);
+        bookshelfGridPane.add(tileButton, column, row);
+    }
+
+    private Button setButtonToInsert(String url) {
         Button tileButton = new Button();
         tileButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         tileButton.setMinSize(0, 0);
@@ -180,6 +160,6 @@ public class GameLayoutController {
         tileButton.setGraphic(img);
         tileButton.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-border-width: 0; -fx-border-radius: 0; -fx-background-radius: 0;");
 
-        bookshelfGridPane.add(tileButton, column, row);
+        return tileButton;
     }
 }
