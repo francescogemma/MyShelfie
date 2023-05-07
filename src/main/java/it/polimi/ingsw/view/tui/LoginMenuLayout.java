@@ -7,10 +7,9 @@ import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.client.LoginEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.networking.DisconnectedException;
-import it.polimi.ingsw.view.tui.terminal.drawable.BlurrableDrawable;
-import it.polimi.ingsw.view.tui.terminal.drawable.DrawableSize;
-import it.polimi.ingsw.view.tui.terminal.drawable.Fill;
-import it.polimi.ingsw.view.tui.terminal.drawable.Orientation;
+import it.polimi.ingsw.view.popup.PopUp;
+import it.polimi.ingsw.view.popup.PopUpQueue;
+import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
 import it.polimi.ingsw.view.tui.terminal.drawable.menu.Button;
@@ -18,22 +17,20 @@ import it.polimi.ingsw.view.tui.terminal.drawable.menu.value.TextBox;
 import it.polimi.ingsw.view.tui.terminal.drawable.menu.value.ValueMenuEntry;
 import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.PrimitiveSymbol;
-import it.polimi.ingsw.view.tui.terminal.drawable.twolayers.TwoLayersDrawable;
 
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class LoginMenuLayout extends AppLayout {
     public static final String NAME = "LOGIN_MENU";
 
+    // Layout:
     private final ValueMenuEntry<String> usernameEntry = new ValueMenuEntry<>("Username",
         new TextBox());
     private final ValueMenuEntry<String> passwordEntry = new ValueMenuEntry<>("Password",
         new TextBox().hideText());
     private final Button loginButton = new Button("Login");
     private final Button exitButton = new Button("Exit");
-    private final BlurrableDrawable blurrableBackground = new OrientedLayout(Orientation.VERTICAL,
+    private final Drawable background = new OrientedLayout(Orientation.VERTICAL,
             usernameEntry.center().weight(1),
             passwordEntry.center().weight(1),
             new OrientedLayout(Orientation.HORIZONTAL,
@@ -42,18 +39,30 @@ public class LoginMenuLayout extends AppLayout {
                 exitButton.center().weight(1),
                 new Fill(PrimitiveSymbol.EMPTY).weight(2)
             ).weight(1)
-        ).center().scrollable().blurrable();
+        ).center().scrollable();
 
-    private final TextBox popUpTextBox = new TextBox().unfocusable();
+    private final PopUpDrawable popUpDrawable = new PopUpDrawable(background);
 
-    private final TwoLayersDrawable twoLayers = new TwoLayersDrawable(
-        blurrableBackground,
-        popUpTextBox.center().crop().fixSize(new DrawableSize(5, 30))
-            .addBorderBox().center()
-    );
+    // Data:
+    private NetworkEventTransceiver transceiver = null;
+
+    // Utilities:
+    private Requester<Response, LoginEventData> loginRequester = null;
+
+    private final PopUpQueue popUpQueue = new PopUpQueue(
+        text -> {
+            synchronized (getLock()) {
+                popUpDrawable.displayPopUp(text);
+            }
+        },
+        () -> {
+            synchronized (getLock()) {
+                popUpDrawable.hidePopUp();
+            }
+        });
 
     public LoginMenuLayout() {
-        setLayout(twoLayers.alignUpLeft().crop());
+        setLayout(popUpDrawable.alignUpLeft().crop());
 
         setData(new AppLayoutData(
             Map.of(
@@ -69,6 +78,7 @@ public class LoginMenuLayout extends AppLayout {
                     .request(new LoginEventData(usernameEntry.getValue(), passwordEntry.getValue()));
             } catch (DisconnectedException e) {
                 displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+
                 return;
             }
 
@@ -77,20 +87,7 @@ public class LoginMenuLayout extends AppLayout {
             if (response.isOk()) {
                 switchAppLayout(AvailableGamesMenuLayout.NAME);
             } else {
-                popUpTextBox.text(response.message());
-
-                blurrableBackground.blur(true);
-                twoLayers.showForeground();
-
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        synchronized (getLock()) {
-                            blurrableBackground.blur(false);
-                            twoLayers.hideForeground();
-                        }
-                    }
-                }, 2000);
+                popUpQueue.add(response.message(), PopUp.hideAfter(2000), p -> {});
             }
         });
 
@@ -100,14 +97,17 @@ public class LoginMenuLayout extends AppLayout {
         });
     }
 
-    private NetworkEventTransceiver transceiver = null;
-    private Requester<Response, LoginEventData> loginRequester = null;
-
     @Override
     public void setup(String previousLayoutName) {
-        if (previousLayoutName.equals(ConnectionMenuLayout.NAME)) {
-            transceiver = (NetworkEventTransceiver)
-                appDataProvider.get(ConnectionMenuLayout.NAME, "transceiver");
+        if (!previousLayoutName.equals(ConnectionMenuLayout.NAME) &&
+            !previousLayoutName.equals(AvailableGamesMenuLayout.NAME)) {
+            throw new IllegalStateException("You can reach LoginMenuLayout only from ConnectionMenuLayout" +
+                " or AvailableGamesMenuLayout");
+        }
+
+        if (transceiver == null) {
+            transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
+                "transceiver");
 
             loginRequester = Response.requester(transceiver, transceiver, getLock());
 
@@ -120,11 +120,15 @@ public class LoginMenuLayout extends AppLayout {
                 }
             });
         }
+
+        loginRequester.registerAllListeners();
+        popUpQueue.enable();
     }
 
     @Override
     public void beforeSwitch() {
-
+        loginRequester.unregisterAllListeners();
+        popUpQueue.disable();
     }
 
     @Override

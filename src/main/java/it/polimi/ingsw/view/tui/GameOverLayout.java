@@ -2,6 +2,8 @@ package it.polimi.ingsw.view.tui;
 
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
+import it.polimi.ingsw.view.displayable.DisplayablePlayer;
+import it.polimi.ingsw.view.displayable.DisplayableScoreBoard;
 import it.polimi.ingsw.view.tui.terminal.drawable.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
@@ -17,12 +19,13 @@ import java.util.Map;
 public class GameOverLayout extends AppLayout {
     public static final String NAME = "GAME_OVER";
 
-    private static class PlayerDisplayDrawable extends FixedLayoutDrawable<Drawable> {
+    // Layout:
+    private static class GameOverDisplayablePlayerDrawable extends FixedLayoutDrawable<Drawable> {
         private final TextBox positionTextBox = new TextBox().unfocusable();
         private final TextBox playerNameTextBox = new TextBox().hideCursor();
         private final TextBox playerPointsTextBox = new TextBox().hideCursor();
 
-        public PlayerDisplayDrawable() {
+        private GameOverDisplayablePlayerDrawable() {
             setLayout(new OrientedLayout(Orientation.HORIZONTAL,
                 positionTextBox.center().weight(1),
                 playerNameTextBox.center().weight(1),
@@ -32,29 +35,34 @@ public class GameOverLayout extends AppLayout {
         }
     }
 
-    private final RecyclerDrawable<PlayerDisplayDrawable, GameLayout.PlayerDisplay> playerDisplayRecyclerDrawable =
-        new RecyclerDrawable<>(Orientation.VERTICAL, PlayerDisplayDrawable::new,
-            ((playerDisplayDrawable, playerDisplay) -> {
-                playerDisplayDrawable.positionTextBox.text("# " + String.valueOf(playerDisplay.getPosition()));
-                playerDisplayDrawable.playerNameTextBox.text(playerDisplay.getName())
-                    .color(playerDisplay.isWinner() ? Color.GREEN : (playerDisplay.isClientPlayer()
-                    ? Color.FOCUS : (playerDisplay.isConnected() ? Color.WHITE : Color.GREY)));
-                playerDisplayDrawable.playerPointsTextBox.text("Points: " + playerDisplay.getPoints());
+    private final RecyclerDrawable<GameOverDisplayablePlayerDrawable,
+        DisplayablePlayer> scoreBoardRecyclerDrawable =
+        new RecyclerDrawable<>(Orientation.VERTICAL,
+            GameOverDisplayablePlayerDrawable::new,
+            ((gameOverDisplayablePlayerDrawable, displayablePlayer) -> {
+                gameOverDisplayablePlayerDrawable.positionTextBox.text("# " + displayablePlayer.getPosition());
+                gameOverDisplayablePlayerDrawable.playerNameTextBox.text(displayablePlayer.getName())
+                    .color(displayablePlayer.isWinner() ? Color.GREEN : (displayablePlayer.isClientPlayer()
+                    ? Color.FOCUS : (displayablePlayer.isConnected() ? Color.WHITE : Color.GREY)));
+                gameOverDisplayablePlayerDrawable.playerPointsTextBox.text("Points: " + displayablePlayer.getPoints());
             }));
 
     private final Button backToAvailableGamesButton = new Button("Back to available games");
     private final Button exitButton = new Button("Exit");
 
+    // Data:
+    private NetworkEventTransceiver transceiver = null;
+
     public GameOverLayout() {
         setLayout(new OrientedLayout(Orientation.VERTICAL,
             new TextBox().text("Scoreboard").unfocusable().center().weight(1),
-            playerDisplayRecyclerDrawable.center()
+            scoreBoardRecyclerDrawable.center()
                 .scrollable().alignUpLeft().weight(8),
             new OrientedLayout(Orientation.HORIZONTAL,
-                new Fill(PrimitiveSymbol.EMPTY).weight(1),
+                new Fill(PrimitiveSymbol.EMPTY).weight(2),
                 backToAvailableGamesButton.center().weight(1),
                 exitButton.center().weight(1),
-                new Fill(PrimitiveSymbol.EMPTY).weight(1)
+                new Fill(PrimitiveSymbol.EMPTY).weight(2)
             ).weight(3)
         ).center().crop());
 
@@ -67,31 +75,32 @@ public class GameOverLayout extends AppLayout {
         });
 
         exitButton.onpress(() -> {
+            transceiver.disconnect();
             mustExit();
         });
     }
 
-    private NetworkEventTransceiver transceiver = null;
-
     @Override
     public void setup(String previousLayoutName) {
-        if (previousLayoutName.equals(GameLayout.NAME)) {
-            playerDisplayRecyclerDrawable.populate((List<GameLayout.PlayerDisplay>) appDataProvider
-                .get(GameLayout.NAME, "scoreboard"));
-
-            if (transceiver == null) {
-                transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
-                "transceiver");
-
-                PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
-                    transceiver = null;
-
-                    if (isCurrentLayout()) {
-                        switchAppLayout(ConnectionMenuLayout.NAME);
-                    }
-                });
-            }
+        if (!previousLayoutName.equals(GameLayout.NAME)) {
+            throw new IllegalStateException("You can reach GameOverLayout only form GameLayout");
         }
+
+        if (transceiver == null) {
+            transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
+            "transceiver");
+
+            PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
+                transceiver = null;
+
+                if (isCurrentLayout()) {
+                    switchAppLayout(ConnectionMenuLayout.NAME);
+                }
+            });
+        }
+
+        scoreBoardRecyclerDrawable.populate(((DisplayableScoreBoard) appDataProvider
+                .get(GameLayout.NAME, "scoreboard")).getDisplayablePlayers());
     }
 
     @Override

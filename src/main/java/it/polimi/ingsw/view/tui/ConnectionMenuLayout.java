@@ -50,7 +50,6 @@ public class ConnectionMenuLayout extends AppLayout {
 
     // Data:
     private NetworkEventTransceiver transceiver;
-    private String connectionType;
 
     // Utilities:
     private final PopUpQueue popUpQueue = new PopUpQueue(
@@ -85,7 +84,8 @@ public class ConnectionMenuLayout extends AppLayout {
                     Connection connection = null;
 
                     try {
-                        if (connectionType.equals("TCP")) {
+                        if (appDataProvider.getString(App.START_NAME, "connection")
+                            .equals("TCP")) {
                             connection = new TCPConnection(ipAddress, port);
                         } else {
                             connection = new RMIConnection(ipAddress, port);
@@ -122,9 +122,7 @@ public class ConnectionMenuLayout extends AppLayout {
     public void setup(String previousLayoutName) {
         popUpQueue.enable();
 
-        if (previousLayoutName.equals(App.START_NAME)) {
-            connectionType = appDataProvider.getString(App.START_NAME, "connection");
-        } else {
+        if (!previousLayoutName.equals(App.START_NAME)) {
             popUpQueue.add("You disconnected from the server", PopUp.hideAfter(2000), p -> {});
         }
     }
