@@ -1,1 +1,47 @@
 @import "BasicStylesheet.css";
+
+#gameBackgroundHBox {
+    -fx-background-color: background;
+}
+
+#gameLeftSide {
+    -fx-effect: dropshadow(three-pass-box, dark-grey, 7, 0, 0, 0);
+    -fx-background-color: form-background;
+    -fx-background-radius: 20;
+}
+
+#firstCommonGoalHBox {
+    -fx-effect: dropshadow(three-pass-box, dark-grey, 7, 0, 0, 0);
+    -fx-background-color: almost-white;
+    -fx-background-radius: 20;
+}
+
+#secondCommonGoalHBox {
+    -fx-effect: dropshadow(three-pass-box, dark-grey, 7, 0, 0, 0);
+    -fx-background-color: almost-white;
+    -fx-background-radius: 20;
+}
+
+#personalGoalHBox {
+    -fx-effect: dropshadow(three-pass-box, dark-grey, 7, 0, 0, 0);
+    -fx-background-color: almost-white;
+    -fx-background-radius: 20;
+}
+
+#gameRightSide {
+    -fx-effect: dropshadow(three-pass-box, dark-grey, 7, 0, 0, 0);
+    -fx-background-color: form-background;
+    -fx-background-radius: 20;
+}
+
+#gameRankingHBox {
+    -fx-effect: dropshadow(three-pass-box, dark-grey, 7, 0, 0, 0);
+    -fx-background-color: almost-white;
+    -fx-background-radius: 20;
+}
+
+#boardBackground {
+    -fx-effect: dropshadow(three-pass-box, dark-grey, 7, 0, 0, 0);
+    -fx-background-color: form-background;
+    -fx-background-radius: 20;
+}

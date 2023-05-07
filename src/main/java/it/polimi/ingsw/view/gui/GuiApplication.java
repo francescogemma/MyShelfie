@@ -30,6 +30,8 @@ public class GuiApplication extends Application {
         primaryStage.getIcons().add(new Image("/Publisher material/Icon 50x50px.png"));
         primaryStage.setScene(scene);
         primaryStage.setFullScreen(true);
+        primaryStage.setMinHeight(400);
+        primaryStage.setMinWidth(600);
 
         // Save connection type
         String connectionType = getParameters().getRaw().get(0);

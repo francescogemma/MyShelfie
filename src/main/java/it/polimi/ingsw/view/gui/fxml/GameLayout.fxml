@@ -13,55 +13,54 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="it.polimi.ingsw.view.gui.controller.GameLayoutController">
 
-    <VBox fx:id="gameLeftSide" HBox.hgrow="ALWAYS">
+    <padding>
+        <Insets left="10" bottom="10" top="10" right="10"/>
+    </padding>
+
+    <VBox fx:id="gameLeftSide" spacing="10" HBox.hgrow="NEVER" minWidth="0" prefWidth="${gameBackgroundHBox.width * 0.15}" maxWidth="${gameBackgroundHBox.width * 0.15}">
         <padding>
-            <Insets bottom="10" top="10" />
+            <Insets bottom="10" left="10" right="10" top="10" />
         </padding>
-        <ScrollPane fitToHeight="true" fitToWidth="true" VBox.vgrow="ALWAYS">
-            <AnchorPane>
-                <VBox fx:id="gameGoalsList" spacing="10" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                    <padding>
-                        <Insets bottom="10" left="10" right="10" top="10" />
-                    </padding>
-                    <HBox fx:id="firstCommonGoalHBox" VBox.vgrow="ALWAYS" alignment="CENTER_LEFT" spacing="5">
-                        <ImageView fx:id="firstCommonGoalImageView" fitHeight="${firstCommonGoalHBox.height * 0.8}"
-                                   fitWidth="${firstCommonGoalHBox.width * 0.5}" preserveRatio="true">
-                            <Image url="/common goal cards/1.jpg"/>
-                        </ImageView>
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="firstCommonGoalLabel" text="First Common Goal" />
-                    </HBox>
+        <HBox fx:id="firstCommonGoalHBox" VBox.vgrow="ALWAYS" alignment="CENTER">
+            <StackPane HBox.hgrow="ALWAYS">
+                <ImageView fx:id="firstCommonGoalImageView" fitHeight="${firstCommonGoalHBox.height * 0.8}"
+                           fitWidth="${firstCommonGoalHBox.width * 0.8}" preserveRatio="true">
+                    <Image url="/common goal cards/1.jpg"/>
+                </ImageView>
 
-                    <HBox fx:id="secondCommonGoalHBox" VBox.vgrow="ALWAYS" alignment="CENTER_LEFT" spacing="5">
-                        <ImageView fx:id="secondCommonGoalImageView" fitHeight="${secondCommonGoalHBox.height * 0.8}"
-                                   fitWidth="${secondCommonGoalHBox.width * 0.5}" preserveRatio="true">
-                            <Image url="/common goal cards/2.jpg"/>
-                        </ImageView>
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="secondCommonGoalLabel" text="Second Common Goal" />
-                    </HBox>
+                <ImageView fx:id="firstScoringToken" />
+            </StackPane>
+        </HBox>
 
-                    <HBox fx:id="personalGoalHBox" VBox.vgrow="ALWAYS" alignment="CENTER_LEFT" spacing="5">
-                        <ImageView fx:id="personalGoalImageView" fitHeight="${personalGoalHBox.height * 0.8}"
-                                   fitWidth="${personalGoalHBox.width * 0.5}" preserveRatio="true">
-                            <Image url="/personal goal cards/Personal_Goals.png"/>
-                        </ImageView>
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="personalGoalLabel" text="Personal Goal" />
-                    </HBox>
-                </VBox>
-            </AnchorPane>
-        </ScrollPane>
+        <HBox fx:id="secondCommonGoalHBox" VBox.vgrow="ALWAYS" alignment="CENTER">
+            <StackPane HBox.hgrow="ALWAYS">
+                <ImageView fx:id="secondCommonGoalImageView" fitHeight="${secondCommonGoalHBox.height * 0.8}"
+                           fitWidth="${secondCommonGoalHBox.width * 0.8}" preserveRatio="true" pickOnBounds="true">
+                    <Image url="/common goal cards/2.jpg"/>
+                </ImageView>
+
+                <ImageView fx:id="secondScoringToken" />
+            </StackPane>
+        </HBox>
+
+        <HBox fx:id="personalGoalHBox" VBox.vgrow="ALWAYS" alignment="CENTER">
+            <ImageView fx:id="personalGoalImageView" fitHeight="${personalGoalHBox.height * 0.8}"
+                       fitWidth="${personalGoalHBox.width * 0.8}" preserveRatio="true">
+                <Image url="/personal goal cards/Personal_Goals.png"/>
+            </ImageView>
+        </HBox>
     </VBox>
 
-    <VBox fx:id="gameCenter" alignment="CENTER" HBox.hgrow="ALWAYS">
+    <VBox fx:id="gameCenter" alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS" minWidth="0" prefWidth="${gameBackgroundHBox.width * 0.55}" maxWidth="${gameBackgroundHBox.width * 0.55}">
         <StackPane fx:id="boardStackPane" VBox.vgrow="ALWAYS">
+            <Pane fx:id="boardBackground" />
+
             <ImageView fx:id="gameBoardImageView" fitHeight="${boardStackPane.height * 0.8}"
                        fitWidth="${boardStackPane.width * 0.8}" preserveRatio="true">
                 <Image fx:id="gameBoardImage" url="/boards/livingroom.png"/>
             </ImageView>
 
-            <GridPane fx:id="boardGridPane" gridLinesVisible="true">
+            <GridPane fx:id="boardGridPane">
                 <columnConstraints>
                     <ColumnConstraints percentWidth="${100.0 / 9.0}" />
                     <ColumnConstraints percentWidth="${100.0 / 9.0}" />
@@ -85,12 +84,19 @@
                     <RowConstraints percentHeight="${100.0 / 9.0}" />
                 </rowConstraints>
             </GridPane>
+
+            <Label fx:id="turnLabel" text="IT'S TURN" />
         </StackPane>
+
+        <HBox alignment="CENTER" spacing="10">
+            <Button fx:id="stopGameButton" mnemonicParsing="false" text="STOP GAME" managed="false"/>
+            <Button fx:id="exitButton" mnemonicParsing="false" text="EXIT"/>
+        </HBox>
     </VBox>
 
-    <VBox fx:id="gameRightSide" HBox.hgrow="ALWAYS">
+    <VBox fx:id="gameRightSide" alignment="BASELINE_CENTER" spacing="10" HBox.hgrow="NEVER" minWidth="0" prefWidth="${gameBackgroundHBox.width * 0.30}" maxWidth="${gameBackgroundHBox.width * 0.30}">
         <padding>
-            <Insets bottom="10" top="10" />
+            <Insets left="10" bottom="10" top="10" right="10" />
         </padding>
         <HBox fx:id="gameRankingHBox" VBox.vgrow="ALWAYS">
             <ScrollPane fitToHeight="true" fitToWidth="true" HBox.hgrow="ALWAYS">
@@ -103,6 +109,10 @@
                 </AnchorPane>
             </ScrollPane>
         </HBox>
+
+        <Region VBox.vgrow="ALWAYS" />
+
+        <Label fx:id="playerBookshelf" text="Giocatore 1"/>
 
         <HBox fx:id="bookshelfHBox" VBox.vgrow="ALWAYS">
             <StackPane fx:id="bookshelfStackPane" HBox.hgrow="ALWAYS">
@@ -129,6 +139,11 @@
                     <Image fx:id="bookshelfImage" url="/boards/bookshelf_orth.png"/>
                 </ImageView>
             </StackPane>
+        </HBox>
+
+        <HBox alignment="CENTER" spacing="10">
+            <Button fx:id="nextBookshelfButton" mnemonicParsing="false" text="&lt;"/>
+            <Button fx:id="previousBookshelfButton" mnemonicParsing="false" text="&gt;"/>
         </HBox>
     </VBox>
 </HBox>
