@@ -6,29 +6,27 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
-import it.polimi.ingsw.model.bookshelf.Bookshelf;
-import it.polimi.ingsw.utils.Logger;
+import it.polimi.ingsw.model.bookshelf.BookshelfView;
 
+import java.util.Objects;
 import java.util.function.Function;
 
-public class BookshelfHasChangedEventData implements EventData {
-    // TODO: Use a BookshelfView instead
-    private final Bookshelf bookshelf;
-    private final String username;
+/**
+ * This event indicates that the bookshelf has changed.
+ * It is sent to all users in the game whenever there is a change in the bookshelf.
+ *
+ * @see BookshelfView
+ * @see EventData
+ * @author Giacomo Groppi
+ */
+public record BookshelfHasChangedEventData(String username, BookshelfView bookshelf) implements EventData {
 
-    public BookshelfHasChangedEventData(String username, Bookshelf bookshelf) {
-        this.username = username;
-        this.bookshelf = new Bookshelf(bookshelf);
+    public BookshelfHasChangedEventData {
+        Objects.requireNonNull(username);
+        Objects.requireNonNull(bookshelf);
     }
 
     public static final String ID = "BOOKSHELF_HAS_CHANGED";
-
-    public String getUsername() {
-        return this.username;
-    }
-    public Bookshelf getBookshelf () {
-        return new Bookshelf(bookshelf);
-    }
 
     public static CastEventReceiver<BookshelfHasChangedEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);

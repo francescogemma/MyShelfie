@@ -6,18 +6,30 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
-import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.board.BoardView;
-import it.polimi.ingsw.utils.Logger;
 
+import java.util.Objects;
 import java.util.function.Function;
 
+/**
+ * The {@code BoardChangedEventData} event indicates that ghe game board has changed.
+ * This event is send to all participants in the game.
+ *
+ * @see BoardView
+ * @see EventData
+ * @author Giacomo Groppi
+ * */
 public record BoardChangedEventData(BoardView board) implements EventData {
     public static final String ID = "BOARD_CHANGE";
 
+    /**
+     * Constructs a new {@code BoardChangedEventData} event with the give {@link BoardView boardView} arguments.
+     * @throws NullPointerException iff board is null
+     *
+     * @see BoardView
+     * */
     public BoardChangedEventData {
-        if (board == null)
-            throw new NullPointerException();
+        Objects.requireNonNull(board);
     }
 
     public static CastEventReceiver<BoardChangedEventData> castEventReceiver(EventReceiver<EventData> receiver) {

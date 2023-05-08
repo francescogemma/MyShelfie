@@ -11,6 +11,7 @@ import it.polimi.ingsw.event.receiver.EventListener;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.model.board.BoardView;
 import it.polimi.ingsw.model.bookshelf.Bookshelf;
+import it.polimi.ingsw.model.bookshelf.BookshelfView;
 import it.polimi.ingsw.model.game.IllegalFlowException;
 import it.polimi.ingsw.model.game.Player;
 import it.polimi.ingsw.model.goal.CommonGoal;
@@ -289,7 +290,7 @@ public class GameLayout extends AppLayout {
     private DisplayableScoreBoard scoreBoard;
     private String gameName;
     private int selectedBookshelfIndex;
-    private List<Bookshelf> bookshelves;
+    private List<BookshelfView> bookshelves;
 
     private boolean isDisplayingCommonGoal;
 
@@ -400,7 +401,7 @@ public class GameLayout extends AppLayout {
     };
 
     private final EventListener<BookshelfHasChangedEventData> bookshelfHasChangedListener = data -> {
-        bookshelves.set(scoreBoard.getDisplayablePlayer(data.getUsername()).getOriginalIndex(), data.getBookshelf());
+        bookshelves.set(scoreBoard.getDisplayablePlayer(data.username()).getOriginalIndex(), data.bookshelf());
 
         if (!isDisplayingCommonGoal) {
             populateBookshelfPanel();

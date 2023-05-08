@@ -1,9 +1,6 @@
 package it.polimi.ingsw.view.tui;
 
-import it.polimi.ingsw.model.bookshelf.Bookshelf;
-import it.polimi.ingsw.model.bookshelf.BookshelfMask;
-import it.polimi.ingsw.model.bookshelf.BookshelfMaskSet;
-import it.polimi.ingsw.model.bookshelf.Shelf;
+import it.polimi.ingsw.model.bookshelf.*;
 import it.polimi.ingsw.view.tui.terminal.drawable.Coordinate;
 import it.polimi.ingsw.view.tui.terminal.drawable.DrawableSize;
 import it.polimi.ingsw.view.tui.terminal.drawable.FixedLayoutDrawable;
@@ -75,11 +72,11 @@ public class BookshelfDrawable extends FixedLayoutDrawable<OrientedLayout> {
                 .getDrawable());
     }
 
-    public BookshelfDrawable populate(Bookshelf bookshelf) {
-        for (int column = 0; column < Bookshelf.COLUMNS; column++) {
+    public BookshelfDrawable populate(BookshelfView bookshelf) {
+        for (int column = 0; column < BookshelfView.COLUMNS; column++) {
             BookshelfColumnDrawable columnDrawable = getColumn(column);
 
-            for (int row = 0; row < Bookshelf.ROWS; row++) {
+            for (int row = 0; row < BookshelfView.ROWS; row++) {
                 columnDrawable.color(row, bookshelf.getTileColorAt(Shelf.getInstance(row, column)));
                 columnDrawable.mask(row, 0);
                 columnDrawable.masked(false);
