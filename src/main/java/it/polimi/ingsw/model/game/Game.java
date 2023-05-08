@@ -533,7 +533,8 @@ public class Game extends GameView {
      */
     private synchronized void calculateNextPlayer() {
         assert this.players.size() >= 2 && this.players.size() <= 4;
-        assert this.isStarted() && !isStopped() && !isWaitingForReconnections();
+        assert this.isStarted();
+        assert !isStopped();
         assert currentPlayerIndex >=  0 && currentPlayerIndex < players.size();
 
         if (atLeastOneBookshelfIsFull() && isLastPlayerSelected()) {

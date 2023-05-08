@@ -927,4 +927,53 @@ class GameTest {
             game.getCurrentPlayer();
         });
     }
+
+    @Test
+    void getCurrentOwner_noPlayerDisconnected_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException, PlayerNotInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        game.startGame("Giacomo");
+
+        game.connectPlayer("Giacomo");
+        game.connectPlayer("Michele");
+        game.connectPlayer("Cristiano");
+
+        Assertions.assertEquals("Giacomo", game.getCurrentOwner().get());
+    }
+
+    @Test
+    void getCurrentOwner_ownerConnectLast_correctOutput() throws PlayerNotInGameException, IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        game.startGame("Giacomo");
+
+        game.connectPlayer("Michele");
+        game.connectPlayer("Cristiano");
+        game.connectPlayer("Giacomo");
+
+        Assertions.assertEquals("Giacomo", game.getCurrentOwner().get());
+    }
+
+    @Test
+    void getCurrentOwner_shift_correctOutput() throws PlayerNotInGameException, IllegalFlowException, PlayerAlreadyInGameException {
+        game.addPlayer("Giacomo");
+        game.addPlayer("Michele");
+        game.addPlayer("Cristiano");
+
+        game.startGame("Giacomo");
+
+        game.connectPlayer("Michele");
+        game.connectPlayer("Cristiano");
+
+        Assertions.assertEquals("Michele", game.getCurrentOwner().get());
+
+        game.disconnectPlayer("Michele");
+
+        Assertions.assertEquals("Cristiano", game.getCurrentOwner().get());
+
+    }
 }
