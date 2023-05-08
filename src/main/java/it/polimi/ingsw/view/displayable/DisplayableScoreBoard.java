@@ -43,9 +43,21 @@ public class DisplayableScoreBoard {
         recalculatePositions(player.getUsername());
     }
 
-    // TODO: [Important] Fix bug in position
     private void recalculatePositions(String modifiedPlayerName) {
-        DisplayablePlayer modifiedPlayer = displayablePlayers.remove(playerNameToIndex(modifiedPlayerName));
+        int modifiedPlayerIndex = playerNameToIndex(modifiedPlayerName);
+
+        if (modifiedPlayerIndex < displayablePlayers.size() - 1 &&
+            displayablePlayers.get(modifiedPlayerIndex).getPosition() <
+                displayablePlayers.get(modifiedPlayerIndex + 1).getPosition() &&
+            (modifiedPlayerIndex == 0 || displayablePlayers.get(modifiedPlayerIndex - 1).getPosition()
+                < displayablePlayers.get(modifiedPlayerIndex).getPosition())) {
+
+            for (int i = modifiedPlayerIndex + 1; i < displayablePlayers.size(); i++) {
+                displayablePlayers.get(i).setPosition(displayablePlayers.get(i).getPosition() - 1);
+            }
+        }
+
+        DisplayablePlayer modifiedPlayer = displayablePlayers.remove(modifiedPlayerIndex);
 
         int previousPlayerPosition = 0;
 
