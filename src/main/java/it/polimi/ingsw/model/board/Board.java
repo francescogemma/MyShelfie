@@ -193,6 +193,9 @@ public class Board extends BoardView {
         return t;
     }
 
+    /**
+     * The function removes the current selection.
+     */
     public void forgetSelection() {
         this.boardSelector = new BoardSelector();
     }

@@ -574,7 +574,11 @@ public class Game extends GameView {
             }
 
             // set new turn
-            board.forgetSelection();
+            if (!board.getSelectedCoordinates().isEmpty()) {
+                board.forgetSelection();
+                this.transceiver.broadcast(new BoardChangedEventData(this.board.createView()));
+            }
+
             this.currentPlayerIndex = index;
 
             this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex)));
