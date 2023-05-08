@@ -422,6 +422,12 @@ public class GameLayout extends AppLayout {
         boardPopUpQueue.add(displayableGoal.toText(),
             popUp -> {
                 synchronized (getLock()) {
+                    List<Integer> newPointStack = commonGoals[displayableGoal.isFirstCommonGoal() ? 0
+                        : 1].getPointStack();
+                    newPointStack.remove(newPointStack.size() - 1);
+                    commonGoals[displayableGoal.isFirstCommonGoal() ? 0
+                        : 1].setPointStack(newPointStack);
+
                     displayGoal(displayableGoal);
 
                     new Timer().schedule(new TimerTask() {
