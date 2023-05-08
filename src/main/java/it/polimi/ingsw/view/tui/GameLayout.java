@@ -586,7 +586,12 @@ public class GameLayout extends AppLayout {
         boardPopUpQueue.add("Waiting for reconnection of other players",
             popUp -> {
                 synchronized (getLock()) {
-                    waitingForReconnectionsPopUp = popUp;
+                    if (scoreBoard.getDisplayablePlayers().stream().filter(DisplayablePlayer::isConnected)
+                        .count() < 2) {
+                        waitingForReconnectionsPopUp = popUp;
+                    } else {
+                        popUp.askToHide();
+                    }
                 }
             },
             popUp -> {});
