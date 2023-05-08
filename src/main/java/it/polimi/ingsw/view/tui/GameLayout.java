@@ -377,7 +377,6 @@ public class GameLayout extends AppLayout {
         populateGoalsPanel();
     };
 
-    // TODO: Account for changes in ownership
     private final EventListener<PlayerHasJoinGameEventData> playerHasJoinGameListener = data -> {
         scoreBoard.setConnectionState(data.username(), true);
         scoreBoardRecyclerDrawable.populate(scoreBoard.getDisplayablePlayers());
@@ -385,6 +384,12 @@ public class GameLayout extends AppLayout {
         if (waitingForReconnectionsPopUp != null) {
             waitingForReconnectionsPopUp.askToHide();
             waitingForReconnectionsPopUp = null;
+        }
+
+        if (data.owner().equals(scoreBoard.getClientPlayer().getName())) {
+            stopGameButtonLayoutElement.setWeight(2);
+        } else {
+            stopGameButtonLayoutElement.setWeight(0);
         }
     };
 
@@ -552,6 +557,12 @@ public class GameLayout extends AppLayout {
             },
             popUp -> {}
         );
+
+        if (data.newOwner().equals(scoreBoard.getClientPlayer().getName())) {
+            stopGameButtonLayoutElement.setWeight(2);
+        } else {
+            stopGameButtonLayoutElement.setWeight(0);
+        }
     };
 
     private final EventListener<GameHasBeenPauseEventData> gameHasBeenPauseListener = data -> {
