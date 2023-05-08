@@ -97,6 +97,7 @@ public class NetworkEventTransceiver implements EventTransceiver {
         }
     }
 
+    // TODO: Perform broadcast in a separated queue (and thread)
     @Override
     public void broadcast(EventData data) {
         try {

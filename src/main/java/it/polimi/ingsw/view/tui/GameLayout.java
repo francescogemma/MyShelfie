@@ -116,16 +116,22 @@ public class GameLayout extends AppLayout {
                         adjacencyGoalDescriptionTextBox.center().weight(4)
                     ).addBorderBox().blurrable();
 
-    private void populateGoalsPanel() {
-        firstCommonGoalDescriptionTextBox.text(commonGoals[0].getDescription());
-        firstCommonGoalDrawable.populate(commonGoals[0].getDisplay());
+    private void populateCommonGoalsPointsTextBoxes() {
         firstCommonGoalPointsTextBox.text("Points: " + (commonGoals[0].getPointStack().size() == 0 ? 0 :
             commonGoals[0].getPointStack().get(commonGoals[0].getPointStack().size() - 1)));
 
-        secondCommonGoalDescriptionTextBox.text(commonGoals[1].getDescription());
-        secondCommonGoalDrawable.populate(commonGoals[1].getDisplay());
         secondCommonGoalPointsTextBox.text("Points: " + (commonGoals[1].getPointStack().size() == 0 ? 0 :
             commonGoals[1].getPointStack().get(commonGoals[1].getPointStack().size() - 1)));
+    }
+
+    private void populateGoalsPanel() {
+        firstCommonGoalDescriptionTextBox.text(commonGoals[0].getDescription());
+        firstCommonGoalDrawable.populate(commonGoals[0].getDisplay());
+
+        secondCommonGoalDescriptionTextBox.text(commonGoals[1].getDescription());
+        secondCommonGoalDrawable.populate(commonGoals[1].getDisplay());
+
+        populateCommonGoalsPointsTextBoxes();
 
         personalGoalDrawable.populate(personalGoal.getTilesColorMask());
     }
@@ -433,6 +439,8 @@ public class GameLayout extends AppLayout {
                     newPointStack.remove(newPointStack.size() - 1);
                     commonGoals[displayableGoal.isFirstCommonGoal() ? 0
                         : 1].setPointStack(newPointStack);
+
+                    populateCommonGoalsPointsTextBoxes();
 
                     displayGoal(displayableGoal);
 
