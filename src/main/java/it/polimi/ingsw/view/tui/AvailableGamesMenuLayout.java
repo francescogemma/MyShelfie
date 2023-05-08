@@ -37,7 +37,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
     private final Drawable usernameDisplayDrawable = new OrientedLayout(Orientation.HORIZONTAL,
         new TextBox().text("Logged in as: ").unfocusable().weight(1),
         usernameTextBox.color(Color.RED).weight(1)
-    ).center().crop().fixSize(new DrawableSize(3, 25));
+    ).center().crop().fixSize(new DrawableSize(3, 35));
     private final Drawable noAvailableGamesTextBox = new TextBox().text("There aren't available games!")
         .unfocusable().center();
 
