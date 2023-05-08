@@ -193,6 +193,10 @@ public class Board extends BoardView {
         return t;
     }
 
+    public void forgetSelection() {
+        this.boardSelector = new BoardSelector();
+    }
+
     /**
      * Use this method to deselect a coordinate from the current extraction
      * @param coordinate the coordinate to deselect

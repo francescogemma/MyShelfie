@@ -16,7 +16,7 @@ import it.polimi.ingsw.utils.Pair;
 import java.util.Arrays;
 import java.util.List;
 
-public class VirtualView implements EventTransmitter{
+public class VirtualView implements EventTransmitter {
     private GameController gameController;
     private String username;
     private final EventTransceiver transceiver;
@@ -59,8 +59,9 @@ public class VirtualView implements EventTransmitter{
         PlayerHasJoinMenu       .castEventReceiver(transceiver).registerListener(event -> this.playerHasJoinMenu());
     }
 
-    private synchronized Response joinLobby (JoinLobbyEventData event) {
+    private Response joinLobby (JoinLobbyEventData event) {
         Logger.writeMessage("%s ask to join lobby".formatted(username));
+
         if (isAuthenticated() && !isInGame() && !isInLobby()) {
             Pair<Response, GameController> res = MenuController
                     .getInstance()
@@ -76,45 +77,42 @@ public class VirtualView implements EventTransmitter{
         }
     }
 
-    private synchronized Response exitLobby(ExitLobbyEventData event) {
+    private Response exitLobby(ExitLobbyEventData event) {
         Logger.writeMessage("%s ask to leave lobby".formatted(username));
-        if (isInLobby()) {
-            Response res = MenuController.getInstance().exitLobby(gameController, this);
 
-            if (res.isOk()) {
-                gameController = null;
-            }
+        if (!isInLobby()) return DEFAULT_NOT_IN_LOBBY;
 
-            return res;
-        } else {
-            return DEFAULT_NOT_IN_LOBBY;
-        }
+        Response response = MenuController.getInstance().exitLobby(gameController, username);
+
+        if (response.isOk())
+            gameController = null;
+
+        return response;
     }
 
-    private synchronized Response logout (LogoutEventData eventData) {
+    private Response logout (LogoutEventData eventData) {
         Logger.writeMessage("%s logout".formatted(username));
         if (isInGame() || isInLobby()) {
             Logger.writeWarning("The client has asked to log out but is in game");
             return new Response("You are in a game or lobby...", ResponseStatus.FAILURE);
         }
 
-        if (isAuthenticated()) {
-            Response response = MenuController.getInstance().logout(this);
-
-            if (response.isOk()) {
-                this.username = null;
-                this.gameController = null;
-            }
-
-            return response;
-        } else {
-            Logger.writeWarning("The client has asked to log out but is not authenticated");
+        if (!isAuthenticated())
             return new Response("You are not login", ResponseStatus.SUCCESS);
+
+        Response response = MenuController.getInstance().logout(this, username);
+
+        if (response.isOk()) {
+            this.username = null;
+            this.gameController = null;
         }
+
+        return response;
     }
 
-    private synchronized void disconnect() {
+    private void disconnect() {
         Logger.writeMessage("user %s disconnected".formatted(username));
+
         MenuController.getInstance().forceDisconnect(
                 this,
                 gameController,
@@ -122,59 +120,53 @@ public class VirtualView implements EventTransmitter{
         );
 
         this.gameController = null;
+        this.username = null;
     }
 
-    private synchronized Response pauseGame (PauseGameEventData eventData) {
+    private Response pauseGame (PauseGameEventData eventData) {
         Logger.writeMessage("Call for username: %s".formatted(username));
 
-        if (isInGame()) {
-            Response response = gameController.stopGame(username);
+        if (!isInGame()) return DEFAULT_MESSAGE_NOT_IN_GAME;
 
-            if (response.isOk()) {
-                this.gameController = null;
-            }
+        Response response = gameController.stopGame(username);
 
-            return response;
-        } else {
-            return DEFAULT_MESSAGE_NOT_IN_GAME;
+        if (response.isOk()) {
+            gameController = null;
         }
+        return response;
     }
 
-    private synchronized Response exitGame (PlayerExitGame exitGame) {
+    private Response exitGame (PlayerExitGame exitGame) {
         Logger.writeMessage("Call for username %s".formatted(username));
-        if (isInGame()) {
-            Response response = MenuController.getInstance().exitGame(gameController, this);
 
-            if (response.isOk()) {
-                this.gameController = null;
-            }
-            return response;
-        } else {
-            return new Response("You are not in a game", ResponseStatus.FAILURE);
-        }
+        if (!isInGame()) return new Response("You are not in a game", ResponseStatus.FAILURE);
+
+        Response response = MenuController.getInstance().exitGame(gameController, username);
+
+        if (response.isOk())
+            gameController = null;
+
+        return response;
     }
 
-    private synchronized void playerHasJoinMenu () {
-        if (this.isAuthenticated()) {
-            MenuController.getInstance().playerHasJoinMenu(this, username);
-        } else {
+    private void playerHasJoinMenu () {
+        if (!isAuthenticated())
             Logger.writeCritical("View send join menu but he is not authenticated");
-        }
+
+        MenuController.getInstance().playerHasJoinMenu(this, username);
     }
 
-    private synchronized Response createNewGame (CreateNewGameEventData eventData) {
+    private Response createNewGame (CreateNewGameEventData eventData) {
         if (this.isAuthenticated()) {
-            if (!isInGame() && !isInLobby()) {
-                return MenuController.getInstance().createNewGame(eventData.gameName(), username);
-            } else {
+            if (isInGame() || isInLobby())
                 return DEFAULT_MESSAGE_ALREADY_IN_GAME;
-            }
+            return MenuController.getInstance().createNewGame(eventData.gameName(), username);
         } else {
             return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
         }
     }
 
-    private synchronized Response restartGame (RestartGameEventData event) {
+    private Response restartGame (RestartGameEventData event) {
         Logger.writeMessage("%s ask for restart game".formatted(username));
         if (isInLobby()) {
             Response res = gameController.restartGame(username);
@@ -189,7 +181,7 @@ public class VirtualView implements EventTransmitter{
         }
     }
 
-    private synchronized Response joinGame (JoinGameEventData eventData) {
+    private Response joinGame (JoinGameEventData eventData) {
         Logger.writeMessage("%s ask for join game".formatted(username));
         if (this.isAuthenticated()) {
             if (isInGame()) {
@@ -201,15 +193,15 @@ public class VirtualView implements EventTransmitter{
             if (isInLobby()) {
                 response = gameController.joinGame(username);
             } else {
-                Pair<Response, GameController> pair = MenuController
-                    .getInstance().joinGame(this, username, eventData.getGameName());
+                    Pair<Response, GameController> pair = MenuController
+                            .getInstance().joinGame(this, username, eventData.getGameName());
 
-                response = pair.getKey();
+                    response = pair.getKey();
 
-                if (pair.getValue() != null) {
-                    assert pair.getKey().isOk();
-                    setGameController(pair.getValue());
-                }
+                    if (pair.getValue() != null) {
+                        assert pair.getKey().isOk();
+                        setGameController(pair.getValue());
+                    }
             }
 
             return response;
@@ -217,25 +209,22 @@ public class VirtualView implements EventTransmitter{
             return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
     }
 
-    private synchronized Response login(LoginEventData event) {
-        if (!isAuthenticated()) {
-            Response response = MenuController.getInstance().authenticated(
-                    this,
-                    event.getUsername(),
-                    event.getPassword()
-            );
-
-            if (response.isOk()) {
-                this.username = event.getUsername();
-            }
-
-            return response;
-        } else {
+    private Response login(LoginEventData event) {
+        if (isAuthenticated())
             return new Response("You are already login", ResponseStatus.FAILURE);
+        Response response = MenuController.getInstance().authenticated(
+                this,
+                event.getUsername(),
+                event.getPassword()
+        );
+
+        if (response.isOk()) {
+            this.username = event.getUsername();
         }
+        return response;
     }
 
-    private synchronized Response deselectTile (DeselectTileEventData eventData) {
+    private Response deselectTile (DeselectTileEventData eventData) {
         if (isInGame()) {
             return gameController.deselectTile(username, eventData.coordinate());
         } else {
@@ -243,7 +232,7 @@ public class VirtualView implements EventTransmitter{
         }
     }
 
-    private synchronized Response insertTile (InsertTileEventData eventData) {
+    private Response insertTile (InsertTileEventData eventData) {
         if (isInGame()) {
             return gameController.insertSelectedTilesInBookshelf(username, eventData.column());
         } else {
@@ -251,7 +240,7 @@ public class VirtualView implements EventTransmitter{
         }
     }
 
-    private synchronized Response selectTile(SelectTileEventData eventData) {
+    private Response selectTile(SelectTileEventData eventData) {
         if (isInGame()) {
             return this.gameController.selectTile(username, eventData.coordinate());
         } else {
@@ -259,26 +248,15 @@ public class VirtualView implements EventTransmitter{
         }
     }
 
-    private synchronized Response startGame (StartGameEventData ignore) {
-        if (this.isAuthenticated()) {
-            if (this.isInLobby()) {
-                return MenuController.getInstance().startGame(gameController, username);
-            } else {
-                return DEFAULT_NOT_IN_LOBBY;
-            }
+    private Response startGame (StartGameEventData ignore) {
+        if (this.isInLobby()) {
+            return MenuController.getInstance().startGame(gameController, username);
         } else {
-            return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
+            return DEFAULT_NOT_IN_LOBBY;
         }
     }
 
-    public synchronized String getUsername () {
-        if (username == null)
-            throw new IllegalStateException("You can't call this function if virtualview is not authenticated");
-
-        return username;
-    }
-
-    public synchronized void setGameController(GameController gameController) {
+    private void setGameController(GameController gameController) {
         assert this.gameController == null;
         assert gameController != null;
         assert isAuthenticated();
@@ -286,13 +264,13 @@ public class VirtualView implements EventTransmitter{
         this.gameController = gameController;
     }
 
-    public synchronized boolean isAuthenticated () {
+    private boolean isAuthenticated () {
         assert username != null || (gameController == null);
 
         return username != null;
     }
 
-    public synchronized boolean isInGame() {
+    private boolean isInGame() {
         final boolean res = gameController != null && gameController.isInGame(username);
 
         // res ==> isAuthenticated
@@ -301,7 +279,7 @@ public class VirtualView implements EventTransmitter{
         return res;
     }
 
-    public synchronized boolean isInLobby() {
+    private boolean isInLobby() {
         final boolean res = gameController != null && this.gameController.isInLobby(username);
 
         // res ==> isAuthenticated
@@ -313,8 +291,6 @@ public class VirtualView implements EventTransmitter{
     @Override
     public void broadcast(EventData data) {
         Logger.writeMessage("%s player receive %s".formatted(username, data.getId()));
-        if (idForceExit.contains(data.getId()) && isInGame())
-            gameController = null;
 
         this.transceiver.broadcast(data);
     }

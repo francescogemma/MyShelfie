@@ -574,6 +574,7 @@ public class Game extends GameView {
             }
 
             // set new turn
+            board.forgetSelection();
             this.currentPlayerIndex = index;
 
             this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex)));

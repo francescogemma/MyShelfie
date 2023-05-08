@@ -9,6 +9,8 @@ public class User implements Identifiable {
     private final String name;
     private final String hashedPassword;
 
+    private transient boolean connected;
+
     private static String hashPassword(String password) {
         StringBuilder hashedPasswordBuilder = new StringBuilder(64);
 
@@ -29,7 +31,16 @@ public class User implements Identifiable {
 
     public User(String name, String password) {
         this.name = name;
+        this.connected = false;
         hashedPassword = hashPassword(password);
+    }
+
+    public boolean isConnected() {
+        return this.connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
     }
 
     @Override

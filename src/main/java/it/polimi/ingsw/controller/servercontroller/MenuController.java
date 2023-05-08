@@ -3,7 +3,6 @@ package it.polimi.ingsw.controller.servercontroller;
 import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.controller.User;
-import it.polimi.ingsw.controller.VirtualView;
 import it.polimi.ingsw.controller.db.DBManager;
 import it.polimi.ingsw.controller.db.IdentifiableNotFoundException;
 import it.polimi.ingsw.event.data.EventData;
@@ -26,8 +25,8 @@ public class MenuController {
     private static final MenuController INSTANCE;
     private final List<GameController> gameControllerList = new ArrayList<>();
 
-    private final List<VirtualView> authenticated;
-    private final List<VirtualView> notAuthenticated;
+    private final List<EventTransmitter> authenticated;
+    private final List<EventTransmitter> notAuthenticated;
     private final List<User> users;
 
     static {
@@ -61,6 +60,10 @@ public class MenuController {
         return INSTANCE;
     }
 
+    public Object getLock() {
+        return this;
+    }
+
     /**
      * password is required in case of player not existing
      * */
@@ -92,16 +95,14 @@ public class MenuController {
         return user;
     }
 
-    /**
-     * We remove virtualView from notAuthenticated and place in authenticated
-     * */
-    private synchronized boolean authenticate (VirtualView transmitter, String username, String password) {
+    private synchronized boolean authenticate (EventTransmitter transmitter, String username, String password) {
         User user = this.getUser(username, password);
 
         if (user.passwordMatches(password)) {
-            if (authenticated.stream().anyMatch(v -> v.getUsername().equals(username))) {
+            if (user.isConnected())
                 return false;
-            }
+
+            user.setConnected(true);
 
             notAuthenticated.remove(transmitter);
             authenticated.add(transmitter);
@@ -117,27 +118,23 @@ public class MenuController {
     private void forEachInMenu(EventData eventData) {
         Objects.requireNonNull(eventData);
 
-        authenticated.stream()
-                .filter(v -> !v.isInLobby() && !v.isInGame())
+        authenticated
                 .forEach(v -> v.broadcast(eventData));
     }
 
-    public synchronized Response exitLobby(GameController gameController, VirtualView view) {
-        assert gameController.isInLobby(view.getUsername());
-        assert !gameController.isInGame(view.getUsername());
+    public synchronized Response exitLobby(GameController gameController, String username) {
+        assert gameController.isInLobby(username);
+        assert !gameController.isInGame(username);
         Response response;
 
         synchronized (gameController.getLock()) {
-            response = gameController.exitLobby(view.getUsername());
+            boolean wasFull = gameController.isFull();
+            response = gameController.exitLobby(username);
 
-            if (!gameController.getGameView().isStarted()) {
+            if (wasFull && !gameController.getGameView().isStarted()) {
                 // we need to notify the player in the menu that a new game is available
                 GameHasBeenCreatedEventData event = new GameHasBeenCreatedEventData(
-                        this.gameControllerList
-                                .stream()
-                                .map(GameController::getGameView)
-                                .map(GameHasBeenCreatedEventData.AvailableGame::new)
-                                .toList()
+                    gameController.getGameView()
                 );
 
                 forEachInMenu(event);
@@ -147,11 +144,8 @@ public class MenuController {
         return response;
     }
 
-    public synchronized Response exitGame(GameController gameController, VirtualView view) {
-        assert view.isAuthenticated();
-        assert view.isInGame();
-
-        return gameController.exitGame(view.getUsername());
+    public synchronized Response exitGame(GameController gameController, String username) {
+        return gameController.exitGame(username);
     }
 
     public Response startGame(GameController gameController, String username) {
@@ -174,19 +168,16 @@ public class MenuController {
         return Optional.empty();
     }
 
-    /**
-     * this function adds virtualView and connect transmitter to GameHasBeenCreated
-     * */
-    public void joinMenu(VirtualView virtualView) {
-        if (virtualView == null)
+    public void joinMenu(EventTransmitter eventTransmitter) {
+        if (eventTransmitter == null)
             throw new NullPointerException();
 
         synchronized (this) {
-            if (authenticated.contains(virtualView))
+            if (authenticated.contains(eventTransmitter))
                 throw new IllegalArgumentException("Already present in authenticated");
-            if (notAuthenticated.contains(virtualView))
+            if (notAuthenticated.contains(eventTransmitter))
                 throw new IllegalArgumentException("Already present in notAuthenticated");
-            notAuthenticated.add(virtualView);
+            notAuthenticated.add(eventTransmitter);
         }
     }
 
@@ -202,8 +193,8 @@ public class MenuController {
         );
     }
 
-    public Response authenticated(VirtualView view, String username, String password) {
-        return this.authenticate(view, username, password) ?
+    public Response authenticated(EventTransmitter transmitter, String username, String password) {
+        return this.authenticate(transmitter, username, password) ?
             new Response("You are log in", ResponseStatus.SUCCESS) :
             new Response("Bad credentials", ResponseStatus.FAILURE);
     }
@@ -211,19 +202,29 @@ public class MenuController {
     /**
      * Let's assume that the player is not in any game.
      */
-    public synchronized Response logout (VirtualView eventTransmitter) {
+    public synchronized Response logout (EventTransmitter eventTransmitter, String username) {
         assert authenticated.contains(eventTransmitter);
         assert !notAuthenticated.contains(eventTransmitter);
 
         authenticated.remove(eventTransmitter);
         notAuthenticated.add(eventTransmitter);
 
+        for (User user : users) {
+            if (user.getName().equals(username))
+                user.setConnected(false);
+        }
+
         return new Response("You are now logout", ResponseStatus.SUCCESS);
     }
 
-    public synchronized void forceDisconnect(VirtualView transmitter, GameController gameController, String username) {
+    public synchronized void forceDisconnect(EventTransmitter transmitter, GameController gameController, String username) {
         authenticated.remove(transmitter);
         notAuthenticated.remove(transmitter);
+
+        for (User user : users) {
+            if (user.getName().equals(username))
+                user.setConnected(false);
+        }
 
         if (gameController != null) {
             assert username != null;
@@ -240,10 +241,11 @@ public class MenuController {
         }
     }
 
-    private final EventListener<GameOverInternalEventData> listenerGameOver = (eventData) -> {
+    private final EventListener<GameOverInternalEventData> listenerGameOver = eventData -> {
         synchronized (this) {
             gameControllerList.remove(eventData.getGameController());
             eventData.getGameController().getInternalTransceiver().unregisterAllListeners();
+            forEachInMenu(new GameIsNoLongerAvailableEventData(eventData.getGameController().gameName()));
         }
     };
 
@@ -273,7 +275,7 @@ public class MenuController {
         }
     }
 
-    public Pair<Response, GameController> joinLobby(VirtualView transmitter, String username, String gameName) {
+    public Pair<Response, GameController> joinLobby(EventTransmitter transmitter, String username, String gameName) {
         Optional<GameController> controller = this.getGameController(gameName);
 
         if (controller.isPresent()) {
@@ -281,6 +283,8 @@ public class MenuController {
                 Response response = controller.get().joinLobby(transmitter, username);
 
                 if (response.isOk()) {
+                    if (controller.get().isFull())
+                        forEachInMenu(new GameIsNoLongerAvailableEventData(controller.get().getGameView().getName()));
                     return Pair.of(response, controller.get());
                 } else {
                     return Pair.of(response, null);
@@ -291,11 +295,11 @@ public class MenuController {
         return Pair.of(new Response("There is no game with this name...", ResponseStatus.FAILURE), null);
     }
 
-    public Pair<Response, GameController> joinGame(VirtualView virtualView, String username, String gameName) {
+    public Pair<Response, GameController> joinGame(EventTransmitter eventTransmitter, String username, String gameName) {
         Optional<GameController> controller = this.getGameController(gameName);
 
         if (controller.isPresent()) {
-            Response response = controller.get().rejoinGame(username, virtualView);
+            Response response = controller.get().rejoinGame(username, eventTransmitter);
 
             if (response.isOk()) {
                 return Pair.of(response, controller.get());

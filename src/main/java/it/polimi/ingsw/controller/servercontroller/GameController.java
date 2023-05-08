@@ -47,15 +47,18 @@ public class GameController {
         game.setTransceiver(transceiver);
 
         transceiver.registerListener(event -> {
-                    clientsInGame.forEach(client -> client.getKey().broadcast(event));
+            synchronized (this) {
+                clientsInGame.forEach(client -> client.getKey().broadcast(event));
 
-                    if (this.game.isStarted() && !eventIgnored.contains(event.getId()))
-                        DBManager.getGamesDBManager().save(game);
+                if (this.game.isStarted() && !eventIgnored.contains(event.getId()))
+                    DBManager.getGamesDBManager().save(game);
 
-                    if (event.getId().equals(GameOverEventData.ID)) {
-                        this.internalTransceiver.broadcast(new GameOverInternalEventData(this));
-                        DBManager.getGamesDBManager().delete(game);
-                    }
+                if (event.getId().equals(GameOverEventData.ID)) {
+                    this.internalTransceiver.broadcast(new GameOverInternalEventData(this));
+                    DBManager.getGamesDBManager().delete(game);
+                    clientsInGame.clear();
+                }
+            }
         });
     }
 
@@ -124,7 +127,7 @@ public class GameController {
      *
      * @return The lock used internally by GameController.
      * */
-    protected Object getLock () {
+    public Object getLock () {
         return this;
     }
 
@@ -179,6 +182,11 @@ public class GameController {
             return new Response("Success exit lobby", ResponseStatus.SUCCESS);
         }
     }
+
+    protected synchronized boolean isFull() {
+        return clientsInLobby.size() == 4;
+    }
+
 
     private synchronized void removePlayer(String username) {
         for (int i = 0; i < clientsInGame.size(); i++) {
