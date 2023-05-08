@@ -77,7 +77,10 @@ public class PopUpQueue {
                     while (true) {
                         while (popUps.isEmpty() || popUps.get(0).isToDisplay()) {
                             if (!enabled) {
-                                popUps.clear();
+                                if (!popUps.isEmpty()) {
+                                    hidePopUp.run();
+                                    popUps.clear();
+                                }
 
                                 return;
                             }
