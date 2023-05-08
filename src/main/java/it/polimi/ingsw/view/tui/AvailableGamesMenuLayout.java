@@ -227,10 +227,12 @@ public class AvailableGamesMenuLayout extends AppLayout {
 
     @Override
     public void beforeSwitch() {
-        createGameRequester.unregisterAllListeners();
-        logoutRequester.unregisterAllListeners();
+        if (transceiver != null) {
+            createGameRequester.unregisterAllListeners();
+            logoutRequester.unregisterAllListeners();
 
-        gameHasBeenCreatedReceiver.unregisterListener(gameHasBeenCreatedListener);
+            gameHasBeenCreatedReceiver.unregisterListener(gameHasBeenCreatedListener);
+        }
     }
 
     @Override

@@ -231,14 +231,16 @@ public class LobbyLayout extends AppLayout {
 
     @Override
     public void beforeSwitch() {
-        joinLobbyRequester.unregisterAllListeners();
-        startGameRequester.unregisterAllListeners();
-        exitLobbyRequester.unregisterAllListeners();
-        restartGameRequester.unregisterAllListeners();
+        if (transceiver != null) {
+            joinLobbyRequester.unregisterAllListeners();
+            startGameRequester.unregisterAllListeners();
+            exitLobbyRequester.unregisterAllListeners();
+            restartGameRequester.unregisterAllListeners();
 
-        playerHasJoinLobbyReceiver.unregisterListener(playerHasJoinLobbyListener);
-        gameHasStartedReceiver.unregisterListener(gameHasStartedListener);
-        playerHasExitLobbyReceiver.unregisterListener(playerHasExitLobbyListener);
+            playerHasJoinLobbyReceiver.unregisterListener(playerHasJoinLobbyListener);
+            gameHasStartedReceiver.unregisterListener(gameHasStartedListener);
+            playerHasExitLobbyReceiver.unregisterListener(playerHasExitLobbyListener);
+        }
     }
 
     @Override

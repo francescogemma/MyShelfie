@@ -127,7 +127,10 @@ public class LoginMenuLayout extends AppLayout {
 
     @Override
     public void beforeSwitch() {
-        loginRequester.unregisterAllListeners();
+        if (transceiver != null) {
+            loginRequester.unregisterAllListeners();
+        }
+
         popUpQueue.disable();
     }
 
