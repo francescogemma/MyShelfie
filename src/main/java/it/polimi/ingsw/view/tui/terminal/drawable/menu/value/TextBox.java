@@ -108,6 +108,10 @@ public class TextBox extends ValueDrawable<String> {
             return primitiveSymbol.highlightBackground().colorForeground(Color.BLACK);
         }
 
+        if (primitiveSymbol == PrimitiveSymbol.EMPTY) {
+            return PrimitiveSymbol.EMPTY;
+        }
+
         Symbol symbol = primitiveSymbol.colorForeground(color);
 
         if (bold) {
