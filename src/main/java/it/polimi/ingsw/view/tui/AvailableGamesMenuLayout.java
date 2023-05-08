@@ -8,6 +8,7 @@ import it.polimi.ingsw.event.data.client.CreateNewGameEventData;
 import it.polimi.ingsw.event.data.client.LogoutEventData;
 import it.polimi.ingsw.event.data.client.PlayerHasJoinMenu;
 import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
+import it.polimi.ingsw.event.data.game.GameIsNoLongerAvailableEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.receiver.EventListener;
 import it.polimi.ingsw.event.receiver.EventReceiver;
@@ -110,21 +111,37 @@ public class AvailableGamesMenuLayout extends AppLayout {
     private Requester<Response, LogoutEventData> logoutRequester = null;
 
     private EventReceiver<GameHasBeenCreatedEventData> gameHasBeenCreatedReceiver = null;
+    private EventReceiver<GameIsNoLongerAvailableEventData> gameIsNoLongerAvailableReceiver = null;
 
     // Listeners:
     private final EventListener<GameHasBeenCreatedEventData> gameHasBeenCreatedListener = data -> {
         availableGames.addAll(data.getNames());
 
-        if (availableGames.size() > 0) {
+        if (availableGames.isEmpty()) {
+            alternativeDrawable.first();
+        } else {
             gamesListRecyclerDrawable.populate(availableGames);
 
             alternativeDrawable.second();
-        } else {
-            alternativeDrawable.first();
         }
     };
 
-    // TODO: Account for games becoming unavailable
+    private final EventListener<GameIsNoLongerAvailableEventData> gameIsNoLongerAvailableListener = data -> {
+        for (int i = 0; i < availableGames.size(); i++) {
+            if (availableGames.get(i).name().equals(data.gameName())) {
+                availableGames.remove(i);
+                break;
+            }
+        }
+
+        if (availableGames.isEmpty()) {
+            alternativeDrawable.first();
+        } else {
+            gamesListRecyclerDrawable.populate(availableGames);
+
+            alternativeDrawable.second();
+        }
+    };
 
     public AvailableGamesMenuLayout() {
         setLayout(new OrientedLayout(Orientation.VERTICAL,
@@ -202,6 +219,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
             logoutRequester = Response.requester(transceiver, transceiver, getLock());
 
             gameHasBeenCreatedReceiver = GameHasBeenCreatedEventData.castEventReceiver(transceiver);
+            gameIsNoLongerAvailableReceiver = GameIsNoLongerAvailableEventData.castEventReceiver(transceiver);
 
             PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
                 transceiver = null;
@@ -210,6 +228,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
                 logoutRequester = null;
 
                 gameHasBeenCreatedReceiver = null;
+                gameIsNoLongerAvailableReceiver = null;
 
                 if (isCurrentLayout()) {
                     switchAppLayout(ConnectionMenuLayout.NAME);
@@ -221,6 +240,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
         logoutRequester.registerAllListeners();
 
         gameHasBeenCreatedReceiver.registerListener(gameHasBeenCreatedListener);
+        gameIsNoLongerAvailableReceiver.registerListener(gameIsNoLongerAvailableListener);
 
         transceiver.broadcast(new PlayerHasJoinMenu());
     }
@@ -232,6 +252,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
             logoutRequester.unregisterAllListeners();
 
             gameHasBeenCreatedReceiver.unregisterListener(gameHasBeenCreatedListener);
+            gameIsNoLongerAvailableReceiver.unregisterListener(gameIsNoLongerAvailableListener);
         }
     }
 
