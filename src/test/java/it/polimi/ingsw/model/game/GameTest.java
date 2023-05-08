@@ -211,11 +211,11 @@ class GameTest {
         game.addPlayer("Giacomo");
         game.addPlayer("Michele");
 
-        AtomicReference<String> username = new AtomicReference<>("");
+        AtomicBoolean call = new AtomicBoolean(false);
 
         PlayerHasDisconnectedEventData.castEventReceiver(transceiver).registerListener(
                 event -> {
-                    username.set(event.username());
+                    call.set(true);
                 }
         );
 
@@ -224,7 +224,7 @@ class GameTest {
 
         game.disconnectPlayer("Giacomo");
 
-        Assertions.assertEquals("Giacomo", username.get());
+        Assertions.assertFalse(call.get());
     }
 
     @Test

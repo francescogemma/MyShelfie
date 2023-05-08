@@ -161,7 +161,7 @@ public class GameController {
      * @param username the username that wants to exit the lobby
      * @return Always SUCCESS
      */
-    public Response exitLobby(String username) {
+    protected Response exitLobby(String username) {
         Objects.requireNonNull(username);
         assert isInLobby(username);
 

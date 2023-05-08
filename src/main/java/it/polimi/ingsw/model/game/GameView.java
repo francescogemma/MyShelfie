@@ -5,9 +5,11 @@ import it.polimi.ingsw.model.bag.Bag;
 import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.board.BoardView;
 import it.polimi.ingsw.model.goal.CommonGoal;
+import it.polimi.ingsw.utils.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Class containing all the getters for the Game class.
@@ -226,6 +228,33 @@ public class GameView implements Identifiable {
             throw new IllegalStateException();
 
         return username.equals(creator);
+    }
+
+    protected synchronized int getIndex (String username) {
+        for (int i = 0; i < players.size(); i++) {
+            if (players.get(i).is(username))
+                return i;
+        }
+
+        throw  new IllegalArgumentException("Player not in this game");
+    }
+
+    protected synchronized Player getPlayer (String username) {
+        final int index = getIndex(username);
+        return players.get(index);
+    }
+
+    public Optional<String> getCurrentOwner() {
+        if (getPlayer(creator).isConnected())
+            return Optional.of(creator);
+        return  players.stream().filter(Player::isConnected).map(Player::getUsername).findFirst();
+    }
+
+    public synchronized boolean canStopGame (String username) throws NoPlayerConnectedException {
+        Optional<String> currentOwner = getCurrentOwner();
+        if (currentOwner.isEmpty())
+            throw new NoPlayerConnectedException();
+        return username.equals(currentOwner.get());
     }
 
     /**

@@ -122,32 +122,36 @@ public class MenuController {
                 .forEach(v -> v.broadcast(eventData));
     }
 
-    public synchronized Response exitGame(GameController gameController, VirtualView view) {
-        assert view.isAuthenticated();
-        assert view.isInGame();
-
+    public synchronized Response exitLobby(GameController gameController, VirtualView view) {
+        assert gameController.isInLobby(view.getUsername());
+        assert !gameController.isInGame(view.getUsername());
         Response response;
 
         synchronized (gameController.getLock()) {
-            final boolean wasVisible = gameController.isStopped() || gameController.isWaitingForReconnections();
-            response = gameController.exitGame(view.getUsername());
+            response = gameController.exitLobby(view.getUsername());
 
-            if (wasVisible != (gameController.isStopped() || gameController.isWaitingForReconnections())) {
+            if (!gameController.getGameView().isStarted()) {
                 // we need to notify the player in the menu that a new game is available
-                GameHasBeenCreatedEventData event;
-                    event = new GameHasBeenCreatedEventData(
-                            this.gameControllerList
-                                    .stream()
-                                    .map(GameController::getGameView)
-                                    .map(GameHasBeenCreatedEventData.AvailableGame::new)
-                                    .toList()
-                    );
+                GameHasBeenCreatedEventData event = new GameHasBeenCreatedEventData(
+                        this.gameControllerList
+                                .stream()
+                                .map(GameController::getGameView)
+                                .map(GameHasBeenCreatedEventData.AvailableGame::new)
+                                .toList()
+                );
 
                 forEachInMenu(event);
             }
         }
 
         return response;
+    }
+
+    public synchronized Response exitGame(GameController gameController, VirtualView view) {
+        assert view.isAuthenticated();
+        assert view.isInGame();
+
+        return gameController.exitGame(view.getUsername());
     }
 
     public Response startGame(GameController gameController, String username) {
@@ -248,7 +252,7 @@ public class MenuController {
         Objects.requireNonNull(username);
 
         if (gameName.length() < 2)
-            return new Response("Game name is too short", ResponseStatus.SUCCESS);
+            return new Response("Game name is too short", ResponseStatus.FAILURE);
 
         Game game = new Game(gameName, username);
         GameController controller = new GameController(game);

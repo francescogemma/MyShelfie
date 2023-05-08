@@ -79,7 +79,7 @@ public class VirtualView implements EventTransmitter{
     private synchronized Response exitLobby(ExitLobbyEventData event) {
         Logger.writeMessage("%s ask to leave lobby".formatted(username));
         if (isInLobby()) {
-            Response res = this.gameController.exitLobby(username);
+            Response res = MenuController.getInstance().exitLobby(gameController, this);
 
             if (res.isOk()) {
                 gameController = null;
@@ -312,10 +312,9 @@ public class VirtualView implements EventTransmitter{
 
     @Override
     public void broadcast(EventData data) {
+        Logger.writeMessage("%s player receive %s".formatted(username, data.getId()));
         if (idForceExit.contains(data.getId()) && isInGame())
             gameController = null;
-
-        Logger.writeMessage("%s player receive %s".formatted(username, data.getId()));
 
         this.transceiver.broadcast(data);
     }

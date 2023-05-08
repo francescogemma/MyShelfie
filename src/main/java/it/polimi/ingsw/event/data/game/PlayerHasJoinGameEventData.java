@@ -10,7 +10,7 @@ import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 
-public record PlayerHasJoinGameEventData(String username) implements EventData {
+public record PlayerHasJoinGameEventData(String username, String owner) implements EventData {
     public static final String ID = "PLAYER_HAS_JOIN_GAME";
 
     public PlayerHasJoinGameEventData {

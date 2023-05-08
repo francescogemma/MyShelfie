@@ -10,10 +10,14 @@ import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 
-public record PlayerHasDisconnectedEventData(String username) implements EventData {
+public record PlayerHasDisconnectedEventData(String username, String newOwner) implements EventData {
     public static final String ID = "PLAYER_HAS_DISCONNECTED";
 
     public PlayerHasDisconnectedEventData {
+        assert username != null;
+        assert newOwner != null;
+
+        assert !newOwner.equals(username);
     }
 
     public static CastEventReceiver<PlayerHasDisconnectedEventData> castEventReceiver(EventReceiver<EventData> receiver) {

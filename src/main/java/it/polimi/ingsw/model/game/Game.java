@@ -97,15 +97,6 @@ public class Game extends GameView {
         players.forEach(p -> p.setConnectionState(false));
     }
 
-    private synchronized int getIndex (String username) {
-        for (int i = 0; i < players.size(); i++) {
-            if (players.get(i).is(username))
-                return i;
-        }
-
-        throw  new IllegalArgumentException("Player not in this game");
-    }
-
     /**
      * This method stops the game. The only way to resume it is
      * @param username The player that wants to stop the game
@@ -113,32 +104,19 @@ public class Game extends GameView {
      * @see StartGameEventData
      */
     public synchronized void stopGame (String username) throws IllegalFlowException {
-        String playerOnline;
-
         Logger.writeMessage("Game name: %s Prima %s".formatted(this.name, username));
 
         try {
-            // If the creator has disconnected, the possibility of stopping the game should be
-            // given in the order of entry into the game.
-            if (getPlayer(creator).isConnected()) {
-                playerOnline = creator;
-            } else {
-                playerOnline = super.players
-                        .get(this.getNextPlayerOnline(0))
-                        .getUsername();
-            }
+            if (!canStopGame(username))
+                throw new IllegalFlowException("%s can't stop the game".formatted(username));
+
+            setStopped();
         } catch (NoPlayerConnectedException ignored) {
             // there is no player except [username]
             Logger.writeCritical("This exception should not be throw");
             assert false;
             throw new IllegalStateException();
         }
-
-        if (!username.equals(playerOnline)) {
-            throw new IllegalFlowException("%s can't stop the game".formatted(username));
-        }
-
-        setStopped();
     }
 
     /**
@@ -195,11 +173,6 @@ public class Game extends GameView {
         super.players.add(player);
 
         return player;
-    }
-
-    private synchronized Player getPlayer (String username) {
-        final int index = getIndex(username);
-        return players.get(index);
     }
 
     /**
@@ -298,7 +271,11 @@ public class Game extends GameView {
 
         player.setConnectionState(false);
 
-        this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername()));
+        if (numberOfPlayerOnline() != 0) {
+            Optional<String> currentOwner = getCurrentOwner();
+            assert currentOwner.isPresent();
+            this.transceiver.broadcast(new PlayerHasDisconnectedEventData(player.getUsername(), currentOwner.get()));
+        }
 
         if (numberOfPlayerOnline() == 0) {
             removeFromWaitingForReconnections();
@@ -369,13 +346,9 @@ public class Game extends GameView {
 
     private synchronized void timerEndForTurn () {
         if (!isStopped()) {
-            try {
-                if (getCurrentPlayer().isDisconnected()) {
-                    calculateNextPlayer();
-                }
-            } catch (IllegalFlowException e) {
-                assert false;
-                Logger.writeCritical("call");
+            if (players.get(currentPlayerIndex).isDisconnected()) {
+                broadcast(new PlayerHasDisconnectedEventData(players.get(currentPlayerIndex).getUsername(), getCurrentOwner().get()));
+                calculateNextPlayer();
             }
         }
     }
@@ -415,7 +388,7 @@ public class Game extends GameView {
                 }
 
                 player.setConnectionState(true);
-                this.transceiver.broadcast(new PlayerHasJoinGameEventData(player.getUsername()));
+                this.transceiver.broadcast(new PlayerHasJoinGameEventData(player.getUsername(), getCurrentOwner().get()));
 
                 if (numberOfPlayerOnline() == 1) {
                     setWaitingForReconnections();
