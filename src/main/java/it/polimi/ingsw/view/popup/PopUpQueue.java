@@ -12,6 +12,7 @@ public class PopUpQueue {
 
     private final List<PopUp> popUps = new ArrayList<>();
 
+    private boolean toDisable = false;
     private boolean enabled = false;
 
     public PopUpQueue(Consumer<String> displayPopUp, Runnable hidePopUp) {
@@ -70,17 +71,27 @@ public class PopUpQueue {
                 return;
             }
 
-            enabled = true;
-
             new Thread(() -> {
                 synchronized (lock) {
+                    while (toDisable) {
+                        try {
+                            lock.wait();
+                        } catch (InterruptedException e) { }
+                    }
+
+                    enabled = true;
+
                     while (true) {
-                        while (popUps.isEmpty() || popUps.get(0).isToDisplay()) {
-                            if (!enabled) {
+                        while (toDisable || popUps.isEmpty() || popUps.get(0).isToDisplay()) {
+                            if (toDisable) {
                                 if (!popUps.isEmpty()) {
                                     hidePopUp.run();
                                     popUps.clear();
                                 }
+
+                                toDisable = false;
+
+                                lock.notifyAll();
 
                                 return;
                             }
@@ -111,7 +122,7 @@ public class PopUpQueue {
                     return;
                 }
 
-                enabled = false;
+                toDisable = true;
 
                 lock.notifyAll();
             }
