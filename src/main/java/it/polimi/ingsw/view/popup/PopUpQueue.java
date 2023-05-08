@@ -79,8 +79,6 @@ public class PopUpQueue {
                         } catch (InterruptedException e) { }
                     }
 
-                    enabled = true;
-
                     while (true) {
                         while (toDisable || popUps.isEmpty() || popUps.get(0).isToDisplay()) {
                             if (toDisable) {
@@ -113,11 +111,17 @@ public class PopUpQueue {
                 }
             }).start();
         }
+
+        enabled = true;
     }
 
     public void disable() {
         new Thread(() -> {
             synchronized (lock) {
+                if (toDisable) {
+                    return;
+                }
+
                 if (!enabled) {
                     return;
                 }
