@@ -88,6 +88,7 @@ public class PopUpQueue {
                                 }
 
                                 toDisable = false;
+                                enabled = false;
 
                                 lock.notifyAll();
 
