@@ -541,21 +541,12 @@ public class GameLayout extends AppLayout {
     private final EventListener<PlayerHasDisconnectedEventData> playerHasDisconnectedListener = data -> {
         boardPopUpQueue.add(data.username() + " has disconnected", data.username().toUpperCase() +
             "_HAS_DISCONNECTED",
-            popUp -> {
-                synchronized (getLock()) {
-                    scoreBoard.setConnectionState(data.username(), false);
-                    scoreBoardRecyclerDrawable.populate(scoreBoard.getDisplayablePlayers());
-
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            popUp.askToHide();
-                        }
-                    }, 2000);
-                }
-            },
+            PopUp.hideAfter(2000),
             popUp -> {}
         );
+
+        scoreBoard.setConnectionState(data.username(), false);
+        scoreBoardRecyclerDrawable.populate(scoreBoard.getDisplayablePlayers());
 
         if (data.newOwner().equals(scoreBoard.getClientPlayer().getName())) {
             stopGameButtonLayoutElement.setWeight(2);
