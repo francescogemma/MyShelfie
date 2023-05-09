@@ -588,6 +588,11 @@ public class GameLayout extends AppLayout {
     }
 
     public void stopGame() {
+        if (waitingForReconnectionsPopUp != null) {
+            waitingForReconnectionsPopUp.askToHide();
+            waitingForReconnectionsPopUp = null;
+        }
+
         boardPopUpQueue.add("Game has been stopped",
             popUp -> {
                 synchronized (getLock()) {
