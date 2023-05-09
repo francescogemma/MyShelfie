@@ -1,20 +1,20 @@
-package it.polimi.ingsw.networking.example01;
+package it.polimi.ingsw.networking.example;
 
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.DisconnectedException;
-import it.polimi.ingsw.networking.TCP.TCPConnection;
+import it.polimi.ingsw.networking.RMI.RMIConnection;
 
 import java.util.Scanner;
 
-public class ClientSocketScanner {
+public class ClientRMIScanner {
     public static void main(String[] args) {
         final String ADDRESS = "x.x.x.x";
-        final int PORT = 1234;
+        final int PORT = 5678;
         Connection connection;
         Scanner scanner = new Scanner(System.in);
 
         try {
-            connection = new TCPConnection(ADDRESS, PORT);
+            connection = new RMIConnection(ADDRESS, PORT);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);

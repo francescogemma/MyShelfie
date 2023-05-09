@@ -1,4 +1,4 @@
-package it.polimi.ingsw.networking.example01;
+package it.polimi.ingsw.networking.example;
 
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.ConnectionAcceptor;
