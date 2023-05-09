@@ -52,17 +52,7 @@ public class ConnectionMenuLayout extends AppLayout {
     private NetworkEventTransceiver transceiver;
 
     // Utilities:
-    private final PopUpQueue popUpQueue = new PopUpQueue(
-        text -> {
-            synchronized (getLock()) {
-                popUpDrawable.displayPopUp(text);
-            }
-        },
-        () -> {
-            synchronized (getLock()) {
-                popUpDrawable.hidePopUp();
-            }
-        });
+    private PopUpQueue popUpQueue;
 
     public ConnectionMenuLayout() {
         setLayout(popUpDrawable.alignUpLeft().crop());
@@ -120,7 +110,18 @@ public class ConnectionMenuLayout extends AppLayout {
 
     @Override
     public void setup(String previousLayoutName) {
-        popUpQueue.enable();
+        popUpQueue = new PopUpQueue(
+            text -> {
+                synchronized (getLock()) {
+                    popUpDrawable.displayPopUp(text);
+                }
+            },
+            () -> {
+                synchronized (getLock()) {
+                    popUpDrawable.hidePopUp();
+                }
+            }, getLock());
+        popUpDrawable.hidePopUp();
 
         if (!previousLayoutName.equals(App.START_NAME)) {
             popUpQueue.add("You disconnected from the server", PopUp.hideAfter(2000), p -> {});
@@ -130,6 +131,7 @@ public class ConnectionMenuLayout extends AppLayout {
     @Override
     public void beforeSwitch() {
         popUpQueue.disable();
+        popUpQueue = null;
     }
 
     @Override

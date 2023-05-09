@@ -11,7 +11,9 @@ public class PopUp {
     private final String kind;
     private final String text;
     private final Object data;
-    private boolean toDisplay = true;
+
+    private boolean toShow = true;
+    private boolean toHide = false;
 
     private final Consumer<PopUp> onshow;
     private final Consumer<PopUp> onhide;
@@ -27,10 +29,6 @@ public class PopUp {
         this.onhide = onhide;
     }
 
-    public Optional<String> getKind() {
-        return Optional.ofNullable(kind);
-    }
-
     public String getText() {
         return text;
     }
@@ -39,29 +37,43 @@ public class PopUp {
         return Optional.ofNullable(data);
     }
 
-    public boolean isToDisplay() {
-        return toDisplay;
-    }
-
     public void askToHide() {
         synchronized (queueLock) {
-            toDisplay = false;
+            toHide = true;
 
             queueLock.notifyAll();
         }
     }
 
-    void show() {
+    Optional<String> getKind() {
+        return Optional.ofNullable(kind);
+    }
+
+    boolean isToShow() {
+        return toShow;
+    }
+    boolean isToHide() {
+        return toHide;
+    }
+
+    void setShown() {
+        toShow = false;
+    }
+
+    void setHidden() {
+        toHide = false;
+    }
+
+    void onshow() {
         onshow.accept(this);
     }
 
-    void hide() {
+    void onhide() {
         onhide.accept(this);
     }
 
     public static Consumer<PopUp> hideAfter(long milliseconds) {
         return popUp -> {
-
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {

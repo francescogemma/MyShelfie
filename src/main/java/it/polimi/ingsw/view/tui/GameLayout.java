@@ -323,17 +323,7 @@ public class GameLayout extends AppLayout {
     private EventReceiver<GameHasBeenPauseEventData> gameHasBeenPauseReceiver = null;
     private EventReceiver<GameHasBeenStoppedEventData> gameHasBeenStoppedReceiver = null;
 
-    private final PopUpQueue boardPopUpQueue = new PopUpQueue(
-        text -> {
-            synchronized (getLock()) {
-                boardPopUpDrawable.displayPopUp(text);
-            }
-        },
-        () -> {
-            synchronized (getLock()) {
-                boardPopUpDrawable.hidePopUp();
-            }
-        });
+    private PopUpQueue boardPopUpQueue;
 
     // Listeners:
     private final EventListener<InitialGameEventData> initialGameListener = data -> {
@@ -830,7 +820,18 @@ public class GameLayout extends AppLayout {
         gameHasBeenPauseReceiver.registerListener(gameHasBeenPauseListener);
         gameHasBeenStoppedReceiver.registerListener(gameHasBeenStoppedListener);
 
-        boardPopUpQueue.enable();
+        boardPopUpQueue = new PopUpQueue(
+            text -> {
+                synchronized (getLock()) {
+                    boardPopUpDrawable.displayPopUp(text);
+                }
+            },
+            () -> {
+                synchronized (getLock()) {
+                    boardPopUpDrawable.hidePopUp();
+                }
+            }, getLock());
+        boardPopUpDrawable.hidePopUp();
 
         Response response;
 
@@ -873,6 +874,7 @@ public class GameLayout extends AppLayout {
         }
 
         boardPopUpQueue.disable();
+        boardPopUpQueue = null;
     }
 
     @Override

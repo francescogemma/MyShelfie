@@ -49,17 +49,7 @@ public class LoginMenuLayout extends AppLayout {
     // Utilities:
     private Requester<Response, LoginEventData> loginRequester = null;
 
-    private final PopUpQueue popUpQueue = new PopUpQueue(
-        text -> {
-            synchronized (getLock()) {
-                popUpDrawable.displayPopUp(text);
-            }
-        },
-        () -> {
-            synchronized (getLock()) {
-                popUpDrawable.hidePopUp();
-            }
-        });
+    private PopUpQueue popUpQueue;
 
     public LoginMenuLayout() {
         setLayout(popUpDrawable.alignUpLeft().crop());
@@ -122,7 +112,19 @@ public class LoginMenuLayout extends AppLayout {
         }
 
         loginRequester.registerAllListeners();
-        popUpQueue.enable();
+
+        popUpQueue = new PopUpQueue(
+            text -> {
+                synchronized (getLock()) {
+                    popUpDrawable.displayPopUp(text);
+                }
+            },
+            () -> {
+                synchronized (getLock()) {
+                    popUpDrawable.hidePopUp();
+                }
+            }, getLock());
+        popUpDrawable.hidePopUp();
     }
 
     @Override
@@ -132,6 +134,7 @@ public class LoginMenuLayout extends AppLayout {
         }
 
         popUpQueue.disable();
+        popUpQueue = null;
     }
 
     @Override
