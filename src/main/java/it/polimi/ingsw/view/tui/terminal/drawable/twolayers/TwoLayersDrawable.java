@@ -13,7 +13,6 @@ public class TwoLayersDrawable extends Drawable {
     private final Drawable foreground;
 
     private boolean foregroundToShow = false;
-    private boolean onFocus = false;
 
     public TwoLayersDrawable(Drawable background, Drawable foreground) {
         this.background = background;
@@ -62,23 +61,12 @@ public class TwoLayersDrawable extends Drawable {
 
     @Override
     public boolean focus(Coordinate desiredCoordinate) {
-        boolean supportsFocus;
-
-        if (foregroundToShow) {
-            supportsFocus = foreground.focus(desiredCoordinate);
-        } else {
-            supportsFocus = background.focus(desiredCoordinate);
-        }
-
-        onFocus = supportsFocus;
-
-        return supportsFocus;
+        return foregroundToShow ? foreground.focus(desiredCoordinate) :
+            background.focus(desiredCoordinate);
     }
 
     @Override
     public void unfocus() {
-        onFocus = false;
-
         if (foregroundToShow) {
             foreground.unfocus();
         } else {
@@ -98,10 +86,9 @@ public class TwoLayersDrawable extends Drawable {
     public TwoLayersDrawable showForeground() {
         foregroundToShow = true;
 
-        if (onFocus) {
+        if (background.getFocusedCoordinate().isPresent()) {
+            foreground.focus(background.getFocusedCoordinate().get());
             background.unfocus();
-
-            foreground.focus(Coordinate.origin());
         }
 
         return this;
@@ -110,10 +97,9 @@ public class TwoLayersDrawable extends Drawable {
     public TwoLayersDrawable hideForeground() {
         foregroundToShow = false;
 
-        if (onFocus) {
+        if (foreground.getFocusedCoordinate().isPresent()) {
+            background.focus(foreground.getFocusedCoordinate().get());
             foreground.unfocus();
-
-            background.focus(Coordinate.origin());
         }
 
         return this;
