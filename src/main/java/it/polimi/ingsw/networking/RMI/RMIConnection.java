@@ -5,11 +5,11 @@ import it.polimi.ingsw.networking.*;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.RMISocketFactory;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.*;
 
 /**
  * {@link Connection Connection} class that represents one side of an RMI pair of connections.
@@ -67,22 +67,11 @@ public class RMIConnection implements Connection {
         pendingMessages = new LinkedList<>();
         disconnected = false;
 
-        ExecutorService executor = Executors.newCachedThreadPool();
-        Callable<Object> serverGetter = new Callable<Object>() {
-            public Object call() {
-                try {
-                    Registry registry = LocateRegistry.getRegistry(address, port);
-                    return registry.lookup("SERVER");
-                } catch (Exception exception) {
-                    return null;
-                }
-            }
-        };
-        Future<Object> future = executor.submit(serverGetter);
-
         try {
+            RMISocketFactory.setSocketFactory(new TimeoutSocketFactory());
+
             Registry registry = LocateRegistry.getRegistry(address, port);
-            RemoteServer remoteServer = (RemoteServer) future.get(3000, TimeUnit.MILLISECONDS);
+            RemoteServer remoteServer = (RemoteServer) registry.lookup("SERVER");
 
             String boundName = remoteServer.getBoundName();
             addQueue = (RemoteQueue) registry.lookup("ADD_" + boundName);
@@ -146,41 +135,22 @@ public class RMIConnection implements Connection {
      * This method creates a thread that checks the remote queue for "heartbeat" messages.
      * All non-heartbeat messages will be sent to the pendingMessages queue.
      */
+
     private void reader() {
         Thread reader = new Thread(() -> {
-            while (true) {
-                Callable<String> poller = new Callable<String>() {
-                    @Override
-                    public String call() {
-                        String read = null;
-                        try {
-                            read = pollQueue.poll();
-                        } catch (RemoteException remoteException) {
-                            disconnect();
-                        }
-
-                        return read;
-                    }
-                };
-
-                final ExecutorService executor = Executors.newSingleThreadExecutor();
-                final Future future = executor.submit(poller);
-                executor.shutdown();
-
-                String read;
-                try {
-                    read = (String) future.get(5000, TimeUnit.MILLISECONDS);
-                    if (read == null) {
-                        disconnect();
+            while(true) {
+                synchronized(lock) {
+                    if (disconnected) {
                         return;
                     }
                 }
-                catch (Exception e) {
+
+                String read;
+                try {
+                    read = pollQueue.poll();
+                } catch (RemoteException remoteException) {
                     disconnect();
                     return;
-                }
-                if (!executor.isTerminated()) {
-                    executor.shutdownNow();
                 }
 
                 if (!read.equals("heartbeat")) {

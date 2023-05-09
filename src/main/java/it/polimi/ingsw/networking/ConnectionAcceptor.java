@@ -3,6 +3,7 @@ package it.polimi.ingsw.networking;
 import it.polimi.ingsw.networking.RMI.RemoteLinkedList;
 import it.polimi.ingsw.networking.RMI.RemoteServer;
 import it.polimi.ingsw.networking.RMI.RMIConnection;
+import it.polimi.ingsw.networking.RMI.TimeoutSocketFactory;
 import it.polimi.ingsw.networking.TCP.TCPConnection;
 
 import java.net.ServerSocket;
@@ -10,6 +11,7 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.RMISocketFactory;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -71,9 +73,11 @@ public class ConnectionAcceptor extends UnicastRemoteObject implements RemoteSer
 
     public ConnectionAcceptor(int TCPPort, int RMIPort) throws RemoteException, ConnectionException {
         this.RMIPort = RMIPort;
-        registry = LocateRegistry.createRegistry(RMIPort);
 
         try {
+            RMISocketFactory.setSocketFactory(new TimeoutSocketFactory())
+            ;
+            registry = LocateRegistry.createRegistry(RMIPort);
             registry.bind("SERVER", this);
             serverSocket = new ServerSocket(TCPPort);
         } catch (Exception exception) {
