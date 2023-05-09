@@ -6,15 +6,12 @@ import it.polimi.ingsw.event.EventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.client.LoginEventData;
 import it.polimi.ingsw.event.data.client.*;
-import it.polimi.ingsw.event.data.game.GameHasBeenStoppedEventData;
-import it.polimi.ingsw.event.data.game.GameOverEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Objects;
 
 public class VirtualView implements EventTransmitter {
     private GameController gameController;
@@ -24,21 +21,15 @@ public class VirtualView implements EventTransmitter {
     private static final Response DEFAULT_MESSAGE_NOT_AUTHENTICATED = new Response("You are not login", ResponseStatus.FAILURE);
     private static final Response DEFAULT_MESSAGE_ALREADY_IN_GAME = new Response("You are in a game...", ResponseStatus.FAILURE);
     private static final Response DEFAULT_MESSAGE_NOT_IN_GAME = new Response("You are not in a game...", ResponseStatus.FAILURE);
-    private static final Response DEFAULT_IN_LOBBY = new Response("You are in lobby...", ResponseStatus.FAILURE);
     private static final Response DEFAULT_NOT_IN_LOBBY = new Response("You are not in lobby...", ResponseStatus.FAILURE);
 
-    private static final List<String> idForceExit = Arrays.asList(
-            GameOverEventData.ID,
-            GameHasBeenStoppedEventData.ID
-    );
-
     public VirtualView(EventTransceiver transceiver) {
-        if (transceiver == null)
-            throw new NullPointerException();
+        Objects.requireNonNull(transceiver);
 
         this.transceiver = transceiver;
-        gameController = null;
+        this.gameController = null;
 
+        // user request
         LoginEventData          .responder(transceiver, transceiver, this::login);
         StartGameEventData      .responder(transceiver, transceiver, this::startGame);
         InsertTileEventData     .responder(transceiver, transceiver, this::insertTile);
@@ -47,71 +38,84 @@ public class VirtualView implements EventTransmitter {
         JoinGameEventData       .responder(transceiver, transceiver, this::joinGame);
         RestartGameEventData    .responder(transceiver, transceiver, this::restartGame);
         JoinLobbyEventData      .responder(transceiver, transceiver, this::joinLobby);
-
         CreateNewGameEventData  .responder(transceiver, transceiver, this::createNewGame);
         PlayerExitGame          .responder(transceiver, transceiver, this::exitGame);
         PauseGameEventData      .responder(transceiver, transceiver, this::pauseGame);
         LogoutEventData         .responder(transceiver, transceiver, this::logout);
         ExitLobbyEventData      .responder(transceiver, transceiver, this::exitLobby);
 
+        // internal signals
         PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(event -> disconnect());
 
+        // user event
         PlayerHasJoinMenu       .castEventReceiver(transceiver).registerListener(event -> this.playerHasJoinMenu());
     }
 
     private Response joinLobby (JoinLobbyEventData event) {
         Logger.writeMessage("%s ask to join lobby".formatted(username));
 
-        if (isAuthenticated() && !isInGame() && !isInLobby()) {
-            Pair<Response, GameController> res = MenuController
-                    .getInstance()
-                    .joinLobby(this, username, event.gameName());
+        if(!isAuthenticated()) return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
 
-            if (res.getKey().isOk()) {
-                this.gameController = res.getValue();
+        Pair<Response, GameController> res;
+
+        if (gameController != null) {
+            synchronized (gameController.getLock()) {
+                if (gameController.isInLobby(username) || gameController.isInGame(username))
+                    return Response.failure("You are not in menu");
             }
-
-            return res.getKey();
-        } else {
-            return DEFAULT_IN_LOBBY;
         }
+
+        res = MenuController
+                .getInstance()
+                .joinLobby(this, username, event.gameName());
+
+        if (res.getKey().isOk()) {
+            this.gameController = res.getValue();
+        }
+
+        Logger.writeMessage("[%s] ask to join lobby response %s is ok: %s".formatted(username, res.getKey().message(), res.getKey().isOk()));
+
+        return res.getKey();
     }
 
     private Response exitLobby(ExitLobbyEventData event) {
         Logger.writeMessage("%s ask to leave lobby".formatted(username));
 
-        if (!isInLobby()) return DEFAULT_NOT_IN_LOBBY;
+        if (!isAuthenticated()) return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
 
-        Response response = MenuController.getInstance().exitLobby(gameController, username);
-
-        if (response.isOk())
-            gameController = null;
-
-        return response;
+        return MenuController.getInstance().exitLobby(gameController, username);
     }
 
     private Response logout (LogoutEventData eventData) {
         Logger.writeMessage("%s logout".formatted(username));
-        if (isInGame() || isInLobby()) {
-            Logger.writeWarning("The client has asked to log out but is in game");
-            return new Response("You are in a game or lobby...", ResponseStatus.FAILURE);
+
+        Response response;
+
+        if(!isAuthenticated())
+            return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
+
+        if (gameController != null) {
+            synchronized (gameController.getLock()) {
+                if (gameController.isInGame(username) || gameController.isInLobby(username)) {
+                    Logger.writeWarning("The client has asked to log out but is in game");
+                    return new Response("You are in a game or lobby...", ResponseStatus.FAILURE);
+                }
+
+                response = MenuController.getInstance().logout(this, username);
+            }
+        } else {
+            response = MenuController.getInstance().logout(this, username);
         }
 
-        if (!isAuthenticated())
-            return new Response("You are not login", ResponseStatus.SUCCESS);
-
-        Response response = MenuController.getInstance().logout(this, username);
-
         if (response.isOk()) {
-            this.username = null;
-            this.gameController = null;
+            username = null;
         }
 
         return response;
     }
 
     private void disconnect() {
-        Logger.writeMessage("user %s disconnected".formatted(username));
+        Logger.writeMessage("[%s] disconnected".formatted(username));
 
         MenuController.getInstance().forceDisconnect(
                 this,
@@ -124,9 +128,9 @@ public class VirtualView implements EventTransmitter {
     }
 
     private Response pauseGame (PauseGameEventData eventData) {
-        Logger.writeMessage("Call for username: %s".formatted(username));
+        Logger.writeMessage("[%s] ask to pause game".formatted(username));
 
-        if (!isInGame()) return DEFAULT_MESSAGE_NOT_IN_GAME;
+        if (gameController == null) return DEFAULT_MESSAGE_NOT_IN_GAME;
 
         Response response = gameController.stopGame(username);
 
@@ -139,7 +143,7 @@ public class VirtualView implements EventTransmitter {
     private Response exitGame (PlayerExitGame exitGame) {
         Logger.writeMessage("Call for username %s".formatted(username));
 
-        if (!isInGame()) return new Response("You are not in a game", ResponseStatus.FAILURE);
+        if (gameController == null) return Response.failure("You are not in a game");
 
         Response response = MenuController.getInstance().exitGame(gameController, username);
 
@@ -150,59 +154,65 @@ public class VirtualView implements EventTransmitter {
     }
 
     private void playerHasJoinMenu () {
-        if (!isAuthenticated())
+        Logger.writeMessage("[%s] join menu".formatted(username));
+        if (!isAuthenticated()) {
             Logger.writeCritical("View send join menu but he is not authenticated");
+        }
 
         MenuController.getInstance().playerHasJoinMenu(this, username);
     }
 
     private Response createNewGame (CreateNewGameEventData eventData) {
-        if (this.isAuthenticated()) {
-            if (isInGame() || isInLobby())
-                return DEFAULT_MESSAGE_ALREADY_IN_GAME;
-            return MenuController.getInstance().createNewGame(eventData.gameName(), username);
-        } else {
-            return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
-        }
+        Logger.writeMessage("[%s] ask to create game".formatted(username));
+        if (!this.isAuthenticated()) return DEFAULT_MESSAGE_ALREADY_IN_GAME;
+
+        if (gameController != null && (gameController.isInLobby(username) || gameController.isInGame(username)))
+            return DEFAULT_MESSAGE_ALREADY_IN_GAME;
+
+        return MenuController.getInstance().createNewGame(eventData.gameName(), username);
     }
 
     private Response restartGame (RestartGameEventData event) {
         Logger.writeMessage("%s ask for restart game".formatted(username));
-        if (isInLobby()) {
-            Response res = gameController.restartGame(username);
+        if (gameController == null) return DEFAULT_NOT_IN_LOBBY;
 
-            if (res.isOk()) {
-                Logger.writeMessage("registerListener");
-            }
+        return gameController.restartGame(username);
+    }
 
-            return res;
-        } else {
-            return DEFAULT_NOT_IN_LOBBY;
+    private Response askToJoinMenu(String gameName) {
+        Response response;
+        Pair<Response, GameController> pair = MenuController
+                .getInstance().joinGame(this, username, gameName);
+
+        response = pair.getKey();
+
+        if (response.isOk()) {
+            assert pair.getKey() != null;
+            setGameController(pair.getValue());
         }
+
+        return response;
     }
 
     private Response joinGame (JoinGameEventData eventData) {
         Logger.writeMessage("%s ask for join game".formatted(username));
         if (this.isAuthenticated()) {
-            if (isInGame()) {
-                return DEFAULT_MESSAGE_ALREADY_IN_GAME;
-            }
+            Response response = null;
 
-            Response response;
-
-            if (isInLobby()) {
-                response = gameController.joinGame(username);
-            } else {
-                    Pair<Response, GameController> pair = MenuController
-                            .getInstance().joinGame(this, username, eventData.getGameName());
-
-                    response = pair.getKey();
-
-                    if (pair.getValue() != null) {
-                        assert pair.getKey().isOk();
-                        setGameController(pair.getValue());
+            if (gameController != null) {
+                synchronized (gameController.getLock()) {
+                    if (gameController.isInLobby(username)) {
+                        response = gameController.joinGame(username);
                     }
+                }
+
+                if (response == null)
+                    response = askToJoinMenu(eventData.getGameName());
+            } else {
+                response = askToJoinMenu(eventData.getGameName());
             }
+
+            Logger.writeMessage("%s receiver %s".formatted(username, response.message()));
 
             return response;
         } else
@@ -225,7 +235,7 @@ public class VirtualView implements EventTransmitter {
     }
 
     private Response deselectTile (DeselectTileEventData eventData) {
-        if (isInGame()) {
+        if (gameController != null) {
             return gameController.deselectTile(username, eventData.coordinate());
         } else {
             return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
@@ -233,7 +243,7 @@ public class VirtualView implements EventTransmitter {
     }
 
     private Response insertTile (InsertTileEventData eventData) {
-        if (isInGame()) {
+        if (gameController != null) {
             return gameController.insertSelectedTilesInBookshelf(username, eventData.column());
         } else {
             return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
@@ -241,7 +251,7 @@ public class VirtualView implements EventTransmitter {
     }
 
     private Response selectTile(SelectTileEventData eventData) {
-        if (isInGame()) {
+        if (gameController != null) {
             return this.gameController.selectTile(username, eventData.coordinate());
         } else {
             return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
@@ -249,7 +259,7 @@ public class VirtualView implements EventTransmitter {
     }
 
     private Response startGame (StartGameEventData ignore) {
-        if (this.isInLobby()) {
+        if (gameController != null) {
             return MenuController.getInstance().startGame(gameController, username);
         } else {
             return DEFAULT_NOT_IN_LOBBY;
@@ -257,7 +267,6 @@ public class VirtualView implements EventTransmitter {
     }
 
     private void setGameController(GameController gameController) {
-        assert this.gameController == null;
         assert gameController != null;
         assert isAuthenticated();
 
@@ -268,24 +277,6 @@ public class VirtualView implements EventTransmitter {
         assert username != null || (gameController == null);
 
         return username != null;
-    }
-
-    private boolean isInGame() {
-        final boolean res = gameController != null && gameController.isInGame(username);
-
-        // res ==> isAuthenticated
-        assert !res || isAuthenticated();
-
-        return res;
-    }
-
-    private boolean isInLobby() {
-        final boolean res = gameController != null && this.gameController.isInLobby(username);
-
-        // res ==> isAuthenticated
-        assert !res || isAuthenticated();
-
-        return res;
     }
 
     @Override

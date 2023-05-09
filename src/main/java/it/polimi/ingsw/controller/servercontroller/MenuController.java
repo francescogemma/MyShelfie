@@ -123,15 +123,16 @@ public class MenuController {
     }
 
     public synchronized Response exitLobby(GameController gameController, String username) {
-        assert gameController.isInLobby(username);
-        assert !gameController.isInGame(username);
+        Objects.requireNonNull(username);
         Response response;
+
+        if (gameController == null) return Response.failure("User not in lobby");
 
         synchronized (gameController.getLock()) {
             boolean wasFull = gameController.isFull();
             response = gameController.exitLobby(username);
 
-            if (wasFull && !gameController.getGameView().isStarted()) {
+            if (response.isOk() && wasFull && !gameController.getGameView().isStarted()) {
                 // we need to notify the player in the menu that a new game is available
                 GameHasBeenCreatedEventData event = new GameHasBeenCreatedEventData(
                     gameController.getGameView()
@@ -145,10 +146,19 @@ public class MenuController {
     }
 
     public synchronized Response exitGame(GameController gameController, String username) {
+        Objects.requireNonNull(gameController);
+        Objects.requireNonNull(username);
+
         return gameController.exitGame(username);
     }
 
     public Response startGame(GameController gameController, String username) {
+        Objects.requireNonNull(username);
+
+        if (gameController == null) {
+            return new Response("User not in lobby", ResponseStatus.FAILURE);
+        }
+
         Response response = gameController.startGame(username);
 
         if (response.isOk()) {

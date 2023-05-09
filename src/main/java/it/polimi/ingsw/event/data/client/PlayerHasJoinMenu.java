@@ -9,6 +9,9 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
+/**
+ * no requester
+ * */
 public class PlayerHasJoinMenu implements EventData {
     public static final String ID = "PLAYER_HAS_JOIN_MENU";
 

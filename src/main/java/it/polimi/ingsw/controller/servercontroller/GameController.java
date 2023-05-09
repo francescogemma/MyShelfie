@@ -166,10 +166,11 @@ public class GameController {
      */
     protected Response exitLobby(String username) {
         Objects.requireNonNull(username);
-        assert isInLobby(username);
 
         Logger.writeMessage("Call for username: %s".formatted(username));
         synchronized (this) {
+            if (!isInLobby(username)) return Response.failure("Not in lobby");
+
             for (int i = 0; i < clientsInLobby.size(); i++) {
                 if (clientsInLobby.get(i).getValue().equals(username)) {
                     clientsInLobby.remove(i);
@@ -256,11 +257,12 @@ public class GameController {
      * SUCCESS otherwise
      */
     public Response joinLobby(EventTransmitter newClient, String username) {
-        assert !isInGame(username) && !isInLobby(username);
         Objects.requireNonNull(newClient);
         Objects.requireNonNull(username);
 
         synchronized (this) {
+            if (isInGame(username) || isInLobby(username)) return Response.failure("You are in lobby or game");
+
             if (game.isStarted() && !game.isStopped())
                 return new Response("This game is being playing", ResponseStatus.FAILURE);
 
@@ -308,11 +310,12 @@ public class GameController {
      */
     public Response selectTile(String username, Coordinate coordinate) {
         assert username != null;
-        assert !isInLobby(username) && isInGame(username);
 
         Logger.writeMessage("[%s] trying to select tile at %s in %s".formatted(username, coordinate, gameName()));
 
         synchronized (this) {
+            if (!isInGame(username)) return Response.failure("Not in game");
+
             try {
                 this.game.selectTile(username, coordinate);
             } catch (IllegalExtractionException | FullSelectionException | IllegalFlowException e) {
@@ -342,10 +345,14 @@ public class GameController {
      */
     public Response deselectTile(String username, Coordinate coordinate) {
         assert username != null;
-        assert isInGame(username) && !isInLobby(username);
+        assert coordinate != null;
+
         Logger.writeMessage(username + " trying to deselect " + coordinate + " in " + gameName());
 
         synchronized (this) {
+            if (!isInGame(username))
+                return Response.failure("%s not in game".formatted(username));
+
             try {
                 this.game.forgetLastSelection(username, coordinate);
             } catch (IllegalFlowException  | RemoveNotLastSelectedException | IllegalArgumentException e) {
@@ -369,7 +376,10 @@ public class GameController {
      */
     public Response insertSelectedTilesInBookshelf(String username, int column) {
         assert username != null;
+
         synchronized (this) {
+            if (!isInGame(username))
+                return Response.failure("Not in game");
             try {
                 game.insertTile(username, column);
 
@@ -406,6 +416,8 @@ public class GameController {
      */
     public synchronized Response restartGame (String username) {
         try {
+            if (!isInLobby(username)) return Response.failure("%s not in lobby".formatted(username));
+
             game.restartGame(username, clientsInLobby.stream().map(Pair::getValue).toList());
             forEachInLobby(new GameHasStartedEventData());
             return new Response("Ok!", ResponseStatus.SUCCESS);
@@ -429,18 +441,24 @@ public class GameController {
      * @param username the username of the user to reconnect
      * @param transmitter the transmitter of the user to reconnect
      *
-     * @return a response with the result of the operation
+     * @return FAILURE iff
+     * <ul>
+     *     <li> Game is not started </li>
+     *     <li> Game is stopped </li>
+     *     <li> Username is already connected </li>
+     *     <li> Username is not in this game </li>
+     * </ul>
+     * SUCCESS otherwise
      */
     private synchronized Response reconnectUserDisconnect(String username, EventTransmitter transmitter) {
         try {
-            // dobbiamo inviargli gli eventi qua dentro altrimenti possiamo perdere delle informazioni
-            // su game rilasciando il lock e riprendendolo
-
             Logger.writeMessage("Clients in lobby: " + clientsInLobby.stream().map(Pair::getValue).toList().toString());
 
             synchronized (game) {
-                if (!game.isStarted() || game.isStopped() || !game.containPlayer(username) || game.isPlayerConnected(username))
-                    return new Response("[4] Game is stopped!", ResponseStatus.FAILURE);
+                if (!game.isStarted())                  return Response.failure("The match hasn't started yet");
+                if (game.isStopped())                   return Response.failure("Game is stopped");
+                if (game.isPlayerConnected(username))   return Response.failure("%s already connected".formatted(username));
+                if (!game.containPlayer(username))      return Response.failure("%s not in this game".formatted(username));
 
                 clientsInGame.add(Pair.of(transmitter, username));
 
@@ -475,23 +493,26 @@ public class GameController {
         Objects.requireNonNull(username);
         Objects.requireNonNull(transmitter);
 
-        assert !isInLobby(username);
-        assert !isInGame(username);
+        if (isInLobby(username) || isInGame(username))
+            return Response.failure("%s is in lobby or game".formatted(username));
 
         return reconnectUserDisconnect(username, transmitter);
     }
 
     /**
      * This method is used for join a user "username" into the game
-     * It requires that the user is in the lobby and not in game.
+     * It requires that the user is in the lobby and not in the game.
      *
      * @param username the username of the user that wants to join the game
      * @throws NullPointerException if username is null
+     * @return FAILURE iff
+     * <ul>
+     *     <li> username is not in lobby </li>
+     *     <li> reconnectUserDisconnect return a FAILURE </li>
+     * </ul>
+     * SUCCESS otherwise
      */
     public synchronized Response joinGame (String username) {
-        assert isInLobby(username);
-        assert !isInGame(username);
-
         Objects.requireNonNull(username);
         Logger.writeMessage("Clients in lobby: " + clientsInLobby.stream().map(Pair::getValue).toList().toString());
 
@@ -517,9 +538,18 @@ public class GameController {
      * It requires that the game is not started and that there are at least 2 players in the lobby
      * All the players in the lobby are added to the game and the lobby is cleared
      *
-     * @return a response with the result of the operation. The result is SUCCESS if the game is started, FAILURE otherwise
+     * @return FAILURE iff
+     * <ul>
+     *     <li> Username is not in lobby </li>
+     *     <li> Game is already started </li>
+     *     <li> Username is not the owner </li>
+     * </ul>
+     * SUCCESS otherwise
      */
     protected synchronized Response startGame(String username) {
+        if (!isInLobby(username))
+            return Response.failure("%s not in lobby".formatted(username));
+
         try {
             for (Pair<EventTransmitter, String> client: clientsInLobby) {
                 game.addPlayer(client.getValue());
@@ -561,35 +591,33 @@ public class GameController {
      *
      * @param username the username of the user that wants to disconnect
      */
-    public void disconnect(String username) {
-        synchronized (this) {
-            try {
-                if (isInGame(username)) {
-                    game.disconnectPlayer(username);
+    public synchronized void disconnect(String username) {
+        try {
+            if (isInGame(username)) {
+                game.disconnectPlayer(username);
 
-                    for (int i = 0; i < clientsInGame.size(); i++) {
-                        if (clientsInGame.get(i).getValue().equals(username)) {
-                            clientsInGame.remove(i);
-                            break;
-                        }
+                for (int i = 0; i < clientsInGame.size(); i++) {
+                    if (clientsInGame.get(i).getValue().equals(username)) {
+                        clientsInGame.remove(i);
+                        break;
                     }
-                } else {
-                    for (int i = 0; i < clientsInLobby.size(); i++) {
-                        if (clientsInLobby.get(i).getValue().equals(username)) {
-                            clientsInLobby.remove(i);
-                            break;
-                        }
-                    }
-
-                    forEachInLobby(new PlayerHasExitLobbyEventData(username));
                 }
-            } catch (IllegalFlowException e) {
-                throw new IllegalStateException();
-            }
+            } else {
+                for (int i = 0; i < clientsInLobby.size(); i++) {
+                    if (clientsInLobby.get(i).getValue().equals(username)) {
+                        clientsInLobby.remove(i);
+                        break;
+                    }
+                }
 
-            if (game.isStopped()) {
-                clientsInGame.clear();
+                forEachInLobby(new PlayerHasExitLobbyEventData(username));
             }
+        } catch (IllegalFlowException e) {
+            throw new IllegalStateException();
+        }
+
+        if (game.isStopped()) {
+            clientsInGame.clear();
         }
     }
 
@@ -597,10 +625,8 @@ public class GameController {
      * @return true iff username can join the game
      * @param username the username of the user that wants to join the game
      */
-    public boolean isAvailableForJoin (String username) {
-        synchronized (this) {
-            return game.isAvailableForJoin(username);
-        }
+    public synchronized boolean isAvailableForJoin (String username) {
+        return game.isAvailableForJoin(username);
     }
 
     /**

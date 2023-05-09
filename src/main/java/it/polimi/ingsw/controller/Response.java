@@ -6,11 +6,20 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
+import jdk.javadoc.doclet.Reporter;
 
 import java.util.function.Function;
 
 public record Response(String message, ResponseStatus status) implements EventData {
     public static final String ID = "RESPONSE";
+
+    public static Response failure(String message) {
+        return new Response(message, ResponseStatus.FAILURE);
+    }
+
+    public static Response success(String message) {
+        return new Response(message, ResponseStatus.SUCCESS);
+    }
 
     public boolean isOk() {
         return status == ResponseStatus.SUCCESS;
