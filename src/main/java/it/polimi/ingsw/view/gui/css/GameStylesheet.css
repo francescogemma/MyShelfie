@@ -29,3 +29,16 @@
 #turnLabel {
     -fx-text-fill: palette-red;
 }
+
+#bookshelfColumn1Button, #bookshelfColumn2Button, #bookshelfColumn3Button, #bookshelfColumn4Button, #bookshelfColumn5Button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
+
+#bookshelfColumn1Button:hover, #bookshelfColumn2Button:hover, #bookshelfColumn3Button:hover, #bookshelfColumn4Button:hover, #bookshelfColumn5Button:hover {
+    -fx-background-color: palette-green;
+    -fx-opacity: 0.4;
+}

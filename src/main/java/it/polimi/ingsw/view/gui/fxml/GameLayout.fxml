@@ -150,6 +150,25 @@
                                fitWidth="${bookshelfStackPane.width * 0.8}" preserveRatio="true">
                         <Image fx:id="bookshelfImage" url="/boards/bookshelf_orth.png"/>
                     </ImageView>
+
+                    <GridPane fx:id="bookshelfColumnSelectorGridPane">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                            <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                            <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                            <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                            <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints percentHeight="100.0" />
+                        </rowConstraints>
+
+                        <Button fx:id="bookshelfColumn1Button" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" minWidth="0" minHeight="0" GridPane.fillHeight="true" GridPane.fillWidth="true" mnemonicParsing="false" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <Button fx:id="bookshelfColumn2Button" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" minWidth="0" minHeight="0" GridPane.fillHeight="true" GridPane.fillWidth="true" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                        <Button fx:id="bookshelfColumn3Button" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" minWidth="0" minHeight="0" GridPane.fillHeight="true" GridPane.fillWidth="true" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                        <Button fx:id="bookshelfColumn4Button" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" minWidth="0" minHeight="0" GridPane.fillHeight="true" GridPane.fillWidth="true" mnemonicParsing="false" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                        <Button fx:id="bookshelfColumn5Button" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" minWidth="0" minHeight="0" GridPane.fillHeight="true" GridPane.fillWidth="true" mnemonicParsing="false" GridPane.columnIndex="4" GridPane.rowIndex="0" />
+                    </GridPane>
                 </StackPane>
             </HBox>
 

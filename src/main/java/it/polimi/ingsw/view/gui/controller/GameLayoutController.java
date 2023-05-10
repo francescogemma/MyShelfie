@@ -12,6 +12,7 @@ public class GameLayoutController {
     @FXML private GridPane boardGridPane;
     @FXML private ImageView gameBoardImageView;
     @FXML private GridPane bookshelfGridPane;
+    @FXML private GridPane bookshelfColumnSelectorGridPane;
     @FXML private ImageView bookshelfImageView;
     @FXML private Pane boardBackground;
     @FXML private Label turnLabel;
@@ -105,6 +106,13 @@ public class GameLayoutController {
         bookshelfGridPane.setTranslateY(-realHeight * bookshelfUpMarginFactor);
         bookshelfGridPane.setHgap(bookshelfGridPane.getWidth() * (61.0 / bookshelfCellsWidth));
         bookshelfGridPane.setVgap(bookshelfGridPane.getHeight() * (30.0 / bookshelfCellsHeight));
+
+        bookshelfColumnSelectorGridPane.setMaxWidth(realWidth * bookshelfWidthResizeFactor);
+        bookshelfColumnSelectorGridPane.setMaxHeight(realHeight * bookshelfHeightResizeFactor);
+        bookshelfColumnSelectorGridPane.setPrefWidth(realWidth * bookshelfWidthResizeFactor);
+        bookshelfColumnSelectorGridPane.setPrefHeight(realHeight * bookshelfHeightResizeFactor);
+        bookshelfColumnSelectorGridPane.setTranslateY(-realHeight * bookshelfUpMarginFactor);
+        bookshelfColumnSelectorGridPane.setHgap(bookshelfColumnSelectorGridPane.getWidth() * (61.0 / bookshelfCellsWidth));
     }
 
     private void resizeCommonGoalToken(ImageView scoringToken) {
@@ -142,6 +150,7 @@ public class GameLayoutController {
 
     private void insertButtonInBookshelf(int row, int column, String url) {
         Button tileButton = setButtonToInsert(url);
+        tileButton.setMouseTransparent(true);
         bookshelfGridPane.add(tileButton, column, row);
     }
 
@@ -158,7 +167,11 @@ public class GameLayoutController {
         img.fitWidthProperty().bind(tileButton.widthProperty());
         img.fitHeightProperty().bind(tileButton.heightProperty());
         tileButton.setGraphic(img);
-        tileButton.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-border-width: 0; -fx-border-radius: 0; -fx-background-radius: 0;");
+        tileButton.setStyle("-fx-background-color: transparent; " +
+                            "-fx-border-color: transparent; " +
+                            "-fx-border-width: 0; " +
+                            "-fx-border-radius: 0; " +
+                            "-fx-background-radius: 0;");
 
         return tileButton;
     }
