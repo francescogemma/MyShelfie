@@ -84,6 +84,10 @@ public class TwoLayersDrawable extends Drawable {
     }
 
     public TwoLayersDrawable showForeground() {
+        if (foregroundToShow) {
+            return this;
+        }
+
         foregroundToShow = true;
 
         if (background.getFocusedCoordinate().isPresent()) {
@@ -95,6 +99,10 @@ public class TwoLayersDrawable extends Drawable {
     }
 
     public TwoLayersDrawable hideForeground() {
+        if (!foregroundToShow) {
+            return this;
+        }
+
         foregroundToShow = false;
 
         if (foreground.getFocusedCoordinate().isPresent()) {
