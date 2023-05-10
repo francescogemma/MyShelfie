@@ -5,7 +5,6 @@ import it.polimi.ingsw.networking.*;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.RMISocketFactory;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Timer;
@@ -68,8 +67,7 @@ public class RMIConnection implements Connection {
         disconnected = false;
 
         try {
-            RMISocketFactory.setSocketFactory(new TimeoutSocketFactory());
-
+            System.setProperty("sun.rmi.transport.tcp.responseTimeout", "5000");
             Registry registry = LocateRegistry.getRegistry(address, port);
             RemoteServer remoteServer = (RemoteServer) registry.lookup("SERVER");
 
@@ -135,7 +133,6 @@ public class RMIConnection implements Connection {
      * This method creates a thread that checks the remote queue for "heartbeat" messages.
      * All non-heartbeat messages will be sent to the pendingMessages queue.
      */
-
     private void reader() {
         Thread reader = new Thread(() -> {
             while(true) {
