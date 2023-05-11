@@ -39,6 +39,6 @@
 }
 
 #bookshelfColumn1Button:hover, #bookshelfColumn2Button:hover, #bookshelfColumn3Button:hover, #bookshelfColumn4Button:hover, #bookshelfColumn5Button:hover {
-    -fx-background-color: palette-green;
-    -fx-opacity: 0.4;
+    -fx-background-color: dark-grey;
+    -fx-opacity: 0.2;
 }

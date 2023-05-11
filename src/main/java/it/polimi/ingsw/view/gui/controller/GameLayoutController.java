@@ -2,7 +2,9 @@ package it.polimi.ingsw.view.gui.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -144,18 +146,18 @@ public class GameLayoutController {
     }
 
     private void insertButtonInBoard(int row, int column, String url) {
-        Button tileButton = setButtonToInsert(url);
+        ToggleButton tileButton = setButtonToInsert(url);
         boardGridPane.add(tileButton, column, row);
     }
 
     private void insertButtonInBookshelf(int row, int column, String url) {
-        Button tileButton = setButtonToInsert(url);
+        ToggleButton tileButton = setButtonToInsert(url);
         tileButton.setMouseTransparent(true);
         bookshelfGridPane.add(tileButton, column, row);
     }
 
-    private Button setButtonToInsert(String url) {
-        Button tileButton = new Button();
+    private ToggleButton setButtonToInsert(String url) {
+        ToggleButton tileButton = new ToggleButton();
         tileButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         tileButton.setMinSize(0, 0);
         GridPane.setFillWidth(tileButton, true);
