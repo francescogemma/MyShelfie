@@ -45,6 +45,7 @@ public class DBManagerTest {
     @BeforeEach
     public void setUp() {
         setPositionDebug();
+        removeCache();
     }
 
     public static void removeCache () {
