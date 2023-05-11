@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 @Execution(ExecutionMode.SAME_THREAD)
@@ -189,18 +190,15 @@ public class DBManagerTest {
         public static void setUp () throws IllegalAccessException, NoSuchFieldException {
             Field instanceGameController = MenuController.class.getDeclaredField("gameControllerList");
             Field instanceAuthenticated = MenuController.class.getDeclaredField("authenticated");
-            Field instanceNotAuthenticated = MenuController.class.getDeclaredField("notAuthenticated");
             Field instanceUsers = MenuController.class.getDeclaredField("users");
 
             instanceGameController.setAccessible(true);
             instanceAuthenticated.setAccessible(true);
-            instanceNotAuthenticated.setAccessible(true);
             instanceUsers.setAccessible(true);
 
             instanceGameController.set(MenuController.getInstance(), new ArrayList<GameController>());
             instanceAuthenticated.set(MenuController.getInstance(), new ArrayList<EventTransmitter>());
-            instanceNotAuthenticated.set(MenuController.getInstance(), new ArrayList<EventTransmitter>());
-            instanceUsers.set(MenuController.getInstance(), new ArrayList<User>());
+            instanceUsers.set(MenuController.getInstance(), new HashSet<User>());
         }
 
         /* @Test

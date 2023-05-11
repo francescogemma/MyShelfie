@@ -50,8 +50,7 @@ public class NetworkEventTransceiver implements EventTransceiver {
                     eventData = gson.fromJson(eventJSON, EventData.class);
                 } catch (JsonParseException e) {
                     // We skip non-valid event JSONs
-                    Logger.writeCritical("Got exception while deserializing");
-                    Logger.writeCritical(e.getMessage());
+                    Logger.writeCritical("Got exception while deserializing " + e.getMessage());
                     continue;
                 }
 

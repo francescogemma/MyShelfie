@@ -4,6 +4,7 @@ import it.polimi.ingsw.controller.db.Identifiable;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 public class User implements Identifiable {
     private final String name;
@@ -41,6 +42,10 @@ public class User implements Identifiable {
 
     public void setConnected(boolean connected) {
         this.connected = connected;
+    }
+
+    public boolean is(String username) {
+        return name.equals(username);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package it.polimi.ingsw.event.data.game;
 
-import it.polimi.ingsw.controller.servercontroller.GameController;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.Responder;
 import it.polimi.ingsw.event.data.EventData;
@@ -79,5 +78,10 @@ public class GameHasBeenCreatedEventData implements EventData {
     @Override
     public String getId() {
         return ID;
+    }
+
+    @Override
+    public String toString() {
+        return this.games.toString();
     }
 }

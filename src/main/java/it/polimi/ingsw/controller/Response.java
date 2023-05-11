@@ -6,7 +6,7 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
-import jdk.javadoc.doclet.Reporter;
+import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 
@@ -17,8 +17,19 @@ public record Response(String message, ResponseStatus status) implements EventDa
         return new Response(message, ResponseStatus.FAILURE);
     }
 
+    protected static final Response notAuthenticated = new Response("Not autenticated", ResponseStatus.FAILURE);
+    protected static final Response notInLobby = new Response("Not in lobby", ResponseStatus.FAILURE);
+    protected static final Response notInGame  = new Response("Not in game", ResponseStatus.FAILURE);
+    protected static final Response alreadyInGame = new Response("Already in game", ResponseStatus.FAILURE);
+    protected static final Response alreadyInLobby = new Response("Already in lobby", ResponseStatus.FAILURE);
+    protected static final Response alreadyLogIn = new Response("Already log in", ResponseStatus.FAILURE);
+
     public static Response success(String message) {
         return new Response(message, ResponseStatus.SUCCESS);
+    }
+
+    public Response {
+        Logger.writeMessage("status: [%s] message: [%s] from: [%s]".formatted(status, message, Thread.currentThread().getStackTrace()[2]));
     }
 
     public boolean isOk() {

@@ -18,7 +18,6 @@ public class VirtualView implements EventTransmitter {
     private String username;
     private final EventTransceiver transceiver;
 
-    private static final Response DEFAULT_MESSAGE_NOT_AUTHENTICATED = new Response("You are not login", ResponseStatus.FAILURE);
     private static final Response DEFAULT_MESSAGE_ALREADY_IN_GAME = new Response("You are in a game...", ResponseStatus.FAILURE);
     private static final Response DEFAULT_MESSAGE_NOT_IN_GAME = new Response("You are not in a game...", ResponseStatus.FAILURE);
     private static final Response DEFAULT_NOT_IN_LOBBY = new Response("You are not in lobby...", ResponseStatus.FAILURE);
@@ -54,7 +53,7 @@ public class VirtualView implements EventTransmitter {
     private Response joinLobby (JoinLobbyEventData event) {
         Logger.writeMessage("%s ask to join lobby".formatted(username));
 
-        if(!isAuthenticated()) return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
+        if (!isAuthenticated()) return Response.notAuthenticated;
 
         Pair<Response, GameController> res;
 
@@ -81,7 +80,7 @@ public class VirtualView implements EventTransmitter {
     private Response exitLobby(ExitLobbyEventData event) {
         Logger.writeMessage("%s ask to leave lobby".formatted(username));
 
-        if (!isAuthenticated()) return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
+        if (!isAuthenticated()) return Response.notAuthenticated;
 
         return MenuController.getInstance().exitLobby(gameController, username);
     }
@@ -91,8 +90,7 @@ public class VirtualView implements EventTransmitter {
 
         Response response;
 
-        if(!isAuthenticated())
-            return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
+        if(!isAuthenticated()) return Response.notAuthenticated;
 
         if (gameController != null) {
             synchronized (gameController.getLock()) {
@@ -109,6 +107,7 @@ public class VirtualView implements EventTransmitter {
 
         if (response.isOk()) {
             username = null;
+            gameController = null;
         }
 
         return response;
@@ -196,32 +195,30 @@ public class VirtualView implements EventTransmitter {
 
     private Response joinGame (JoinGameEventData eventData) {
         Logger.writeMessage("%s ask for join game".formatted(username));
-        if (this.isAuthenticated()) {
-            Response response = null;
+        if (!isAuthenticated()) return Response.notAuthenticated;
 
-            if (gameController != null) {
-                synchronized (gameController.getLock()) {
-                    if (gameController.isInLobby(username)) {
-                        response = gameController.joinGame(username);
-                    }
+        Response response = null;
+
+        if (gameController != null) {
+            synchronized (gameController.getLock()) {
+                if (gameController.isInLobby(username)) {
+                    response = gameController.joinGame(username);
                 }
-
-                if (response == null)
-                    response = askToJoinMenu(eventData.getGameName());
-            } else {
-                response = askToJoinMenu(eventData.getGameName());
             }
 
-            Logger.writeMessage("%s receiver %s".formatted(username, response.message()));
+            if (response == null)
+                response = askToJoinMenu(eventData.getGameName());
+        } else {
+            response = askToJoinMenu(eventData.getGameName());
+        }
 
-            return response;
-        } else
-            return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
+        Logger.writeMessage("%s receiver %s".formatted(username, response.message()));
+
+        return response;
     }
 
     private Response login(LoginEventData event) {
-        if (isAuthenticated())
-            return new Response("You are already login", ResponseStatus.FAILURE);
+        if (isAuthenticated()) return Response.alreadyLogIn;
         Response response = MenuController.getInstance().authenticated(
                 this,
                 event.getUsername(),
@@ -235,35 +232,35 @@ public class VirtualView implements EventTransmitter {
     }
 
     private Response deselectTile (DeselectTileEventData eventData) {
-        if (gameController != null) {
-            return gameController.deselectTile(username, eventData.coordinate());
-        } else {
-            return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
-        }
+        if (gameController == null) return Response.notInGame;
+
+        assert isAuthenticated();
+
+        return gameController.deselectTile(username, eventData.coordinate());
     }
 
     private Response insertTile (InsertTileEventData eventData) {
-        if (gameController != null) {
-            return gameController.insertSelectedTilesInBookshelf(username, eventData.column());
-        } else {
-            return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
-        }
+        if (gameController == null) return Response.notInGame;
+
+        assert isAuthenticated();
+
+        return gameController.insertSelectedTilesInBookshelf(username, eventData.column());
     }
 
     private Response selectTile(SelectTileEventData eventData) {
-        if (gameController != null) {
-            return this.gameController.selectTile(username, eventData.coordinate());
-        } else {
-            return DEFAULT_MESSAGE_NOT_AUTHENTICATED;
-        }
+        if (gameController == null) return Response.notInGame;
+
+        assert isAuthenticated();
+
+        return this.gameController.selectTile(username, eventData.coordinate());
     }
 
     private Response startGame (StartGameEventData ignore) {
-        if (gameController != null) {
-            return MenuController.getInstance().startGame(gameController, username);
-        } else {
-            return DEFAULT_NOT_IN_LOBBY;
-        }
+        if (gameController == null) return Response.notInGame;
+
+        assert isAuthenticated();
+
+        return MenuController.getInstance().startGame(gameController, username);
     }
 
     private void setGameController(GameController gameController) {
@@ -281,7 +278,7 @@ public class VirtualView implements EventTransmitter {
 
     @Override
     public void broadcast(EventData data) {
-        Logger.writeMessage("%s player receive %s".formatted(username, data.getId()));
+        Logger.writeMessage("[%s] player receive %s".formatted(username, data.getId()));
 
         this.transceiver.broadcast(data);
     }

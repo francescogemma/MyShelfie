@@ -9,10 +9,17 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.game.GameView;
 import it.polimi.ingsw.utils.Logger;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 public record InitialGameEventData(GameView gameView) implements EventData {
     public static final String ID = "INITIAL_GAME";
+
+    public InitialGameEventData {
+        Objects.requireNonNull(gameView);
+        Objects.requireNonNull(gameView.getBoard());
+        Objects.requireNonNull(gameView.getPlayers());
+    }
 
     public static CastEventReceiver<InitialGameEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);

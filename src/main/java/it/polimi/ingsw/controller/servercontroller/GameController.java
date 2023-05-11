@@ -103,7 +103,7 @@ public class GameController {
 
         synchronized (this) {
             if (!game.containPlayer(username))
-                throw new IllegalArgumentException();
+                return Response.failure("Player not in this game");
 
             try {
                 game.stopGame(username);
@@ -550,6 +550,7 @@ public class GameController {
         if (!isInLobby(username))
             return Response.failure("%s not in lobby".formatted(username));
 
+         // add player to game
         try {
             for (Pair<EventTransmitter, String> client: clientsInLobby) {
                 game.addPlayer(client.getValue());
