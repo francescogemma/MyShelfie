@@ -1,8 +1,9 @@
 package it.polimi.ingsw.view.gui.controller;
 
+import it.polimi.ingsw.model.tile.Tile;
+import it.polimi.ingsw.model.tile.TileColor;
+import it.polimi.ingsw.model.tile.TileVersion;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
@@ -55,22 +56,23 @@ public class GameLayoutController {
         setCommonGoalImageViewsListeners();
 
         for(int i = 0; i < 6; i++) {
-            for(int j = 0; j < 5; j++)
-                insertButtonInBookshelf(i, j, "/item tiles/Trofei1.1.png");
+            for(int j = 0; j < 5; j++) {
+                insertButtonInBookshelf(i, j, toUrl(Tile.getInstance(TileColor.CYAN, TileVersion.SECOND)));
+            }
         }
-        insertButtonInBoard(5, 5, "/item tiles/Gatti1.3.png");
+        insertButtonInBoard(5, 5, toUrl(Tile.getInstance(TileColor.GREEN, TileVersion.THIRD)));
     }
 
-    private void setTokenImage(int token, ImageView tokenImageView) {
-        if(token == 0) {
+    private void setTokenImage(int points, ImageView tokenImageView) {
+        if(points == 0) {
             tokenImageView.setVisible(false);
-        } else if(token == 2) {
+        } else if(points == 2) {
             tokenImageView.setImage(new Image("/scoring tokens/scoring_2.jpg"));
-        } else if(token == 4) {
+        } else if(points == 4) {
             tokenImageView.setImage(new Image("/scoring tokens/scoring_4.jpg"));
-        } else if(token == 6) {
+        } else if(points == 6) {
             tokenImageView.setImage(new Image("/scoring tokens/scoring_6.jpg"));
-        } else if(token == 8) {
+        } else if(points == 8) {
             tokenImageView.setImage(new Image("/scoring tokens/scoring_8.jpg"));
         } else {
             throw new IllegalArgumentException("Invalid token value");
@@ -169,12 +171,49 @@ public class GameLayoutController {
         img.fitWidthProperty().bind(tileButton.widthProperty());
         img.fitHeightProperty().bind(tileButton.heightProperty());
         tileButton.setGraphic(img);
-        tileButton.setStyle("-fx-background-color: transparent; " +
-                            "-fx-border-color: transparent; " +
-                            "-fx-border-width: 0; " +
-                            "-fx-border-radius: 0; " +
-                            "-fx-background-radius: 0;");
 
         return tileButton;
+    }
+
+    private String toUrl(Tile tile) {
+        if(tile == Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)) {
+            return "/item tiles/Gatti1.1.png";
+        } else if(tile == Tile.getInstance(TileColor.GREEN, TileVersion.SECOND)) {
+            return "/item tiles/Gatti1.2.png";
+        } else if(tile == Tile.getInstance(TileColor.GREEN, TileVersion.THIRD)) {
+            return "/item tiles/Gatti1.3.png";
+        } else if(tile == Tile.getInstance(TileColor.BLUE, TileVersion.FIRST)) {
+            return "/item tiles/Cornici1.1.png";
+        } else if(tile == Tile.getInstance(TileColor.BLUE, TileVersion.SECOND)) {
+            return "/item tiles/Cornici1.2.png";
+        } else if(tile == Tile.getInstance(TileColor.BLUE, TileVersion.THIRD)) {
+            return "/item tiles/Cornici1.3.png";
+        } else if(tile == Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST)) {
+            return "/item tiles/Piante1.1.png";
+        } else if(tile == Tile.getInstance(TileColor.MAGENTA, TileVersion.SECOND)) {
+            return "/item tiles/Piante1.2.png";
+        } else if(tile == Tile.getInstance(TileColor.MAGENTA, TileVersion.THIRD)) {
+            return "/item tiles/Piante1.3.png";
+        } else if(tile == Tile.getInstance(TileColor.CYAN, TileVersion.FIRST)) {
+            return "/item tiles/Trofei1.1.png";
+        } else if(tile == Tile.getInstance(TileColor.CYAN, TileVersion.SECOND)) {
+            return "/item tiles/Trofei1.2.png";
+        } else if(tile == Tile.getInstance(TileColor.CYAN, TileVersion.THIRD)) {
+            return "/item tiles/Trofei1.3.png";
+        } else if(tile == Tile.getInstance(TileColor.YELLOW, TileVersion.FIRST)) {
+            return "/item tiles/Giochi1.1.png";
+        } else if(tile == Tile.getInstance(TileColor.YELLOW, TileVersion.SECOND)) {
+            return "/item tiles/Giochi1.2.png";
+        } else if(tile == Tile.getInstance(TileColor.YELLOW, TileVersion.THIRD)) {
+            return "/item tiles/Giochi1.3.png";
+        } else if(tile == Tile.getInstance(TileColor.WHITE, TileVersion.FIRST)) {
+            return "/item tiles/Libri1.1.png";
+        } else if(tile == Tile.getInstance(TileColor.WHITE, TileVersion.SECOND)) {
+            return "/item tiles/Libri1.2.png";
+        } else if(tile == Tile.getInstance(TileColor.WHITE, TileVersion.THIRD)) {
+            return "/item tiles/Libri1.3.png";
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 }
