@@ -8,6 +8,8 @@ import java.util.*;
 /**
  * Is an {@link EventTransceiver} which allows broadcast and reception of events between components living in the same
  * machine.
+ *
+ * @author Cristiano Migali
  */
 public class LocalEventTransceiver implements EventTransceiver {
     /**

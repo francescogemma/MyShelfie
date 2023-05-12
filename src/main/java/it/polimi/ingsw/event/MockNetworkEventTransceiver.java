@@ -12,15 +12,43 @@ import it.polimi.ingsw.model.goal.PersonalGoal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Is an {@link EventTransceiver} which simulates the dispatch of {@link EventData} through the network. In reality
+ * events are broadcast on the same machine between different threads. It is used for testing purposes.
+ *
+ * @author Cristiano Migali
+ */
 public class MockNetworkEventTransceiver implements EventTransceiver {
+    /**
+     * Lock object which allows synchronization of listeners registration and removal.
+     */
     private final Object lock = new Object();
+
+    /**
+     * List of {@link EventData} JSON which are being dispatched. They will be received by another thread which
+     * will consume the list and notify the listeners.
+     */
     private final List<String> serializedEvents = new ArrayList<>();
+
+    /**
+     * List of listeners registered on the transceiver.
+     */
     private final List<EventListener<EventData>> listeners = new ArrayList<>();
 
+    /**
+     * {@link Gson} object used for serialization and deserialization of {@link EventData}.
+     */
     private final Gson gson;
 
+    /**
+     * disconnect is true iff the transceiver won't broadcast any event, anymore.
+     */
     private boolean disconnect = false;
 
+    /**
+     * Constructor of the class. It initializes the {@link Gson} object used in serialization and starts the
+     * "receiver" thread which will notify the listeners of the broadcast events.
+     */
     public MockNetworkEventTransceiver() {
         gson = new GsonBuilder()
                 .registerTypeAdapterFactory(new EventDataTypeAdapterFactory())
@@ -92,6 +120,10 @@ public class MockNetworkEventTransceiver implements EventTransceiver {
         }
     }
 
+    /**
+     * Disconnects the transceiver. That is, it stops the receiver thread associated with the transceiver.
+     * The transceiver won't be able to broadcast events anymore.
+     */
     public void disconnect() {
         synchronized (serializedEvents) {
             disconnect = true;
