@@ -5,9 +5,19 @@ import it.polimi.ingsw.event.receiver.EventListener;
 
 import java.util.*;
 
+/**
+ * Is an {@link EventTransceiver} which allows broadcast and reception of events between components living in the same
+ * machine.
+ */
 public class LocalEventTransceiver implements EventTransceiver {
+    /**
+     * Is the list of listeners registered on the transceiver.
+     */
     private final List<EventListener<EventData>> listeners = new ArrayList<>();
 
+    /**
+     * Lock object used to synchronize listeners registrations, removal and broadcast.
+     */
     private final Object lock = new Object();
 
     @Override
