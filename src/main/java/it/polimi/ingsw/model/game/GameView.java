@@ -8,6 +8,7 @@ import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.utils.Logger;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -145,9 +146,7 @@ public class GameView implements Identifiable {
         this.isWaitingForReconnections = other.isWaitingForReconnections;
 
         this.commonGoals = new CommonGoal[other.commonGoals.length];
-        for (int i = 0; i < other.commonGoals.length; i++) {
-            this.commonGoals[i] = other.commonGoals[i];
-        }
+        System.arraycopy(other.commonGoals, 0, this.commonGoals, 0, other.commonGoals.length);
     }
 
     /**
@@ -244,16 +243,24 @@ public class GameView implements Identifiable {
         return players.get(index);
     }
 
+    /**
+     * The function returns the creator if they are connected,
+     * otherwise it returns the first player who joined the lobby and is connected.
+     * If there are no connected players, it returns null.
+     * @return Current owner
+     */
     public Optional<String> getCurrentOwner() {
         if (getPlayer(creator).isConnected())
             return Optional.of(creator);
         return  players.stream().filter(Player::isConnected).map(Player::getUsername).findFirst();
     }
 
-    public synchronized boolean canStopGame (String username) throws NoPlayerConnectedException {
+    /**
+     * @return true iff username can stop this game.
+     */
+    public synchronized boolean canStopGame (String username) {
         Optional<String> currentOwner = getCurrentOwner();
-        if (currentOwner.isEmpty())
-            throw new NoPlayerConnectedException();
+        assert currentOwner.isPresent();
         return username.equals(currentOwner.get());
     }
 
@@ -280,13 +287,7 @@ public class GameView implements Identifiable {
      * @return the current player of the game.
      */
     public synchronized Player getCurrentPlayer() throws IllegalFlowException {
-        if (!isStarted()) {
-            throw new IllegalFlowException("There is no current player until you start the game");
-        }
-
-        if (isOver()) {
-            throw new IllegalFlowException("There is no current player when the game is over");
-        }
+        requireStatus(EnumSet.of(RequiredState.STARTED, RequiredState.NOT_OVER));
 
         return players.get(currentPlayerIndex);
     }
@@ -305,13 +306,33 @@ public class GameView implements Identifiable {
         return players.stream().anyMatch(p -> p.getBookshelf().isFull());
     }
 
+    protected enum RequiredState {
+        STARTED,
+        NOT_STARTED,
+        STOP,
+        NOT_STOP,
+        WAITING_FOR_RECONNECTION,
+        NOT_WAITING_FOR_RECONNECTION,
+        OVER,
+        NOT_OVER
+    }
+
+    protected void requireStatus (EnumSet<RequiredState> set) throws IllegalFlowException {
+        if (!isStarted() && set.contains(RequiredState.STARTED)) throw new IllegalFlowException("Game is not started");
+        if ( isStarted() && set.contains(RequiredState.NOT_STARTED)) throw new IllegalFlowException("Game is already started");
+        if (!isWaitingForReconnections() && set.contains(RequiredState.WAITING_FOR_RECONNECTION)) throw new IllegalFlowException("Game is not waiting for reconnections");
+        if ( isWaitingForReconnections() && set.contains(RequiredState.NOT_WAITING_FOR_RECONNECTION)) throw new IllegalFlowException("Game is already waiting for reconnections");
+        if ( isStopped() && set.contains(RequiredState.NOT_STOP)) throw new IllegalFlowException("Game is stopped");
+        if (!isStopped() && set.contains(RequiredState.STOP)) throw new IllegalFlowException("Game is not stopped");
+        if (!isOver() && set.contains(RequiredState.OVER)) throw new IllegalFlowException("Game is not over");
+        if ( isOver() && set.contains(RequiredState.NOT_OVER)) throw new IllegalFlowException("Game is over");
+    }
+
     /**
      * @return whether the game is over or not.
      */
     public synchronized List<Player> getWinners() throws IllegalFlowException {
-        if (!isOver()) {
-            throw new IllegalFlowException("There is no winner until the game is over");
-        }
+        requireStatus(EnumSet.of(RequiredState.OVER));
 
         return winners.stream().map(Player::new).toList();
     }
@@ -321,9 +342,7 @@ public class GameView implements Identifiable {
      * @return the last player in the list of players
      * */
     public synchronized Player getLastPlayer() throws IllegalFlowException {
-        if (!isStarted()) {
-            throw new IllegalFlowException("There is no last player until you start the game");
-        }
+        requireStatus(EnumSet.of(RequiredState.STARTED));
 
         return players.get(players.size() - 1);
     }

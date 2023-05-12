@@ -67,7 +67,7 @@ public class LoginMenuLayout extends AppLayout {
                 response = loginRequester
                     .request(new LoginEventData(usernameEntry.getValue(), passwordEntry.getValue()));
             } catch (DisconnectedException e) {
-                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                displayServerResponse(Response.failure("Disconnected!"));
 
                 return;
             }

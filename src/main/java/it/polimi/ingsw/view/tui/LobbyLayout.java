@@ -130,7 +130,7 @@ public class LobbyLayout extends AppLayout {
             try {
                 displayServerResponse(startGameRequester.request(new StartGameEventData()));
             } catch (DisconnectedException e) {
-                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                displayServerResponse(Response.failure("Disconnected!"));
             }
         });
 
@@ -138,7 +138,7 @@ public class LobbyLayout extends AppLayout {
             try {
                 displayServerResponse(restartGameRequester.request(new RestartGameEventData()));
             } catch (DisconnectedException e) {
-                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                displayServerResponse(Response.failure("Disconnected!"));
             }
         });
 
@@ -151,7 +151,7 @@ public class LobbyLayout extends AppLayout {
                     return;
                 }
             } catch (DisconnectedException e) {
-                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                displayServerResponse(Response.failure("Disconnected!"));
 
                 return;
             }
@@ -225,7 +225,7 @@ public class LobbyLayout extends AppLayout {
                 switchAppLayout(AvailableGamesMenuLayout.NAME);
             }
         } catch (DisconnectedException e) {
-            displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+            displayServerResponse(Response.failure("Disconnected!"));
         }
     }
 

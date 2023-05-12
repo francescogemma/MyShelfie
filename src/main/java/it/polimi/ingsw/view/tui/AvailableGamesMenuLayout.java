@@ -171,7 +171,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
             try {
                 displayServerResponse(createGameRequester.request(new CreateNewGameEventData(gameNameEntry.getValue())));
             } catch (DisconnectedException e) {
-                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                displayServerResponse(Response.failure("Disconnected!"));
             }
         });
 
@@ -185,7 +185,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
                     return;
                 }
             } catch (DisconnectedException e) {
-                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                displayServerResponse(Response.failure("Disconnected!"));
 
                 return;
             }

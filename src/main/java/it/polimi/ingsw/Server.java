@@ -35,9 +35,7 @@ public class Server {
 
             NetworkEventTransceiver transceiver = new NetworkEventTransceiver(connection, new Object());
 
-            VirtualView virtualView = new VirtualView(transceiver);
-
-            menuController.joinMenu(virtualView);
+            new VirtualView(transceiver);
         }
     }
 }

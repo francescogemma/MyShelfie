@@ -10,8 +10,10 @@ import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 
-public record Response(String message, ResponseStatus status) implements EventData {
+public class Response implements EventData {
     public static final String ID = "RESPONSE";
+    private final String message;
+    private final ResponseStatus status;
 
     public static Response failure(String message) {
         return new Response(message, ResponseStatus.FAILURE);
@@ -28,8 +30,18 @@ public record Response(String message, ResponseStatus status) implements EventDa
         return new Response(message, ResponseStatus.SUCCESS);
     }
 
-    public Response {
-        Logger.writeMessage("status: [%s] message: [%s] from: [%s]".formatted(status, message, Thread.currentThread().getStackTrace()[2]));
+    private Response(String message, ResponseStatus status) {
+        Logger.writeMessage("status: [%s] message: [%s] from: [%s]".formatted(status, message, Thread.currentThread().getStackTrace()[3]));
+        this.status = status;
+        this.message = message;
+    }
+
+    public String message() {
+        return this.message;
+    }
+
+    public ResponseStatus status () {
+        return status;
     }
 
     public boolean isOk() {

@@ -666,7 +666,7 @@ public class GameLayout extends AppLayout {
                     displayServerResponse(selectTileRequester.request(new SelectTileEventData(
                         new Coordinate(rowInBoard, columnInBoard))));
                 } catch (DisconnectedException e) {
-                    displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                    displayServerResponse(Response.failure("Disconnected!"));
                 }
             }));
 
@@ -677,7 +677,7 @@ public class GameLayout extends AppLayout {
                         new Coordinate(rowInBoard, columnInBoard)
                     )));
                 } catch (DisconnectedException e) {
-                    displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                    displayServerResponse(Response.failure("Disconnected!"));
                 }
             }));
 
@@ -686,7 +686,7 @@ public class GameLayout extends AppLayout {
                 try {
                     displayServerResponse(insertTileRequester.request(new InsertTileEventData(c)));
                 } catch (DisconnectedException e) {
-                    displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                    displayServerResponse(Response.failure("Disconnected!"));
                 }
             });
         }
@@ -695,7 +695,7 @@ public class GameLayout extends AppLayout {
             try {
                 displayServerResponse(pauseGameRequester.request(new PauseGameEventData()));
             } catch (DisconnectedException e) {
-                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                displayServerResponse(Response.failure("Disconnected!"));
             }
         });
 
@@ -715,7 +715,7 @@ public class GameLayout extends AppLayout {
 
                 switchAppLayout(AvailableGamesMenuLayout.NAME);
             } catch (DisconnectedException e) {
-                displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+                displayServerResponse(Response.failure("Disconnected!"));
             }
         });
     }
@@ -841,7 +841,7 @@ public class GameLayout extends AppLayout {
                 switchAppLayout(AvailableGamesMenuLayout.NAME);
             }
         } catch (DisconnectedException e) {
-            displayServerResponse(new Response("Disconnected!", ResponseStatus.FAILURE));
+            displayServerResponse(Response.failure("Disconnected!"));
         }
     }
 

@@ -19,11 +19,34 @@ import it.polimi.ingsw.utils.Pair;
 import java.util.*;
 import java.util.function.Function;
 
+/**
+ * Class for the management of ongoing games and accounts.
+ *
+ * @see EventTransmitter
+ * @see it.polimi.ingsw.controller.VirtualView
+ * @author Giacomo Groppi
+ */
 public class MenuController {
+    /**
+     * Private instance of MenuController.
+     */
     private static final MenuController INSTANCE;
+
+    /**
+     * List of all ongoing games.
+     */
     private final List<GameController> gameControllerList = new ArrayList<>();
 
+    /**
+     * List of all {@link EventTransmitter eventTransmitters} of all
+     * authenticated users.
+     */
     private final List<EventTransmitter> authenticated;
+
+    /**
+     * List of all users who have connected to the server at least once
+     * or who have tried to log in without success.
+     */
     private final Set<User> users;
 
     static {
@@ -51,17 +74,21 @@ public class MenuController {
         authenticated = new ArrayList<>();
     }
 
+    /**
+     * This function returns the instance of the {@link MenuController MenuController} object.
+     * @return MenuController instance
+     */
     public static MenuController getInstance() {
         return INSTANCE;
     }
 
-    public Object getLock() {
-        return this;
-    }
-
     /**
-     * password is required in case of player not existing
-     * */
+     * This method returns the user with the same username as "username".
+     * If the user doesn't exist, the user is created and saved to disk with the provided password.
+     *
+     * @param username the username of the user to return
+     * @param password the password of the user.
+     */
     private User getUser (String username, String password) {
         User user;
 
@@ -90,12 +117,33 @@ public class MenuController {
         return user;
     }
 
+    /**
+     * The function iterates over all authenticated users and broadcasts the given event.
+     *
+     * @param eventData The event to broadcast.
+     * @see EventTransmitter
+     */
     private synchronized void forEachAuthenticated(EventData eventData) {
         Objects.requireNonNull(eventData);
 
         authenticated.forEach(v -> v.broadcast(eventData));
     }
 
+    /**
+     * This method is used to disconnect a user from the lobby. If the lobby is full, after removing the user, an event will be broadcast to inform everyone that a new game has been created.
+     *
+     * @param gameController The possible game in which the user is located
+     * @param username The username of the user who wants to leave the lobby
+     *
+     * @throws NullPointerException iff username is null
+     * @return SUCCESS iff
+     * <ul>
+     *     <li>gameController has successfully removed the user from the lobby</li>
+     * </ul>
+     * FAILURE otherwise
+     * 
+     * @see GameController#exitLobby(String) 
+     */
     public synchronized Response exitLobby(GameController gameController, String username) {
         Objects.requireNonNull(username);
 
@@ -104,6 +152,19 @@ public class MenuController {
         return removeFromLobbyIfNecessary(gameController, username, game -> game.exitLobby(username));
     }
 
+    /**
+     * This method removes a user from the game.
+     * @param username The username of the user who wants to leave the game.
+     * @param gameController The GameController of the user with username.
+     * @return SUCCESS iff
+     * <ul>
+     *  <li> gameController has successfully removed the user from the game </li>
+     * </ul>
+     * FAILURE otherwise.
+     *
+     * @throws NullPointerException if gameController or username are null
+     * @see GameController#exitGame(String)
+     */
     public synchronized Response exitGame(GameController gameController, String username) {
         Objects.requireNonNull(gameController);
         Objects.requireNonNull(username);
@@ -111,11 +172,27 @@ public class MenuController {
         return gameController.exitGame(username);
     }
 
+    /**
+     * This method starts a game.
+     * If the call succeeds, a message is sent to all users
+     * that the game is no longer available, as it has started.
+     *
+     * @param gameController the GameController of the user with username
+     * @param username the username of the user who wants to start the game
+     *
+     * @throws NullPointerException if username is null
+     * @return FAILURE if
+     * <ul>
+     *  <li> gameController is null </li>
+     *  <li> {@link GameController#startGame(String) startGame()} fails </li>
+     * </ul>
+     * @see GameController#startGame(String)
+     */
     public Response startGame(GameController gameController, String username) {
         Objects.requireNonNull(username);
 
         if (gameController == null) {
-            return new Response("User not in lobby", ResponseStatus.FAILURE);
+            return Response.failure("User not in lobby");
         }
 
         Response response = gameController.startGame(username);
@@ -137,17 +214,29 @@ public class MenuController {
         return Optional.empty();
     }
 
-    public void joinMenu(EventTransmitter eventTransmitter) {
-        Objects.requireNonNull(eventTransmitter);
+    /**
+     * This method sends to the user with username "username", using the provided transmitter,
+     * all the available games that the user can access.
+     *
+     * @param username The username of the user who entered the menu and wants to receive available games.
+     * @param transmitter The {@link EventTransmitter eventTransmitter} of the user with username "username".
+     *
+     * @throws NullPointerException if
+     * <ul>
+     *     <li> transmitter is null </li>
+     *     <li> username is null </li>
+     * </ul>
+     *
+     * @see EventTransmitter
+     * @see it.polimi.ingsw.controller.VirtualView
+     */
+    public synchronized void playerHasJoinMenu (EventTransmitter transmitter, String username) {
+        Objects.requireNonNull(transmitter);
+        Objects.requireNonNull(username);
 
-        synchronized (this) {
-            if (authenticated.contains(eventTransmitter))
-                throw new IllegalArgumentException("Already present in authenticated or notAuthenticated");
-        }
-    }
+        assert authenticated.contains(transmitter);
 
-    public synchronized void playerHasJoinMenu (EventTransmitter transceiver, String username) {
-        transceiver.broadcast(
+        transmitter.broadcast(
                 new GameHasBeenCreatedEventData(
                         gameControllerList.stream()
                                 .filter(g -> g.isAvailableForJoin(username))
@@ -158,6 +247,26 @@ public class MenuController {
         );
     }
 
+    /**
+     * This method authenticates the user with username "username" and password "password".
+     * If the method succeeds, the transmitter is added to the list of connected players
+     * and will receive all events for the games that are created and also for the games
+     * that are no longer available.
+     *
+     * @return SUCCESS iff
+     * <ul>
+     *     <li>username is authenticated</li>
+     * </ul>
+     *
+     * @throws NullPointerException iff
+     * <ul>
+     *     <li>transmitter is null</li>
+     *     <li>username is null</li>
+     *     <li>password is null</li>
+     * </ul>
+     * 
+     * @see MenuController#logout(EventTransmitter, String)
+     */
     public Response authenticated(EventTransmitter transmitter, String username, String password) {
         Objects.requireNonNull(transmitter);
         Objects.requireNonNull(username);
@@ -181,16 +290,21 @@ public class MenuController {
     }
 
     /**
-     * Let's assume that the player is not in any game.
+     * This method is used to log out the user with the given username.
+     *
+     * @param username the username of the user who wants to log out.
+     * @throws NullPointerException if the eventTransmitter is null.
+     * @return always returns SUCCESS.
      */
     public synchronized Response logout (EventTransmitter eventTransmitter, String username) {
         assert authenticated.contains(eventTransmitter);
+        Objects.requireNonNull(eventTransmitter);
 
         authenticated.remove(eventTransmitter);
 
         setConnectUser(username, false);
 
-        return new Response("You are now logout", ResponseStatus.SUCCESS);
+        return Response.success("You are now logout");
     }
 
     private synchronized void setConnectUser(String username, boolean connected) {
@@ -224,7 +338,17 @@ public class MenuController {
         return response;
     }
 
+    /**
+     * This method marks the user with username as disconnected and makes them exit
+     * from a game or lobby if they are currently in one.
+     *
+     * @param username the username of the user disconnecting
+     * @param gameController the possible game the user is in
+     * @param transmitter the user's event transmitter
+     * @throws NullPointerException iff transmitter is null
+     */
     public synchronized void forceDisconnect(EventTransmitter transmitter, GameController gameController, String username) {
+        Objects.requireNonNull(transmitter);
         authenticated.remove(transmitter);
 
         if (username == null) return;
@@ -232,8 +356,6 @@ public class MenuController {
         setConnectUser(username, false);
 
         if (gameController != null) {
-            assert username != null;
-
             removeFromLobbyIfNecessary(gameController, username, game -> {
                 game.disconnect(username);
                 return Response.success("");
@@ -255,19 +377,33 @@ public class MenuController {
         GameOverInternalEventData.castEventReceiver(gameController.getInternalTransceiver()).registerListener(this.listenerGameOver);
     }
 
+    /**
+     * This function creates a new game if and only if there is no other game with the same name.
+     *
+     * @param username the username of the user who wants to create the game.
+     * @param gameName the name of the game to be created.
+     *
+     * @throws NullPointerException if
+     * <ul>
+     *     <li>username is null</li>
+     *     <li>gameName is null</li>
+     * </ul>
+     *
+     * @return SUCCESS iff there is no game with the same name
+     */
     public Response createNewGame(String gameName, String username) {
         Objects.requireNonNull(gameName);
         Objects.requireNonNull(username);
 
         if (gameName.length() < 2)
-            return new Response("Game name is too short", ResponseStatus.FAILURE);
+            return Response.failure("Game name is too short");
 
         Game game = new Game(gameName, username);
         GameController controller = new GameController(game);
 
         synchronized (this) {
             if (getGameController(gameName).isPresent()) {
-                return new Response("This game already exists", ResponseStatus.FAILURE);
+                return Response.failure("This game already exists");
             }
 
             syncToGameController(controller);
@@ -276,11 +412,31 @@ public class MenuController {
 
             forEachAuthenticated(new GameHasBeenCreatedEventData(game));
 
-            return new Response("Game: [%s] has been created".formatted(gameName), ResponseStatus.SUCCESS);
+            return Response.success("Game: [%s] has been created".formatted(gameName));
         }
     }
 
+    /**
+     * This function allows the player with username "username" to enter the lobby of the game with name "gameName".
+     *
+     * @param username The username of the user
+     * @param gameName The name of the game where the user wants to enter
+     * @param transmitter The eventTransmitter of the user username
+     *
+     * @throws NullPointerException if
+     * <ul>
+     *     <li>transmitter is null</li>
+     *     <li>username is null</li>
+     *     <li>gameName is null</li>
+     * </ul>
+     *
+     * @return A pair with SUCCESS equal to true iff the user has successfully entered the lobby with the gameController of the game.
+     */
     public synchronized Pair<Response, GameController> joinLobby(EventTransmitter transmitter, String username, String gameName) {
+        Objects.requireNonNull(transmitter);
+        Objects.requireNonNull(username);
+        Objects.requireNonNull(gameName);
+
         Optional<GameController> controller = this.getGameController(gameName);
 
         if (controller.isPresent()) {
@@ -297,10 +453,32 @@ public class MenuController {
             }
         }
 
-        return Pair.of(new Response("There is no game with this name...", ResponseStatus.FAILURE), null);
+        return Pair.of(Response.failure("There is no game with this name..."), null);
     }
 
+    /**
+     * This method allows the user with the given username to enter the game with the
+     * given name, bypassing the lobby.
+     *
+     * @param gameName The name of the game
+     * @param username The username of the user
+     * @param eventTransmitter The event transmitter of the user
+     *
+     * @throws NullPointerException if
+     * <ul>
+     *     <li>eventTransmitter is null</li>
+     *     <li>username is null</li>
+     *     <li>gameName is null</li>
+     * </ul>
+     *
+     * @return a pair with SUCCESS equal to true iff the user managed to enter the
+     * game and the gameController of the game.
+     * */
     public Pair<Response, GameController> joinGame(EventTransmitter eventTransmitter, String username, String gameName) {
+        Objects.requireNonNull(eventTransmitter);
+        Objects.requireNonNull(username);
+        Objects.requireNonNull(gameName);
+
         Optional<GameController> controller = this.getGameController(gameName);
 
         if (controller.isPresent()) {
@@ -313,6 +491,6 @@ public class MenuController {
             }
         }
 
-        return Pair.of(new Response("There is no game with this name...", ResponseStatus.FAILURE), null);
+        return Pair.of(Response.failure("There is no game with this name..."), null);
     }
 }

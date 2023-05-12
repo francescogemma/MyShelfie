@@ -21,20 +21,76 @@ import it.polimi.ingsw.model.goal.PersonalGoal;
 
 import java.util.*;
 
+/**
+ * Class for managing a game.
+ * To make games truly contemporary and take full advantage of multithreading,
+ * the GameController class allows executing a set of instructions without passing
+ * through the {@link MenuController MenuController}.
+ * This is to avoid all game calls having to go
+ * through the {@link MenuController MenuController} and thus slow down the entire server.
+ * It is possible to perform atomic instructions on multiple functions of the
+ * {@code GameController} by synchronizing on the Object returned by {@link GameController#getLock()},
+ * which currently returns this, but, for portability reasons, it is always better
+ * to rely on the {@link GameController#getLock()} function.
+ * The GameController implements both a game session, with several players
+ * connected within the game, and a lobby, where users can enter to restart or
+ * start a game.
+ * It is possible to enter directly into the game without going
+ * through the lobby only if you were already part of the game, you are currently
+ * in the menu, and there is someone already playing inside.
+ *
+ * @see Game
+ * @see MenuController
+ * @see EventTransceiver
+ * @see LocalEventTransceiver
+ *
+ * @author Giacomo Groppi
+ */
 public class GameController {
+    /**
+     * Current game.
+     */
     private final Game game;
 
+    /**
+     * Clients in game
+     * */
     private final ArrayList<Pair<EventTransmitter, String>> clientsInGame;
+
+    /**
+     * Clients in lobby
+     * */
     private final ArrayList<Pair<EventTransmitter, String>> clientsInLobby;
 
-    private static final List<String> eventIgnored = List.of(
+    /**
+     * Events for which it's possible to avoid saving the game on disk.
+     */
+    private static final Set<String> eventIgnored = Set.of(
             PlayerHasJoinLobbyEventData.ID,
             PlayerHasDisconnectedEventData.ID,
             GameOverEventData.ID
     );
 
+    /**
+     * Uses a LocalEventTransceiver to implement the observer pattern for those who want to
+     * stay updated on changes to the GameController.
+     * The only event that is broadcast is {@link GameOverInternalEventData GameOverInternalEventData},
+     * which is used to notify the {@link MenuController MenuController} that the game can be
+     * completely removed from the list of games and from the disk.
+     *
+     * @see LocalEventTransceiver
+     * @see MenuController
+     */
     private final EventTransceiver internalTransceiver = new LocalEventTransceiver();
 
+    /**
+     * Constructs a new {@code GameController} object for the {@link Game game}.
+     * 
+     * @throws NullPointerException iff game is null
+     *
+     * @see Game
+     * @see MenuController
+     * */
     public GameController(Game game) {
         Objects.requireNonNull(game);
 
@@ -92,6 +148,7 @@ public class GameController {
      * @param username The username that wants to stop the game.
      * @return SUCCESS iff
      *  <ul>
+     *      <li> Player is not in this game </li>
      *      <li> The game has been stopped </li>
      *  </ul>
      * FAILURE otherwise
@@ -109,15 +166,11 @@ public class GameController {
                 game.stopGame(username);
                 this.clientsInGame.clear();
 
-                return new Response("Game has been stopped", ResponseStatus.SUCCESS);
+                return Response.success("Game has been stopped");
             } catch (IllegalFlowException e) {
-                return new Response("Game is not stopped", ResponseStatus.FAILURE);
+                return Response.success("Game is not stopped");
             }
         }
-    }
-
-    public synchronized boolean isWaitingForReconnections() {
-        return this.game.isWaitingForReconnections();
     }
 
     /**
@@ -140,21 +193,24 @@ public class GameController {
      * This method is used to check if the player with the given "username" is in the lobby.
      *
      * @param username The username to search for in the lobby.
+     * @throws NullPointerException iff username is null
      * @return True if there exists a player with the given "username" in the lobby.
      */
     public synchronized boolean isInLobby(String username) {
         Objects.requireNonNull(username);
-        return clientsInLobby.stream().map(Pair::getValue).toList().contains(username);
+        return clientsInLobby.stream().anyMatch(p -> p.getValue().equals(username));
     }
 
     /**
      * This method is used to check if the player with the given "username" is in the game.
      *
      * @param username The username to search for in the game.
+     * @throws NullPointerException iff username is null
      * @return True if there exists a player with the given "username" in the game.
      * */
     public synchronized boolean isInGame(String username) {
-        return clientsInGame.stream().map(Pair::getValue).toList().contains(username);
+        Objects.requireNonNull(username);
+        return clientsInGame.stream().anyMatch(p -> p.getValue().equals(username));
     }
 
     /**
@@ -162,41 +218,28 @@ public class GameController {
      * It requires that the player is in the lobby.
      *
      * @param username the username that wants to exit the lobby
-     * @return Always SUCCESS
+     * @throws NullPointerException iff username is null
+     * @return FAILURE iff username is not in lobby, SUCCESS otherwise
      */
-    protected Response exitLobby(String username) {
+    protected synchronized Response exitLobby(String username) {
         Objects.requireNonNull(username);
 
         Logger.writeMessage("Call for username: %s".formatted(username));
-        synchronized (this) {
-            if (!isInLobby(username)) return Response.failure("Not in lobby");
+        if (!isInLobby(username)) return Response.failure("Not in lobby");
 
-            for (int i = 0; i < clientsInLobby.size(); i++) {
-                if (clientsInLobby.get(i).getValue().equals(username)) {
-                    clientsInLobby.remove(i);
-                    break;
-                }
-            }
+        removeFromList(username, clientsInLobby);
 
-            forEachInLobby(new PlayerHasExitLobbyEventData(username));
+        forEachInLobby(new PlayerHasExitLobbyEventData(username));
 
-            return new Response("Success exit lobby", ResponseStatus.SUCCESS);
-        }
+        return Response.success("Success exit lobby");
     }
 
+    /**
+     * This function is used to check if the lobby is currently full.
+     * @return true iff lobby is full
+     */
     protected synchronized boolean isFull() {
         return clientsInLobby.size() == 4;
-    }
-
-
-    private synchronized void removePlayer(String username) {
-        for (int i = 0; i < clientsInGame.size(); i++) {
-            if (clientsInGame.get(i).getValue().equals(username)){
-                clientsInGame.remove(i);
-                return;
-            }
-        }
-        assert false;
     }
 
     /**
@@ -216,20 +259,20 @@ public class GameController {
         Logger.writeMessage("Call for username: %s".formatted(username));
 
         if (!isInGame(username)) {
-            return new Response("You are in the lobby", ResponseStatus.FAILURE);
+            return Response.failure("You are in the lobby");
         }
 
-        removePlayer(username);
+        removeFromList(username, this.clientsInGame);
 
         try {
             game.disconnectPlayer(username);
 
             if (game.isStopped()) {
                 clientsInGame.clear();
-                return new Response("You have book remove from this game", ResponseStatus.SUCCESS);
+                return Response.success("You have book remove from this game");
             }
 
-            return new Response("You have been remove from this game", ResponseStatus.SUCCESS);
+            return Response.success("You have been remove from this game");
         } catch (IllegalFlowException e) {
             Logger.writeCritical("call " + e.getMessage());
             throw new IllegalStateException("Player already disconnected " + e.getMessage());
@@ -264,10 +307,10 @@ public class GameController {
             if (isInGame(username) || isInLobby(username)) return Response.failure("You are in lobby or game");
 
             if (game.isStarted() && !game.isStopped())
-                return new Response("This game is being playing", ResponseStatus.FAILURE);
+                return Response.failure("This game is being playing");
 
             if (!game.isAvailableForJoin(username))
-                return new Response("You can't join this game", ResponseStatus.FAILURE);
+                return Response.failure("You can't join this game");
 
             clientsInLobby.forEach(c -> c.getKey().broadcast(new PlayerHasJoinLobbyEventData(username)));
 
@@ -277,7 +320,7 @@ public class GameController {
                 newClient.broadcast(new PlayerHasJoinLobbyEventData(eventTransmitterStringPair.getValue()));
         }
 
-        return new Response("You've joined the game", ResponseStatus.SUCCESS);
+        return Response.success("You've joined the game");
     }
 
     /**
@@ -319,11 +362,11 @@ public class GameController {
             try {
                 this.game.selectTile(username, coordinate);
             } catch (IllegalExtractionException | FullSelectionException | IllegalFlowException e) {
-                return new Response(e.toString(), ResponseStatus.FAILURE);
+                return Response.failure(e.toString());
             }
             Logger.writeMessage("selected tile at " + coordinate + " in " + gameName());
 
-            return new Response("You've selected a tile", ResponseStatus.SUCCESS);
+            return Response.success("You've selected a tile");
         }
     }
 
@@ -334,18 +377,23 @@ public class GameController {
      * @param username The username that wants to deselect the Tiles from the game.
      * @param coordinate The {@link Coordinate coordinate} to remove from the selection.
      *
-     * @return SUCCESS iff
+     * @return FAILURE iff
      *  <ul>
-     *   <li> The deselect operation in the game for the username "username" was successful </li>
+     *     <li> User is not in game </li>
+     *     <li> forgetLastSelection create is an illegal operation </li>
      *  </ul>
-     *  otherwise FAILURE.
-     *
+     *  SUCCESS otherwise
+     * @throws NullPointerException iff
+     * <ul>
+     *     <li> username is null </li>
+     *     <li> coordinate is null </li>
+     * </ul>
      * @see Game#forgetLastSelection(String, Coordinate)
      * @see Coordinate
      */
     public Response deselectTile(String username, Coordinate coordinate) {
-        assert username != null;
-        assert coordinate != null;
+        Objects.requireNonNull(username);
+        Objects.requireNonNull(coordinate);
 
         Logger.writeMessage(username + " trying to deselect " + coordinate + " in " + gameName());
 
@@ -356,10 +404,10 @@ public class GameController {
             try {
                 this.game.forgetLastSelection(username, coordinate);
             } catch (IllegalFlowException  | RemoveNotLastSelectedException | IllegalArgumentException e) {
-                return new Response(e.toString(), ResponseStatus.FAILURE);
+                return Response.failure(e.toString());
             }
 
-            return new Response("You've deselected a tile", ResponseStatus.SUCCESS);
+            return Response.success("You've deselected a tile");
         }
     }
 
@@ -383,10 +431,9 @@ public class GameController {
             try {
                 game.insertTile(username, column);
 
-                return new Response("Ok!", ResponseStatus.SUCCESS);
+                return Response.success("Ok!");
             } catch (IllegalExtractionException | IllegalFlowException | NotEnoughSpaceInColumnException e) {
-                return new Response("Failure during insertion of tiles into the bookshelf",
-                    ResponseStatus.FAILURE);
+                return Response.failure("Failure during insertion of tiles into the bookshelf");
             }
         }
     }
@@ -420,9 +467,9 @@ public class GameController {
 
             game.restartGame(username, clientsInLobby.stream().map(Pair::getValue).toList());
             forEachInLobby(new GameHasStartedEventData());
-            return new Response("Ok!", ResponseStatus.SUCCESS);
+            return Response.success("Ok!");
         } catch (IllegalFlowException e) {
-            return new Response(e.getMessage(), ResponseStatus.FAILURE);
+            return Response.failure(e.getMessage());
         }
     }
 
@@ -476,7 +523,7 @@ public class GameController {
             throw new IllegalStateException("[5]");
         }
 
-        return new Response("You have joined the game", ResponseStatus.SUCCESS);
+        return Response.success("You have joined the game");
     }
 
     /**
@@ -530,7 +577,7 @@ public class GameController {
             }
         }
 
-        return new Response("Player not in lobby", ResponseStatus.FAILURE);
+        return Response.failure("Player not in lobby");
     }
 
     /**
@@ -557,7 +604,7 @@ public class GameController {
             }
         } catch (IllegalFlowException | PlayerAlreadyInGameException e) {
             assert game.isStarted();
-            return new Response(e.getMessage(), ResponseStatus.FAILURE);
+            return Response.failure(e.getMessage());
         }
 
         try {
@@ -571,12 +618,12 @@ public class GameController {
                     assert false;
                 }
             }
-            return new Response(e.getMessage(), ResponseStatus.FAILURE);
+            return Response.failure(e.getMessage());
         }
 
         forEachInLobby(new GameHasStartedEventData());
 
-        return new Response("The game has started", ResponseStatus.SUCCESS);
+        return Response.success("The game has started");
     }
 
     /**
@@ -584,6 +631,23 @@ public class GameController {
      */
     public synchronized boolean isStopped() {
         return game.isStopped();
+    }
+
+    /**
+     * @return true iff we have remove one element
+     * */
+    private boolean removeFromList (String username, ArrayList<Pair<EventTransmitter, String>> list) {
+        Objects.requireNonNull(username);
+        Objects.requireNonNull(list);
+
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getValue().equals(username)) {
+                list.remove(i);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -597,19 +661,9 @@ public class GameController {
             if (isInGame(username)) {
                 game.disconnectPlayer(username);
 
-                for (int i = 0; i < clientsInGame.size(); i++) {
-                    if (clientsInGame.get(i).getValue().equals(username)) {
-                        clientsInGame.remove(i);
-                        break;
-                    }
-                }
+                removeFromList(username, clientsInGame);
             } else {
-                for (int i = 0; i < clientsInLobby.size(); i++) {
-                    if (clientsInLobby.get(i).getValue().equals(username)) {
-                        clientsInLobby.remove(i);
-                        break;
-                    }
-                }
+                removeFromList(username, clientsInLobby);
 
                 forEachInLobby(new PlayerHasExitLobbyEventData(username));
             }

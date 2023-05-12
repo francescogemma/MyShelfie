@@ -18,9 +18,9 @@ public class VirtualView implements EventTransmitter {
     private String username;
     private final EventTransceiver transceiver;
 
-    private static final Response DEFAULT_MESSAGE_ALREADY_IN_GAME = new Response("You are in a game...", ResponseStatus.FAILURE);
-    private static final Response DEFAULT_MESSAGE_NOT_IN_GAME = new Response("You are not in a game...", ResponseStatus.FAILURE);
-    private static final Response DEFAULT_NOT_IN_LOBBY = new Response("You are not in lobby...", ResponseStatus.FAILURE);
+    private static final Response DEFAULT_MESSAGE_ALREADY_IN_GAME = Response.failure("You are in a game...");
+    private static final Response DEFAULT_MESSAGE_NOT_IN_GAME = Response.failure("You are not in a game...");
+    private static final Response DEFAULT_NOT_IN_LOBBY = Response.failure("You are not in lobby...");
 
     public VirtualView(EventTransceiver transceiver) {
         Objects.requireNonNull(transceiver);
@@ -96,7 +96,7 @@ public class VirtualView implements EventTransmitter {
             synchronized (gameController.getLock()) {
                 if (gameController.isInGame(username) || gameController.isInLobby(username)) {
                     Logger.writeWarning("The client has asked to log out but is in game");
-                    return new Response("You are in a game or lobby...", ResponseStatus.FAILURE);
+                    return Response.failure("You are in a game or lobby...");
                 }
 
                 response = MenuController.getInstance().logout(this, username);
@@ -156,6 +156,7 @@ public class VirtualView implements EventTransmitter {
         Logger.writeMessage("[%s] join menu".formatted(username));
         if (!isAuthenticated()) {
             Logger.writeCritical("View send join menu but he is not authenticated");
+            return;
         }
 
         MenuController.getInstance().playerHasJoinMenu(this, username);
@@ -178,7 +179,7 @@ public class VirtualView implements EventTransmitter {
         return gameController.restartGame(username);
     }
 
-    private Response askToJoinMenu(String gameName) {
+    private Response askToJoinGame(String gameName) {
         Response response;
         Pair<Response, GameController> pair = MenuController
                 .getInstance().joinGame(this, username, gameName);
@@ -207,9 +208,9 @@ public class VirtualView implements EventTransmitter {
             }
 
             if (response == null)
-                response = askToJoinMenu(eventData.getGameName());
+                response = askToJoinGame(eventData.getGameName());
         } else {
-            response = askToJoinMenu(eventData.getGameName());
+            response = askToJoinGame(eventData.getGameName());
         }
 
         Logger.writeMessage("%s receiver %s".formatted(username, response.message()));

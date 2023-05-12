@@ -58,11 +58,6 @@ class VirtualViewTest {
             System.out.println("Set up failed");
             System.exit(-1);
         }
-
-        MenuController.getInstance().joinMenu(virtualView1);
-        MenuController.getInstance().joinMenu(virtualView2);
-        MenuController.getInstance().joinMenu(virtualView3);
-        MenuController.getInstance().joinMenu(virtualView4);
     }
 
     private void authenticate(VirtualView virtualView, EventTransceiver transceiver, String username) throws DisconnectedException {
