@@ -9,6 +9,8 @@ import it.polimi.ingsw.event.data.EventData;
  * request.
  *
  * @param <T> is the type of the primitive EventData of the request or the response.
+ *
+ * @author Cristiano Migali
  */
 public class SyncEventDataWrapper<T extends EventData> extends EventDataWrapper<T> {
     /**
@@ -19,11 +21,11 @@ public class SyncEventDataWrapper<T extends EventData> extends EventDataWrapper<
 
     /**
      * Constructor of the class.
-     * It initializes the count attribute, that is the integer which allows synchronization, and the primtive
+     * It initializes the count attribute, that is the integer which allows synchronization, and the primitive
      * {@link EventData} of the request or the response.
      *
-     * @param count
-     * @param dataToWrap
+     * @param count is the integer that will be attached to the primitive EventData.
+     * @param dataToWrap is the primitive EventData.
      */
     public SyncEventDataWrapper(int count, T dataToWrap) {
         super(dataToWrap);

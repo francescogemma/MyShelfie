@@ -14,6 +14,7 @@ import java.util.function.Function;
  * account's username and account's password.
  * In particular if the specified username is not already registered on the server, registration
  * is performed instead of a login.
+ *
  * @author Cristiano Migali
  */
 public class LoginEventData implements EventData {

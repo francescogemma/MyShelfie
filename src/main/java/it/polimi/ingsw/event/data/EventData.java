@@ -29,6 +29,8 @@ package it.polimi.ingsw.event.data;
  *
  * @see it.polimi.ingsw.event.EventDataTypeAdapterFactory Events serialization
  * @see it.polimi.ingsw.event.receiver.CastEventReceiver
+ *
+ * @author Cristiano Migali
  */
 public interface EventData {
     /**
