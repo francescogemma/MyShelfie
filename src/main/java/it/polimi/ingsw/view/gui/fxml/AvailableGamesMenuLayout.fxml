@@ -21,15 +21,7 @@
         <padding>
             <Insets bottom="10" left="90" right="90" top="10" />
         </padding>
-        <ScrollPane fitToHeight="true" fitToWidth="true" HBox.hgrow="ALWAYS">
-            <AnchorPane>
-                <VBox fx:id="availableGamesList" spacing="10" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                    <padding>
-                        <Insets bottom="10" left="20" right="20" top="10" />
-                    </padding>
-                </VBox>
-            </AnchorPane>
-        </ScrollPane>
+        <ListView fx:id="availableGamesListView" HBox.hgrow="ALWAYS" />
     </HBox>
 
     <HBox alignment="CENTER" spacing="10">

@@ -84,3 +84,12 @@
     -fx-background-color : form-background;
     -fx-background-radius : 100;
 }
+
+.list-cell {
+    -fx-padding: 10;
+    -fx-background-color: transparent;
+}
+
+.list-view {
+    -fx-background-color: transparent;
+}
