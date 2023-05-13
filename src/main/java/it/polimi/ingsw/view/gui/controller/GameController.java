@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.gui.controller;
 import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.tile.TileVersion;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
@@ -11,7 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
-public class GameLayoutController {
+public class GameController extends Controller {
     @FXML private GridPane boardGridPane;
     @FXML private ImageView gameBoardImageView;
     @FXML private GridPane bookshelfGridPane;
@@ -43,6 +44,8 @@ public class GameLayoutController {
     private final double tokenCommonGoalAngle = -7.6426;
     private final double tokenCommonGoalUpMarginFactor = 39.5 / commonGoalWidth;
     private final double tokenCommonGoalRightMarginFactor = 326.5 / commonGoalWidth;
+
+    public static final String NAME = "Game";
 
     @FXML
     private void initialize() {
@@ -213,7 +216,23 @@ public class GameLayoutController {
         } else if(tile == Tile.getInstance(TileColor.WHITE, TileVersion.THIRD)) {
             return "/item tiles/Libri1.3.png";
         } else {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Tile not found");
         }
+    }
+
+    @FXML
+    private void exit() {
+        Platform.exit();
+        System.exit(0);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public void beforeSwitch() {
+
     }
 }

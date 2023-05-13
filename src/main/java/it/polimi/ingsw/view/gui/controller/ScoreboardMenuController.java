@@ -10,8 +10,10 @@ import javafx.scene.control.Button;
 import java.io.IOException;
 import java.util.Objects;
 
-public class ScoreboardMenuController {
+public class ScoreboardMenuController extends Controller {
     @FXML private Button backToAvailableGamesButton;
+
+    public static final String NAME = "ScoreboardMenu";
 
     @FXML
     private void backToAvailableGames() {
@@ -28,5 +30,15 @@ public class ScoreboardMenuController {
     private void exit() {
         Platform.exit();
         System.exit(0);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public void beforeSwitch() {
+
     }
 }

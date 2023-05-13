@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.gui;
 
+import it.polimi.ingsw.view.gui.controller.Controller;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -22,8 +23,12 @@ public class GuiApplication extends Application {
         Font.loadFont(Objects.requireNonNull(getClass().getResource("/ESKARGOT.ttf")).toExternalForm(), 10);
 
         // Load the first scene from the FXML file
-        Parent connectionMenu = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/GameLayout.fxml")));
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("/ConnectionMenuLayout.fxml"));
+        loader.setController(Controller.getConnectionMenuControllerInstance());
+        Parent connectionMenu = loader.load();
         Scene scene = new Scene(connectionMenu);
+        Controller.setScene(scene);
 
         // Set the stage
         primaryStage.setTitle("My Shelfie");

@@ -7,7 +7,6 @@
 <?import javafx.scene.layout.*?>
 
 <VBox fx:id="connectionVBox"
-      fx:controller="it.polimi.ingsw.view.gui.controller.ConnectionMenuController"
       maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
       stylesheets="/ConnectionMenuStylesheet.css"
       xmlns="http://javafx.com/javafx/17.0.2-ea"
@@ -48,7 +47,7 @@
 
    <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
       <Region HBox.hgrow="ALWAYS"/>
-      <Button fx:id="connectionMenuNextButton" mnemonicParsing="false" text="NEXT" onAction="#switchLayout"/>
+      <Button fx:id="connectionMenuNextButton" mnemonicParsing="false" text="NEXT" onAction="#connect"/>
       <Region HBox.hgrow="ALWAYS"/>
       <Button mnemonicParsing="false" text="EXIT" onAction="#exit"/>
       <Region HBox.hgrow="ALWAYS"/>

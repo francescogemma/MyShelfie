@@ -7,8 +7,7 @@
 <VBox fx:id="availableGamesVBox"
       maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
       stylesheets="/AvailableGamesMenuStylesheet.css"
-      xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="it.polimi.ingsw.view.gui.controller.AvailableGamesMenuController">
+      xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
 
     <HBox>
         <padding>

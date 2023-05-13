@@ -12,11 +12,13 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.util.Objects;
 
-public class AvailableGamesMenuController {
+public class AvailableGamesMenuController extends Controller {
     @FXML private Button createNewGameButton;
     @FXML private TextField gameNameTextField;
     @FXML private Button backToLoginButton;
     @FXML private VBox availableGamesList;
+
+    public static final String NAME = "AvailableGamesMenu";
 
     @FXML
     private void backToLogin() {
@@ -34,4 +36,12 @@ public class AvailableGamesMenuController {
         Platform.exit();
         System.exit(0);
     }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public void beforeSwitch() {}
 }

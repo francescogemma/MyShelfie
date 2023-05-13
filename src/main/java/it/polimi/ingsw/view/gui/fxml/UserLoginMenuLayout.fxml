@@ -9,8 +9,7 @@
 <VBox fx:id="userLoginVBox" prefHeight="400" prefWidth="600"
       stylesheets="/UserLoginMenuStylesheet.css"
       xmlns="http://javafx.com/javafx/17.0.2-ea"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="it.polimi.ingsw.view.gui.controller.UserLoginMenuController">
+      xmlns:fx="http://javafx.com/fxml/1">
 
    <HBox fx:id="userLoginImageHBox" alignment="CENTER" VBox.vgrow="ALWAYS">
       <ImageView fx:id="userLoginImageView"
@@ -42,7 +41,7 @@
 
    <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
       <Region HBox.hgrow="ALWAYS"/>
-      <Button fx:id="userLoginNextButton" mnemonicParsing="false" text="NEXT" onAction="#switchLayout"/>
+      <Button fx:id="userLoginNextButton" mnemonicParsing="false" text="LOG IN" onAction="#login"/>
       <Region HBox.hgrow="ALWAYS"/>
       <Button mnemonicParsing="false" text="EXIT" onAction="#exit"/>
       <Region HBox.hgrow="ALWAYS"/>
