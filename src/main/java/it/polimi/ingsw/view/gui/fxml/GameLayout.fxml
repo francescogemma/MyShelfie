@@ -167,4 +167,11 @@
     </HBox>
 
     <Pane fx:id="gameBackgroundBlurPane" managed="false"/>
+
+    <HBox alignment="CENTER_RIGHT">
+        <padding>
+            <Insets right="20"/>
+        </padding>
+        <Label fx:id="statusBar" visible="false"/>
+    </HBox>
 </StackPane>

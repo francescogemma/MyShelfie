@@ -20,6 +20,8 @@ import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.view.displayable.DisplayableGoal;
 import it.polimi.ingsw.view.popup.PopUp;
 import it.polimi.ingsw.view.popup.PopUpQueue;
+import it.polimi.ingsw.view.tui.AvailableGamesMenuLayout;
+import it.polimi.ingsw.view.tui.LoginMenuLayout;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -506,6 +508,12 @@ public class GameController extends Controller {
             }
         }
 
+        bookshelfColumnsButton[0] = this.bookshelfColumn1Button;
+        bookshelfColumnsButton[1] = this.bookshelfColumn2Button;
+        bookshelfColumnsButton[2] = this.bookshelfColumn3Button;
+        bookshelfColumnsButton[3] = this.bookshelfColumn4Button;
+        bookshelfColumnsButton[4] = this.bookshelfColumn5Button;
+
         for (int bookshelfColumn = 0; bookshelfColumn < BookshelfView.COLUMNS; bookshelfColumn++) {
             bookshelfColumnsButton[bookshelfColumn].setDisable(true);
 
@@ -563,6 +571,47 @@ public class GameController extends Controller {
             },
             new Object()
         );
+
+        scoreBoard = new DisplayableScoreBoard(getValue(
+                "username"
+        ));
+
+        joinGameRequester.registerAllListeners();
+        selectTileRequester.registerAllListeners();
+        deselectTileRequester.registerAllListeners();;
+        insertTileRequester.registerAllListeners();;
+        pauseGameRequester.registerAllListeners();;
+        playerExitGameRequester.registerAllListeners();;
+
+        initialGameReceiver.registerListener(initialGameListener);
+        personalGoalSetReceiver.registerListener(personalGoalSetListener);
+        playerHasJoinGameReceiver.registerListener(playerHasJoinGameListener);
+        boardChangedReceiver.registerListener(boardChangedListener);
+        bookshelfHasChangedReceiver.registerListener(bookshelfHasChangedListener);
+        currentPlayerChangedReceiver.registerListener(currentPlayerChangedListener);
+        commonGoalCompletedReceiver.registerListener(commonGoalCompletedListener);
+        firstFullBookshelfReceiver.registerListener(firstFullBookshelfListener);
+        gameOverReceiver.registerListener(gameOverListener);
+        playerHasDisconnectedReceiver.registerListener(playerHasDisconnectedListener);
+        gameHasBeenPauseReceiver.registerListener(gameHasBeenPauseListener);
+        gameHasBeenStoppedReceiver.registerListener(gameHasBeenStoppedListener);
+
+
+
+        // ask for join game.
+        Response response;
+        try {
+            response = joinGameRequester.request(new JoinGameEventData(
+                    getValue("selectedgame")));
+
+            showResponse(response);
+
+            if (!response.isOk()) {
+                switchLayout(AvailableGamesMenuLayout.NAME);
+            }
+        } catch (DisconnectedException e) {
+            showResponse(Response.failure("Disconnected!"));
+        }
     }
 
     @FXML
@@ -609,9 +658,9 @@ public class GameController extends Controller {
 
     // listeners:
     private final EventListener<InitialGameEventData> initialGameListener = data -> {
-        Platform.runLater(() -> {
-            commonGoals = data.gameView().getCommonGoals();
+        commonGoals = data.gameView().getCommonGoals();
 
+        Platform.runLater(() -> {
             for (int i = 0; i < data.gameView().getPlayers().size(); i++) {
                 scoreBoard.addDisplayablePlayer(data.gameView().getPlayers().get(i), i);
             }
@@ -823,7 +872,6 @@ public class GameController extends Controller {
         );
 
         scoreBoard.setConnectionState(data.username(), false);
-        // TODO scoreBoard
         scoreBoardRecyclerDrawable.populate(scoreBoard.getDisplayablePlayers());
 
         if (data.newOwner().equals(scoreBoard.getClientPlayer().getName())) {

@@ -103,8 +103,9 @@ public abstract class Controller {
         });
     }
 
-    public Object getValue(String property) {
-        return getScene().getProperties().get(property);
+
+    public <T> T getValue(String property) {
+        return (T) getScene().getProperties().get(property);
     }
 
     public boolean isCurrentLayout() {

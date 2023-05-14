@@ -67,7 +67,6 @@ public class GameLobbyMenuController extends Controller {
 
     private final EventListener<GameHasStartedEventData> gameHasStartedListener = data -> {
         switchLayout(GameController.NAME);
-
     };
 
     private final EventListener<PlayerHasExitLobbyEventData> playerHasExitLobbyListener = data -> {
