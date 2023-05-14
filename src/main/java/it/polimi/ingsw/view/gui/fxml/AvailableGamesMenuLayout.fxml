@@ -17,12 +17,17 @@
         <Label fx:id="loggedUsername" />
     </HBox>
 
-    <HBox fx:id="availableGamesListHBox" VBox.vgrow="ALWAYS">
+    <StackPane fx:id="availableGamesListStackPane" VBox.vgrow="ALWAYS">
         <padding>
             <Insets bottom="10" left="90" right="90" top="10" />
         </padding>
-        <ListView fx:id="availableGamesListView" HBox.hgrow="ALWAYS" />
-    </HBox>
+
+        <HBox fx:id="noAvailableGamesHBox" alignment="CENTER" visible="false">
+            <Label fx:id="noAvailableGamesLabel" text="There are no available games!" />
+        </HBox>
+
+        <ListView fx:id="availableGamesListView" />
+    </StackPane>
 
     <HBox alignment="CENTER" spacing="10">
         <padding>

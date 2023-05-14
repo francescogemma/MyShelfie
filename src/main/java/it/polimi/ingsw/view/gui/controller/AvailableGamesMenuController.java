@@ -1,6 +1,5 @@
 package it.polimi.ingsw.view.gui.controller;
 
-import com.sun.scenario.animation.shared.TimerReceiver;
 import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
@@ -11,41 +10,27 @@ import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventListener;
 import it.polimi.ingsw.networking.*;
-import it.polimi.ingsw.networking.RMI.RMIConnection;
-import it.polimi.ingsw.networking.TCP.SocketCreationException;
-import it.polimi.ingsw.networking.TCP.TCPConnection;
-import it.polimi.ingsw.view.gui.LoaderException;
-import it.polimi.ingsw.view.popup.PopUp;
-import it.polimi.ingsw.view.popup.PopUpQueue;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.util.Callback;
-import javafx.scene.control.Control;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class AvailableGamesMenuController extends Controller {
     @FXML private Label loggedUsername;
     @FXML private Button createNewGameButton;
     @FXML private TextField gameNameTextField;
     @FXML private Button backToLoginButton;
+    @FXML private HBox noAvailableGamesHBox;
     @FXML private ListView<GameHasBeenCreatedEventData.AvailableGame> availableGamesListView;
 
     public static final String NAME = "AvailableGamesMenu";
-
-    private Timer timerStatusBar;
 
     // Data:
     private NetworkEventTransceiver transceiver = null;
@@ -60,24 +45,34 @@ public class AvailableGamesMenuController extends Controller {
     // Listeners:
     private final EventListener<GameHasBeenCreatedEventData> gameHasBeenCreatedListener = data -> {
         Platform.runLater(() -> {
-            this.availableGamesListView.getItems().addAll(data.getNames());
+            availableGamesListView.getItems().addAll(data.getNames());
+            manageNoAvailableGames();
         });
-        // TODO: show some message with 0 game
     };
 
     private final EventListener<GameIsNoLongerAvailableEventData> gameIsNoLongerAvailableListener = data -> {
         Platform.runLater(() -> {
-            List<GameHasBeenCreatedEventData.AvailableGame> list = this.availableGamesListView.getItems();
+            List<GameHasBeenCreatedEventData.AvailableGame> list = availableGamesListView.getItems();
 
-            // TODO: HANDLE no available games.
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i).name().equals(data.gameName())) {
                     list.remove(i);
                     break;
                 }
             }
+            manageNoAvailableGames();
         });
     };
+
+    private void manageNoAvailableGames() {
+        if (availableGamesListView.getItems().isEmpty()) {
+            availableGamesListView.setVisible(false);
+            noAvailableGamesHBox.setVisible(true);
+        } else {
+            availableGamesListView.setVisible(true);
+            noAvailableGamesHBox.setVisible(false);
+        }
+    }
 
     @FXML
     private void initialize() {
