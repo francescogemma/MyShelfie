@@ -69,7 +69,7 @@ public class ConnectionMenuLayout extends AppLayout {
             String ipAddress = ipAddressEntry.getValue();
             int port = portEntry.getValue();
 
-            popUpQueue.add("Trying to connect to the server...",
+            popUpQueue.add("Trying to connect to the server...", "CONNECTING-..........",
                 popUp -> {
                     Connection connection = null;
 
