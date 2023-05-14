@@ -9,6 +9,7 @@ import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
 import it.polimi.ingsw.event.data.game.GameIsNoLongerAvailableEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
+import it.polimi.ingsw.event.receiver.EventListener;
 import it.polimi.ingsw.networking.*;
 import it.polimi.ingsw.networking.RMI.RMIConnection;
 import it.polimi.ingsw.networking.TCP.SocketCreationException;
@@ -56,14 +57,15 @@ public class AvailableGamesMenuController extends Controller {
     private CastEventReceiver<GameHasBeenCreatedEventData> gameHasBeenCreatedEventDataCastEventReceiver;
     private CastEventReceiver<GameIsNoLongerAvailableEventData> gameIsNoLongerAvailableEventDataCastEventReceiver;
 
-    private void addGame(GameHasBeenCreatedEventData data) {
+    // Listeners:
+    private final EventListener<GameHasBeenCreatedEventData> gameHasBeenCreatedListener = data -> {
         Platform.runLater(() -> {
             this.availableGamesListView.getItems().addAll(data.getNames());
         });
         // TODO: show some message with 0 game
-    }
+    };
 
-    private void removeGame(GameIsNoLongerAvailableEventData data) {
+    private final EventListener<GameIsNoLongerAvailableEventData> gameIsNoLongerAvailableListener = data -> {
         Platform.runLater(() -> {
             List<GameHasBeenCreatedEventData.AvailableGame> list = this.availableGamesListView.getItems();
 
@@ -75,8 +77,7 @@ public class AvailableGamesMenuController extends Controller {
                 }
             }
         });
-
-    }
+    };
 
     @FXML
     private void initialize() {
@@ -103,8 +104,8 @@ public class AvailableGamesMenuController extends Controller {
             });
         }
 
-        gameHasBeenCreatedEventDataCastEventReceiver.registerListener(this::addGame);
-        gameIsNoLongerAvailableEventDataCastEventReceiver.registerListener(this::removeGame);
+        gameHasBeenCreatedEventDataCastEventReceiver.registerListener(gameHasBeenCreatedListener);
+        gameIsNoLongerAvailableEventDataCastEventReceiver.registerListener(gameIsNoLongerAvailableListener);
 
         responseCreateNewGameEventDataRequester.registerAllListeners();
         responseLogoutEventDataRequester.registerAllListeners();
@@ -113,11 +114,22 @@ public class AvailableGamesMenuController extends Controller {
             @Override
             public ListCell<GameHasBeenCreatedEventData.AvailableGame> call(ListView<GameHasBeenCreatedEventData.AvailableGame> stringListView) {
                 return new ListCell<>() {
+                    private boolean isEmpty = true;
                     @Override
                     protected void updateItem(GameHasBeenCreatedEventData.AvailableGame game, boolean b) {
                         super.updateItem(game, b);
+                        if (game == null || b) {
+                            isEmpty = true;
+                            setGraphic(null);
+                            return;
+                        }
+
+                        if (!isEmpty) {
+                            return;
+                        }
 
                         if (game != null) {
+                            isEmpty = false;
                             HBox gameHBox = new HBox();
                             Label gameNameLabel = new Label(game.name());
                             gameNameLabel.setStyle("-fx-font-size: 26");
@@ -212,8 +224,8 @@ public class AvailableGamesMenuController extends Controller {
     @Override
     public void beforeSwitch() {
         if (transceiver != null) {
-            gameIsNoLongerAvailableEventDataCastEventReceiver.unregisterListener(this::removeGame);
-            gameHasBeenCreatedEventDataCastEventReceiver.unregisterListener(this::addGame);
+            gameIsNoLongerAvailableEventDataCastEventReceiver.unregisterListener(gameIsNoLongerAvailableListener);
+            gameHasBeenCreatedEventDataCastEventReceiver.unregisterListener(gameHasBeenCreatedListener);
             responseLogoutEventDataRequester.unregisterAllListeners();
             responseCreateNewGameEventDataRequester.unregisterAllListeners();
         }

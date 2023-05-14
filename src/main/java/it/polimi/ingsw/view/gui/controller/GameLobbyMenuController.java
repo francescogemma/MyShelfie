@@ -12,6 +12,7 @@ import it.polimi.ingsw.event.data.game.GameHasStartedEventData;
 import it.polimi.ingsw.event.data.game.PlayerHasExitLobbyEventData;
 import it.polimi.ingsw.event.data.game.PlayerHasJoinLobbyEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
+import it.polimi.ingsw.event.receiver.EventListener;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.networking.DisconnectedException;
 import javafx.application.Platform;
@@ -56,22 +57,23 @@ public class GameLobbyMenuController extends Controller {
     private EventReceiver<PlayerHasExitLobbyEventData> playerHasExitLobbyReceiver = null;
 
     // Listeners:
-    private void playerHasJoinLobby(PlayerHasJoinLobbyEventData data) {
+    private final EventListener<PlayerHasJoinLobbyEventData> playerHasJoinLobbyListener = data -> {
         Platform.runLater(() -> {
             players.add(data.getUsername());
         });
-    }
+    };
 
-    private void gameHasStarted(GameHasStartedEventData data) {
+    private final EventListener<GameHasStartedEventData> gameHasStartedListener = data -> {
         switchLayout(GameController.NAME);
-    }
 
-    private void playerHasExitLobby(PlayerHasExitLobbyEventData data) {
+    };
+
+    private final EventListener<PlayerHasExitLobbyEventData> playerHasExitLobbyListener = data -> {
         Platform.runLater(() -> {
             players.remove(data.username());
-            System.out.println(players);
+            System.out.println(players); // TODO: remove this
         });
-    }
+    };
 
     @FXML
     private void startGame() {
@@ -191,19 +193,31 @@ public class GameLobbyMenuController extends Controller {
         restartGameRequester.registerAllListeners();
         exitLobbyRequester.registerAllListeners();
 
-        playerHasJoinLobbyReceiver.registerListener(this::playerHasJoinLobby);
-        gameHasStartedReceiver.registerListener(this::gameHasStarted);
-        playerHasExitLobbyReceiver.registerListener(this::playerHasExitLobby);
+        playerHasJoinLobbyReceiver.registerListener(playerHasJoinLobbyListener);
+        gameHasStartedReceiver.registerListener(gameHasStartedListener);
+        playerHasExitLobbyReceiver.registerListener(playerHasExitLobbyListener);
 
         playersListView.setCellFactory(new Callback<>() {
             @Override
             public ListCell<String> call(ListView<String> stringListView) {
                 return new ListCell<>() {
+                    private boolean isEmpty = true;
                     @Override
                     protected void updateItem(String player, boolean b) {
                         super.updateItem(player, b);
 
+                        if (player == null || b) {
+                            isEmpty = true;
+                            setGraphic(null);
+                            return;
+                        }
+
+                        if (!isEmpty) {
+                            return;
+                        }
+
                         if (player != null) {
+                            isEmpty = false;
                             Label playerLabel = new Label(player);
                             playerLabel.setStyle("-fx-font-size: 26");
 
@@ -251,9 +265,9 @@ public class GameLobbyMenuController extends Controller {
             restartGameRequester.unregisterAllListeners();
             exitLobbyRequester.unregisterAllListeners();
 
-            playerHasJoinLobbyReceiver.unregisterListener(this::playerHasJoinLobby);
-            gameHasStartedReceiver.unregisterListener(this::gameHasStarted);
-            playerHasExitLobbyReceiver.unregisterListener(this::playerHasExitLobby);
+            playerHasJoinLobbyReceiver.unregisterListener(playerHasJoinLobbyListener);
+            gameHasStartedReceiver.unregisterListener(gameHasStartedListener);
+            playerHasExitLobbyReceiver.unregisterListener(playerHasExitLobbyListener);
         }
     }
 }
