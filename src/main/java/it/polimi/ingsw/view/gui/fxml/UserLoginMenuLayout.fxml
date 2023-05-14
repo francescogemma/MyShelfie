@@ -6,44 +6,56 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="userLoginVBox" prefHeight="400" prefWidth="600"
-      stylesheets="/UserLoginMenuStylesheet.css"
-      xmlns="http://javafx.com/javafx/17.0.2-ea"
-      xmlns:fx="http://javafx.com/fxml/1">
+<StackPane fx:id="userLoginStackPane" prefHeight="400" prefWidth="600"
+           stylesheets="/UserLoginMenuStylesheet.css"
+           xmlns="http://javafx.com/javafx/17.0.2-ea"
+           xmlns:fx="http://javafx.com/fxml/1">
 
-   <HBox fx:id="userLoginImageHBox" alignment="CENTER" VBox.vgrow="ALWAYS">
-      <ImageView fx:id="userLoginImageView"
-                 fitHeight="${userLoginImageHBox.height * 0.8}"
-                 fitWidth="${userLoginImageHBox.width * 0.8}"
-                 preserveRatio="true" >
+   <VBox fx:id="userLoginVBox" >
+      <HBox fx:id="userLoginImageHBox" alignment="CENTER" VBox.vgrow="ALWAYS">
+         <ImageView fx:id="userLoginImageView"
+                    fitHeight="${userLoginImageHBox.height * 0.8}"
+                    fitWidth="${userLoginImageHBox.width * 0.8}"
+                    preserveRatio="true" >
 
-         <Image url="/Publisher material/Title 2000x618px.png"/>
-      </ImageView>
-   </HBox>
-
-   <HBox VBox.vgrow="ALWAYS">
-      <HBox fx:id="usernameBackground" alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
-         <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Username" />
-         <TextField fx:id="usernameTextField" promptText="Username" HBox.hgrow="ALWAYS" />
-         <padding> <Insets left="20.0" right="20.0" /> </padding>
+            <Image url="/Publisher material/Title 2000x618px.png"/>
+         </ImageView>
       </HBox>
-      <padding> <Insets bottom="10" left="90.0" right="90.0" top="10" /> </padding>
-   </HBox>
 
-   <HBox VBox.vgrow="ALWAYS">
-      <HBox fx:id="passwordBackground" alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
-         <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Password" />
-         <PasswordField fx:id="passwordTextField" promptText="Password" HBox.hgrow="ALWAYS" />
-         <padding> <Insets left="20.0" right="20.0" /> </padding>
+      <HBox VBox.vgrow="ALWAYS">
+         <HBox fx:id="usernameBackground" alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+            <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Username" />
+            <TextField fx:id="usernameTextField" promptText="Username" HBox.hgrow="ALWAYS" />
+            <padding> <Insets left="20.0" right="20.0" /> </padding>
+         </HBox>
+         <padding> <Insets bottom="10" left="90.0" right="90.0" top="10" /> </padding>
       </HBox>
-      <padding> <Insets bottom="10" left="90.0" right="90.0" top="10" /> </padding>
-   </HBox>
 
-   <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
-      <Region HBox.hgrow="ALWAYS"/>
-      <Button fx:id="userLoginNextButton" mnemonicParsing="false" text="LOG IN" onAction="#login"/>
-      <Region HBox.hgrow="ALWAYS"/>
-      <Button mnemonicParsing="false" text="EXIT" onAction="#exit"/>
-      <Region HBox.hgrow="ALWAYS"/>
-   </HBox>
-</VBox>
+      <HBox VBox.vgrow="ALWAYS">
+         <HBox fx:id="passwordBackground" alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+            <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Password" />
+            <PasswordField fx:id="passwordTextField" promptText="Password" HBox.hgrow="ALWAYS" />
+            <padding> <Insets left="20.0" right="20.0" /> </padding>
+         </HBox>
+         <padding> <Insets bottom="10" left="90.0" right="90.0" top="10" /> </padding>
+      </HBox>
+
+      <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+         <Region HBox.hgrow="ALWAYS"/>
+         <Button fx:id="userLoginNextButton" mnemonicParsing="false" text="LOG IN" onAction="#login"/>
+         <Region HBox.hgrow="ALWAYS"/>
+         <Button mnemonicParsing="false" text="EXIT" onAction="#exit"/>
+         <Region HBox.hgrow="ALWAYS"/>
+      </HBox>
+   </VBox>
+
+   <Pane fx:id="userLoginBackgroundBlurPane" visible="false"/>
+   <VBox alignment="CENTER" maxWidth="500" maxHeight="400" >
+      <HBox fx:id="userLoginPopUpMessageBackground" alignment="CENTER" spacing="10.0" maxWidth="500" maxHeight="400" visible="false">
+         <Label fx:id="userLoginPopUpLabel" alignment="CENTER" wrapText="true"/>
+         <padding>
+            <Insets top="20.0" bottom="20.0" left="40.0" right="40.0"/>
+         </padding>
+      </HBox>
+   </VBox>
+</StackPane>

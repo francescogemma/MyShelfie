@@ -16,6 +16,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -24,6 +26,9 @@ public class UserLoginMenuController extends Controller {
     @FXML private TextField usernameTextField;
     @FXML private TextField passwordTextField;
     @FXML private Button userLoginNextButton;
+    @FXML private Pane userLoginBackgroundBlurPane;
+    @FXML private HBox userLoginPopUpMessageBackground;
+    @FXML private Label userLoginPopUpLabel;
 
     public static final String NAME = "UserLoginMenu";
 
@@ -53,8 +58,19 @@ public class UserLoginMenuController extends Controller {
         loginRequester.registerAllListeners();
 
         popUpQueue = new PopUpQueue(
-                text -> System.out.println(text),
-                () -> System.out.println("removing pop up"),
+                text -> {
+                    Platform.runLater(() -> {
+                        userLoginPopUpLabel.setText(text);
+                        userLoginBackgroundBlurPane.setVisible(true);
+                        userLoginPopUpMessageBackground.setVisible(true);
+                    });
+                },
+                () -> {
+                    Platform.runLater(() -> {
+                        userLoginBackgroundBlurPane.setVisible(false);
+                        userLoginPopUpMessageBackground.setVisible(false);
+                    });
+                },
                 new Object()
         );
     }

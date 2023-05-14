@@ -6,50 +6,62 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="connectionVBox"
-      maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
-      stylesheets="/ConnectionMenuStylesheet.css"
-      xmlns="http://javafx.com/javafx/17.0.2-ea"
-      xmlns:fx="http://javafx.com/fxml/1">
+<StackPane fx:id="connectionStackPane"
+           maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0"
+           stylesheets="/ConnectionMenuStylesheet.css"
+           xmlns="http://javafx.com/javafx/17.0.2-ea"
+           xmlns:fx="http://javafx.com/fxml/1">
 
-   <HBox fx:id="connectionImageHBox" alignment="CENTER" VBox.vgrow="ALWAYS">
-      <ImageView fx:id="connectionImageView" fitHeight="${connectionImageHBox.height * 0.8}"
-                 fitWidth="${connectionImageHBox.width * 0.8}" preserveRatio="true">
-         <Image url="/Publisher material/Title 2000x618px.png"/>
-      </ImageView>
-   </HBox>
-
-   <HBox VBox.vgrow="ALWAYS">
-      <padding>
-         <Insets bottom="10" left="90.0" right="90.0" top="10"/>
-      </padding>
-      <HBox fx:id="serverIPBackground" alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
-         <padding>
-            <Insets left="20.0" right="20.0"/>
-         </padding>
-         <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Server IP"/>
-         <TextField fx:id="serverIPTextField" promptText="Server IP" text="10.0.0.2" HBox.hgrow="ALWAYS"/>
+   <VBox fx:id="connectionVBox">
+      <HBox fx:id="connectionImageHBox" alignment="CENTER" VBox.vgrow="ALWAYS">
+         <ImageView fx:id="connectionImageView" fitHeight="${connectionImageHBox.height * 0.8}"
+                    fitWidth="${connectionImageHBox.width * 0.8}" preserveRatio="true">
+            <Image url="/Publisher material/Title 2000x618px.png"/>
+         </ImageView>
       </HBox>
-   </HBox>
 
-   <HBox VBox.vgrow="ALWAYS">
-      <padding>
-         <Insets bottom="10" left="90.0" right="90.0" top="10"/>
-      </padding>
-      <HBox fx:id="serverPortBackground" alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+      <HBox VBox.vgrow="ALWAYS">
          <padding>
-            <Insets left="20.0" right="20.0"/>
+            <Insets bottom="10" left="90.0" right="90.0" top="10"/>
          </padding>
-         <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Server Port"/>
-         <TextField fx:id="serverPortTextField" promptText="Server Port" text="8080" HBox.hgrow="ALWAYS"/>
+         <HBox fx:id="serverIPBackground" alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+            <padding>
+               <Insets left="20.0" right="20.0"/>
+            </padding>
+            <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Server IP"/>
+            <TextField fx:id="serverIPTextField" promptText="Server IP" text="10.0.0.2" HBox.hgrow="ALWAYS"/>
+         </HBox>
       </HBox>
-   </HBox>
 
-   <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
-      <Region HBox.hgrow="ALWAYS"/>
-      <Button fx:id="connectionMenuNextButton" mnemonicParsing="false" text="NEXT" onAction="#connect"/>
-      <Region HBox.hgrow="ALWAYS"/>
-      <Button mnemonicParsing="false" text="EXIT" onAction="#exit"/>
-      <Region HBox.hgrow="ALWAYS"/>
-   </HBox>
-</VBox>
+      <HBox VBox.vgrow="ALWAYS">
+         <padding>
+            <Insets bottom="10" left="90.0" right="90.0" top="10"/>
+         </padding>
+         <HBox fx:id="serverPortBackground" alignment="CENTER" spacing="10.0" HBox.hgrow="ALWAYS">
+            <padding>
+               <Insets left="20.0" right="20.0"/>
+            </padding>
+            <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Server Port"/>
+            <TextField fx:id="serverPortTextField" promptText="Server Port" text="8080" HBox.hgrow="ALWAYS"/>
+         </HBox>
+      </HBox>
+
+      <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+         <Region HBox.hgrow="ALWAYS"/>
+         <Button fx:id="connectionMenuNextButton" mnemonicParsing="false" text="NEXT" onAction="#connect"/>
+         <Region HBox.hgrow="ALWAYS"/>
+         <Button mnemonicParsing="false" text="EXIT" onAction="#exit"/>
+         <Region HBox.hgrow="ALWAYS"/>
+      </HBox>
+   </VBox>
+
+   <Pane fx:id="connectionBackgroundBlurPane" visible="false"/>
+   <VBox alignment="CENTER" maxWidth="500" maxHeight="400" >
+      <HBox fx:id="connectionPopUpMessageBackground" alignment="CENTER" spacing="10.0" maxWidth="500" maxHeight="400" visible="false">
+         <Label fx:id="connectionPopUpLabel" alignment="CENTER" wrapText="true"/>
+         <padding>
+            <Insets top="20.0" bottom="20.0" left="40.0" right="40.0"/>
+         </padding>
+      </HBox>
+   </VBox>
+</StackPane>

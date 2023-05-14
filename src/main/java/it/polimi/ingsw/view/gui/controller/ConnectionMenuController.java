@@ -14,8 +14,11 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 
 import java.util.function.UnaryOperator;
 
@@ -23,6 +26,9 @@ public class ConnectionMenuController extends Controller {
     @FXML private TextField serverIPTextField;
     @FXML private TextField serverPortTextField;
     @FXML private Button connectionMenuNextButton;
+    @FXML private Pane connectionBackgroundBlurPane;
+    @FXML private HBox connectionPopUpMessageBackground;
+    @FXML private Label connectionPopUpLabel;
 
     public static final String NAME = "ConnectionMenu";
 
@@ -33,8 +39,19 @@ public class ConnectionMenuController extends Controller {
         setServerPortTextFieldToDecimalOnly();
 
         popUpQueue = new PopUpQueue(
-                text -> System.out.println(text),
-                () -> System.out.println("removing pop up"),
+                text -> {
+                    Platform.runLater(() -> {
+                        connectionPopUpLabel.setText(text);
+                        connectionBackgroundBlurPane.setVisible(true);
+                        connectionPopUpMessageBackground.setVisible(true);
+                    });
+                },
+                () -> {
+                    Platform.runLater(() -> {
+                        connectionBackgroundBlurPane.setVisible(false);
+                        connectionPopUpMessageBackground.setVisible(false);
+                    });
+                },
                 new Object()
         );
 
