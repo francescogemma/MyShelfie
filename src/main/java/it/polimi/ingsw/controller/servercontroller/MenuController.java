@@ -253,10 +253,12 @@ public class MenuController {
      * and will receive all events for the games that are created and also for the games
      * that are no longer available.
      *
-     * @return SUCCESS iff
+     * @return FAILURE iff
      * <ul>
-     *     <li>username is authenticated</li>
-     * </ul>
+     *     <li>username or password is empty</li>
+     *     <li>username is already authenticated</li>
+     *     <li>password is wrong for username</li>
+     * </ul> SUCCESS otherwise
      *
      * @throws NullPointerException iff
      * <ul>
@@ -271,6 +273,10 @@ public class MenuController {
         Objects.requireNonNull(transmitter);
         Objects.requireNonNull(username);
         Objects.requireNonNull(password);
+
+        if (username.isEmpty() || password.isEmpty()) {
+            return Response.failure("Password or username too short");
+        }
 
         User user = this.getUser(username, password);
 

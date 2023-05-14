@@ -44,6 +44,23 @@ public class GameHasBeenCreatedEventData implements EventData {
         public boolean isStopped() {
             return isStopped;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this)
+                return true;
+            if (obj == null || obj.getClass() != this.getClass())
+                return false;
+            if (((AvailableGame) obj).isStopped != isStopped)
+                return false;
+            if (((AvailableGame) obj).isStarted != isStarted)
+                return false;
+            if (!((AvailableGame) obj).name.equals(name))
+                return false;
+            if (!((AvailableGame) obj).owner.equals(owner))
+                return false;
+            return true;
+        }
     }
 
 

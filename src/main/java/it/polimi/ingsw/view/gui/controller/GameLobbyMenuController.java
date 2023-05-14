@@ -33,6 +33,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.util.Callback;
 
+import java.util.Optional;
+
 public class GameLobbyMenuController extends Controller {
     @FXML private Label gameNameLabel;
     @FXML private Button backToAvailableGamesButton;
@@ -201,32 +203,29 @@ public class GameLobbyMenuController extends Controller {
             @Override
             public ListCell<String> call(ListView<String> stringListView) {
                 return new ListCell<>() {
-                    private boolean isEmpty = true;
+                    private Optional<String> playerName = Optional.empty();
                     @Override
                     protected void updateItem(String player, boolean b) {
                         super.updateItem(player, b);
 
                         if (player == null || b) {
-                            isEmpty = true;
+                            playerName = Optional.empty();
                             setGraphic(null);
                             return;
                         }
 
-                        if (!isEmpty) {
+                        if (playerName.isPresent() && playerName.get().equals(player))
                             return;
-                        }
 
-                        if (player != null) {
-                            isEmpty = false;
-                            Label playerLabel = new Label(player);
-                            playerLabel.setStyle("-fx-font-size: 26");
+                        playerName = Optional.of(player);
+                        Label playerLabel = new Label(player);
+                        playerLabel.setStyle("-fx-font-size: 26");
 
-                            HBox gameHBox = new HBox(playerLabel);
-                            gameHBox.setPadding(new Insets(30, 30, 30, 30));
-                            gameHBox.getStyleClass().add("player");
-                            gameHBox.setAlignment(Pos.CENTER);
-                            setGraphic(gameHBox);
-                        }
+                        HBox gameHBox = new HBox(playerLabel);
+                        gameHBox.setPadding(new Insets(30, 30, 30, 30));
+                        gameHBox.getStyleClass().add("player");
+                        gameHBox.setAlignment(Pos.CENTER);
+                        setGraphic(gameHBox);
                     }
                 };
             }

@@ -21,6 +21,7 @@ import javafx.scene.layout.Priority;
 import javafx.util.Callback;
 
 import java.util.List;
+import java.util.Optional;
 
 public class AvailableGamesMenuController extends Controller {
     @FXML private Label loggedUsername;
@@ -109,54 +110,52 @@ public class AvailableGamesMenuController extends Controller {
             @Override
             public ListCell<GameHasBeenCreatedEventData.AvailableGame> call(ListView<GameHasBeenCreatedEventData.AvailableGame> stringListView) {
                 return new ListCell<>() {
-                    private boolean isEmpty = true;
+                    private Optional<GameHasBeenCreatedEventData.AvailableGame> availableGame = Optional.empty();
                     @Override
                     protected void updateItem(GameHasBeenCreatedEventData.AvailableGame game, boolean b) {
                         super.updateItem(game, b);
                         if (game == null || b) {
-                            isEmpty = true;
+                            availableGame = Optional.empty();
                             setGraphic(null);
                             return;
                         }
 
-                        if (!isEmpty) {
+                        if (availableGame.isPresent() && availableGame.get().equals(game)) {
                             return;
                         }
 
-                        if (game != null) {
-                            isEmpty = false;
-                            HBox gameHBox = new HBox();
-                            Label gameNameLabel = new Label(game.name());
-                            gameNameLabel.setStyle("-fx-font-size: 26");
-                            HBox labelHBox = new HBox(gameNameLabel);
-                            HBox.setHgrow(labelHBox, Priority.ALWAYS);
-                            labelHBox.setAlignment(Pos.CENTER);
-                            gameHBox.setPadding(new Insets(30, 30, 30, 30));
-                            gameHBox.getStyleClass().add("availableGame");
-                            setGraphic(gameHBox);
+                        availableGame = Optional.of(game);
+                        HBox gameHBox = new HBox();
+                        Label gameNameLabel = new Label(game.name());
+                        gameNameLabel.setStyle("-fx-font-size: 26");
+                        HBox labelHBox = new HBox(gameNameLabel);
+                        HBox.setHgrow(labelHBox, Priority.ALWAYS);
+                        labelHBox.setAlignment(Pos.CENTER);
+                        gameHBox.setPadding(new Insets(30, 30, 30, 30));
+                        gameHBox.getStyleClass().add("availableGame");
+                        setGraphic(gameHBox);
 
-                            Button joinButton;
-                            String buttonLabel;
-                            String nextLayoutName;
+                        Button joinButton;
+                        String buttonLabel;
+                        String nextLayoutName;
 
-                            if (game.isStarted() && !game.isStopped()) {
-                                buttonLabel = "Join game";
-                                nextLayoutName = GameController.NAME;
-                            } else {
-                                buttonLabel = "Join lobby";
-                                nextLayoutName = GameLobbyMenuController.NAME;
-                            }
-
-                            joinButton = new Button(buttonLabel);
-                            joinButton.setOnAction(event -> {
-                                setProperty("selectedgamename", game.name());
-                                setProperty("selectedgameowner", game.owner());
-                                setProperty("isselectedgamestopped", game.isStopped());
-                                switchLayout(nextLayoutName);
-                            });
-
-                            gameHBox.getChildren().addAll(labelHBox, joinButton);
+                        if (game.isStarted() && !game.isStopped()) {
+                            buttonLabel = "Join game";
+                            nextLayoutName = GameController.NAME;
+                        } else {
+                            buttonLabel = "Join lobby";
+                            nextLayoutName = GameLobbyMenuController.NAME;
                         }
+
+                        joinButton = new Button(buttonLabel);
+                        joinButton.setOnAction(event -> {
+                            setProperty("selectedgamename", game.name());
+                            setProperty("selectedgameowner", game.owner());
+                            setProperty("isselectedgamestopped", game.isStopped());
+                            switchLayout(nextLayoutName);
+                        });
+
+                        gameHBox.getChildren().addAll(labelHBox, joinButton);
                     }
                 };
             }
