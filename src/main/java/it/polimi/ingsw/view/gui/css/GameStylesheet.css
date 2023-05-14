@@ -15,7 +15,7 @@
     -fx-background-radius: 20;
 }
 
-#firstCommonGoalVBox, #secondCommonGoalVBox, #personalGoalVBox, #gameRankingHBox {
+#firstCommonGoalVBox, #secondCommonGoalVBox, #personalGoalVBox, #scoreBoardHBox {
     -fx-effect: dropshadow(three-pass-box, dark-grey, 7, 0, 0, 0);
     -fx-background-color: almost-white;
     -fx-background-radius: 10;

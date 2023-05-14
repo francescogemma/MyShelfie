@@ -23,42 +23,6 @@ public class Board extends BoardView {
     public static final int COLUMN_BOARDS = 9;
 
     /**
-     * All the possible cell positions if the players were two.
-     */
-    public static final List<Coordinate> TWO_PLAYER_POSITIONS = Coordinate.toList(Arrays.asList(
-            new int [][] {
-                                {1, 3}, {1, 4},
-                        {2, 2}, {2, 3}, {2, 4}, {2, 5},
-                {3, 1}, {3, 2}, {3, 3}, {3, 4}, {3, 5}, {3, 6}, {3, 7},
-        {4, 0}, {4, 1}, {4, 2}, {4, 3}, {4, 4}, {4, 5}, {4, 6}, {4, 7},
-                {5, 1}, {5, 2}, {5, 3}, {5, 4}, {5, 5}, {5, 6},
-                                {6, 3}, {6, 4}, {6, 5},
-                                {7, 3}, {7, 4}, {7, 5}
-    }));
-
-    /**
-     * All the possible cell positions if the players were three.
-     */
-    public static final List<Coordinate> THREE_PLAYER_POSITIONS = Coordinate.toList(Arrays.asList(
-            new int[][] {
-                                    {0, 3},
-                                                            {2, 6},
-                                                                            {3, 8},
-            {5, 0},
-                            {6, 2},                 {6, 6},
-                                                    {8, 5}
-            }
-    ));
-
-    /**
-     * All the possible cell positions if the players were four.
-     */
-    public static final List<Coordinate> FOUR_PLAYER_POSITIONS = Coordinate.toList(Arrays.asList(
-        new int[][] {
-                {0, 4}, {1, 5}, {4, 8}, {5, 7}, {8, 4}
-    }));
-
-    /**
      * Constructor of the Board class.
      * Initially, it represents an empty Board, so it will be necessary
      * to call the fillRandomly function to fill it.

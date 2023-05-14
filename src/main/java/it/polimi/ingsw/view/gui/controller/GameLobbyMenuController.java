@@ -253,7 +253,7 @@ public class GameLobbyMenuController extends Controller {
 
     @Override
     public String getName() {
-        return null;
+        return NAME;
     }
 
     @Override

@@ -26,9 +26,7 @@
 
                 <StackPane VBox.vgrow="ALWAYS">
                     <ImageView fx:id="firstCommonGoalImageView" fitHeight="${firstCommonGoalVBox.height * 0.8}"
-                               fitWidth="${firstCommonGoalVBox.width * 0.8}" preserveRatio="true">
-                        <Image url="/common goal cards/1.jpg"/>
-                    </ImageView>
+                               fitWidth="${firstCommonGoalVBox.width * 0.8}" preserveRatio="true" />
 
                     <ImageView fx:id="firstScoringToken" />
                 </StackPane>
@@ -39,9 +37,7 @@
 
                 <StackPane VBox.vgrow="ALWAYS">
                     <ImageView fx:id="secondCommonGoalImageView" fitHeight="${secondCommonGoalVBox.height * 0.8}"
-                               fitWidth="${secondCommonGoalVBox.width * 0.8}" preserveRatio="true" pickOnBounds="true">
-                        <Image url="/common goal cards/2.jpg"/>
-                    </ImageView>
+                               fitWidth="${secondCommonGoalVBox.width * 0.8}" preserveRatio="true" pickOnBounds="true" />
 
                     <ImageView fx:id="secondScoringToken" />
                 </StackPane>
@@ -109,16 +105,8 @@
                 <Insets left="10" bottom="10" top="10" right="10" />
             </padding>
 
-            <HBox fx:id="gameRankingHBox" VBox.vgrow="ALWAYS">
-                <ScrollPane fitToHeight="true" fitToWidth="true" HBox.hgrow="ALWAYS">
-                    <AnchorPane>
-                        <VBox fx:id="gameRanking" spacing="10" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                            <padding>
-                                <Insets bottom="10" left="10" right="10" top="10" />
-                            </padding>
-                        </VBox>
-                    </AnchorPane>
-                </ScrollPane>
+            <HBox fx:id="scoreBoardHBox" VBox.vgrow="ALWAYS">
+                <ListView fx:id="scoreBoardListView" HBox.hgrow="ALWAYS" />
             </HBox>
 
             <Region VBox.vgrow="ALWAYS" />

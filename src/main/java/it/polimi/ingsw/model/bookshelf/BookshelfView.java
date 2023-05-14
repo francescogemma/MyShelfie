@@ -68,6 +68,14 @@ public class BookshelfView {
         return content[shelf.getRow()][shelf.getColumn()].getColor();
     }
 
+    /**
+     * @param shelf where we want to know which is the {@link Tile tile} in it.
+     * @return the {@link Tile tile} inside the specified shelf.
+     */
+    public Tile getTileAt(Shelf shelf) {
+        return content[shelf.getRow()][shelf.getColumn()];
+    }
+
     public BookshelfView createView () {
         return new BookshelfView(this);
     }
