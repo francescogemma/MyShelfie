@@ -31,6 +31,13 @@
         <Button mnemonicParsing="false" text="EXIT" onAction="#exit"/>
         <Button fx:id="backToLoginButton" mnemonicParsing="false" onAction="#backToLogin" text="BACK TO LOGIN" />
         <TextField fx:id="gameNameTextField" promptText="Game name" HBox.hgrow="ALWAYS" />
-        <Button fx:id="createNewGameButton" mnemonicParsing="false" text="CREATE NEW GAME" />
+        <Button fx:id="createNewGameButton" mnemonicParsing="false" text="CREATE NEW GAME" onAction="#createNewGame"/>
+    </HBox>
+
+    <HBox alignment="CENTER_RIGHT">
+        <padding>
+            <Insets right="20"/>
+        </padding>
+        <Label fx:id="statusBar" visible="false"/>
     </HBox>
 </VBox>

@@ -1,7 +1,11 @@
 package it.polimi.ingsw.view.gui.controller;
 
+import it.polimi.ingsw.controller.Response;
+import it.polimi.ingsw.event.data.client.JoinLobbyEventData;
+import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.view.gui.LoaderException;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,6 +18,31 @@ public class GameLobbyMenuController extends Controller {
     @FXML private Button backToAvailableGamesButton;
 
     public static final String NAME = "GameLobbyMenu";
+
+    /*
+    private void tryEnterLobby(String gameName) {
+        new Thread(new Task<Void>() {
+            @Override
+            protected Void call() {
+                Response response;
+
+                try {
+                    response = responseJoinLobbyEventDataRequester.request(new JoinLobbyEventData(gameName));
+                } catch (DisconnectedException e) {
+                    // TODO: print status bar (disconnected)
+                    return null;
+                }
+
+                if (response.isOk()) {
+                    switchLayout(GameLobbyMenuController.NAME);
+                } else {
+                    showResponse(response);
+                }
+                return null;
+            }
+        });
+    }
+    */
 
     @FXML
     private void backToAvailableGames() {

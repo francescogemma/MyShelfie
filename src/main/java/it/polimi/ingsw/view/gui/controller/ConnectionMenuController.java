@@ -61,6 +61,9 @@ public class ConnectionMenuController extends Controller {
 
     @FXML
     private void connect() {
+        String ipAddress = serverIPTextField.getText();
+        int port = Integer.parseInt(serverPortTextField.getText());
+
         popUpQueue.add(
                 "Trying to connect to the server...",
                 "CONNECTING",
@@ -71,9 +74,6 @@ public class ConnectionMenuController extends Controller {
                             Connection connection = null;
 
                             try {
-                                String ipAddress = serverIPTextField.getText();
-                                int port = Integer.parseInt(serverPortTextField.getText());
-
                                 if (getScene().getProperties().get("connection").equals("TCP")) {
                                     connection = new TCPConnection(ipAddress, port);
                                 } else {
@@ -100,7 +100,7 @@ public class ConnectionMenuController extends Controller {
                             } finally {
                                 popUp.askToHide();
                                 if(connection != null) {
-                                    getScene().getProperties().put("transceiver", new NetworkEventTransceiver(connection, new Object()));
+                                    setProperty("transceiver", new NetworkEventTransceiver(connection, new Object()));
                                     switchLayout(UserLoginMenuController.NAME);
                                 }
                             }
