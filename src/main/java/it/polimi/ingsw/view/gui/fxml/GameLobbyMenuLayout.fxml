@@ -12,32 +12,28 @@
     <HBox>
         <padding> <Insets bottom="10" left="10" right="10" top="10" /> </padding>
         <Label text="Game: " />
-        <Label fx:id="gameName" />
+        <Label fx:id="gameNameLabel" />
     </HBox>
 
-    <HBox fx:id="playerListHBox" VBox.vgrow="ALWAYS">
+    <HBox fx:id="playersListHBox" VBox.vgrow="ALWAYS">
         <padding> <Insets bottom="10" left="90" right="90" top="10" /> </padding>
-        <ScrollPane fitToHeight="true" fitToWidth="true" HBox.hgrow="ALWAYS">
-            <AnchorPane>
-                <VBox fx:id="playerList" spacing="10"
-                      AnchorPane.topAnchor="0.0"
-                      AnchorPane.bottomAnchor="0.0"
-                      AnchorPane.leftAnchor="0.0"
-                      AnchorPane.rightAnchor="0.0">
-
-                    <padding> <Insets bottom="10" left="20" right="20" top="10" /> </padding>
-                </VBox>
-            </AnchorPane>
-        </ScrollPane>
+        <ListView fx:id="playersListView" HBox.hgrow="ALWAYS" />
     </HBox>
 
     <HBox alignment="CENTER" spacing="10">
         <padding> <Insets bottom="10" left="20" right="20" top="10" /> </padding>
 
         <Button mnemonicParsing="false" text="Exit" onAction="#exit"/>
-        <Button fx:id="startGameButton" mnemonicParsing="false" text="Start Game" />
-        <Button fx:id="restartGameButton" mnemonicParsing="false" text="Restart Game" />
+        <Button fx:id="startGameButton" mnemonicParsing="false" text="Start Game" onAction="#startGame" />
+        <Button fx:id="restartGameButton" mnemonicParsing="false" text="Restart Game" onAction="#restartGame" />
         <Button fx:id="backToAvailableGamesButton" mnemonicParsing="false"
                 text="Back to Available Games" onAction="#backToAvailableGames" />
+    </HBox>
+
+    <HBox alignment="CENTER_RIGHT">
+        <padding>
+            <Insets right="20"/>
+        </padding>
+        <Label fx:id="statusBar" visible="false"/>
     </HBox>
 </VBox>

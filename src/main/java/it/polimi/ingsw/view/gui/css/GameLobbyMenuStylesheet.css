@@ -18,3 +18,11 @@
 #gameName {
     -fx-text-fill: palette-red;
 }
+
+.player {
+    -fx-background-color: #ddc99b;
+    -fx-border-color:dark-grey;
+    -fx-border-radius: 100;
+    -fx-background-radius: 100;
+    -fx-effect: dropshadow(three-pass-box, dark-grey, 7, 0, 0, 0);
+}
