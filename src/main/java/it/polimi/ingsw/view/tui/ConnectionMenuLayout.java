@@ -28,7 +28,7 @@ public class ConnectionMenuLayout extends AppLayout {
 
     // Layout:
     private final ValueMenuEntry<String> ipAddressEntry = new ValueMenuEntry<>("Server IP",
-        new TextBox().text("10.0.0.2"));
+        new TextBox().text("10.0.0.4"));
     private final ValueMenuEntry<Integer> portEntry = new ValueMenuEntry<>("Server port",
         new IntTextBox().integer(8080));
 

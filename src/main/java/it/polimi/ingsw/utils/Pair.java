@@ -1,6 +1,7 @@
 package it.polimi.ingsw.utils;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Pair<T, F> {
     private T key;
@@ -32,18 +33,13 @@ public class Pair<T, F> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
+        if (this == obj) return true;
 
-        if (obj instanceof Pair) {
-            Pair pair = (Pair) obj;
-            if (key != null ? !key.equals(pair.key) : pair.key != null)
-                return false;
-            if (value != null ? !value.equals(pair.value) : pair.value != null)
-                return false;
-            return true;
-        }
+        if (obj == null || obj.getClass() != this.getClass())
+            return false;
 
-        return false;
+        if (!Objects.equals(key, ((Pair<?, ?>) obj).key))
+            return false;
+        return Objects.equals(value, ((Pair<?, ?>) obj).value);
     }
 }

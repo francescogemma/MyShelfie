@@ -29,7 +29,7 @@
                <Insets left="20.0" right="20.0"/>
             </padding>
             <Label alignment="CENTER_RIGHT" prefWidth="150.0" text="Server IP"/>
-            <TextField fx:id="serverIPTextField" promptText="Server IP" text="10.0.0.2" HBox.hgrow="ALWAYS"/>
+            <TextField fx:id="serverIPTextField" promptText="Server IP" text="10.0.0.4" HBox.hgrow="ALWAYS"/>
          </HBox>
       </HBox>
 

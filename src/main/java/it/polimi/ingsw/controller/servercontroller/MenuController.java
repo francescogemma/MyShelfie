@@ -310,6 +310,8 @@ public class MenuController {
 
         authenticated.remove(Pair.of(username, eventTransmitter));
 
+        assert !authenticated.contains(Pair.of(username, eventTransmitter));
+
         setConnectUser(username, false);
 
         return Response.success("You are now logout");
