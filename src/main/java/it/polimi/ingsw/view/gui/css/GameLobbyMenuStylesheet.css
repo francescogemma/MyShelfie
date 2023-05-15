@@ -26,7 +26,3 @@
     -fx-background-radius: 100;
     -fx-effect: dropshadow(three-pass-box, dark-grey, 7, 0, 0, 0);
 }
-
-.button:disabled {
-    -fx-background-color: almost-white;
-}
