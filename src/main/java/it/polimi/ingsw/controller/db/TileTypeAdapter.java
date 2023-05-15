@@ -41,6 +41,8 @@ public class TileTypeAdapter extends TypeAdapter<Tile> {
             return null;
         }
 
+        jsonReader.beginObject();
+
         String readColorFieldName = jsonReader.nextName();
         if (!readColorFieldName.equals(COLOR_FIELD_NAME)) {
             throw new IOException("The name for the color field in a serialized tile is " + COLOR_FIELD_NAME);
@@ -80,6 +82,8 @@ public class TileTypeAdapter extends TypeAdapter<Tile> {
         if (version == null) {
             throw new IOException("The specified version for the tile isn't among the available versions");
         }
+
+        jsonReader.endObject();
 
         return Tile.getInstance(color, version);
     }
