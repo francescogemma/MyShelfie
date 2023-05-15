@@ -60,7 +60,8 @@ public class MenuController {
             throw new RuntimeException(e);
         }
 
-        allGame.stream().filter(g -> !g.isOver())
+        allGame.stream()
+                .filter(g -> !g.isOver())
                 .forEach(g -> {
                     g.forceStop();
                     GameController gameController = new GameController(g);
@@ -94,7 +95,7 @@ public class MenuController {
 
         synchronized (this) {
             for (User u: users) {
-                if (u.getName().equals(username))
+                if (u.getName().equalsIgnoreCase(username))
                     return u;
             }
 

@@ -150,28 +150,6 @@ public class DBManagerTest {
             .toFile().exists());
     }
 
-    @Test
-    @DisplayName("Get the list of names in use")
-    void getSavedIdentifiablesNames__correctOutput() {
-        User firstUser = new User("first", "passwrd");
-        User secondUser = new User("second", "password");
-        User thirdUser = new User("third", "password");
-
-        DBManager.getUsersDBManager().save(firstUser);
-        DBManager.getUsersDBManager().save(secondUser);
-        DBManager.getUsersDBManager().save(thirdUser);
-
-        Assertions.assertEquals(Set.of("first", "second", "third"),
-            DBManager.getUsersDBManager().getSavedIdentifiablesNames());
-    }
-
-    @Test
-    @DisplayName("Get the list of names in use when the db is empty")
-    void getSavedIdentifiablesNames_emptyDB_emptySet() {
-        Assertions.assertEquals(Set.of(),
-            DBManager.getGamesDBManager().getSavedIdentifiablesNames());
-    }
-
     // TODO: Add tests for GamesDBManager
 
     public static class MenuControllerTest {

@@ -39,7 +39,7 @@ public class DBManager<T extends Identifiable> {
 
     // Used also for testing purpose
     Path getIdentifiableFilePath(String name) {
-        return Paths.get(ROOT_FOLDER_NAME, folderName, name + JSON_EXTENSION);
+        return Paths.get(ROOT_FOLDER_NAME, folderName, name.toLowerCase() + JSON_EXTENSION);
     }
 
     private DBManager(String folderName, Type type) {
@@ -109,7 +109,7 @@ public class DBManager<T extends Identifiable> {
         }
     }
 
-    public Set<String> getSavedIdentifiablesNames() {
+    private Set<String> getSavedIdentifiablesNames() {
         synchronized (lock) {
             return Optional.ofNullable(getFolderPath().toFile().list()).map(
                     fileNames -> Arrays.stream(fileNames).map(fileName ->
