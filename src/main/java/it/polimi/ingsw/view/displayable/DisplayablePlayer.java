@@ -131,4 +131,29 @@ public class DisplayablePlayer {
             return -1;
         }
     }
+
+    @Override
+    public String toString() {
+        return "#" + position + " " + name + (!isConnected ? " (disconnected)" : "") + " [" + points +
+            (additionalPoints > 0 ? " + " + additionalPoints : "") + "]";
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+
+        if (!(other instanceof DisplayablePlayer)) {
+            return false;
+        }
+
+        DisplayablePlayer otherDisplayablePlayer = (DisplayablePlayer) other;
+
+        return name.equals(otherDisplayablePlayer.name) && points == otherDisplayablePlayer.points
+            && isConnected == otherDisplayablePlayer.isConnected && originalIndex == otherDisplayablePlayer.originalIndex
+            && isClientPlayer == otherDisplayablePlayer.isClientPlayer && position == otherDisplayablePlayer.position
+            && additionalPoints == otherDisplayablePlayer.additionalPoints && isBlurred == otherDisplayablePlayer.isBlurred
+            && isWinner == otherDisplayablePlayer.isWinner;
+    }
 }
