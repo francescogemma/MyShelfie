@@ -939,11 +939,19 @@ public class GameController extends Controller {
 
     // Model to URLs:
     private String commonGoalToUrl(int index) {
-        return "/common goal cards/%s.jpg".formatted(index);
+        return "/common goal cards/%s.jpg".formatted(index + 1);
     }
 
     private String personalGoalToUrl(int index) {
-        return "/personal goal cards/Personal_Goals%s.png".formatted((index > 0) ? index + 1 : "");
+
+        /*
+        final String path = "/personal goal cards/Personal_Goals%s.png".formatted(
+                index > 0 ? index + 1 : ""
+        );
+        */
+
+        if (index > 0) return "/personal goal cards/Personal_Goals" + (index + 1) + ".png";
+        return "/personal goal cards/Personal_Goals.png";
     }
 
     private String tileToUrl(Tile tile) {

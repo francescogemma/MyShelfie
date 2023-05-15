@@ -564,7 +564,7 @@ public class GameController {
      */
     public synchronized Response joinGame (String username) {
         Objects.requireNonNull(username);
-        Logger.writeMessage("Clients in lobby: " + clientsInLobby.stream().map(Pair::getValue).toList().toString());
+        Logger.writeMessage("Clients in lobby before modify: " + clientsInLobby.stream().map(Pair::getValue).toList().toString());
 
         for (int i = 0; i < clientsInLobby.size(); i++) {
             if (clientsInLobby.get(i).getValue().equals(username)) {
