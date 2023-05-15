@@ -39,19 +39,15 @@ public class ConnectionMenuController extends Controller {
         setServerPortTextFieldToDecimalOnly();
 
         popUpQueue = new PopUpQueue(
-                text -> {
-                    Platform.runLater(() -> {
-                        connectionPopUpLabel.setText(text);
-                        connectionBackgroundBlurPane.setVisible(true);
-                        connectionPopUpMessageBackground.setVisible(true);
-                    });
-                },
-                () -> {
-                    Platform.runLater(() -> {
-                        connectionBackgroundBlurPane.setVisible(false);
-                        connectionPopUpMessageBackground.setVisible(false);
-                    });
-                },
+                text -> Platform.runLater(() -> {
+                    connectionPopUpLabel.setText(text);
+                    connectionBackgroundBlurPane.setVisible(true);
+                    connectionPopUpMessageBackground.setVisible(true);
+                }),
+                () -> Platform.runLater(() -> {
+                    connectionBackgroundBlurPane.setVisible(false);
+                    connectionPopUpMessageBackground.setVisible(false);
+                }),
                 new Object()
         );
 
@@ -98,7 +94,7 @@ public class ConnectionMenuController extends Controller {
                                 }
                             } catch (NumberFormatException | BadPortException e) {
                                 popUpQueue.add(
-                                        "Invalid port",
+                                        "Invalid port number",
                                         PopUp.hideAfter(2000),
                                         p -> {}
                                 );

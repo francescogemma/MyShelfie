@@ -58,19 +58,15 @@ public class UserLoginMenuController extends Controller {
         loginRequester.registerAllListeners();
 
         popUpQueue = new PopUpQueue(
-                text -> {
-                    Platform.runLater(() -> {
-                        userLoginPopUpLabel.setText(text);
-                        userLoginBackgroundBlurPane.setVisible(true);
-                        userLoginPopUpMessageBackground.setVisible(true);
-                    });
-                },
-                () -> {
-                    Platform.runLater(() -> {
-                        userLoginBackgroundBlurPane.setVisible(false);
-                        userLoginPopUpMessageBackground.setVisible(false);
-                    });
-                },
+                text -> Platform.runLater(() -> {
+                    userLoginPopUpLabel.setText(text);
+                    userLoginBackgroundBlurPane.setVisible(true);
+                    userLoginPopUpMessageBackground.setVisible(true);
+                }),
+                () -> Platform.runLater(() -> {
+                    userLoginBackgroundBlurPane.setVisible(false);
+                    userLoginPopUpMessageBackground.setVisible(false);
+                }),
                 new Object()
         );
     }

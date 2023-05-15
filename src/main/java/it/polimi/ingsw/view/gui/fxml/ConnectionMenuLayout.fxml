@@ -56,9 +56,10 @@
    </VBox>
 
    <Pane fx:id="connectionBackgroundBlurPane" visible="false"/>
+
    <VBox alignment="CENTER" maxWidth="500" maxHeight="400" >
       <HBox fx:id="connectionPopUpMessageBackground" alignment="CENTER" spacing="10.0" maxWidth="500" maxHeight="400" visible="false">
-         <Label fx:id="connectionPopUpLabel" alignment="CENTER" wrapText="true"/>
+         <Label fx:id="connectionPopUpLabel" alignment="CENTER" wrapText="true" textAlignment="JUSTIFY"/>
          <padding>
             <Insets top="20.0" bottom="20.0" left="40.0" right="40.0"/>
          </padding>
