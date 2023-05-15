@@ -96,7 +96,7 @@
 
             <HBox alignment="CENTER" spacing="10">
                 <Button fx:id="stopGameButton" mnemonicParsing="false" text="STOP GAME" managed="false"/>
-                <Button fx:id="exitButton" mnemonicParsing="false" text="EXIT" onAction="#exit"/>
+                <Button fx:id="exitButton" mnemonicParsing="false" text="EXIT"/>
             </HBox>
         </VBox>
 
