@@ -7,6 +7,7 @@ import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 public class JoinGameEventData implements EventData {
@@ -15,6 +16,7 @@ public class JoinGameEventData implements EventData {
     private final String gameName;
 
     public JoinGameEventData(String gameName) {
+        Objects.requireNonNull(gameName);
         this.gameName = gameName;
     }
 

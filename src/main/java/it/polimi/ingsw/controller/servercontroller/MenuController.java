@@ -359,9 +359,13 @@ public class MenuController {
      */
     public synchronized void forceDisconnect(EventTransmitter transmitter, GameController gameController, String username) {
         Objects.requireNonNull(transmitter);
-        if (username == null) return;
 
-        authenticated.remove(Pair.of(transmitter, username));
+        if (username == null) {
+            assert authenticated.stream().noneMatch(p -> p.getValue().equals(transmitter));
+            return;
+        }
+
+        authenticated.remove(Pair.of(username, transmitter));
 
         setConnectUser(username, false);
 

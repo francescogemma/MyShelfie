@@ -941,7 +941,7 @@ public class GameController extends Controller {
     }
 
     private String personalGoalToUrl(int index) {
-        return "/personal goal cards/Personal_Goals%s.png".formatted(index);
+        return "/personal goal cards/Personal_Goals%s.png".formatted((index > 0) ? index + 1 : "");
     }
 
     private String tileToUrl(Tile tile) {

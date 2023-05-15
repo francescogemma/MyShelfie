@@ -682,8 +682,10 @@ public class GameController {
     /**
      * @return true iff username can join the game
      * @param username the username of the user that wants to join the game
+     * @throws NullPointerException iff username is null
      */
     public synchronized boolean isAvailableForJoin (String username) {
+        Objects.requireNonNull(username);
         return game.isAvailableForJoin(username);
     }
 
