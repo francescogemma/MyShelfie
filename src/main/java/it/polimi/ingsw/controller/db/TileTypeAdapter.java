@@ -38,6 +38,7 @@ public class TileTypeAdapter extends TypeAdapter<Tile> {
     public Tile read(JsonReader jsonReader) throws IOException {
         if (jsonReader.peek() == JsonToken.NULL) {
             jsonReader.nextNull();
+
             return null;
         }
 
@@ -68,7 +69,7 @@ public class TileTypeAdapter extends TypeAdapter<Tile> {
             throw new IOException("The name for the version field in a serialized tile is " + VERSION_FIELD_NAME);
         }
 
-        String versionName = jsonReader.nextName();
+        String versionName = jsonReader.nextString();
 
         TileVersion version = null;
 
