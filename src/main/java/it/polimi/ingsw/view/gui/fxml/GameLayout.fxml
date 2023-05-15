@@ -12,7 +12,7 @@
       xmlns="http://javafx.com/javafx/17.0.2-ea"
       xmlns:fx="http://javafx.com/fxml/1">
 
-    <HBox fx:id="gameBackgroundHBox">
+    <HBox fx:id="gameBackgroundHBox" styleClass="background">
         <padding>
             <Insets left="10" bottom="10" top="10" right="10"/>
         </padding>

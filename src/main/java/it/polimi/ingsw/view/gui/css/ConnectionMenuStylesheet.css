@@ -1,8 +1,5 @@
 @import "BasicStylesheet.css";
 
-#connectionVBox {
-    -fx-background-color: background;
-}
 
 #serverIPBackground {
     -fx-effect: dropshadow(three-pass-box, dark-grey, 7, 0, 0, 0);
@@ -14,15 +11,4 @@
     -fx-effect: dropshadow(three-pass-box, dark-grey, 7, 0, 0, 0);
     -fx-background-color: form-background;
     -fx-background-radius: 1000;
-}
-
-#connectionPopUpMessageBackground {
-    -fx-effect: dropshadow(three-pass-box, dark-grey, 7, 0, 0, 0);
-    -fx-background-color: form-background;
-    -fx-background-radius: 1000;
-}
-
-#connectionBackgroundBlurPane {
-    -fx-background-color: background;
-    -fx-opacity: 0.5;
 }

@@ -1,10 +1,6 @@
 @import "BasicStylesheet.css";
 
 
-#availableGamesVBox {
-    -fx-background-color: background;
-}
-
 #availableGamesListStackPane {
     -fx-background-color: transparent;
 }

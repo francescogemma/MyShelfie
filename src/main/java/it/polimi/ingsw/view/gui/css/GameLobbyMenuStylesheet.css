@@ -1,10 +1,6 @@
 @import "BasicStylesheet.css";
 
 
-#gameLobbyVBox {
-    -fx-background-color: background;
-}
-
 #playerListHBox {
     -fx-background-color: transparent;
 }

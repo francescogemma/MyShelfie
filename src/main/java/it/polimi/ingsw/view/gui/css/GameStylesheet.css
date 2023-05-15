@@ -1,12 +1,9 @@
 @import "BasicStylesheet.css";
 
+
 #gameBackgroundBlurPane {
     -fx-background-color: background;
     -fx-opacity: 0.5;
-}
-
-#gameBackgroundHBox {
-    -fx-background-color: background;
 }
 
 #gameLeftSide, #gameRightSide, #boardBackground {

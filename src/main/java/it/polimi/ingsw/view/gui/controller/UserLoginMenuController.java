@@ -6,28 +6,22 @@ import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.client.LoginEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.networking.DisconnectedException;
-import it.polimi.ingsw.view.gui.LoaderException;
 import it.polimi.ingsw.view.popup.PopUp;
 import it.polimi.ingsw.view.popup.PopUpQueue;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-
-import java.io.IOException;
-import java.util.Objects;
+import javafx.scene.layout.VBox;
 
 public class UserLoginMenuController extends Controller {
     @FXML private TextField usernameTextField;
     @FXML private TextField passwordTextField;
     @FXML private Button userLoginNextButton;
     @FXML private Pane userLoginBackgroundBlurPane;
-    @FXML private HBox userLoginPopUpMessageBackground;
+    @FXML private VBox userLoginPopUpMessageBackground;
     @FXML private Label userLoginPopUpLabel;
 
     public static final String NAME = "UserLoginMenu";

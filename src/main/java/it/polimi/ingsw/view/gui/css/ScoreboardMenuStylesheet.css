@@ -1,10 +1,6 @@
 @import "BasicStylesheet.css";
 
 
-#scoreboardVBox {
-    -fx-background-color: background;
-}
-
 #playerListHBox {
     -fx-background-color: transparent;
 }

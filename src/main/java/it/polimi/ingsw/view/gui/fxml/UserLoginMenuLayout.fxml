@@ -11,7 +11,7 @@
            xmlns="http://javafx.com/javafx/17.0.2-ea"
            xmlns:fx="http://javafx.com/fxml/1">
 
-   <VBox fx:id="userLoginVBox" >
+   <VBox fx:id="userLoginVBox" styleClass="background">
       <HBox fx:id="userLoginImageHBox" alignment="CENTER" VBox.vgrow="ALWAYS">
          <ImageView fx:id="userLoginImageView"
                     fitHeight="${userLoginImageHBox.height * 0.8}"
@@ -49,10 +49,10 @@
       </HBox>
    </VBox>
 
-   <Pane fx:id="userLoginBackgroundBlurPane" visible="false"/>
+   <Pane fx:id="userLoginBackgroundBlurPane" visible="false" styleClass="backgroundBlurPane"/>
 
-   <VBox alignment="CENTER" maxWidth="500" maxHeight="400" >
-      <HBox fx:id="userLoginPopUpMessageBackground" alignment="CENTER" spacing="10.0" maxWidth="500" maxHeight="400" visible="false">
+   <VBox fx:id="userLoginPopUpMessageBackground" alignment="CENTER" maxWidth="500" maxHeight="400" visible="false">
+      <HBox alignment="CENTER" spacing="10.0" maxWidth="500" maxHeight="400" styleClass="popUpMessageBackground">
          <Label fx:id="userLoginPopUpLabel" alignment="CENTER" wrapText="true" textAlignment="JUSTIFY"/>
          <padding>
             <Insets top="20.0" bottom="20.0" left="40.0" right="40.0"/>
