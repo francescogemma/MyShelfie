@@ -85,7 +85,7 @@ public class GameController extends Controller {
             if(points == 0) {
                 tokenImageView.setVisible(false);
             } else if(points >= 2 && points <= 8) {
-                String path = "/scoring tokens/scoring_%d.jpeg".formatted(points);
+                String path = "/scoring tokens/scoring_%s.jpg".formatted(points);
                 tokenImageView.setImage(new Image(path));
             } else {
                 throw new IllegalArgumentException("Invalid token value");
