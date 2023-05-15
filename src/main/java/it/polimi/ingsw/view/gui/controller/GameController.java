@@ -442,6 +442,7 @@ public class GameController extends Controller {
                 .equals(scoreBoard.getClientPlayer().getName())) {
 
                 stopGameButton.setManaged(true);
+                stopGameButton.setVisible(true);
             }
 
             exitButton.setDisable(false);
@@ -461,6 +462,7 @@ public class GameController extends Controller {
             scoreBoardListView.getItems().setAll(scoreBoard.getDisplayablePlayers());
 
             stopGameButton.setManaged(data.owner().equals(scoreBoard.getClientPlayer().getName()));
+            stopGameButton.setVisible(data.owner().equals(scoreBoard.getClientPlayer().getName()));
         });
 
         if (waitingForReconnectionsPopUp != null) {
@@ -620,11 +622,8 @@ public class GameController extends Controller {
         Platform.runLater(() -> {
             scoreBoardListView.getItems().setAll(scoreBoard.getDisplayablePlayers());
 
-            if (data.newOwner().equals(scoreBoard.getClientPlayer().getName())) {
-                stopGameButton.setManaged(true);
-            } else {
-                stopGameButton.setManaged(false);
-            }
+            stopGameButton.setManaged(data.newOwner().equals(scoreBoard.getClientPlayer().getName()));
+            stopGameButton.setVisible(data.newOwner().equals(scoreBoard.getClientPlayer().getName()));
         });
     };
 
@@ -803,6 +802,9 @@ public class GameController extends Controller {
 
         exitButton.setDisable(true);
         stopGameButton.setDisable(true);
+        stopGameButton.setVisible(false);
+        stopGameButton.setManaged(false);
+
         previousBookshelfButton.setDisable(true);
         nextBookshelfButton.setDisable(true);
 
@@ -893,7 +895,7 @@ public class GameController extends Controller {
         Response response;
 
         try {
-            response = joinGameRequester.request(new JoinGameEventData(getValue("selectedgame")));
+            response = joinGameRequester.request(new JoinGameEventData(getValue("selectedgamename")));
 
             showResponse(response);
 
