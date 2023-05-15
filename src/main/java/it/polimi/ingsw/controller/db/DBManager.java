@@ -6,6 +6,7 @@ import it.polimi.ingsw.controller.User;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
+import it.polimi.ingsw.model.tile.Tile;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -49,6 +50,7 @@ public class DBManager<T extends Identifiable> {
         gson = new GsonBuilder().setPrettyPrinting()
             .registerTypeAdapter(PersonalGoal.class, new PersonalGoalTypeAdapter())
             .registerTypeAdapter(CommonGoal.class, new CommonGoalTypeAdapter())
+            .registerTypeAdapter(Tile.class, new TileTypeAdapter())
             .create();
     }
 

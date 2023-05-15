@@ -4,10 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import it.polimi.ingsw.controller.db.CommonGoalTypeAdapter;
 import it.polimi.ingsw.controller.db.PersonalGoalTypeAdapter;
+import it.polimi.ingsw.controller.db.TileTypeAdapter;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.receiver.EventListener;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.goal.PersonalGoal;
+import it.polimi.ingsw.model.tile.Tile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +56,7 @@ public class MockNetworkEventTransceiver implements EventTransceiver {
                 .registerTypeAdapterFactory(new EventDataTypeAdapterFactory())
                 .registerTypeAdapter(CommonGoal.class, new CommonGoalTypeAdapter())
                 .registerTypeAdapter(PersonalGoal.class, new PersonalGoalTypeAdapter())
+                .registerTypeAdapter(Tile.class, new TileTypeAdapter())
                 .create();
 
         new Thread(() -> {
