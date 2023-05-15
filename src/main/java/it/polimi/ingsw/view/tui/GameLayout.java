@@ -300,6 +300,7 @@ public class GameLayout extends AppLayout {
     private boolean isDisplayingCommonGoal;
 
     private PopUp waitingForReconnectionsPopUp;
+    private boolean gameHasBeenStopped;
 
     // Utilities:
     private Requester<Response, JoinGameEventData> joinGameRequester = null;
@@ -567,7 +568,7 @@ public class GameLayout extends AppLayout {
             popUp -> {
                 synchronized (getLock()) {
                     if (scoreBoard.getDisplayablePlayers().stream().filter(DisplayablePlayer::isConnected)
-                        .count() < 2) {
+                        .count() < 2 && !gameHasBeenStopped) {
                         waitingForReconnectionsPopUp = popUp;
                     } else {
                         popUp.askToHide();
@@ -578,6 +579,8 @@ public class GameLayout extends AppLayout {
     }
 
     public void stopGame() {
+        gameHasBeenStopped = true;
+
         if (waitingForReconnectionsPopUp != null) {
             waitingForReconnectionsPopUp.askToHide();
             waitingForReconnectionsPopUp = null;
@@ -842,6 +845,8 @@ public class GameLayout extends AppLayout {
         } catch (DisconnectedException e) {
             displayServerResponse(Response.failure("Disconnected!"));
         }
+
+        gameHasBeenStopped = false;
     }
 
     @Override
