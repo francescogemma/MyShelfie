@@ -116,10 +116,10 @@ public class GameLayout extends AppLayout {
                     ).addBorderBox().blurrable();
 
     private void populateCommonGoalsPointsTextBoxes() {
-        firstCommonGoalPointsTextBox.text("Points: " + (commonGoals[0].getPointStack().size() == 0 ? 0 :
+        firstCommonGoalPointsTextBox.text("Points: " + (commonGoals[0].getPointStack().isEmpty() ? 0 :
             commonGoals[0].getPointStack().get(commonGoals[0].getPointStack().size() - 1)));
 
-        secondCommonGoalPointsTextBox.text("Points: " + (commonGoals[1].getPointStack().size() == 0 ? 0 :
+        secondCommonGoalPointsTextBox.text("Points: " + (commonGoals[1].getPointStack().isEmpty() ? 0 :
             commonGoals[1].getPointStack().get(commonGoals[1].getPointStack().size() - 1)));
     }
 

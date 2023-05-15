@@ -111,7 +111,7 @@
 
             <Region VBox.vgrow="ALWAYS" />
 
-            <Label fx:id="playerBookshelf" text="Giocatore 1"/>
+            <Label fx:id="selectedBookshelfLabel" />
 
             <HBox fx:id="bookshelfHBox" VBox.vgrow="ALWAYS">
                 <StackPane fx:id="bookshelfStackPane" HBox.hgrow="ALWAYS">

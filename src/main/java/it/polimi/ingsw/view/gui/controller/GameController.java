@@ -21,10 +21,7 @@ import it.polimi.ingsw.view.displayable.DisplayableGoal;
 import it.polimi.ingsw.view.popup.PopUp;
 import it.polimi.ingsw.view.popup.PopUpQueue;
 import it.polimi.ingsw.view.tui.AvailableGamesMenuLayout;
-import it.polimi.ingsw.view.tui.LoginMenuLayout;
 import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -48,114 +45,31 @@ import it.polimi.ingsw.model.game.IllegalFlowException;
 import it.polimi.ingsw.view.displayable.DisplayableScoreBoard;
 
 public class GameController extends Controller {
-    // Layout:
-    @FXML private GridPane boardGridPane;
-    @FXML private ImageView gameBoardImageView;
-    @FXML private GridPane bookshelfGridPane;
-    @FXML private GridPane bookshelfColumnSelectorGridPane;
-    @FXML private ImageView bookshelfImageView;
-    @FXML private Pane boardBackground;
-    @FXML private Label turnLabel;
-    @FXML private ImageView firstScoringToken;
-    @FXML private ImageView secondScoringToken;
-    @FXML private ImageView firstCommonGoalImageView;
-    @FXML private ImageView secondCommonGoalImageView;
-    @FXML private ImageView personalGoalImageView;
-    @FXML private Button stopGameButton;
-    @FXML private Button exitButton;
-    @FXML private Button nextBookshelfButton;
-    @FXML private Button previousBookshelfButton;
-    @FXML private ListView<DisplayablePlayer> scoreBoardListView;
-
-    @FXML private Button bookshelfColumn1Button;
-    @FXML private Button bookshelfColumn2Button;
-    @FXML private Button bookshelfColumn3Button;
-    @FXML private Button bookshelfColumn4Button;
-    @FXML private Button bookshelfColumn5Button;
-
-    @FXML private Label playerBookshelf;
-
-    private Button[] bookshelfColumnsButton = new Button[BookshelfView.COLUMNS];
-    private static final double boardSize = 2965.0;
-    private static final double boardCellsSize = 2661.0;
-    private static final double boardResizeFactor = boardCellsSize / boardSize;
-    private static final double boardRightMarginFactor = 13.0 / boardSize;
-    private static final double bookshelfCellsWidth = 1074.0;
-    private static final double bookshelfCellsHeight = 1144.0;
-    private static final double bookshelfWidth = 1414.0;
-    private static final double bookshelfHeight = 1411.0;
-    private static final double bookshelfAspectRatio = bookshelfWidth / bookshelfHeight;
-    private static final double bookshelfWidthResizeFactor = bookshelfCellsWidth / bookshelfWidth;
-    private static final double bookshelfHeightResizeFactor = bookshelfCellsHeight / bookshelfHeight;
-    private static final double bookshelfUpMarginFactor = 38.5 / bookshelfHeight;
-    private static final double commonGoalWidth = 1385.0;
-    private static final double commonGoalHeight = 913.0;
-    private static final double commonGoalAspectRatio = commonGoalWidth / commonGoalHeight;
-    private static final double tokenCommonGoalResizeFactor = 315.805 / commonGoalWidth;
-    private static final double tokenCommonGoalAngle = -7.6426;
-    private static final double tokenCommonGoalUpMarginFactor = 39.5 / commonGoalWidth;
-    private static final double tokenCommonGoalRightMarginFactor = 326.5 / commonGoalWidth;
-
     public static final String NAME = "Game";
 
-    private void resizeBoard() {
-        double realWidth = Math.min(gameBoardImageView.getFitWidth(), gameBoardImageView.getFitHeight());
-        double realHeight = Math.min(gameBoardImageView.getFitHeight(), gameBoardImageView.getFitWidth());
-
-        boardGridPane.setMaxWidth(realWidth * boardResizeFactor);
-        boardGridPane.setMaxHeight(realHeight * boardResizeFactor);
-        boardGridPane.setPrefWidth(realWidth * boardResizeFactor);
-        boardGridPane.setPrefHeight(realHeight * boardResizeFactor);
-        boardGridPane.setTranslateX(-realWidth * boardRightMarginFactor);
-        boardGridPane.setHgap(boardGridPane.getWidth() * (36.0 / boardCellsSize));
-        boardGridPane.setVgap(boardGridPane.getHeight() * (36.0 / boardCellsSize));
-
-        boardBackground.setMaxWidth(realWidth * 1.12);
-        boardBackground.setMaxHeight(realHeight * 1.12);
-        boardBackground.setPrefWidth(realWidth * 1.12);
-        boardBackground.setPrefHeight(realHeight * 1.12);
-
-        turnLabel.setTranslateY(-realWidth * 1.12 / 2 - turnLabel.getHeight() / 2);
-    }
-
-    private void resizeBookshelf() {
-        double realWidth = Math.min(bookshelfImageView.getFitWidth(), bookshelfImageView.getFitHeight() * bookshelfAspectRatio);
-        double realHeight = Math.min(bookshelfImageView.getFitHeight(), bookshelfImageView.getFitWidth() / bookshelfAspectRatio);
-
-        bookshelfGridPane.setMaxWidth(realWidth * bookshelfWidthResizeFactor);
-        bookshelfGridPane.setMaxHeight(realHeight * bookshelfHeightResizeFactor);
-        bookshelfGridPane.setPrefWidth(realWidth * bookshelfWidthResizeFactor);
-        bookshelfGridPane.setPrefHeight(realHeight * bookshelfHeightResizeFactor);
-        bookshelfGridPane.setTranslateY(-realHeight * bookshelfUpMarginFactor);
-        bookshelfGridPane.setHgap(bookshelfGridPane.getWidth() * (61.0 / bookshelfCellsWidth));
-        bookshelfGridPane.setVgap(bookshelfGridPane.getHeight() * (30.0 / bookshelfCellsHeight));
-
-        bookshelfColumnSelectorGridPane.setMaxWidth(realWidth * bookshelfWidthResizeFactor);
-        bookshelfColumnSelectorGridPane.setMaxHeight(realHeight * bookshelfHeightResizeFactor);
-        bookshelfColumnSelectorGridPane.setPrefWidth(realWidth * bookshelfWidthResizeFactor);
-        bookshelfColumnSelectorGridPane.setPrefHeight(realHeight * bookshelfHeightResizeFactor);
-        bookshelfColumnSelectorGridPane.setTranslateY(-realHeight * bookshelfUpMarginFactor);
-        bookshelfColumnSelectorGridPane.setHgap(bookshelfColumnSelectorGridPane.getWidth() * (61.0 / bookshelfCellsWidth));
-    }
+    // Layout:
+    // Left panel:
+    @FXML private ImageView firstCommonGoalImageView;
+    @FXML private ImageView firstScoringToken;
+    @FXML private ImageView secondCommonGoalImageView;
+    @FXML private ImageView secondScoringToken;
+    @FXML private ImageView personalGoalImageView;
+    private static final double COMMON_GOAL_WIDTH = 1385.0;
+    private static final double COMMON_GOAL_HEIGHT = 913.0;
+    private static final double COMMON_GOAL_ASPECT_RATIO = COMMON_GOAL_WIDTH / COMMON_GOAL_HEIGHT;
+    private static final double TOKEN_COMMON_GOAL_RESIZE_FACTOR = 315.805 / COMMON_GOAL_WIDTH;
+    private static final double TOKEN_COMMON_GOAL_ANGLE = -7.6426;
+    private static final double TOKEN_COMMON_GOAL_UP_MARGIN_FACTOR = 39.5 / COMMON_GOAL_WIDTH;
+    private static final double TOKEN_COMMON_GOAL_RIGHT_MARGIN_FACTOR = 326.5 / COMMON_GOAL_WIDTH;
 
     private void resizeCommonGoalToken(ImageView scoringToken) {
-        double realWidth = Math.min(firstCommonGoalImageView.getFitWidth(), firstCommonGoalImageView.getFitHeight() * commonGoalAspectRatio);
+        double realWidth = Math.min(firstCommonGoalImageView.getFitWidth(), firstCommonGoalImageView.getFitHeight() * COMMON_GOAL_ASPECT_RATIO);
 
-        scoringToken.setFitWidth(realWidth * tokenCommonGoalResizeFactor);
-        scoringToken.setFitHeight(realWidth * tokenCommonGoalResizeFactor);
-        scoringToken.setTranslateY(-realWidth * tokenCommonGoalUpMarginFactor);
-        scoringToken.setTranslateX(realWidth * tokenCommonGoalRightMarginFactor);
-        scoringToken.setRotate(tokenCommonGoalAngle);
-    }
-
-    private void setBoardImageViewListener() {
-        gameBoardImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> resizeBoard());
-        gameBoardImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> resizeBoard());
-    }
-
-    private void setBookshelfImageViewListener() {
-        bookshelfImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> resizeBookshelf());
-        bookshelfImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> resizeBookshelf());
+        scoringToken.setFitWidth(realWidth * TOKEN_COMMON_GOAL_RESIZE_FACTOR);
+        scoringToken.setFitHeight(realWidth * TOKEN_COMMON_GOAL_RESIZE_FACTOR);
+        scoringToken.setTranslateY(-realWidth * TOKEN_COMMON_GOAL_UP_MARGIN_FACTOR);
+        scoringToken.setTranslateX(realWidth * TOKEN_COMMON_GOAL_RIGHT_MARGIN_FACTOR);
+        scoringToken.setRotate(TOKEN_COMMON_GOAL_ANGLE);
     }
 
     private void setCommonGoalImageViewsListeners() {
@@ -164,77 +78,6 @@ public class GameController extends Controller {
 
         secondCommonGoalImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> resizeCommonGoalToken(secondScoringToken));
         secondCommonGoalImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> resizeCommonGoalToken(secondScoringToken));
-    }
-
-    private void populateBoard() {
-        Platform.runLater(() -> {
-            for (int row = 0; row < Board.BOARD_ROWS; row++) {
-                for (int column = 0; column < Board.COLUMN_BOARDS; column++) {
-                    Coordinate boardCoordinate = new Coordinate(row, column);
-
-                    Tile tile = board.tileAt(boardCoordinate);
-
-                    if (tile != null) {
-                        ((ImageView) boardButtons[row][column].getGraphic()).setImage(new Image(
-                            toUrl(tile)
-                        ));
-                        boardButtons[row][column].setVisible(true);
-
-                        if (board.getSelectableCoordinate().contains(boardCoordinate)
-                            || board.getSelectedCoordinates().contains(boardCoordinate)) {
-                            boardButtons[row][column].setRotate(45.d);
-                            boardButtons[row][column].setMouseTransparent(false);
-                        } else {
-                            boardButtons[row][column].setRotate(0.d);
-                            boardButtons[row][column].setMouseTransparent(true);
-                        }
-                    } else {
-                        boardButtons[row][column].setVisible(false);
-                    }
-                }
-            }
-        });
-    }
-
-    private void populateBookshelfPanel() {
-        Platform.runLater(() -> {
-            for (int row = 0; row < BookshelfView.ROWS; row++) {
-                for (int column = 0; column < BookshelfView.COLUMNS; column++) {
-                    bookshelfButtons[row][column].setOpacity(1.d);
-
-                    Tile tile = bookshelves.get(selectedBookshelfIndex)
-                        .getTileAt(Shelf.getInstance(row, column));
-
-                    if (tile == Tile.getInstance(TileColor.EMPTY, TileVersion.FIRST)) {
-                        bookshelfButtons[row][column].setVisible(false);
-                    } else {
-                        ((ImageView) bookshelfButtons[row][column].getGraphic()).setImage(new Image(
-                            toUrl(tile)
-                        ));
-                        bookshelfButtons[row][column].setVisible(true);
-                    }
-                }
-            }
-        });
-    }
-
-    private void populateBookshelfPanelWithMask(BookshelfMaskSet maskSet) {
-        Platform.runLater(() -> {
-            for (int row = 0; row < BookshelfView.ROWS; row++) {
-                for (int column = 0; column < BookshelfView.COLUMNS; column++) {
-                    bookshelfButtons[row][column].setOpacity(0.5d);
-                }
-            }
-
-            int count = 0;
-            for (BookshelfMask mask : maskSet.getBookshelfMasks()) {
-                for (Shelf shelf : mask.getShelves()) {
-                    bookshelfButtons[shelf.getRow()][shelf.getColumn()].setOpacity(1.0d);
-                }
-
-                count++;
-            }
-        });
     }
 
     private void setTokenImage(int points, ImageView tokenImageView) {
@@ -264,11 +107,9 @@ public class GameController extends Controller {
 
     private void populateGoalsPanel() {
         Platform.runLater(() -> {
-            // first common goal
             firstCommonGoalImageView.setImage(new Image(commonGoalToUrl(commonGoals[0].getIndex())));
             Tooltip.install(firstCommonGoalImageView, new Tooltip(commonGoals[0].getDescription()));
 
-            // second common goal
             secondCommonGoalImageView.setImage(new Image(commonGoalToUrl(commonGoals[1].getIndex())));
             Tooltip.install(secondCommonGoalImageView, new Tooltip(commonGoals[1].getDescription()));
 
@@ -291,7 +132,7 @@ public class GameController extends Controller {
         Platform.runLater(() -> {
             scoreBoardListView.getItems().setAll(scoreBoard.getDisplayablePlayers());
 
-            playerBookshelf.setText(displayableGoal.getPlayerName());
+            selectedBookshelfLabel.setText(displayableGoal.getPlayerName());
             selectedBookshelfIndex = scoreBoard.getDisplayablePlayer(displayableGoal.getPlayerName())
                 .getOriginalIndex();
             previousBookshelfButton.setDisable(true);
@@ -314,6 +155,166 @@ public class GameController extends Controller {
         });
 
         populateBookshelfPanel();
+    }
+
+    // Board (center panel):
+    @FXML private Label turnLabel;
+    @FXML private Pane boardBackground;
+    @FXML private GridPane boardGridPane;
+    @FXML private ImageView gameBoardImageView;
+    @FXML private Button stopGameButton;
+    @FXML private Button exitButton;
+    private static final double FULL_BOARD_IMAGE_SIZE = 2965.0;
+    private static final double BOARD_SIZE = 2661.0;
+    private static final double BOARD_RESIZE_FACTOR = BOARD_SIZE / FULL_BOARD_IMAGE_SIZE;
+    private static final double BOARD_RIGHT_MARGIN_FACTOR = 13.0 / FULL_BOARD_IMAGE_SIZE;
+
+    private void resizeBoard() {
+        double realWidth = Math.min(gameBoardImageView.getFitWidth(), gameBoardImageView.getFitHeight());
+        double realHeight = Math.min(gameBoardImageView.getFitHeight(), gameBoardImageView.getFitWidth());
+
+        boardGridPane.setMaxWidth(realWidth * BOARD_RESIZE_FACTOR);
+        boardGridPane.setMaxHeight(realHeight * BOARD_RESIZE_FACTOR);
+        boardGridPane.setPrefWidth(realWidth * BOARD_RESIZE_FACTOR);
+        boardGridPane.setPrefHeight(realHeight * BOARD_RESIZE_FACTOR);
+        boardGridPane.setTranslateX(-realWidth * BOARD_RIGHT_MARGIN_FACTOR);
+        boardGridPane.setHgap(boardGridPane.getWidth() * (36.0 / BOARD_SIZE));
+        boardGridPane.setVgap(boardGridPane.getHeight() * (36.0 / BOARD_SIZE));
+
+        boardBackground.setMaxWidth(realWidth * 1.12);
+        boardBackground.setMaxHeight(realHeight * 1.12);
+        boardBackground.setPrefWidth(realWidth * 1.12);
+        boardBackground.setPrefHeight(realHeight * 1.12);
+
+        turnLabel.setTranslateY(-realWidth * 1.12 / 2 - turnLabel.getHeight() / 2);
+    }
+
+    private void setBoardImageViewListener() {
+        gameBoardImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> resizeBoard());
+        gameBoardImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> resizeBoard());
+    }
+
+    private void populateBoard() {
+        Platform.runLater(() -> {
+            for (int row = 0; row < Board.BOARD_ROWS; row++) {
+                for (int column = 0; column < Board.COLUMN_BOARDS; column++) {
+                    Coordinate boardCoordinate = new Coordinate(row, column);
+
+                    Tile tile = board.tileAt(boardCoordinate);
+
+                    if (tile != null) {
+                        ((ImageView) boardButtons[row][column].getGraphic()).setImage(new Image(
+                            tileToUrl(tile)
+                        ));
+                        boardButtons[row][column].setVisible(true);
+
+                        if (board.getSelectableCoordinate().contains(boardCoordinate)
+                            || board.getSelectedCoordinates().contains(boardCoordinate)) {
+                            boardButtons[row][column].setRotate(45.d);
+                            boardButtons[row][column].setMouseTransparent(false);
+                        } else {
+                            boardButtons[row][column].setRotate(0.d);
+                            boardButtons[row][column].setMouseTransparent(true);
+                        }
+                    } else {
+                        boardButtons[row][column].setVisible(false);
+                    }
+                }
+            }
+        });
+    }
+
+    // Right panel:
+    // Score board:
+    @FXML private ListView<DisplayablePlayer> scoreBoardListView;
+
+    // Bookshelves:
+    @FXML private Label selectedBookshelfLabel;
+    @FXML private GridPane bookshelfGridPane;
+    @FXML private ImageView bookshelfImageView;
+    @FXML private GridPane bookshelfColumnSelectorGridPane;
+    @FXML private Button nextBookshelfButton;
+    @FXML private Button previousBookshelfButton;
+    @FXML private Button bookshelfColumn1Button;
+    @FXML private Button bookshelfColumn2Button;
+    @FXML private Button bookshelfColumn3Button;
+    @FXML private Button bookshelfColumn4Button;
+    @FXML private Button bookshelfColumn5Button;
+    private static final double FULL_BOOKSHELF_IMAGE_WIDTH = 1414.0;
+    private static final double FULL_BOOKSHELF_IMAGE_HEIGHT = 1411.0;
+    private static final double BOOKSHELF_WIDTH = 1074.0;
+    private static final double BOOKSHELF_HEIGHT = 1144.0;
+    private static final double BOOKSHELF_ASPECT_RATIO = FULL_BOOKSHELF_IMAGE_WIDTH / FULL_BOOKSHELF_IMAGE_HEIGHT;
+    private static final double BOOKSHELF_WIDTH_RESIZE_FACTOR = BOOKSHELF_WIDTH / FULL_BOOKSHELF_IMAGE_WIDTH;
+    private static final double BOOKSHELF_HEIGHT_RESIZE_FACTOR = BOOKSHELF_HEIGHT / FULL_BOOKSHELF_IMAGE_HEIGHT;
+    private static final double BOOKSHELF_UP_MARGIN_FACTOR = 38.5 / FULL_BOOKSHELF_IMAGE_HEIGHT;
+
+    private Button[] bookshelfColumnsButton = new Button[BookshelfView.COLUMNS];
+
+    private void resizeBookshelf() {
+        double realWidth = Math.min(bookshelfImageView.getFitWidth(), bookshelfImageView.getFitHeight() * BOOKSHELF_ASPECT_RATIO);
+        double realHeight = Math.min(bookshelfImageView.getFitHeight(), bookshelfImageView.getFitWidth() / BOOKSHELF_ASPECT_RATIO);
+
+        bookshelfGridPane.setMaxWidth(realWidth * BOOKSHELF_WIDTH_RESIZE_FACTOR);
+        bookshelfGridPane.setMaxHeight(realHeight * BOOKSHELF_HEIGHT_RESIZE_FACTOR);
+        bookshelfGridPane.setPrefWidth(realWidth * BOOKSHELF_WIDTH_RESIZE_FACTOR);
+        bookshelfGridPane.setPrefHeight(realHeight * BOOKSHELF_HEIGHT_RESIZE_FACTOR);
+        bookshelfGridPane.setTranslateY(-realHeight * BOOKSHELF_UP_MARGIN_FACTOR);
+        bookshelfGridPane.setHgap(bookshelfGridPane.getWidth() * (61.0 / BOOKSHELF_WIDTH));
+        bookshelfGridPane.setVgap(bookshelfGridPane.getHeight() * (30.0 / BOOKSHELF_HEIGHT));
+
+        bookshelfColumnSelectorGridPane.setMaxWidth(realWidth * BOOKSHELF_WIDTH_RESIZE_FACTOR);
+        bookshelfColumnSelectorGridPane.setMaxHeight(realHeight * BOOKSHELF_HEIGHT_RESIZE_FACTOR);
+        bookshelfColumnSelectorGridPane.setPrefWidth(realWidth * BOOKSHELF_WIDTH_RESIZE_FACTOR);
+        bookshelfColumnSelectorGridPane.setPrefHeight(realHeight * BOOKSHELF_HEIGHT_RESIZE_FACTOR);
+        bookshelfColumnSelectorGridPane.setTranslateY(-realHeight * BOOKSHELF_UP_MARGIN_FACTOR);
+        bookshelfColumnSelectorGridPane.setHgap(bookshelfColumnSelectorGridPane.getWidth() * (61.0 / BOOKSHELF_WIDTH));
+    }
+
+    private void setBookshelfImageViewListener() {
+        bookshelfImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> resizeBookshelf());
+        bookshelfImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> resizeBookshelf());
+    }
+
+    private void populateBookshelfPanel() {
+        Platform.runLater(() -> {
+            for (int row = 0; row < BookshelfView.ROWS; row++) {
+                for (int column = 0; column < BookshelfView.COLUMNS; column++) {
+                    bookshelfButtons[row][column].setOpacity(1.d);
+
+                    Tile tile = bookshelves.get(selectedBookshelfIndex)
+                        .getTileAt(Shelf.getInstance(row, column));
+
+                    if (tile == Tile.getInstance(TileColor.EMPTY, TileVersion.FIRST)) {
+                        bookshelfButtons[row][column].setVisible(false);
+                    } else {
+                        ((ImageView) bookshelfButtons[row][column].getGraphic()).setImage(new Image(
+                            tileToUrl(tile)
+                        ));
+                        bookshelfButtons[row][column].setVisible(true);
+                    }
+                }
+            }
+        });
+    }
+
+    private void populateBookshelfPanelWithMask(BookshelfMaskSet maskSet) {
+        Platform.runLater(() -> {
+            for (int row = 0; row < BookshelfView.ROWS; row++) {
+                for (int column = 0; column < BookshelfView.COLUMNS; column++) {
+                    bookshelfButtons[row][column].setOpacity(0.5d);
+                }
+            }
+
+            int count = 0;
+            for (BookshelfMask mask : maskSet.getBookshelfMasks()) {
+                for (Shelf shelf : mask.getShelves()) {
+                    bookshelfButtons[shelf.getRow()][shelf.getColumn()].setOpacity(1.0d);
+                }
+
+                count++;
+            }
+        });
     }
 
     private void populateTurnTextBox() {
@@ -350,56 +351,6 @@ public class GameController extends Controller {
         tileButton.setVisible(false);
 
         return tileButton;
-    }
-
-    private String commonGoalToUrl(int index) {
-        return "/common goal cards/%s.jpg".formatted(index);
-    }
-
-    private String personalGoalToUrl(int index) {
-        return "/personal goal cards/PersonalGoals%s".formatted(index);
-    }
-
-    private String toUrl(Tile tile) {
-        if(tile == Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)) {
-            return "/item tiles/Gatti1.1.png";
-        } else if(tile == Tile.getInstance(TileColor.GREEN, TileVersion.SECOND)) {
-            return "/item tiles/Gatti1.2.png";
-        } else if(tile == Tile.getInstance(TileColor.GREEN, TileVersion.THIRD)) {
-            return "/item tiles/Gatti1.3.png";
-        } else if(tile == Tile.getInstance(TileColor.BLUE, TileVersion.FIRST)) {
-            return "/item tiles/Cornici1.1.png";
-        } else if(tile == Tile.getInstance(TileColor.BLUE, TileVersion.SECOND)) {
-            return "/item tiles/Cornici1.2.png";
-        } else if(tile == Tile.getInstance(TileColor.BLUE, TileVersion.THIRD)) {
-            return "/item tiles/Cornici1.3.png";
-        } else if(tile == Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST)) {
-            return "/item tiles/Piante1.1.png";
-        } else if(tile == Tile.getInstance(TileColor.MAGENTA, TileVersion.SECOND)) {
-            return "/item tiles/Piante1.2.png";
-        } else if(tile == Tile.getInstance(TileColor.MAGENTA, TileVersion.THIRD)) {
-            return "/item tiles/Piante1.3.png";
-        } else if(tile == Tile.getInstance(TileColor.CYAN, TileVersion.FIRST)) {
-            return "/item tiles/Trofei1.1.png";
-        } else if(tile == Tile.getInstance(TileColor.CYAN, TileVersion.SECOND)) {
-            return "/item tiles/Trofei1.2.png";
-        } else if(tile == Tile.getInstance(TileColor.CYAN, TileVersion.THIRD)) {
-            return "/item tiles/Trofei1.3.png";
-        } else if(tile == Tile.getInstance(TileColor.YELLOW, TileVersion.FIRST)) {
-            return "/item tiles/Giochi1.1.png";
-        } else if(tile == Tile.getInstance(TileColor.YELLOW, TileVersion.SECOND)) {
-            return "/item tiles/Giochi1.2.png";
-        } else if(tile == Tile.getInstance(TileColor.YELLOW, TileVersion.THIRD)) {
-            return "/item tiles/Giochi1.3.png";
-        } else if(tile == Tile.getInstance(TileColor.WHITE, TileVersion.FIRST)) {
-            return "/item tiles/Libri1.1.png";
-        } else if(tile == Tile.getInstance(TileColor.WHITE, TileVersion.SECOND)) {
-            return "/item tiles/Libri1.2.png";
-        } else if(tile == Tile.getInstance(TileColor.WHITE, TileVersion.THIRD)) {
-            return "/item tiles/Libri1.3.png";
-        } else {
-            throw new IllegalArgumentException("Tile not found");
-        }
     }
 
     @FXML
@@ -558,16 +509,18 @@ public class GameController extends Controller {
         popUpQueue = new PopUpQueue(
             text -> {
                 Platform.runLater(() -> {
-                    userLoginPopUpLabel.setText(text);
+                    System.out.println(text);
+                    /* userLoginPopUpLabel.setText(text);
                     userLoginBackgroundBlurPane.setVisible(true);
-                    userLoginPopUpMessageBackground.setVisible(true);
+                    userLoginPopUpMessageBackground.setVisible(true); */
                 });
             },
             () -> {
-                Platform.runLater(() -> {
+                System.out.println("Removing pop up");
+                /* Platform.runLater(() -> {
                     userLoginBackgroundBlurPane.setVisible(false);
                     userLoginPopUpMessageBackground.setVisible(false);
-                });
+                }); */
             },
             new Object()
         );
@@ -670,7 +623,7 @@ public class GameController extends Controller {
                 throw new IllegalStateException("It should be always possible to retrieve playing player");
             }
             populateTurnTextBox();
-            scoreBoardRecyclerDrawable.populate(scoreBoard.getDisplayablePlayers());
+            scoreBoardListView.getItems().setAll(scoreBoard.getDisplayablePlayers());
 
             board = data.gameView().getBoard();
             populateBoard();
@@ -710,7 +663,7 @@ public class GameController extends Controller {
 
     private final EventListener<PlayerHasJoinGameEventData> playerHasJoinGameListener = data -> {
         scoreBoard.setConnectionState(data.username(), true);
-        scoreBoardRecyclerDrawable.populate(scoreBoard.getDisplayablePlayers());
+        scoreBoardListView.getItems().setAll(scoreBoard.getDisplayablePlayers());
 
         if (waitingForReconnectionsPopUp != null) {
             waitingForReconnectionsPopUp.askToHide();
@@ -781,7 +734,7 @@ public class GameController extends Controller {
             popUp -> {
                 Platform.runLater(() -> {
                     scoreBoard.addAdditionalPoints(data.username(), 1);
-                    scoreBoardRecyclerDrawable.populate(scoreBoard.getDisplayablePlayers());
+                    scoreBoardListView.getItems().setAll(scoreBoard.getDisplayablePlayers());
 
                     new Timer().schedule(new TimerTask() {
                         @Override
@@ -794,7 +747,7 @@ public class GameController extends Controller {
             popUp -> {
                 Platform.runLater(() -> {
                     scoreBoard.sumPoints(data.username());
-                    scoreBoardRecyclerDrawable.populate(scoreBoard.getDisplayablePlayers());
+                    scoreBoardListView.getItems().setAll(scoreBoard.getDisplayablePlayers());
                 });
             });
     };
@@ -872,7 +825,7 @@ public class GameController extends Controller {
         );
 
         scoreBoard.setConnectionState(data.username(), false);
-        scoreBoardRecyclerDrawable.populate(scoreBoard.getDisplayablePlayers());
+        scoreBoardListView.getItems().setAll(scoreBoard.getDisplayablePlayers());
 
         if (data.newOwner().equals(scoreBoard.getClientPlayer().getName())) {
             stopGameButton.setManaged(true);
@@ -954,5 +907,56 @@ public class GameController extends Controller {
 
         popUpQueue.disable();
         popUpQueue = null;
+    }
+
+    // Model to URLs:
+    private String commonGoalToUrl(int index) {
+        return "/common goal cards/%s.jpg".formatted(index);
+    }
+
+    private String personalGoalToUrl(int index) {
+        return "/personal goal cards/PersonalGoals%s".formatted(index);
+    }
+
+    private String tileToUrl(Tile tile) {
+        if(tile == Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)) {
+            return "/item tiles/Gatti1.1.png";
+        } else if(tile == Tile.getInstance(TileColor.GREEN, TileVersion.SECOND)) {
+            return "/item tiles/Gatti1.2.png";
+        } else if(tile == Tile.getInstance(TileColor.GREEN, TileVersion.THIRD)) {
+            return "/item tiles/Gatti1.3.png";
+        } else if(tile == Tile.getInstance(TileColor.BLUE, TileVersion.FIRST)) {
+            return "/item tiles/Cornici1.1.png";
+        } else if(tile == Tile.getInstance(TileColor.BLUE, TileVersion.SECOND)) {
+            return "/item tiles/Cornici1.2.png";
+        } else if(tile == Tile.getInstance(TileColor.BLUE, TileVersion.THIRD)) {
+            return "/item tiles/Cornici1.3.png";
+        } else if(tile == Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST)) {
+            return "/item tiles/Piante1.1.png";
+        } else if(tile == Tile.getInstance(TileColor.MAGENTA, TileVersion.SECOND)) {
+            return "/item tiles/Piante1.2.png";
+        } else if(tile == Tile.getInstance(TileColor.MAGENTA, TileVersion.THIRD)) {
+            return "/item tiles/Piante1.3.png";
+        } else if(tile == Tile.getInstance(TileColor.CYAN, TileVersion.FIRST)) {
+            return "/item tiles/Trofei1.1.png";
+        } else if(tile == Tile.getInstance(TileColor.CYAN, TileVersion.SECOND)) {
+            return "/item tiles/Trofei1.2.png";
+        } else if(tile == Tile.getInstance(TileColor.CYAN, TileVersion.THIRD)) {
+            return "/item tiles/Trofei1.3.png";
+        } else if(tile == Tile.getInstance(TileColor.YELLOW, TileVersion.FIRST)) {
+            return "/item tiles/Giochi1.1.png";
+        } else if(tile == Tile.getInstance(TileColor.YELLOW, TileVersion.SECOND)) {
+            return "/item tiles/Giochi1.2.png";
+        } else if(tile == Tile.getInstance(TileColor.YELLOW, TileVersion.THIRD)) {
+            return "/item tiles/Giochi1.3.png";
+        } else if(tile == Tile.getInstance(TileColor.WHITE, TileVersion.FIRST)) {
+            return "/item tiles/Libri1.1.png";
+        } else if(tile == Tile.getInstance(TileColor.WHITE, TileVersion.SECOND)) {
+            return "/item tiles/Libri1.2.png";
+        } else if(tile == Tile.getInstance(TileColor.WHITE, TileVersion.THIRD)) {
+            return "/item tiles/Libri1.3.png";
+        } else {
+            throw new IllegalArgumentException("Tile not found");
+        }
     }
 }
