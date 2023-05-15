@@ -7,6 +7,7 @@ import it.polimi.ingsw.event.EventTransceiver;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.game.*;
+import it.polimi.ingsw.event.data.internal.GameHasBeenStoppedInternalEventData;
 import it.polimi.ingsw.event.data.internal.GameOverInternalEventData;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.model.board.FullSelectionException;
@@ -113,6 +114,8 @@ public class GameController {
                     this.internalTransceiver.broadcast(new GameOverInternalEventData(this));
                     DBManager.getGamesDBManager().delete(game);
                     clientsInGame.clear();
+                } else if (event.getId().equals(GameHasBeenStoppedEventData.ID)) {
+                    this.internalTransceiver.broadcast(new GameHasBeenStoppedInternalEventData(this));
                 }
             }
         });

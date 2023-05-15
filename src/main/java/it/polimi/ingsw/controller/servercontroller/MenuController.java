@@ -7,7 +7,9 @@ import it.polimi.ingsw.controller.db.DBManager;
 import it.polimi.ingsw.controller.db.IdentifiableNotFoundException;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
+import it.polimi.ingsw.event.data.game.GameHasBeenStoppedEventData;
 import it.polimi.ingsw.event.data.game.GameIsNoLongerAvailableEventData;
+import it.polimi.ingsw.event.data.internal.GameHasBeenStoppedInternalEventData;
 import it.polimi.ingsw.event.data.internal.GameOverInternalEventData;
 import it.polimi.ingsw.event.receiver.EventListener;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
@@ -41,7 +43,7 @@ public class MenuController {
      * List of all {@link EventTransmitter eventTransmitters} of all
      * authenticated users.
      */
-    private final List<EventTransmitter> authenticated;
+    private final List<Pair<String, EventTransmitter>> authenticated = new ArrayList<>();
 
     /**
      * List of all users who have connected to the server at least once
@@ -72,7 +74,6 @@ public class MenuController {
 
     private MenuController() {
         users = new HashSet<>();
-        authenticated = new ArrayList<>();
     }
 
     /**
@@ -127,7 +128,7 @@ public class MenuController {
     private synchronized void forEachAuthenticated(EventData eventData) {
         Objects.requireNonNull(eventData);
 
-        authenticated.forEach(v -> v.broadcast(eventData));
+        authenticated.forEach(v -> v.getValue().broadcast(eventData));
     }
 
     /**
@@ -235,7 +236,7 @@ public class MenuController {
         Objects.requireNonNull(transmitter);
         Objects.requireNonNull(username);
 
-        assert authenticated.contains(transmitter);
+        assert authenticated.contains(Pair.of(username, transmitter));
 
         transmitter.broadcast(
                 new GameHasBeenCreatedEventData(
@@ -289,7 +290,7 @@ public class MenuController {
 
         user.setConnected(true);
 
-        authenticated.add(transmitter);
+        authenticated.add(Pair.of(username, transmitter));
 
         Logger.writeMessage("%s authenticated correctly".formatted(username));
 
@@ -304,10 +305,10 @@ public class MenuController {
      * @return always returns SUCCESS.
      */
     public synchronized Response logout (EventTransmitter eventTransmitter, String username) {
-        assert authenticated.contains(eventTransmitter);
+        assert authenticated.contains(Pair.of(username, eventTransmitter));
         Objects.requireNonNull(eventTransmitter);
 
-        authenticated.remove(eventTransmitter);
+        authenticated.remove(Pair.of(username, eventTransmitter));
 
         setConnectUser(username, false);
 
@@ -356,9 +357,9 @@ public class MenuController {
      */
     public synchronized void forceDisconnect(EventTransmitter transmitter, GameController gameController, String username) {
         Objects.requireNonNull(transmitter);
-        authenticated.remove(transmitter);
-
         if (username == null) return;
+
+        authenticated.remove(Pair.of(transmitter, username));
 
         setConnectUser(username, false);
 
@@ -369,6 +370,17 @@ public class MenuController {
             });
         }
     }
+
+    private final EventListener<GameHasBeenStoppedInternalEventData> listenerGameStop = eventData -> {
+        synchronized (this) {
+            authenticated.stream()
+                    .filter(a -> eventData.getGameController().isAvailableForJoin(a.getKey()))
+                    .forEach(a -> {
+                        a.getValue().broadcast(new GameIsNoLongerAvailableEventData(eventData.getGameController().gameName()));
+                        a.getValue().broadcast(new GameHasBeenCreatedEventData(eventData.getGameController().getGameView()));
+                    });
+        }
+    };
 
     private final EventListener<GameOverInternalEventData> listenerGameOver = eventData -> {
         synchronized (this) {
@@ -381,6 +393,7 @@ public class MenuController {
     private void syncToGameController(GameController gameController) {
         Objects.requireNonNull(gameController);
 
+        GameHasBeenStoppedInternalEventData.castEventReceiver(gameController.getInternalTransceiver()).registerListener(this.listenerGameStop);
         GameOverInternalEventData.castEventReceiver(gameController.getInternalTransceiver()).registerListener(this.listenerGameOver);
     }
 
