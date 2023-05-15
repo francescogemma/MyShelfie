@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 
 import java.io.IOException;
 import java.util.Map;
@@ -21,7 +22,8 @@ public abstract class Controller {
     private boolean isCurrentLayout = true;
     private static Scene scene;
     private Timer timerStatusBar;
-    @FXML private Label statusBar;
+    @FXML private HBox statusBarHBox;
+    @FXML private Label statusBarLabel;
 
     private static final Map<String, Controller> controllers = Map.of(
             AvailableGamesMenuController.NAME, new AvailableGamesMenuController(),
@@ -74,14 +76,14 @@ public abstract class Controller {
 
             this.timerStatusBar = new Timer();
 
-            this.statusBar.setText(message);
-            this.statusBar.setVisible(true);
+            this.statusBarLabel.setText(message);
+            this.statusBarHBox.setVisible(true);
 
             this.timerStatusBar.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     Platform.runLater(() -> {
-                        statusBar.setVisible(false);
+                        statusBarHBox.setVisible(false);
                     });
                 }
             }, 2000);

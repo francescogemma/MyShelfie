@@ -31,10 +31,10 @@
                 text="Back to Available Games" onAction="#backToAvailableGames" />
     </HBox>
 
-    <HBox alignment="CENTER_RIGHT">
+    <HBox fx:id="statusBarHBox" alignment="CENTER_RIGHT" visible="false">
         <padding>
             <Insets right="20"/>
         </padding>
-        <Label fx:id="statusBar" visible="false"/>
+        <Label fx:id="statusBarLabel" />
     </HBox>
 </VBox>

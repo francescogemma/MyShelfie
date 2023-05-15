@@ -683,13 +683,13 @@ public class GameController extends Controller {
 
         setCommonGoalImageViewsListeners();
 
-        nextBookshelfButton.setOnKeyPressed(event -> {
+        nextBookshelfButton.setOnAction(event -> {
             selectedBookshelfIndex++;
 
             populateBookshelfPanel();
         });
 
-        previousBookshelfButton.setOnKeyPressed(event -> {
+        previousBookshelfButton.setOnAction(event -> {
             selectedBookshelfIndex--;
 
             populateBookshelfPanel();
@@ -707,7 +707,7 @@ public class GameController extends Controller {
 
                     ToggleButton currentButton = boardButtons[row][column];
 
-                    boardButtons[row][column].setOnKeyPressed(event -> {
+                    boardButtons[row][column].setOnAction(event -> {
                         new Thread(new Task<Void>() {
                             @Override
                             protected Void call() {
@@ -752,7 +752,7 @@ public class GameController extends Controller {
 
             Integer column = bookshelfColumn;
 
-            bookshelfColumnsButton[bookshelfColumn].setOnKeyPressed(event -> {
+            bookshelfColumnsButton[bookshelfColumn].setOnAction(event -> {
                 new Thread(new Task<Void>() {
                     @Override
                     protected Void call() {
@@ -768,7 +768,7 @@ public class GameController extends Controller {
             });
         }
 
-        stopGameButton.setOnKeyReleased(event -> {
+        stopGameButton.setOnAction(event -> {
             try {
                 showResponse(pauseGameRequester.request(new PauseGameEventData()));
             } catch (DisconnectedException e) {
@@ -776,7 +776,7 @@ public class GameController extends Controller {
             }
         });
 
-        exitButton.setOnKeyReleased(event -> {
+        exitButton.setOnAction(event -> {
             try {
                 Response response = playerExitGameRequester.request(new PlayerExitGame());
 
