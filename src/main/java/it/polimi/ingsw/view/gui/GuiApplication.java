@@ -1,6 +1,7 @@
 package it.polimi.ingsw.view.gui;
 
 import it.polimi.ingsw.view.gui.controller.Controller;
+import it.polimi.ingsw.view.gui.controller.ImageProvider;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -50,5 +51,7 @@ public class GuiApplication extends Application {
 
         // Show the stage
         primaryStage.show();
+
+        new Thread(ImageProvider::getInstance).start();
     }
 }

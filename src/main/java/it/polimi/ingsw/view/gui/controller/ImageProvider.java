@@ -11,54 +11,63 @@ import java.util.Map;
 import java.util.Objects;
 
 
-public class ImageController {
-    private static final ImageController INSTANCE;
+public class ImageProvider {
+    private static final Object lock = new Object();
+    private static final ImageProvider INSTANCE;
     private final Map<String, Image> images;
-    private ImageController() {
+    private ImageProvider() {
         images = new HashMap<>();
     }
 
-    public static ImageController getInstance() {
+    public static ImageProvider getInstance() {
         return INSTANCE;
     }
 
     static {
-        INSTANCE = new ImageController();
+        synchronized (lock) {
+            INSTANCE = new ImageProvider();
 
-        for (int i = 0; i < 12; i++) {
-            INSTANCE.images.put(personalGoalToUrl(i), new Image(personalGoalToUrl(i)));
-        }
+            for (int i = 0; i < 12; i++) {
+                INSTANCE.images.put(personalGoalToUrl(i), new Image(personalGoalToUrl(i)));
+            }
 
-        for (int i = 0; i < 12; i++) {
-            INSTANCE.images.put(commonGoalToUrl(i), new Image(commonGoalToUrl(i)));
-        }
+            for (int i = 0; i < 12; i++) {
+                INSTANCE.images.put(commonGoalToUrl(i), new Image(commonGoalToUrl(i)));
+            }
 
-        for (Tile t: Tile.getTiles()) {
-            if (t.getColor() != TileColor.EMPTY) {
-                INSTANCE.images.put(tileToUrl(t), new Image(tileToUrl(t)));
+            for (Tile t: Tile.getTiles()) {
+                if (t.getColor() != TileColor.EMPTY) {
+                    INSTANCE.images.put(tileToUrl(t), new Image(tileToUrl(t)));
+                }
             }
         }
     }
 
     final Image getPersonalGoal (int index) {
-        assert index >= 0 && index < 12;
-        assert images.containsKey(personalGoalToUrl(index));
+        synchronized (lock) {
+            assert index >= 0 && index < 12;
+            assert images.containsKey(personalGoalToUrl(index));
 
-        return images.get(personalGoalToUrl(index));
+            return images.get(personalGoalToUrl(index));
+        }
     }
 
     final Image getCommonGoal (int index) {
-        assert index >= 0 && index < 12;
-        assert images.containsKey(commonGoalToUrl(index));
+        synchronized (lock) {
+            assert index >= 0 && index < 12;
+            assert images.containsKey(commonGoalToUrl(index));
 
-        return images.get(commonGoalToUrl(index));
+            return images.get(commonGoalToUrl(index));
+        }
     }
 
     final Image getTile(Tile tile) {
-        Objects.requireNonNull(tile);
-        assert images.containsKey(tileToUrl(tile));
+        synchronized (lock) {
+            Objects.requireNonNull(tile);
+            assert images.containsKey(tileToUrl(tile));
 
-        return images.get(tileToUrl(tile));
+            return images.get(tileToUrl(tile));
+        }
     }
 
     private static String personalGoalToUrl(int index) {

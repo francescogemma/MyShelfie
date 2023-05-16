@@ -108,17 +108,17 @@ public class GameController extends Controller {
 
     private void populateGoalsPanel() {
         Platform.runLater(() -> {
-            firstCommonGoalImageView.setImage(ImageController.getInstance().getCommonGoal(commonGoals[0].getIndex()));
+            firstCommonGoalImageView.setImage(ImageProvider.getInstance().getCommonGoal(commonGoals[0].getIndex()));
             Tooltip tooltip = new Tooltip(commonGoals[0].getDescription());
             tooltip.setShowDelay(Duration.seconds(0));
             Tooltip.install(firstCommonGoalImageView, tooltip);
 
-            secondCommonGoalImageView.setImage(ImageController.getInstance().getCommonGoal(commonGoals[1].getIndex()));
+            secondCommonGoalImageView.setImage(ImageProvider.getInstance().getCommonGoal(commonGoals[1].getIndex()));
             tooltip = new Tooltip(commonGoals[1].getDescription());
             tooltip.setShowDelay(Duration.seconds(0));
             Tooltip.install(secondCommonGoalImageView, tooltip);
 
-            personalGoalImageView.setImage(ImageController.getInstance().getPersonalGoal(this.personalGoal.getIndex()));
+            personalGoalImageView.setImage(ImageProvider.getInstance().getPersonalGoal(this.personalGoal.getIndex()));
         });
 
         populateCommonGoalsPointsTextBoxes();
@@ -220,7 +220,7 @@ public class GameController extends Controller {
 
                     if (tile != null) {
                         ((ImageView) boardButtons[row][column].getGraphic()).setImage(
-                                ImageController.getInstance().getTile(tile)
+                                ImageProvider.getInstance().getTile(tile)
                         );
                         boardButtons[row][column].setVisible(true);
 
@@ -329,7 +329,7 @@ public class GameController extends Controller {
                         bookshelfButtons[row][column].setVisible(false);
                     } else {
                         ((ImageView) bookshelfButtons[row][column].getGraphic()).setImage(
-                                ImageController.getInstance().getTile(tile)
+                                ImageProvider.getInstance().getTile(tile)
                         );
                         bookshelfButtons[row][column].setVisible(true);
                     }
