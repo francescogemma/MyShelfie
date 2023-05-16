@@ -103,7 +103,7 @@ public class GameController extends Controller {
         setTokenImage((commonGoals[0].getPointStack().isEmpty()) ? 0 :
             commonGoals[0].getPointStack().get(commonGoals[0].getPointStack().size() - 1), firstScoringToken);
         setTokenImage((commonGoals[1].getPointStack().isEmpty()) ? 0 :
-            commonGoals[1].getPointStack().get(commonGoals[0].getPointStack().size() - 1), secondScoringToken);
+            commonGoals[1].getPointStack().get(commonGoals[1].getPointStack().size() - 1), secondScoringToken);
     }
 
     private void populateGoalsPanel() {
