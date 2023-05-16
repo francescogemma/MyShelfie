@@ -171,7 +171,7 @@ public class GameController extends Controller {
     private static final double BOARD_SIZE = 2661.0;
     private static final double BOARD_RESIZE_FACTOR = BOARD_SIZE / FULL_BOARD_IMAGE_SIZE;
     private static final double BOARD_RIGHT_MARGIN_FACTOR = 13.0 / FULL_BOARD_IMAGE_SIZE;
-    private ToggleButton[][] boardButtons = new ToggleButton[Board.BOARD_ROWS][Board.COLUMN_BOARDS];
+    private Button[][] boardButtons = new Button[Board.BOARD_ROWS][Board.COLUMN_BOARDS];
 
     private void resizeBoard() {
         double realWidth = Math.min(gameBoardImageView.getFitWidth(), gameBoardImageView.getFitHeight());
@@ -226,13 +226,23 @@ public class GameController extends Controller {
 
                         boardButtons[row][column].getStyleClass().clear();
 
-                        if (board.getSelectedTiles().contains(boardCoordinate)) {
+                        if (board.getSelectedCoordinates().contains(boardCoordinate)) {
                             boardButtons[row][column].getStyleClass().add("selectedTile");
+                            ((ImageView) boardButtons[row][column].getGraphic()).fitWidthProperty()
+                                    .bind(boardButtons[row][column].widthProperty().subtract(8));
+                            ((ImageView) boardButtons[row][column].getGraphic()).fitHeightProperty()
+                                    .bind(boardButtons[row][column].heightProperty().subtract(8));
+                        } else {
+                            ((ImageView) boardButtons[row][column].getGraphic()).fitWidthProperty()
+                                    .bind(boardButtons[row][column].widthProperty());
+                            ((ImageView) boardButtons[row][column].getGraphic()).fitHeightProperty()
+                                    .bind(boardButtons[row][column].heightProperty());
                         }
 
                         if (scoreBoard.isClientPlaying() && (board.getSelectableCoordinate().contains(boardCoordinate)
                             || board.getSelectedCoordinates().contains(boardCoordinate))) {
                             boardButtons[row][column].setMouseTransparent(false);
+                            boardButtons[row][column].getStyleClass().add("selectableTile");
                         } else {
                             boardButtons[row][column].setMouseTransparent(true);
                             boardButtons[row][column].getStyleClass().add("unselectableTile");
@@ -269,7 +279,7 @@ public class GameController extends Controller {
     private static final double BOOKSHELF_WIDTH_RESIZE_FACTOR = BOOKSHELF_WIDTH / FULL_BOOKSHELF_IMAGE_WIDTH;
     private static final double BOOKSHELF_HEIGHT_RESIZE_FACTOR = BOOKSHELF_HEIGHT / FULL_BOOKSHELF_IMAGE_HEIGHT;
     private static final double BOOKSHELF_UP_MARGIN_FACTOR = 38.5 / FULL_BOOKSHELF_IMAGE_HEIGHT;
-    private final ToggleButton[][] bookshelfButtons = new ToggleButton[BookshelfView.ROWS][BookshelfView.COLUMNS];
+    private final Button[][] bookshelfButtons = new Button[BookshelfView.ROWS][BookshelfView.COLUMNS];
     private final Button[] bookshelfColumnsButton = new Button[BookshelfView.COLUMNS];
 
     private void resizeBookshelf() {
@@ -350,8 +360,8 @@ public class GameController extends Controller {
         });
     }
 
-    private ToggleButton craftTileButton(boolean isMouseTransparent) {
-        ToggleButton tileButton = new ToggleButton();
+    private Button craftTileButton(boolean isMouseTransparent) {
+        Button tileButton = new Button();
 
         tileButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         tileButton.setMinSize(0, 0);
@@ -901,11 +911,9 @@ public class GameController extends Controller {
         popUpQueue = new PopUpQueue(
             text -> Platform.runLater(() -> {
                 gamePopUpLabel.setText(text);
-                gameBackgroundBlurPane.setVisible(true);
                 gamePopUpMessageBackground.setVisible(true);
             }),
             () -> Platform.runLater(() -> {
-                gameBackgroundBlurPane.setVisible(false);
                 gamePopUpMessageBackground.setVisible(false);
             }),
             new Object()

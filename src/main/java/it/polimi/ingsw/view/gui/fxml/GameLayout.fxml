@@ -175,8 +175,6 @@
         </HBox>
     </VBox>
 
-    <Pane fx:id="gameBackgroundBlurPane" visible="false" />
-
     <VBox fx:id="gamePopUpMessageBackground" alignment="CENTER" maxWidth="500" maxHeight="400" visible="false">
         <HBox alignment="CENTER" spacing="10.0" maxWidth="500" maxHeight="400" styleClass="popUpMessageBackground">
             <Label fx:id="gamePopUpLabel" alignment="CENTER" wrapText="true" textAlignment="JUSTIFY"/>
