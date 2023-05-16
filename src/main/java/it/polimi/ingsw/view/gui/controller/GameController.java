@@ -225,6 +225,7 @@ public class GameController extends Controller {
                         boardButtons[row][column].setVisible(true);
 
                         boardButtons[row][column].getStyleClass().clear();
+                        boardButtons[row][column].getStyleClass().add("baseTile");
 
                         if (board.getSelectedCoordinates().contains(boardCoordinate)) {
                             boardButtons[row][column].getStyleClass().add("selectedTile");
@@ -242,7 +243,6 @@ public class GameController extends Controller {
                         if (scoreBoard.isClientPlaying() && (board.getSelectableCoordinate().contains(boardCoordinate)
                             || board.getSelectedCoordinates().contains(boardCoordinate))) {
                             boardButtons[row][column].setMouseTransparent(false);
-                            boardButtons[row][column].getStyleClass().add("selectableTile");
                         } else {
                             boardButtons[row][column].setMouseTransparent(true);
                             boardButtons[row][column].getStyleClass().add("unselectableTile");
@@ -373,6 +373,8 @@ public class GameController extends Controller {
         imageView.fitWidthProperty().bind(tileButton.widthProperty());
         imageView.fitHeightProperty().bind(tileButton.heightProperty());
         tileButton.setGraphic(imageView);
+
+        tileButton.getStyleClass().add("baseTile");
 
         tileButton.setMouseTransparent(isMouseTransparent);
 

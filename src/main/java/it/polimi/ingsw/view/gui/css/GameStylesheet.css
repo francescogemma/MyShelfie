@@ -35,7 +35,7 @@
     -fx-opacity: 0.2;
 }
 
-.selectableTile {
+.baseTile {
     -fx-background-color: transparent;
     -fx-border-width: 4;
     -fx-border-color: transparent;
@@ -52,7 +52,6 @@
 .unselectableTile {
     -fx-background-color: transparent;
     -fx-border-width: 4;
-    -fx-border-color: transparent;
     -fx-border-radius: 4;
     -fx-background-radius: 0;
     -fx-opacity: 0.5;
