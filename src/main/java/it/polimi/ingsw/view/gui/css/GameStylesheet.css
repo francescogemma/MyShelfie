@@ -43,3 +43,11 @@
     -fx-background-radius: 0;
     -fx-cursor: hand;
 }
+
+.selectedTile {
+
+}
+
+.unselectableTile {
+    -fx-opacity: 0.5;
+}

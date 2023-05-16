@@ -224,17 +224,18 @@ public class GameController extends Controller {
                         );
                         boardButtons[row][column].setVisible(true);
 
+                        boardButtons[row][column].getStyleClass().clear();
+
+                        if (board.getSelectedTiles().contains(boardCoordinate)) {
+                            boardButtons[row][column].getStyleClass().add("selectedTile");
+                        }
+
                         if (scoreBoard.isClientPlaying() && (board.getSelectableCoordinate().contains(boardCoordinate)
                             || board.getSelectedCoordinates().contains(boardCoordinate))) {
-                            boardButtons[row][column].setOpacity(1.d);
                             boardButtons[row][column].setMouseTransparent(false);
-
-                            if (board.getSelectedTiles().contains(boardCoordinate)) {
-                                // TODO: Display in some way that the tile is selected
-                            }
                         } else {
-                            boardButtons[row][column].setOpacity(0.5d);
                             boardButtons[row][column].setMouseTransparent(true);
+                            boardButtons[row][column].getStyleClass().add("unselectableTile");
                         }
                     } else {
                         boardButtons[row][column].setVisible(false);
