@@ -627,6 +627,7 @@ public class GameController extends Controller {
                         }, 10000);
                     },
                 (i == displayableGoals.size() - 1) ? popUp -> {
+                    resetLayoutAfterDisplayingGoal();
                     setProperty("scoreboard", scoreBoard);
                     switchLayout(ScoreboardMenuController.NAME);
                 } : popUp -> {
