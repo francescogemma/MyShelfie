@@ -13,7 +13,6 @@ import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Color;
 import it.polimi.ingsw.view.tui.terminal.drawable.symbol.PrimitiveSymbol;
 
-import java.util.List;
 import java.util.Map;
 
 public class GameOverLayout extends AppLayout {
