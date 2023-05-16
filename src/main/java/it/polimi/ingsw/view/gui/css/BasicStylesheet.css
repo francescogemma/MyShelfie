@@ -49,18 +49,6 @@
     -fx-border-color: dark-grey;
 }
 
-.scroll-pane {
-    -fx-background-color: transparent;
-}
-
-.scroll-pane > .viewport {
-    -fx-background-color: transparent;
-}
-
-.scroll-pane > .corner {
-    -fx-background-color: transparent;
-}
-
 .scroll-bar:horizontal, .scroll-bar:vertical {
     -fx-background-color:transparent;
 }
@@ -98,7 +86,7 @@
     -fx-background-color: transparent;
 }
 
-.list-view > .corner {
+.corner {
     -fx-background-color: transparent;
 }
 
