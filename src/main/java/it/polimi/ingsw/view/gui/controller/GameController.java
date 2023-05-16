@@ -133,13 +133,14 @@ public class GameController extends Controller {
         Platform.runLater(() -> {
             scoreBoardListView.getItems().setAll(scoreBoard.getDisplayablePlayers());
 
-            selectedBookshelfLabel.setText(displayableGoal.getPlayerName());
             selectedBookshelfIndex = scoreBoard.getDisplayablePlayer(displayableGoal.getPlayerName())
                 .getOriginalIndex();
 
             previousBookshelfButton.setDisable(true);
             nextBookshelfButton.setDisable(true);
         });
+
+        populateBookshelfPanel();
 
         populateBookshelfPanelWithMask(displayableGoal.getMaskSet());
     }
@@ -333,7 +334,7 @@ public class GameController extends Controller {
         Platform.runLater(() -> {
             for (int row = 0; row < BookshelfView.ROWS; row++) {
                 for (int column = 0; column < BookshelfView.COLUMNS; column++) {
-                    bookshelfButtons[row][column].setOpacity(0.5d);
+                    bookshelfButtons[row][column].setOpacity(0.3d);
                 }
             }
 
