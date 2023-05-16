@@ -190,7 +190,7 @@ public class GameController extends Controller {
         boardBackground.setPrefWidth(realWidth * 1.12);
         boardBackground.setPrefHeight(realHeight * 1.12);
 
-        turnLabel.setTranslateY(-realWidth * 1.12 / 2 - turnLabel.getHeight() / 2);
+        turnLabel.setTranslateY(-realWidth * 1.12 / 2 - turnLabel.getHeight() / 2 - 5);
     }
 
     private void setBoardImageViewListener() {
@@ -205,7 +205,7 @@ public class GameController extends Controller {
             );
 
             turnLabel.setStyle("-fx-text-fill: %s".formatted(
-                scoreBoard.isClientPlaying() ? "#403f28" : "#f0ede3"
+                scoreBoard.isClientPlaying() ? "#a51c18" : "#403f28"
             ));
         });
     }

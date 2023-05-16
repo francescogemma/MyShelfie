@@ -23,6 +23,10 @@
                     <Insets bottom="10" left="10" right="10" top="10" />
                 </padding>
                 <VBox fx:id="firstCommonGoalVBox" VBox.vgrow="ALWAYS" alignment="CENTER">
+                    <padding>
+                        <Insets top="5" />
+                    </padding>
+
                     <Label fx:id="firstCommonGoalLabel" text="First Common Goal" />
 
                     <StackPane VBox.vgrow="ALWAYS">
@@ -34,6 +38,10 @@
                 </VBox>
 
                 <VBox fx:id="secondCommonGoalVBox" VBox.vgrow="ALWAYS" alignment="CENTER">
+                    <padding>
+                        <Insets top="5" />
+                    </padding>
+
                     <Label fx:id="secondCommonGoalLabel" text="Second Common Goal" />
 
                     <StackPane VBox.vgrow="ALWAYS">
@@ -45,6 +53,10 @@
                 </VBox>
 
                 <VBox fx:id="personalGoalVBox" VBox.vgrow="ALWAYS" alignment="CENTER">
+                    <padding>
+                        <Insets top="5" />
+                    </padding>
+
                     <Label fx:id="personalGoalLabel" text="Personal Goal" />
 
                     <Region VBox.vgrow="ALWAYS" />
