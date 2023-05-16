@@ -44,6 +44,7 @@ import it.polimi.ingsw.view.displayable.DisplayablePlayer;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.game.IllegalFlowException;
 import it.polimi.ingsw.view.displayable.DisplayableScoreBoard;
+import javafx.scene.layout.VBox;
 
 public class GameController extends Controller {
     public static final String NAME = "Game";
@@ -55,6 +56,10 @@ public class GameController extends Controller {
     @FXML private ImageView secondCommonGoalImageView;
     @FXML private ImageView secondScoringToken;
     @FXML private ImageView personalGoalImageView;
+
+    @FXML private Label gamePopUpLabel;
+    @FXML private VBox gamePopUpMessageBackground;
+
     private static final double COMMON_GOAL_WIDTH = 1385.0;
     private static final double COMMON_GOAL_HEIGHT = 913.0;
     private static final double COMMON_GOAL_ASPECT_RATIO = COMMON_GOAL_WIDTH / COMMON_GOAL_HEIGHT;
@@ -886,12 +891,13 @@ public class GameController extends Controller {
         gameHasBeenStoppedReceiver.registerListener(gameHasBeenStoppedListener);
 
         popUpQueue = new PopUpQueue(
-            text -> {
-                System.out.println(text);
-            },
-            () -> {
-                System.out.println("Removing pop up");
-            },
+            text -> Platform.runLater(() -> {
+                gamePopUpLabel.setText(text);
+                gamePopUpMessageBackground.setVisible(true);
+            }),
+            () -> Platform.runLater(() -> {
+                gamePopUpMessageBackground.setVisible(false);
+            }),
             new Object()
         );
 
