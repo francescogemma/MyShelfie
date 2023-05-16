@@ -65,18 +65,18 @@ public abstract class CommonGoal extends IndexedGoal {
         }
 
         return switch (index) {
-            case 0 -> (CommonGoal) new TwoTwoByTwoSquaresGoal().index(10);
-            case 1 -> (CommonGoal) new ColumnDifferentGoal().index(0);
-            case 2 -> (CommonGoal) new FourGroupsFourTilesGoal().index(4);
-            case 3 -> (CommonGoal) new SixGroupsTwoTilesGoal().index(7);
-            case 4 -> (CommonGoal) new ThreeColumnsGoal().index(9);
-            case 5 -> (CommonGoal) new RowFiveAllDifferentColor().index(6);
-            case 6 -> (CommonGoal) new FourRowsGoal().index(5);
-            case 7 -> (CommonGoal) new CornersGoal().index(1);
-            case 8 -> (CommonGoal) new EightTilesGoal().index(3);
-            case 9 -> (CommonGoal) new XPatternGoal().index(11);
-            case 10 -> (CommonGoal) new DiagonalGoal().index(2);
-            case 11 -> (CommonGoal) new StairGoal().index(8);
+            case 0 -> (CommonGoal) new TwoTwoByTwoSquaresGoal().index(0);
+            case 1 -> (CommonGoal) new ColumnDifferentGoal().index(1);
+            case 2 -> (CommonGoal) new FourGroupsFourTilesGoal().index(2);
+            case 3 -> (CommonGoal) new SixGroupsTwoTilesGoal().index(3);
+            case 4 -> (CommonGoal) new ThreeColumnsGoal().index(4);
+            case 5 -> (CommonGoal) new RowFiveAllDifferentColor().index(5);
+            case 6 -> (CommonGoal) new FourRowsGoal().index(6);
+            case 7 -> (CommonGoal) new CornersGoal().index(7);
+            case 8 -> (CommonGoal) new EightTilesGoal().index(8);
+            case 9 -> (CommonGoal) new XPatternGoal().index(9);
+            case 10 -> (CommonGoal) new DiagonalGoal().index(10);
+            case 11 -> (CommonGoal) new StairGoal().index(11);
             default -> throw new IllegalStateException("We've already checked that index is between 0 and 11");
         };
     }
