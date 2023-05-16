@@ -1,5 +1,10 @@
 package it.polimi.ingsw.model.tile;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
 public class Tile {
     private final TileColor color;
     private final TileVersion version;
@@ -24,6 +29,12 @@ public class Tile {
                 INSTANCES[tileColor.ordinal()][tileVersion.ordinal()] = new Tile(tileColor, tileVersion);
             }
         }
+    }
+
+    public static Collection<Tile> getTiles() {
+        return Arrays.stream(INSTANCES)
+                .flatMap(Arrays::stream)
+                .toList();
     }
 
     public static Tile getInstance(TileColor tileColor, TileVersion tileVersion) {

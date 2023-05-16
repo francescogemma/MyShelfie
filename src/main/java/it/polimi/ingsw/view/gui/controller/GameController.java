@@ -1,5 +1,6 @@
 package it.polimi.ingsw.view.gui.controller;
 
+import com.sun.javafx.tk.ImageLoader;
 import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
@@ -102,13 +103,13 @@ public class GameController extends Controller {
 
     private void populateGoalsPanel() {
         Platform.runLater(() -> {
-            firstCommonGoalImageView.setImage(new Image(commonGoalToUrl(commonGoals[0].getIndex())));
+            firstCommonGoalImageView.setImage(ImageController.getInstance().getCommonGoal(commonGoals[0].getIndex()));
             Tooltip.install(firstCommonGoalImageView, new Tooltip(commonGoals[0].getDescription()));
 
-            secondCommonGoalImageView.setImage(new Image(commonGoalToUrl(commonGoals[1].getIndex())));
+            secondCommonGoalImageView.setImage(ImageController.getInstance().getCommonGoal(commonGoals[1].getIndex()));
             Tooltip.install(secondCommonGoalImageView, new Tooltip(commonGoals[1].getDescription()));
 
-            personalGoalImageView.setImage(new Image(personalGoalToUrl(this.personalGoal.getIndex())));
+            personalGoalImageView.setImage(ImageController.getInstance().getPersonalGoal(this.personalGoal.getIndex()));
         });
 
         populateCommonGoalsPointsTextBoxes();
@@ -208,9 +209,9 @@ public class GameController extends Controller {
                     Tile tile = board.tileAt(boardCoordinate);
 
                     if (tile != null) {
-                        ((ImageView) boardButtons[row][column].getGraphic()).setImage(new Image(
-                            tileToUrl(tile)
-                        ));
+                        ((ImageView) boardButtons[row][column].getGraphic()).setImage(
+                                ImageController.getInstance().getTile(tile)
+                        );
                         boardButtons[row][column].setVisible(true);
 
                         if (scoreBoard.isClientPlaying() && (board.getSelectableCoordinate().contains(boardCoordinate)
@@ -306,9 +307,9 @@ public class GameController extends Controller {
                     if (tile == Tile.getInstance(TileColor.EMPTY, TileVersion.FIRST)) {
                         bookshelfButtons[row][column].setVisible(false);
                     } else {
-                        ((ImageView) bookshelfButtons[row][column].getGraphic()).setImage(new Image(
-                            tileToUrl(tile)
-                        ));
+                        ((ImageView) bookshelfButtons[row][column].getGraphic()).setImage(
+                                ImageController.getInstance().getTile(tile)
+                        );
                         bookshelfButtons[row][column].setVisible(true);
                     }
                 }
@@ -338,7 +339,7 @@ public class GameController extends Controller {
         });
     }
 
-    private ToggleButton craftTileButton(boolean isMouseTrasparent) {
+    private ToggleButton craftTileButton(boolean isMouseTransparent) {
         ToggleButton tileButton = new ToggleButton();
 
         tileButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -352,7 +353,7 @@ public class GameController extends Controller {
         imageView.fitHeightProperty().bind(tileButton.heightProperty());
         tileButton.setGraphic(imageView);
 
-        tileButton.setMouseTransparent(isMouseTrasparent);
+        tileButton.setMouseTransparent(isMouseTransparent);
 
         tileButton.setVisible(false);
 
@@ -939,62 +940,5 @@ public class GameController extends Controller {
         popUpQueue = null;
     }
 
-    // Model to URLs:
-    private String commonGoalToUrl(int index) {
-        return "/common goal cards/%s.jpg".formatted(index + 1);
-    }
 
-    private String personalGoalToUrl(int index) {
-
-        /*
-        final String path = "/personal goal cards/Personal_Goals%s.png".formatted(
-                index > 0 ? index + 1 : ""
-        );
-        */
-
-        if (index > 0) return "/personal goal cards/Personal_Goals" + (index + 1) + ".png";
-        return "/personal goal cards/Personal_Goals.png";
-    }
-
-    private String tileToUrl(Tile tile) {
-        if(tile == Tile.getInstance(TileColor.GREEN, TileVersion.FIRST)) {
-            return "/item tiles/Gatti1.1.png";
-        } else if(tile == Tile.getInstance(TileColor.GREEN, TileVersion.SECOND)) {
-            return "/item tiles/Gatti1.2.png";
-        } else if(tile == Tile.getInstance(TileColor.GREEN, TileVersion.THIRD)) {
-            return "/item tiles/Gatti1.3.png";
-        } else if(tile == Tile.getInstance(TileColor.BLUE, TileVersion.FIRST)) {
-            return "/item tiles/Cornici1.1.png";
-        } else if(tile == Tile.getInstance(TileColor.BLUE, TileVersion.SECOND)) {
-            return "/item tiles/Cornici1.2.png";
-        } else if(tile == Tile.getInstance(TileColor.BLUE, TileVersion.THIRD)) {
-            return "/item tiles/Cornici1.3.png";
-        } else if(tile == Tile.getInstance(TileColor.MAGENTA, TileVersion.FIRST)) {
-            return "/item tiles/Piante1.1.png";
-        } else if(tile == Tile.getInstance(TileColor.MAGENTA, TileVersion.SECOND)) {
-            return "/item tiles/Piante1.2.png";
-        } else if(tile == Tile.getInstance(TileColor.MAGENTA, TileVersion.THIRD)) {
-            return "/item tiles/Piante1.3.png";
-        } else if(tile == Tile.getInstance(TileColor.CYAN, TileVersion.FIRST)) {
-            return "/item tiles/Trofei1.1.png";
-        } else if(tile == Tile.getInstance(TileColor.CYAN, TileVersion.SECOND)) {
-            return "/item tiles/Trofei1.2.png";
-        } else if(tile == Tile.getInstance(TileColor.CYAN, TileVersion.THIRD)) {
-            return "/item tiles/Trofei1.3.png";
-        } else if(tile == Tile.getInstance(TileColor.YELLOW, TileVersion.FIRST)) {
-            return "/item tiles/Giochi1.1.png";
-        } else if(tile == Tile.getInstance(TileColor.YELLOW, TileVersion.SECOND)) {
-            return "/item tiles/Giochi1.2.png";
-        } else if(tile == Tile.getInstance(TileColor.YELLOW, TileVersion.THIRD)) {
-            return "/item tiles/Giochi1.3.png";
-        } else if(tile == Tile.getInstance(TileColor.WHITE, TileVersion.FIRST)) {
-            return "/item tiles/Libri1.1.png";
-        } else if(tile == Tile.getInstance(TileColor.WHITE, TileVersion.SECOND)) {
-            return "/item tiles/Libri1.2.png";
-        } else if(tile == Tile.getInstance(TileColor.WHITE, TileVersion.THIRD)) {
-            return "/item tiles/Libri1.3.png";
-        } else {
-            throw new IllegalArgumentException("Tile not found");
-        }
-    }
 }
