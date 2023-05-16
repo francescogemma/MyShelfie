@@ -1,6 +1,5 @@
 package it.polimi.ingsw.view.gui.controller;
 
-import com.sun.javafx.tk.ImageLoader;
 import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
@@ -689,6 +688,8 @@ public class GameController extends Controller {
         return NAME;
     }
 
+    @FXML private Pane gameBackgroundBlurPane;
+
     @FXML
     private void initialize() {
         setBoardImageViewListener();
@@ -899,9 +900,11 @@ public class GameController extends Controller {
         popUpQueue = new PopUpQueue(
             text -> Platform.runLater(() -> {
                 gamePopUpLabel.setText(text);
+                gameBackgroundBlurPane.setVisible(true);
                 gamePopUpMessageBackground.setVisible(true);
             }),
             () -> Platform.runLater(() -> {
+                gameBackgroundBlurPane.setVisible(false);
                 gamePopUpMessageBackground.setVisible(false);
             }),
             new Object()
@@ -951,6 +954,4 @@ public class GameController extends Controller {
         popUpQueue.disable();
         popUpQueue = null;
     }
-
-
 }

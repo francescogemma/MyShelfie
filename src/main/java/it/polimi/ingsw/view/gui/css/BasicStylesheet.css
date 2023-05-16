@@ -98,6 +98,10 @@
     -fx-background-color: transparent;
 }
 
+.list-view > .corner {
+    -fx-background-color: transparent;
+}
+
 .button:disabled {
     -fx-background-color: almost-white;
 }
