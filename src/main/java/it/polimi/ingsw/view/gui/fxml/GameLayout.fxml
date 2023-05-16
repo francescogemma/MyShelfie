@@ -12,166 +12,168 @@
       xmlns="http://javafx.com/javafx/17.0.2-ea"
       xmlns:fx="http://javafx.com/fxml/1">
 
-    <HBox fx:id="gameBackgroundHBox" styleClass="background">
-        <padding>
-            <Insets left="10" bottom="10" top="10" right="10"/>
-        </padding>
-
-        <VBox fx:id="gameLeftSide" spacing="10" HBox.hgrow="NEVER" minWidth="0" prefWidth="${gameBackgroundHBox.width * 0.15}" maxWidth="${gameBackgroundHBox.width * 0.15}">
+    <VBox styleClass="background">
+        <HBox fx:id="gameBackgroundHBox" VBox.vgrow="ALWAYS">
             <padding>
-                <Insets bottom="10" left="10" right="10" top="10" />
-            </padding>
-            <VBox fx:id="firstCommonGoalVBox" VBox.vgrow="ALWAYS" alignment="CENTER">
-                <Label fx:id="firstCommonGoalLabel" text="First Common Goal" />
-
-                <StackPane VBox.vgrow="ALWAYS">
-                    <ImageView fx:id="firstCommonGoalImageView" fitHeight="${firstCommonGoalVBox.height * 0.8}"
-                               fitWidth="${firstCommonGoalVBox.width * 0.8}" preserveRatio="true" />
-
-                    <ImageView fx:id="firstScoringToken" />
-                </StackPane>
-            </VBox>
-
-            <VBox fx:id="secondCommonGoalVBox" VBox.vgrow="ALWAYS" alignment="CENTER">
-                <Label fx:id="secondCommonGoalLabel" text="Second Common Goal" />
-
-                <StackPane VBox.vgrow="ALWAYS">
-                    <ImageView fx:id="secondCommonGoalImageView" fitHeight="${secondCommonGoalVBox.height * 0.8}"
-                               fitWidth="${secondCommonGoalVBox.width * 0.8}" preserveRatio="true" pickOnBounds="true" />
-
-                    <ImageView fx:id="secondScoringToken" />
-                </StackPane>
-            </VBox>
-
-            <VBox fx:id="personalGoalVBox" VBox.vgrow="ALWAYS" alignment="CENTER">
-                <Label fx:id="personalGoalLabel" text="Personal Goal" />
-
-                <Region VBox.vgrow="ALWAYS" />
-
-                <ImageView fx:id="personalGoalImageView" fitHeight="${personalGoalVBox.height * 0.8}"
-                           fitWidth="${personalGoalVBox.width * 0.8}" preserveRatio="true">
-                    <Image url="/personal goal cards/Personal_Goals.png"/>
-                </ImageView>
-
-                <Region VBox.vgrow="ALWAYS" />
-            </VBox>
-        </VBox>
-
-        <VBox fx:id="gameCenter" alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS" minWidth="0" prefWidth="${gameBackgroundHBox.width * 0.55}" maxWidth="${gameBackgroundHBox.width * 0.55}">
-            <StackPane fx:id="boardStackPane" VBox.vgrow="ALWAYS">
-                <Pane fx:id="boardBackground" />
-
-                <ImageView fx:id="gameBoardImageView" fitHeight="${boardStackPane.height * 0.8}"
-                           fitWidth="${boardStackPane.width * 0.8}" preserveRatio="true">
-                    <Image fx:id="gameBoardImage" url="/boards/livingroom.png"/>
-                </ImageView>
-
-                <GridPane fx:id="boardGridPane">
-                    <columnConstraints>
-                        <ColumnConstraints percentWidth="${100.0 / 9.0}" />
-                        <ColumnConstraints percentWidth="${100.0 / 9.0}" />
-                        <ColumnConstraints percentWidth="${100.0 / 9.0}" />
-                        <ColumnConstraints percentWidth="${100.0 / 9.0}" />
-                        <ColumnConstraints percentWidth="${100.0 / 9.0}" />
-                        <ColumnConstraints percentWidth="${100.0 / 9.0}" />
-                        <ColumnConstraints percentWidth="${100.0 / 9.0}" />
-                        <ColumnConstraints percentWidth="${100.0 / 9.0}" />
-                        <ColumnConstraints percentWidth="${100.0 / 9.0}" />
-                    </columnConstraints>
-                    <rowConstraints>
-                        <RowConstraints percentHeight="${100.0 / 9.0}" />
-                        <RowConstraints percentHeight="${100.0 / 9.0}" />
-                        <RowConstraints percentHeight="${100.0 / 9.0}" />
-                        <RowConstraints percentHeight="${100.0 / 9.0}" />
-                        <RowConstraints percentHeight="${100.0 / 9.0}" />
-                        <RowConstraints percentHeight="${100.0 / 9.0}" />
-                        <RowConstraints percentHeight="${100.0 / 9.0}" />
-                        <RowConstraints percentHeight="${100.0 / 9.0}" />
-                        <RowConstraints percentHeight="${100.0 / 9.0}" />
-                    </rowConstraints>
-                </GridPane>
-
-                <Label fx:id="turnLabel" text="IT'S TURN" />
-            </StackPane>
-
-            <HBox alignment="CENTER" spacing="10">
-                <Button fx:id="stopGameButton" mnemonicParsing="false" text="STOP GAME" managed="false"/>
-                <Button fx:id="exitButton" mnemonicParsing="false" text="EXIT"/>
-            </HBox>
-        </VBox>
-
-        <VBox fx:id="gameRightSide" alignment="BASELINE_CENTER" spacing="10" HBox.hgrow="NEVER" minWidth="0" prefWidth="${gameBackgroundHBox.width * 0.30}" maxWidth="${gameBackgroundHBox.width * 0.30}">
-            <padding>
-                <Insets left="10" bottom="10" top="10" right="10" />
+                <Insets left="10" bottom="10" top="10" right="10"/>
             </padding>
 
-            <HBox fx:id="scoreBoardHBox" VBox.vgrow="ALWAYS">
-                <ListView fx:id="scoreBoardListView" HBox.hgrow="ALWAYS" />
-            </HBox>
+            <VBox fx:id="gameLeftSide" spacing="10" HBox.hgrow="NEVER" minWidth="0" prefWidth="${gameBackgroundHBox.width * 0.15}" maxWidth="${gameBackgroundHBox.width * 0.15}">
+                <padding>
+                    <Insets bottom="10" left="10" right="10" top="10" />
+                </padding>
+                <VBox fx:id="firstCommonGoalVBox" VBox.vgrow="ALWAYS" alignment="CENTER">
+                    <Label fx:id="firstCommonGoalLabel" text="First Common Goal" />
 
-            <Region VBox.vgrow="ALWAYS" />
+                    <StackPane VBox.vgrow="ALWAYS">
+                        <ImageView fx:id="firstCommonGoalImageView" fitHeight="${firstCommonGoalVBox.height * 0.8}"
+                                   fitWidth="${firstCommonGoalVBox.width * 0.8}" preserveRatio="true" />
 
-            <Label fx:id="selectedBookshelfLabel" />
+                        <ImageView fx:id="firstScoringToken" />
+                    </StackPane>
+                </VBox>
 
-            <HBox fx:id="bookshelfHBox" VBox.vgrow="ALWAYS">
-                <StackPane fx:id="bookshelfStackPane" HBox.hgrow="ALWAYS">
-                    <GridPane fx:id="bookshelfGridPane">
-                        <columnConstraints>
-                            <ColumnConstraints percentWidth="${100.0 / 5.0}" />
-                            <ColumnConstraints percentWidth="${100.0 / 5.0}" />
-                            <ColumnConstraints percentWidth="${100.0 / 5.0}" />
-                            <ColumnConstraints percentWidth="${100.0 / 5.0}" />
-                            <ColumnConstraints percentWidth="${100.0 / 5.0}" />
-                        </columnConstraints>
-                        <rowConstraints>
-                            <RowConstraints percentHeight="${100.0 / 6.0}" />
-                            <RowConstraints percentHeight="${100.0 / 6.0}" />
-                            <RowConstraints percentHeight="${100.0 / 6.0}" />
-                            <RowConstraints percentHeight="${100.0 / 6.0}" />
-                            <RowConstraints percentHeight="${100.0 / 6.0}" />
-                            <RowConstraints percentHeight="${100.0 / 6.0}" />
-                        </rowConstraints>
-                    </GridPane>
+                <VBox fx:id="secondCommonGoalVBox" VBox.vgrow="ALWAYS" alignment="CENTER">
+                    <Label fx:id="secondCommonGoalLabel" text="Second Common Goal" />
 
-                    <ImageView fx:id="bookshelfImageView" fitHeight="${bookshelfStackPane.height * 0.8}"
-                               fitWidth="${bookshelfStackPane.width * 0.8}" preserveRatio="true">
-                        <Image fx:id="bookshelfImage" url="/boards/bookshelf_orth.png"/>
+                    <StackPane VBox.vgrow="ALWAYS">
+                        <ImageView fx:id="secondCommonGoalImageView" fitHeight="${secondCommonGoalVBox.height * 0.8}"
+                                   fitWidth="${secondCommonGoalVBox.width * 0.8}" preserveRatio="true" pickOnBounds="true" />
+
+                        <ImageView fx:id="secondScoringToken" />
+                    </StackPane>
+                </VBox>
+
+                <VBox fx:id="personalGoalVBox" VBox.vgrow="ALWAYS" alignment="CENTER">
+                    <Label fx:id="personalGoalLabel" text="Personal Goal" />
+
+                    <Region VBox.vgrow="ALWAYS" />
+
+                    <ImageView fx:id="personalGoalImageView" fitHeight="${personalGoalVBox.height * 0.8}"
+                               fitWidth="${personalGoalVBox.width * 0.8}" preserveRatio="true">
+                        <Image url="/personal goal cards/Personal_Goals.png"/>
                     </ImageView>
 
-                    <GridPane fx:id="bookshelfColumnSelectorGridPane">
+                    <Region VBox.vgrow="ALWAYS" />
+                </VBox>
+            </VBox>
+
+            <VBox fx:id="gameCenter" alignment="CENTER" spacing="10" HBox.hgrow="ALWAYS" minWidth="0" prefWidth="${gameBackgroundHBox.width * 0.55}" maxWidth="${gameBackgroundHBox.width * 0.55}">
+                <StackPane fx:id="boardStackPane" VBox.vgrow="ALWAYS">
+                    <Pane fx:id="boardBackground" />
+
+                    <ImageView fx:id="gameBoardImageView" fitHeight="${boardStackPane.height * 0.8}"
+                               fitWidth="${boardStackPane.width * 0.8}" preserveRatio="true">
+                        <Image fx:id="gameBoardImage" url="/boards/livingroom.png"/>
+                    </ImageView>
+
+                    <GridPane fx:id="boardGridPane">
                         <columnConstraints>
-                            <ColumnConstraints percentWidth="${100.0 / 5.0}" />
-                            <ColumnConstraints percentWidth="${100.0 / 5.0}" />
-                            <ColumnConstraints percentWidth="${100.0 / 5.0}" />
-                            <ColumnConstraints percentWidth="${100.0 / 5.0}" />
-                            <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                            <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                            <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                            <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                            <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                            <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                            <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                            <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                            <ColumnConstraints percentWidth="${100.0 / 9.0}" />
+                            <ColumnConstraints percentWidth="${100.0 / 9.0}" />
                         </columnConstraints>
                         <rowConstraints>
-                            <RowConstraints percentHeight="100.0" />
+                            <RowConstraints percentHeight="${100.0 / 9.0}" />
+                            <RowConstraints percentHeight="${100.0 / 9.0}" />
+                            <RowConstraints percentHeight="${100.0 / 9.0}" />
+                            <RowConstraints percentHeight="${100.0 / 9.0}" />
+                            <RowConstraints percentHeight="${100.0 / 9.0}" />
+                            <RowConstraints percentHeight="${100.0 / 9.0}" />
+                            <RowConstraints percentHeight="${100.0 / 9.0}" />
+                            <RowConstraints percentHeight="${100.0 / 9.0}" />
+                            <RowConstraints percentHeight="${100.0 / 9.0}" />
                         </rowConstraints>
-
-                        <Button fx:id="bookshelfColumn1Button" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" minWidth="0" minHeight="0" GridPane.fillHeight="true" GridPane.fillWidth="true" mnemonicParsing="false" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                        <Button fx:id="bookshelfColumn2Button" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" minWidth="0" minHeight="0" GridPane.fillHeight="true" GridPane.fillWidth="true" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                        <Button fx:id="bookshelfColumn3Button" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" minWidth="0" minHeight="0" GridPane.fillHeight="true" GridPane.fillWidth="true" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-                        <Button fx:id="bookshelfColumn4Button" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" minWidth="0" minHeight="0" GridPane.fillHeight="true" GridPane.fillWidth="true" mnemonicParsing="false" GridPane.columnIndex="3" GridPane.rowIndex="0" />
-                        <Button fx:id="bookshelfColumn5Button" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" minWidth="0" minHeight="0" GridPane.fillHeight="true" GridPane.fillWidth="true" mnemonicParsing="false" GridPane.columnIndex="4" GridPane.rowIndex="0" />
                     </GridPane>
+
+                    <Label fx:id="turnLabel" text="IT'S TURN" />
                 </StackPane>
-            </HBox>
 
-            <HBox alignment="CENTER" spacing="10">
-                <Button fx:id="nextBookshelfButton" mnemonicParsing="false" text="&lt;"/>
-                <Button fx:id="previousBookshelfButton" mnemonicParsing="false" text="&gt;"/>
-            </HBox>
-        </VBox>
-    </HBox>
+                <HBox alignment="CENTER" spacing="10">
+                    <Button fx:id="stopGameButton" mnemonicParsing="false" text="STOP GAME" managed="false"/>
+                    <Button fx:id="exitButton" mnemonicParsing="false" text="EXIT"/>
+                </HBox>
+            </VBox>
 
-    <Pane fx:id="gameBackgroundBlurPane" managed="false"/>
+            <VBox fx:id="gameRightSide" alignment="BASELINE_CENTER" spacing="10" HBox.hgrow="NEVER" minWidth="0" prefWidth="${gameBackgroundHBox.width * 0.30}" maxWidth="${gameBackgroundHBox.width * 0.30}">
+                <padding>
+                    <Insets left="10" bottom="10" top="10" right="10" />
+                </padding>
 
-    <HBox fx:id="statusBarHBox" alignment="CENTER_RIGHT" visible="false">
-        <padding>
-            <Insets right="20"/>
-        </padding>
-        <Label fx:id="statusBarLabel" />
-    </HBox>
+                <HBox fx:id="scoreBoardHBox" prefHeight="${gameRightSide.height * 0.25}" maxHeight="${gameRightSide.height * 0.25}">
+                    <ListView fx:id="scoreBoardListView" HBox.hgrow="ALWAYS"/>
+                </HBox>
+
+                <Region VBox.vgrow="ALWAYS" />
+
+                <Label fx:id="selectedBookshelfLabel" />
+
+                <HBox fx:id="bookshelfHBox" VBox.vgrow="ALWAYS">
+                    <StackPane fx:id="bookshelfStackPane" HBox.hgrow="ALWAYS">
+                        <GridPane fx:id="bookshelfGridPane">
+                            <columnConstraints>
+                                <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                                <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                                <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                                <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                                <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints percentHeight="${100.0 / 6.0}" />
+                                <RowConstraints percentHeight="${100.0 / 6.0}" />
+                                <RowConstraints percentHeight="${100.0 / 6.0}" />
+                                <RowConstraints percentHeight="${100.0 / 6.0}" />
+                                <RowConstraints percentHeight="${100.0 / 6.0}" />
+                                <RowConstraints percentHeight="${100.0 / 6.0}" />
+                            </rowConstraints>
+                        </GridPane>
+
+                        <ImageView fx:id="bookshelfImageView" fitHeight="${bookshelfStackPane.height * 0.8}"
+                                   fitWidth="${bookshelfStackPane.width * 0.8}" preserveRatio="true">
+                            <Image fx:id="bookshelfImage" url="/boards/bookshelf_orth.png"/>
+                        </ImageView>
+
+                        <GridPane fx:id="bookshelfColumnSelectorGridPane">
+                            <columnConstraints>
+                                <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                                <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                                <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                                <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                                <ColumnConstraints percentWidth="${100.0 / 5.0}" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints percentHeight="100.0" />
+                            </rowConstraints>
+
+                            <Button fx:id="bookshelfColumn1Button" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" minWidth="0" minHeight="0" GridPane.fillHeight="true" GridPane.fillWidth="true" mnemonicParsing="false" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                            <Button fx:id="bookshelfColumn2Button" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" minWidth="0" minHeight="0" GridPane.fillHeight="true" GridPane.fillWidth="true" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                            <Button fx:id="bookshelfColumn3Button" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" minWidth="0" minHeight="0" GridPane.fillHeight="true" GridPane.fillWidth="true" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                            <Button fx:id="bookshelfColumn4Button" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" minWidth="0" minHeight="0" GridPane.fillHeight="true" GridPane.fillWidth="true" mnemonicParsing="false" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                            <Button fx:id="bookshelfColumn5Button" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308" minWidth="0" minHeight="0" GridPane.fillHeight="true" GridPane.fillWidth="true" mnemonicParsing="false" GridPane.columnIndex="4" GridPane.rowIndex="0" />
+                        </GridPane>
+                    </StackPane>
+                </HBox>
+
+                <HBox alignment="CENTER" spacing="10">
+                    <Button fx:id="nextBookshelfButton" mnemonicParsing="false" text="&lt;"/>
+                    <Button fx:id="previousBookshelfButton" mnemonicParsing="false" text="&gt;"/>
+                </HBox>
+            </VBox>
+        </HBox>
+
+        <HBox fx:id="statusBarHBox" alignment="CENTER_RIGHT" visible="false">
+            <padding>
+                <Insets right="20"/>
+            </padding>
+            <Label fx:id="statusBarLabel" />
+        </HBox>
+    </VBox>
+
+    <Pane fx:id="gameBackgroundBlurPane" visible="false" styleClass="backgroundBlurPane"/>
 </StackPane>

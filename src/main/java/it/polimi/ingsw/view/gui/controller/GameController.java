@@ -190,7 +190,7 @@ public class GameController extends Controller {
     private void populateTurnTextBox() {
         Platform.runLater(() -> {
             turnLabel.setText(
-                "It's " + (scoreBoard.isClientPlaying() ? "your" : scoreBoard.getPlayingPlayer().getName() + "'s") + "turn"
+                "It's " + (scoreBoard.isClientPlaying() ? "your" : scoreBoard.getPlayingPlayer().getName() + "'s") + " turn"
             );
 
             turnLabel.setStyle("-fx-text-fill: %s".formatted(

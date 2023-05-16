@@ -1,11 +1,6 @@
 @import "BasicStylesheet.css";
 
 
-#gameBackgroundBlurPane {
-    -fx-background-color: background;
-    -fx-opacity: 0.5;
-}
-
 #gameLeftSide, #gameRightSide, #boardBackground {
     -fx-effect: dropshadow(three-pass-box, dark-grey, 7, 0, 0, 0);
     -fx-background-color: form-background;
