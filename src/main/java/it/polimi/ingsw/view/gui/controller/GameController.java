@@ -45,6 +45,7 @@ import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.game.IllegalFlowException;
 import it.polimi.ingsw.view.displayable.DisplayableScoreBoard;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 public class GameController extends Controller {
     public static final String NAME = "Game";
@@ -109,10 +110,14 @@ public class GameController extends Controller {
     private void populateGoalsPanel() {
         Platform.runLater(() -> {
             firstCommonGoalImageView.setImage(ImageController.getInstance().getCommonGoal(commonGoals[0].getIndex()));
-            Tooltip.install(firstCommonGoalImageView, new Tooltip(commonGoals[0].getDescription()));
+            Tooltip tooltip = new Tooltip(commonGoals[0].getDescription());
+            tooltip.setShowDelay(Duration.seconds(0));
+            Tooltip.install(firstCommonGoalImageView, tooltip);
 
             secondCommonGoalImageView.setImage(ImageController.getInstance().getCommonGoal(commonGoals[1].getIndex()));
-            Tooltip.install(secondCommonGoalImageView, new Tooltip(commonGoals[1].getDescription()));
+            tooltip = new Tooltip(commonGoals[1].getDescription());
+            tooltip.setShowDelay(Duration.seconds(0));
+            Tooltip.install(secondCommonGoalImageView, tooltip);
 
             personalGoalImageView.setImage(ImageController.getInstance().getPersonalGoal(this.personalGoal.getIndex()));
         });
