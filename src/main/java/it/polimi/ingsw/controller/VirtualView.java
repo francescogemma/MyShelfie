@@ -176,7 +176,7 @@ public class VirtualView implements EventTransmitter {
         Logger.writeMessage("%s ask for restart game".formatted(username));
         if (gameController == null) return DEFAULT_NOT_IN_LOBBY;
 
-        return gameController.restartGame(username);
+        return MenuController.getInstance().restartGame(gameController, username);
     }
 
     private Response askToJoinGame(String gameName) {

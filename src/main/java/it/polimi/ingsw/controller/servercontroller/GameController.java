@@ -464,7 +464,7 @@ public class GameController {
      *
      * @param username The username of the player who wants to restart the game.
      */
-    public synchronized Response restartGame (String username) {
+    protected synchronized Response restartGame (String username) {
         try {
             if (!isInLobby(username)) return Response.failure("%s not in lobby".formatted(username));
 

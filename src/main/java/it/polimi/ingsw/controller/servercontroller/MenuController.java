@@ -519,4 +519,24 @@ public class MenuController {
 
         return Pair.of(Response.failure("There is no game with this name..."), null);
     }
+
+    public Response restartGame(GameController gameController, String username) {
+        Objects.requireNonNull(username);
+        Objects.requireNonNull(gameController);
+
+        Response response = gameController.restartGame(username);
+
+        if (response.isOk()) {
+            synchronized (this) {
+                GameView view = gameController.getGameView();
+                this.authenticated.stream().filter(p -> gameController.isAvailableForJoin(p.getKey()))
+                        .forEach(p -> {
+                            p.getValue().broadcast(new GameIsNoLongerAvailableEventData(view.getName()));
+                            p.getValue().broadcast(new GameHasBeenCreatedEventData(view));
+                        });
+            };
+        }
+
+        return response;
+    }
 }
