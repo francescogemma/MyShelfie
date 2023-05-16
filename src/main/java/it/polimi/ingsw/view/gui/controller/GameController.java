@@ -213,8 +213,8 @@ public class GameController extends Controller {
                         ));
                         boardButtons[row][column].setVisible(true);
 
-                        if (board.getSelectableCoordinate().contains(boardCoordinate)
-                            || board.getSelectedCoordinates().contains(boardCoordinate)) {
+                        if (scoreBoard.isClientPlaying() && (board.getSelectableCoordinate().contains(boardCoordinate)
+                            || board.getSelectedCoordinates().contains(boardCoordinate))) {
                             boardButtons[row][column].setOpacity(1.d);
                             boardButtons[row][column].setMouseTransparent(false);
 
@@ -490,6 +490,8 @@ public class GameController extends Controller {
 
         populateTurnTextBox();
 
+        populateBoard();
+
         if (!isDisplayingCommonGoal) {
             populateBookshelfPanel();
         }
@@ -705,20 +707,20 @@ public class GameController extends Controller {
                     Integer rowInBoard = row;
                     Integer columnInBoard = column;
 
-                    ToggleButton currentButton = boardButtons[row][column];
-
                     boardButtons[row][column].setOnAction(event -> {
                         new Thread(new Task<Void>() {
                             @Override
                             protected Void call() {
                                 try {
-                                    if (currentButton.isSelected()) {
+                                    Coordinate coordinateInBoard = new Coordinate(rowInBoard, columnInBoard);
+
+                                    if (board.getSelectedCoordinates().contains(coordinateInBoard)) {
                                         showResponse(deselectTileRequester.request(new DeselectTileEventData(
-                                            new Coordinate(rowInBoard, columnInBoard)
+                                            coordinateInBoard
                                         )));
                                     } else {
                                         showResponse(selectTileRequester.request(new SelectTileEventData(
-                                            new Coordinate(rowInBoard, columnInBoard)
+                                            coordinateInBoard
                                         )));
                                     }
                                 } catch (DisconnectedException e) {

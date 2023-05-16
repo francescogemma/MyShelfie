@@ -43,7 +43,3 @@
     -fx-background-radius: 0;
     -fx-cursor: hand;
 }
-
-.toggle-button:selected {
-    -fx-opacity: 0.7;
-}
