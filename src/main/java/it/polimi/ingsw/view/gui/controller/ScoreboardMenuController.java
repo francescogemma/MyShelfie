@@ -88,14 +88,13 @@ public class ScoreboardMenuController extends Controller {
 
                         // player name
                         Label playerNameLabel = new Label(player.getName());
-                        playerNameLabel.setStyle("");
 
                         if (!player.isConnected()) {
-                            playerNameLabel.setStyle("-fx-font-size: 26; -fx-text-fill: #808080");
+                            playerNameLabel.setStyle("-fx-font-size: 26; -fx-text-fill: light-grey");
                         } else if (player.isWinner()) {
-                            playerNameLabel.setStyle("-fx-font-size: 26; -fx-text-fill: #00FF00");
+                            playerNameLabel.setStyle("-fx-font-size: 26; -fx-text-fill: palette-green");
                         } else if (player.isClientPlayer()) {
-                            playerNameLabel.setStyle("-fx-font-size: 26; -fx-text-fill: #ff0000");
+                            playerNameLabel.setStyle("-fx-font-size: 26; -fx-text-fill: palette-light-red");
                         } else {
                             playerNameLabel.setStyle("-fx-font-size: 26");
                         }
