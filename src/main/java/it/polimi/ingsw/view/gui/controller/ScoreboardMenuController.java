@@ -1,7 +1,6 @@
 package it.polimi.ingsw.view.gui.controller;
 
 import it.polimi.ingsw.event.NetworkEventTransceiver;
-import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.view.displayable.DisplayablePlayer;
 import it.polimi.ingsw.view.displayable.DisplayableScoreBoard;
@@ -93,10 +92,10 @@ public class ScoreboardMenuController extends Controller {
 
                         if (!player.isConnected()) {
                             playerNameLabel.setStyle("-fx-font-size: 26; -fx-text-fill: #808080");
-                        } else if (player.isClientPlayer()) {
-                            playerNameLabel.setStyle("-fx-font-size: 26; -fx-text-fill: #ff0000");
                         } else if (player.isWinner()) {
                             playerNameLabel.setStyle("-fx-font-size: 26; -fx-text-fill: #00FF00");
+                        } else if (player.isClientPlayer()) {
+                            playerNameLabel.setStyle("-fx-font-size: 26; -fx-text-fill: #ff0000");
                         } else {
                             playerNameLabel.setStyle("-fx-font-size: 26");
                         }
