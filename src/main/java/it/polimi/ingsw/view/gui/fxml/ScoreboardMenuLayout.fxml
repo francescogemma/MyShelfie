@@ -17,7 +17,10 @@
 
     <HBox fx:id="playerListHBox" VBox.vgrow="ALWAYS">
         <padding> <Insets bottom="10" left="90" right="90" top="10" /> </padding>
-        <ListView fx:id="scoreBoardListView" />
+
+        <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+            <ListView fx:id="scoreBoardListView" HBox.hgrow="ALWAYS" />
+        </VBox>
     </HBox>
 
     <HBox alignment="CENTER" spacing="10">
