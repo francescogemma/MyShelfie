@@ -41,7 +41,6 @@ public class ScoreboardMenuController extends Controller {
 
     @FXML
     private void initialize() {
-
         if (transceiver == null) {
             transceiver = getValue("transceiver");
 

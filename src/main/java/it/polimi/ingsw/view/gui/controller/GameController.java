@@ -24,26 +24,24 @@ import it.polimi.ingsw.view.tui.AvailableGamesMenuLayout;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.model.game.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import it.polimi.ingsw.view.displayable.DisplayablePlayer;
 import it.polimi.ingsw.model.goal.CommonGoal;
 import it.polimi.ingsw.model.game.IllegalFlowException;
 import it.polimi.ingsw.view.displayable.DisplayableScoreBoard;
-import javafx.scene.layout.VBox;
+import javafx.util.Callback;
 import javafx.util.Duration;
 
 public class GameController extends Controller {
@@ -890,6 +888,80 @@ public class GameController extends Controller {
         }
 
         scoreBoard = new DisplayableScoreBoard(getValue("username"));
+
+        scoreBoardListView.setCellFactory(new Callback<>() {
+            @Override
+            public ListCell<DisplayablePlayer> call(ListView<DisplayablePlayer> displayablePlayerListView) {
+                return new ListCell<>() {
+                    private Optional<DisplayablePlayer> availablePlayer = Optional.empty();
+                    @Override
+                    protected void updateItem(DisplayablePlayer player, boolean b) {
+                        super.updateItem(player, b);
+                        if (player == null || b) {
+                            availablePlayer = Optional.empty();
+                            setGraphic(null);
+                            return;
+                        }
+
+                        if (availablePlayer.isPresent() && availablePlayer.get().equals(player)) {
+                            return;
+                        }
+
+                        availablePlayer = Optional.of(player);
+
+                        // main box
+                        HBox playerHBox = new HBox();
+                        playerHBox.setPadding(new Insets(5, 5, 5, 5));
+                        playerHBox.getStyleClass().add("playerBox");
+
+                        // score position
+                        Label playerPositionLabel = new Label("[#" + player.getPosition() + "] ");
+
+                        // player name
+                        Label playerNameLabel = new Label(player.getName());
+
+                        if (!player.isConnected()) {
+                            playerNameLabel.setStyle("-fx-text-fill: light-grey");
+                        } else if (player.isWinner()) {
+                            playerNameLabel.setStyle("-fx-text-fill: palette-green");
+                        } else if (player.isClientPlayer()) {
+                            playerNameLabel.setStyle("-fx-text-fill: palette-light-red");
+                        }
+
+                        // box for left-side fields
+                        HBox leftBox = new HBox();
+                        HBox.setHgrow(leftBox, Priority.ALWAYS);
+                        leftBox.setAlignment(Pos.CENTER);
+                        leftBox.getChildren().add(playerPositionLabel);
+                        leftBox.getChildren().add(playerNameLabel);
+
+                        // points
+                        Label pointsLabel = new Label("Score: " + player.getPoints());
+                        pointsLabel.setPadding(new Insets(0, 0, 0, 10));
+                        pointsLabel.setAlignment(Pos.CENTER_RIGHT);
+
+                        // additional points
+                        int additionalPoints = player.getAdditionalPoints();
+                        Label additionalPointsLabel = new Label(" + " + additionalPoints);
+                        additionalPointsLabel.setStyle("-fx-text-fill: #00FF00");
+                        additionalPointsLabel.setVisible(additionalPoints > 0);
+                        additionalPointsLabel.setPadding(new Insets(0, 0, 0, 10));
+                        additionalPointsLabel.setAlignment(Pos.CENTER_RIGHT);
+
+                        // box for right-side fields
+                        HBox rightBox = new HBox();
+                        HBox.setHgrow(rightBox, Priority.ALWAYS);
+                        rightBox.setAlignment(Pos.CENTER);
+                        rightBox.getChildren().add(pointsLabel);
+                        rightBox.getChildren().add(additionalPointsLabel);
+
+                        // finish it up
+                        setGraphic(playerHBox);
+                        playerHBox.getChildren().addAll(leftBox, rightBox);
+                    }
+                };
+            }
+        });
 
         joinGameRequester.registerAllListeners();
         selectTileRequester.registerAllListeners();
