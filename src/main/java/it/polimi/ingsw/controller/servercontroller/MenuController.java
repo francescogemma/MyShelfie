@@ -209,7 +209,7 @@ public class MenuController {
 
     private synchronized Optional<GameController> getGameController(String gameName) {
         for (GameController controller: gameControllerList) {
-            if (controller.gameName().equals(gameName))
+            if (controller.gameName().equalsIgnoreCase(gameName))
                 return Optional.of(controller);
         }
 
@@ -443,7 +443,7 @@ public class MenuController {
     }
 
     /**
-     * This function allows the player with username "username" to enter the lobby of the game with name "gameName".
+     * This function allows the player with username "username" to enter the lobby of the game with the name "gameName".
      *
      * @param username The username of the user
      * @param gameName The name of the game where the user wants to enter
@@ -456,7 +456,8 @@ public class MenuController {
      *     <li>gameName is null</li>
      * </ul>
      *
-     * @return A pair with SUCCESS equal to true iff the user has successfully entered the lobby with the gameController of the game.
+     * @return A pair with SUCCESS equal to true iff the user has successfully entered the lobby
+     *  with the gameController of the game.
      */
     public synchronized Pair<Response, GameController> joinLobby(EventTransmitter transmitter, String username, String gameName) {
         Objects.requireNonNull(transmitter);
@@ -520,21 +521,43 @@ public class MenuController {
         return Pair.of(Response.failure("There is no game with this name..."), null);
     }
 
-    public Response restartGame(GameController gameController, String username) {
+    /**
+     * This method is used to restart a game.
+     * It notifies the players who previously participated in the game that the game has restarted,
+     * and therefore they can join without going through the lobby.
+     *
+     * @param username il player che vuole restartare il game.
+     * @param gameController il game che si vuole far ripartire
+     *
+     * @throws NullPointerException iff
+     * <ul>
+     *     <li> gameController is null </li>
+     *     <li> username is null </li>
+     * </ul>
+     *
+     * @return SUCCESS iff {@link GameController#restartGame(String) restartGame} return SUCCESS
+     *
+     * @see GameController#restartGame(String)
+     * @see Response
+     * @see GameController
+     * */
+    public synchronized Response restartGame(GameController gameController, String username) {
         Objects.requireNonNull(username);
         Objects.requireNonNull(gameController);
 
-        Response response = gameController.restartGame(username);
+        Response response;
 
-        if (response.isOk()) {
-            synchronized (this) {
+        synchronized (gameController.getLock()) {
+            response = gameController.restartGame(username);
+
+            if (response.isOk()) {
                 GameView view = gameController.getGameView();
                 this.authenticated.stream().filter(p -> gameController.isAvailableForJoin(p.getKey()))
                         .forEach(p -> {
                             p.getValue().broadcast(new GameIsNoLongerAvailableEventData(view.getName()));
                             p.getValue().broadcast(new GameHasBeenCreatedEventData(view));
                         });
-            };
+            }
         }
 
         return response;
