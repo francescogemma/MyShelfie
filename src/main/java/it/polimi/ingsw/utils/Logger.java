@@ -1,6 +1,9 @@
 package it.polimi.ingsw.utils;
 
+import com.sun.jna.Platform;
+
 import java.io.*;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -142,7 +145,7 @@ public class Logger {
     }
 
     static {
-        final String nameFolder = "/log_MyShelfie";
+        final String nameFolder = (Platform.isWindows() ? "\\" : "/") + "log_MyShelfie";
         try {
             new File(System.getProperty("user.home") + nameFolder).mkdirs();
             logPosition = System.getProperty("user.home") + nameFolder;

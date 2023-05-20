@@ -10,40 +10,124 @@ import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 
+/**
+ * An event sent in many responses.
+ * It contains a textual message and a {@link ResponseStatus status}.
+ * The object is thread-safe and immutable.
+ *
+ * @see EventData
+ * @see ResponseStatus
+ * @author Cristiano Migali
+ * @author Giacomo Groppi
+ * */
 public class Response implements EventData {
+    /**
+     * Event id
+     * */
     public static final String ID = "RESPONSE";
+
+    /**
+     * A message set by the constructor
+     * */
     private final String message;
+
+    /**
+     * A status set by the constructor
+     * */
     private final ResponseStatus status;
 
-    public static Response failure(String message) {
-        return new Response(message, ResponseStatus.FAILURE);
-    }
-
+    /**
+     * Default message for not authenticated user
+     * */
     protected static final Response notAuthenticated = new Response("Not autenticated", ResponseStatus.FAILURE);
+
+    /**
+     * Default message for client not in lobby
+     */
     protected static final Response notInLobby = new Response("Not in lobby", ResponseStatus.FAILURE);
+
+    /**
+     * Default message for client not in game
+     * */
     protected static final Response notInGame  = new Response("Not in game", ResponseStatus.FAILURE);
+
+    /**
+     * Default message for client not in game
+     * */
     protected static final Response alreadyInGame = new Response("Already in game", ResponseStatus.FAILURE);
+
+    /**
+     * Default message for client already in game
+     * */
     protected static final Response alreadyInLobby = new Response("Already in lobby", ResponseStatus.FAILURE);
+
+    /**
+     * Default failure message for client already log in
+     * */
     protected static final Response alreadyLogIn = new Response("Already log in", ResponseStatus.FAILURE);
 
+    /**
+     * Creates a new Response object with a success status.
+     *
+     * @param message The message to be set.
+     * @return A new response object with the message "message" and a status of {@link ResponseStatus#SUCCESS}.
+     * @author Giacomo Groppi
+     * */
     public static Response success(String message) {
         return new Response(message, ResponseStatus.SUCCESS);
     }
 
+    /**
+     * Creates a new Response object with a failure status.
+     *
+     * @param message The message to be set.
+     * @return A new response object with the message "message" and a status of {@link ResponseStatus#FAILURE}.
+     * @author Giacomo Groppi
+     */
+    public static Response failure(String message) {
+        return new Response(message, ResponseStatus.FAILURE);
+    }
+
+    /**
+     * Creates a new Response object with the specified message and status.
+     *
+     * @param message The message to be set as the response.
+     * @param status The status that the message should have.
+     * @author Cristiano Migali
+     * */
     private Response(String message, ResponseStatus status) {
         Logger.writeMessage("status: [%s] message: [%s] from: [%s]".formatted(status, message, Thread.currentThread().getStackTrace()[3]));
         this.status = status;
         this.message = message;
     }
 
+    /**
+     * Returns the message of the response.
+     *
+     * @return The message contained in the response.
+     * @author Cristiano Migali
+     * */
     public String message() {
         return this.message;
     }
 
+    /**
+     * This method returns the status of the request.
+     *
+     * @return The status contained in the response.
+     * @see ResponseStatus
+     * @author Cristiano Migali
+     * */
     public ResponseStatus status () {
         return status;
     }
 
+    /**
+     * Use this method to check if the status is {@link ResponseStatus#SUCCESS}.
+     *
+     * @return true if the internal status is {@link ResponseStatus#SUCCESS}, false otherwise.
+     * @author Giacomo Groppi
+     * */
     public boolean isOk() {
         return status == ResponseStatus.SUCCESS;
     }
