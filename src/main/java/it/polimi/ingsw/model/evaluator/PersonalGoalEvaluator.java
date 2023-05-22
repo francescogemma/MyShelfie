@@ -34,7 +34,7 @@ public class PersonalGoalEvaluator implements Evaluator {
 
     /**
      * The amount of shelves that have a color that coincides with the specifics
-     * given by the {@link this#personalGoal} object.
+     * given by the {@link it.polimi.ingsw.model.goal.PersonalGoal personalGoal} object.
      */
     private int successfulShelves;
 
