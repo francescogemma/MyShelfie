@@ -9,6 +9,14 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
+/**
+ * This event allows inserting the previously selected tiles into the bookshelf.
+ *
+ * @param column The column where the insertion should take place.
+ *
+ * @author Giacomo Groppi
+ * @see it.polimi.ingsw.controller.servercontroller.GameController#insertSelectedTilesInBookshelf(String, int)
+ * */
 public record InsertTileEventData(int column) implements EventData {
     public static final String ID = "INSERT_TILE";
 
