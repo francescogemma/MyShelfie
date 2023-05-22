@@ -6,6 +6,7 @@ import it.polimi.ingsw.controller.db.DBManager;
 import it.polimi.ingsw.event.EventTransceiver;
 import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
+import it.polimi.ingsw.event.data.VoidEventData;
 import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.event.data.internal.GameHasBeenStoppedInternalEventData;
 import it.polimi.ingsw.event.data.internal.GameOverInternalEventData;
@@ -158,7 +159,7 @@ public class GameController {
      *
      * @throws NullPointerException iff "username" is null.
      */
-    public Response stopGame (String username) {
+    public Response<VoidEventData> stopGame (String username) {
         Objects.requireNonNull(username);
 
         synchronized (this) {
@@ -224,7 +225,7 @@ public class GameController {
      * @throws NullPointerException iff username is null
      * @return FAILURE iff username is not in lobby, SUCCESS otherwise
      */
-    protected synchronized Response exitLobby(String username) {
+    protected synchronized Response<VoidEventData> exitLobby(String username) {
         Objects.requireNonNull(username);
 
         Logger.writeMessage("Call for username: %s".formatted(username));
@@ -257,7 +258,7 @@ public class GameController {
      *
      * @throws NullPointerException iff username is null
      */
-    protected synchronized Response exitGame (String username) {
+    protected synchronized Response<VoidEventData> exitGame (String username) {
         Objects.requireNonNull(username);
         Logger.writeMessage("Call for username: %s".formatted(username));
 
@@ -302,7 +303,7 @@ public class GameController {
      * </ul>
      * SUCCESS otherwise
      */
-    public Response joinLobby(EventTransmitter newClient, String username) {
+    public Response<VoidEventData> joinLobby(EventTransmitter newClient, String username) {
         Objects.requireNonNull(newClient);
         Objects.requireNonNull(username);
 
@@ -354,7 +355,7 @@ public class GameController {
      * @see Game#selectTile(String, Coordinate)
      * @see Coordinate
      */
-    public Response selectTile(String username, Coordinate coordinate) {
+    public Response<VoidEventData> selectTile(String username, Coordinate coordinate) {
         assert username != null;
 
         Logger.writeMessage("[%s] trying to select tile at %s in %s".formatted(username, coordinate, gameName()));
@@ -394,7 +395,7 @@ public class GameController {
      * @see Game#forgetLastSelection(String, Coordinate)
      * @see Coordinate
      */
-    public Response deselectTile(String username, Coordinate coordinate) {
+    public Response<VoidEventData> deselectTile(String username, Coordinate coordinate) {
         Objects.requireNonNull(username);
         Objects.requireNonNull(coordinate);
 
@@ -425,7 +426,7 @@ public class GameController {
      *  </ul>
      * FAILURE otherwise.
      */
-    public Response insertSelectedTilesInBookshelf(String username, int column) {
+    public Response<VoidEventData> insertSelectedTilesInBookshelf(String username, int column) {
         assert username != null;
 
         synchronized (this) {
@@ -464,7 +465,7 @@ public class GameController {
      *
      * @param username The username of the player who wants to restart the game.
      */
-    protected synchronized Response restartGame (String username) {
+    protected synchronized Response<VoidEventData> restartGame (String username) {
         try {
             if (!isInLobby(username)) return Response.failure("%s not in lobby".formatted(username));
 
@@ -500,7 +501,7 @@ public class GameController {
      * </ul>
      * SUCCESS otherwise
      */
-    private synchronized Response reconnectUserDisconnect(String username, EventTransmitter transmitter) {
+    private synchronized Response<VoidEventData> reconnectUserDisconnect(String username, EventTransmitter transmitter) {
         try {
             Logger.writeMessage("Clients in lobby: " + clientsInLobby.stream().map(Pair::getValue).toList().toString());
 
@@ -539,7 +540,7 @@ public class GameController {
      * @throws NullPointerException if username or transmitter is null
      * @return a response with the result of the operation
      */
-    public synchronized Response rejoinGame(String username, EventTransmitter transmitter) {
+    public synchronized Response<VoidEventData> rejoinGame(String username, EventTransmitter transmitter) {
         Objects.requireNonNull(username);
         Objects.requireNonNull(transmitter);
 
@@ -562,7 +563,7 @@ public class GameController {
      * </ul>
      * SUCCESS otherwise
      */
-    public synchronized Response joinGame (String username) {
+    public synchronized Response<VoidEventData> joinGame (String username) {
         Objects.requireNonNull(username);
         Logger.writeMessage("Clients in lobby before modify: " + clientsInLobby.stream().map(Pair::getValue).toList().toString());
 
@@ -570,7 +571,7 @@ public class GameController {
             if (clientsInLobby.get(i).getValue().equals(username)) {
                 Pair<EventTransmitter, String> client = clientsInLobby.get(i);
 
-                Response response = reconnectUserDisconnect(client.getValue(), client.getKey());
+                Response<VoidEventData> response = reconnectUserDisconnect(client.getValue(), client.getKey());
 
                 if (response.isOk()) {
                     clientsInLobby.remove(i);
@@ -596,7 +597,7 @@ public class GameController {
      * </ul>
      * SUCCESS otherwise
      */
-    protected synchronized Response startGame(String username) {
+    protected synchronized Response<VoidEventData> startGame(String username) {
         if (!isInLobby(username))
             return Response.failure("%s not in lobby".formatted(username));
 
