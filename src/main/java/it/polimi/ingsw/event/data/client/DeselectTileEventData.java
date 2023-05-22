@@ -10,6 +10,13 @@ import it.polimi.ingsw.utils.Coordinate;
 
 import java.util.function.Function;
 
+/**
+ * This event is used to deselect the last selected tile.
+ *
+ * @param coordinate The coordinate of the tile to be deselected.
+ * @see it.polimi.ingsw.controller.servercontroller.GameController#deselectTile(String, Coordinate)
+ * @author Giacomo Groppi
+ */
 public record DeselectTileEventData(Coordinate coordinate) implements EventData {
     public static final String ID = "DESELECT_TILE";
 
