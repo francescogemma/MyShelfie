@@ -1,5 +1,6 @@
 package it.polimi.ingsw.event.data.client;
 
+import it.polimi.ingsw.controller.servercontroller.GameController;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.Responder;
 import it.polimi.ingsw.event.data.EventData;
@@ -9,16 +10,14 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
-
 /**
- * utente chiede di uscire dalla lobby
+ * This event is used to request the server to exit the lobby.
+ *
+ * @see it.polimi.ingsw.controller.servercontroller.MenuController#exitLobby(GameController, String)
+ * @author Giacomo Groppi
  */
 public class ExitLobbyEventData implements EventData {
     public static final String ID = "EXIT_LOBBY";
-
-    public ExitLobbyEventData() {
-
-    }
 
     public static CastEventReceiver<ExitLobbyEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
