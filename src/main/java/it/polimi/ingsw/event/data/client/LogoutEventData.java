@@ -9,12 +9,14 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
+/**
+ * This event is used to request the server to perform a logout.
+ * 
+ * @see it.polimi.ingsw.controller.servercontroller.MenuController#logout(EventTransmitter, String)
+ * @author Giacomo Groppi
+ * */
 public class LogoutEventData implements EventData {
     public static final String ID = "LOGOUT";
-
-    public LogoutEventData() {
-
-    }
 
     public static CastEventReceiver<LogoutEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
