@@ -9,6 +9,13 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
+/**
+ * This event is used to request the server to create a game with the name "gameName".
+ *
+ * @param gameName The name of the game that you want to create.
+ * @author Giacomo Groppi
+ * @see it.polimi.ingsw.controller.servercontroller.MenuController#createNewGame(String, String)
+ * */
 public record CreateNewGameEventData(String gameName) implements EventData {
     public static final String ID = "CREATE_NEW_GAME";
 
