@@ -9,6 +9,14 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
+/**
+ * This event is used to request the server to enter the lobby of a game.
+ *
+ * @param gameName The name of the game for which you want to enter the lobby.
+ *
+ * @see it.polimi.ingsw.controller.servercontroller.MenuController#joinLobby(EventTransmitter, String, String)
+ * @author Giacomo Groppi
+ * */
 public record JoinLobbyEventData(String gameName) implements EventData {
     public static final String ID = "JOIN_LOBBY";
 
