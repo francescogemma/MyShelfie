@@ -26,7 +26,7 @@
 
         <Button mnemonicParsing="false" text="Exit" onAction="#exit"/>
         <Button fx:id="startGameButton" mnemonicParsing="false" text="Start Game" onAction="#startGame" />
-        <Button fx:id="restartGameButton" mnemonicParsing="false" text="Restart Game" onAction="#restartGame" />
+        <Button fx:id="restartGameButton" mnemonicParsing="false" text="Resume Game" onAction="#restartGame" />
         <Button fx:id="backToAvailableGamesButton" mnemonicParsing="false"
                 text="Back to Available Games" onAction="#backToAvailableGames" />
     </HBox>

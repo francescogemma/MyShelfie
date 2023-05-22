@@ -48,7 +48,7 @@ public class LobbyLayout extends AppLayout {
             (playerInLobbyDrawable, player) -> playerInLobbyDrawable.nameTextBox.text(player));
 
     private final Button startButton = new Button("Start game");
-    private final Button restartButton = new Button("Restart game");
+    private final Button restartButton = new Button("Resume game");
     private final OrientedLayoutElement startButtonLayoutElement = startButton.center().weight(0);
     private final OrientedLayoutElement restartButtonLayoutElement = restartButton.center().weight(1);
 
