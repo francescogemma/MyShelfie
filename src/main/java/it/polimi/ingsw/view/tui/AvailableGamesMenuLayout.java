@@ -4,6 +4,7 @@ import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
+import it.polimi.ingsw.event.data.VoidEventData;
 import it.polimi.ingsw.event.data.client.CreateNewGameEventData;
 import it.polimi.ingsw.event.data.client.LogoutEventData;
 import it.polimi.ingsw.event.data.client.PlayerHasJoinMenu;
@@ -107,8 +108,8 @@ public class AvailableGamesMenuLayout extends AppLayout {
     private boolean isSelectedGameStopped;
 
     // Utilities:
-    private Requester<Response, CreateNewGameEventData> createGameRequester = null;
-    private Requester<Response, LogoutEventData> logoutRequester = null;
+    private Requester<Response<VoidEventData>, CreateNewGameEventData> createGameRequester = null;
+    private Requester<Response<VoidEventData>, LogoutEventData> logoutRequester = null;
 
     private EventReceiver<GameHasBeenCreatedEventData> gameHasBeenCreatedReceiver = null;
     private EventReceiver<GameIsNoLongerAvailableEventData> gameIsNoLongerAvailableReceiver = null;

@@ -3,6 +3,7 @@ package it.polimi.ingsw.controller;
 import it.polimi.ingsw.controller.db.DBManagerTest;
 import it.polimi.ingsw.controller.servercontroller.MenuController;
 import it.polimi.ingsw.event.*;
+import it.polimi.ingsw.event.data.VoidEventData;
 import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.DisconnectedException;
@@ -61,7 +62,7 @@ class VirtualViewTest {
     }
 
     private void authenticate(VirtualView virtualView, EventTransceiver transceiver, String username) throws DisconnectedException {
-        Requester<Response, LoginEventData> requester = Response.requester(transceiver, transceiver, new Object());
+        Requester<Response<VoidEventData>, LoginEventData> requester = Response.requester(transceiver, transceiver, new Object());
         requester.registerAllListeners();
         Assertions.assertTrue(requester.request(new LoginEventData(username, "ciao")).isOk());
 
@@ -69,21 +70,21 @@ class VirtualViewTest {
     }
 
     private void createNewGame(VirtualView view, EventTransceiver transceiver, String gameName) throws DisconnectedException {
-        Requester<Response, CreateNewGameEventData> requester = Response.requester(transceiver, transceiver, new Object());
+        Requester<Response<VoidEventData>, CreateNewGameEventData> requester = Response.requester(transceiver, transceiver, new Object());
         requester.registerAllListeners();
         Assertions.assertTrue(requester.request(new CreateNewGameEventData(gameName)).isOk());
     }
 
     private void joinGame(VirtualView view, EventTransceiver transceiver, String gameName) throws DisconnectedException {
-        Requester<Response, JoinLobbyEventData> requester = Response.requester(transceiver, transceiver, new Object());
+        Requester<Response<VoidEventData>, JoinLobbyEventData> requester = Response.requester(transceiver, transceiver, new Object());
         requester.registerAllListeners();
         Assertions.assertTrue(requester.request(new JoinLobbyEventData(gameName)).isOk());
     }
 
     private void pauseGame(VirtualView view, EventTransceiver transceiver, String username) throws DisconnectedException {
-        Requester<Response, PauseGameEventData> requester = Response.requester(transceiver, transceiver, new Object());
+        Requester<Response<VoidEventData>, PauseGameEventData> requester = Response.requester(transceiver, transceiver, new Object());
         requester.registerAllListeners();
-        Response response = requester.request(new PauseGameEventData());
+        Response<VoidEventData> response = requester.request(new PauseGameEventData());
 
         if (response.isOk()) return;
 
@@ -91,21 +92,21 @@ class VirtualViewTest {
     }
 
     private void exitGame(VirtualView view, EventTransceiver transceiver) throws DisconnectedException {
-        Requester<Response, PlayerExitGame> requester = Response.requester(transceiver, transceiver, new Object());
+        Requester<Response<VoidEventData>, PlayerExitGame> requester = Response.requester(transceiver, transceiver, new Object());
         requester.registerAllListeners();
         Assertions.assertTrue(requester.request(new PlayerExitGame()).isOk());
     }
 
     private void startGame(VirtualView view, EventTransceiver transceiver) throws DisconnectedException {
-        Requester<Response, StartGameEventData> requester = Response.requester(transceiver, transceiver, new Object());
+        Requester<Response<VoidEventData>, StartGameEventData> requester = Response.requester(transceiver, transceiver, new Object());
         requester.registerAllListeners();
         Assertions.assertTrue(requester.request(new StartGameEventData()).isOk());
     }
 
     private void joinLobby(VirtualView view, EventTransceiver transceiver, String gameName) throws DisconnectedException {
-        Requester<Response, JoinLobbyEventData> requester = Response.requester(transceiver, transceiver, new Object());
+        Requester<Response<VoidEventData>, JoinLobbyEventData> requester = Response.requester(transceiver, transceiver, new Object());
         requester.registerAllListeners();
-        Response response = requester.request(new JoinLobbyEventData(gameName));
+        Response<VoidEventData> response = requester.request(new JoinLobbyEventData(gameName));
 
         if (response.isOk())
             return;
@@ -114,15 +115,15 @@ class VirtualViewTest {
     }
 
     private void exitLobby(VirtualView view, EventTransceiver transceiver) throws DisconnectedException {
-        Requester<Response, ExitLobbyEventData> requester = Response.requester(transceiver, transceiver, new Object());
+        Requester<Response<VoidEventData>, ExitLobbyEventData> requester = Response.requester(transceiver, transceiver, new Object());
         requester.registerAllListeners();
         Assertions.assertTrue(requester.request(new ExitLobbyEventData()).isOk());
     }
 
     private void connectPlayer(VirtualView view, EventTransceiver transceiver) throws DisconnectedException {
-        Requester<Response, JoinGameEventData> requester = Response.requester(transceiver, transceiver, new Object());
+        Requester<Response<VoidEventData>, JoinGameEventData> requester = Response.requester(transceiver, transceiver, new Object());
         requester.registerAllListeners();
-        Response response = requester.request(new JoinGameEventData(""));
+        Response<VoidEventData> response = requester.request(new JoinGameEventData(""));
 
         if (response.isOk()) return;
         Assertions.fail(response.message());

@@ -9,6 +9,7 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.data.EventData;
+import it.polimi.ingsw.event.data.VoidEventData;
 import it.polimi.ingsw.event.data.client.LoginEventData;
 import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.*;
@@ -42,7 +43,6 @@ public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
             Map.entry(GameHasStartedEventData.ID, GameHasStartedEventData.class),
             Map.entry(PlayerHasDisconnectedEventData.ID, PlayerHasDisconnectedEventData.class),
             Map.entry(PlayerHasJoinGameEventData.ID, PlayerHasJoinGameEventData.class),
-            Map.entry(Response.ID, Response.class),
             Map.entry(JoinLobbyEventData.ID, JoinLobbyEventData.class),
             Map.entry(GameIsNoLongerAvailableEventData.ID, GameIsNoLongerAvailableEventData.class),
             Map.entry(StartGameEventData.ID, StartGameEventData.class),
@@ -70,7 +70,9 @@ public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
             Map.entry(PlayerHasJoinLobbyEventData.ID, PlayerHasJoinLobbyEventData.class),
             Map.entry(RestartGameEventData.ID, RestartGameEventData.class),
             Map.entry(GameOverInternalEventData.ID, GameOverInternalEventData.class),
-            Map.entry(GameHasBeenStoppedInternalEventData.ID, GameHasBeenStoppedInternalEventData.class)
+            Map.entry(GameHasBeenStoppedInternalEventData.ID, GameHasBeenStoppedInternalEventData.class),
+            Map.entry(VoidEventData.ID, VoidEventData.class),
+            Map.entry(UsernameEventData.ID, UsernameEventData.class)
     );
 
     /**
@@ -80,7 +82,8 @@ public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
      * in the event JSON.
      */
     private static final Map<String, Type> WRAPPER_DATA_TYPES = Map.of(
-        SyncEventDataWrapper.WRAPPER_ID, SyncEventDataWrapper.class
+        SyncEventDataWrapper.WRAPPER_ID, SyncEventDataWrapper.class,
+        Response.WRAPPER_ID, Response.class
     );
 
     /**

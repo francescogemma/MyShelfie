@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.gui.controller;
 import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
+import it.polimi.ingsw.event.data.VoidEventData;
 import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
 import it.polimi.ingsw.event.data.game.GameIsNoLongerAvailableEventData;
@@ -37,8 +38,8 @@ public class AvailableGamesMenuController extends Controller {
     private NetworkEventTransceiver transceiver = null;
 
     // Utilities:
-    private Requester<Response, CreateNewGameEventData> responseCreateNewGameEventDataRequester;
-    private Requester<Response, LogoutEventData> responseLogoutEventDataRequester;
+    private Requester<Response<VoidEventData>, CreateNewGameEventData> responseCreateNewGameEventDataRequester;
+    private Requester<Response<VoidEventData>, LogoutEventData> responseLogoutEventDataRequester;
 
     private CastEventReceiver<GameHasBeenCreatedEventData> gameHasBeenCreatedEventDataCastEventReceiver;
     private CastEventReceiver<GameIsNoLongerAvailableEventData> gameIsNoLongerAvailableEventDataCastEventReceiver;

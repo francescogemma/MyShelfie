@@ -3,6 +3,8 @@ package it.polimi.ingsw.controller;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.Responder;
 import it.polimi.ingsw.event.data.EventData;
+import it.polimi.ingsw.event.data.VoidEventData;
+import it.polimi.ingsw.event.data.wrapper.EventDataWrapper;
 import it.polimi.ingsw.event.receiver.CastEventReceiver;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
@@ -20,11 +22,11 @@ import java.util.function.Function;
  * @author Cristiano Migali
  * @author Giacomo Groppi
  * */
-public class Response implements EventData {
+public class Response <T extends EventData> extends EventDataWrapper<T> {
     /**
      * Event id
      * */
-    public static final String ID = "RESPONSE";
+    public static final String WRAPPER_ID = "RESPONSE";
 
     /**
      * A message set by the constructor
@@ -39,32 +41,32 @@ public class Response implements EventData {
     /**
      * Default message for not authenticated user
      * */
-    protected static final Response notAuthenticated = new Response("Not autenticated", ResponseStatus.FAILURE);
+    protected static final Response<VoidEventData> notAuthenticated = Response.failure("Not autenticated");
 
     /**
      * Default message for client not in lobby
      */
-    protected static final Response notInLobby = new Response("Not in lobby", ResponseStatus.FAILURE);
+    protected static final Response<VoidEventData> notInLobby = Response.failure("Not in lobby");
 
     /**
      * Default message for client not in game
      * */
-    protected static final Response notInGame  = new Response("Not in game", ResponseStatus.FAILURE);
+    protected static final Response<VoidEventData> notInGame  = Response.failure("Not in game");
 
     /**
      * Default message for client not in game
      * */
-    protected static final Response alreadyInGame = new Response("Already in game", ResponseStatus.FAILURE);
+    protected static final Response<VoidEventData> alreadyInGame = Response.failure("Already in game");
 
     /**
      * Default message for client already in game
      * */
-    protected static final Response alreadyInLobby = new Response("Already in lobby", ResponseStatus.FAILURE);
+    protected static final Response<VoidEventData> alreadyInLobby = Response.failure("Already in lobby");
 
     /**
      * Default failure message for client already log in
      * */
-    protected static final Response alreadyLogIn = new Response("Already log in", ResponseStatus.FAILURE);
+    protected static final Response<VoidEventData> alreadyLogIn = Response.failure("Already log in");
 
     /**
      * Creates a new Response object with a success status.
@@ -73,8 +75,8 @@ public class Response implements EventData {
      * @return A new response object with the message "message" and a status of {@link ResponseStatus#SUCCESS}.
      * @author Giacomo Groppi
      * */
-    public static Response success(String message) {
-        return new Response(message, ResponseStatus.SUCCESS);
+    public static Response<VoidEventData> success(String message) {
+        return new Response<>(message, ResponseStatus.SUCCESS, new VoidEventData());
     }
 
     /**
@@ -84,8 +86,8 @@ public class Response implements EventData {
      * @return A new response object with the message "message" and a status of {@link ResponseStatus#FAILURE}.
      * @author Giacomo Groppi
      */
-    public static Response failure(String message) {
-        return new Response(message, ResponseStatus.FAILURE);
+    public static Response<VoidEventData> failure(String message) {
+        return new Response<>(message, ResponseStatus.FAILURE, new VoidEventData());
     }
 
     /**
@@ -95,7 +97,8 @@ public class Response implements EventData {
      * @param status The status that the message should have.
      * @author Cristiano Migali
      * */
-    private Response(String message, ResponseStatus status) {
+    public Response(String message, ResponseStatus status, T data) {
+        super(data);
         Logger.writeMessage("status: [%s] message: [%s] from: [%s]".formatted(status, message, Thread.currentThread().getStackTrace()[3]));
         this.status = status;
         this.message = message;
@@ -132,24 +135,28 @@ public class Response implements EventData {
         return status == ResponseStatus.SUCCESS;
     }
 
-    public static CastEventReceiver<Response> castEventReceiver(EventReceiver<EventData> receiver) {
-        return new CastEventReceiver<>(ID, receiver);
-    }
-
-    public static <T extends EventData> Requester<Response, T> requester(EventTransmitter transmitter,
+    public static <T extends EventData> Requester<Response<VoidEventData>, T> requester(EventTransmitter transmitter,
                                                                          EventReceiver<EventData> receiver,
                                                                          Object responsesLock) {
-        return new Requester<>(ID, transmitter, receiver, responsesLock);
+        return new Requester<>(WRAPPER_ID + "_" + VoidEventData.ID,
+                transmitter,
+                receiver,
+                responsesLock);
     }
 
-    public static <T extends EventData> Responder<Response, T> responder(EventTransmitter transmitter,
-                                                                         EventReceiver<EventData> receiver,
-                                                                         Function<Response, T> response) {
-        return new Responder<>(ID, transmitter, receiver, response);
+    public static <T extends EventData, Z extends EventData> Requester<Response<Z>, T>
+            requester(EventTransmitter transmitter,
+                      EventReceiver<EventData> receiver,
+                      String wrappedEventId,
+                      Object responsesLock) {
+        return new Requester<>(WRAPPER_ID + "_" + wrappedEventId,
+                transmitter,
+                receiver,
+                responsesLock);
     }
 
     @Override
-    public String getId() {
-        return ID;
+    public String getWrapperId() {
+        return WRAPPER_ID;
     }
 }

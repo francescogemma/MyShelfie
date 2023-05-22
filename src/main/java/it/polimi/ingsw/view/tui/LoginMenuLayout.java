@@ -4,6 +4,7 @@ import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
+import it.polimi.ingsw.event.data.VoidEventData;
 import it.polimi.ingsw.event.data.client.LoginEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.networking.DisconnectedException;
@@ -47,7 +48,7 @@ public class LoginMenuLayout extends AppLayout {
     private NetworkEventTransceiver transceiver = null;
 
     // Utilities:
-    private Requester<Response, LoginEventData> loginRequester = null;
+    private Requester<Response<VoidEventData>, LoginEventData> loginRequester = null;
 
     private PopUpQueue popUpQueue;
 

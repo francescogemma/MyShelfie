@@ -2,6 +2,7 @@ package it.polimi.ingsw.view.gui.controller;
 
 import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
+import it.polimi.ingsw.event.data.VoidEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.receiver.EventListener;
 import it.polimi.ingsw.event.receiver.EventReceiver;
@@ -400,12 +401,12 @@ public class GameController extends Controller {
     private boolean gameHasBeenStopped;
 
     // Utilities:
-    private Requester<Response, JoinGameEventData> joinGameRequester = null;
-    private Requester<Response, SelectTileEventData> selectTileRequester = null;
-    private Requester<Response, DeselectTileEventData> deselectTileRequester = null;
-    private Requester<Response, InsertTileEventData> insertTileRequester = null;
-    private Requester<Response, PauseGameEventData> pauseGameRequester = null;
-    private Requester<Response, PlayerExitGame> playerExitGameRequester = null;
+    private Requester<Response<VoidEventData>, JoinGameEventData> joinGameRequester = null;
+    private Requester<Response<VoidEventData>, SelectTileEventData> selectTileRequester = null;
+    private Requester<Response<VoidEventData>, DeselectTileEventData> deselectTileRequester = null;
+    private Requester<Response<VoidEventData>, InsertTileEventData> insertTileRequester = null;
+    private Requester<Response<VoidEventData>, PauseGameEventData> pauseGameRequester = null;
+    private Requester<Response<VoidEventData>, PlayerExitGame> playerExitGameRequester = null;
 
     private EventReceiver<InitialGameEventData> initialGameReceiver = null;
     private EventReceiver<PersonalGoalSetEventData> personalGoalSetReceiver = null;

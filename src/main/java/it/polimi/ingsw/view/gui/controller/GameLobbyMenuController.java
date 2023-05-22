@@ -3,6 +3,7 @@ package it.polimi.ingsw.view.gui.controller;
 import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
+import it.polimi.ingsw.event.data.VoidEventData;
 import it.polimi.ingsw.event.data.client.ExitLobbyEventData;
 import it.polimi.ingsw.event.data.client.JoinLobbyEventData;
 import it.polimi.ingsw.event.data.client.RestartGameEventData;
@@ -49,10 +50,10 @@ public class GameLobbyMenuController extends Controller {
     private NetworkEventTransceiver transceiver = null;
 
     // Utilities:
-    private Requester<Response, JoinLobbyEventData> joinLobbyRequester = null;
-    private Requester<Response, StartGameEventData> startGameRequester = null;
-    private Requester<Response, RestartGameEventData> restartGameRequester = null;
-    private Requester<Response, ExitLobbyEventData> exitLobbyRequester = null;
+    private Requester<Response<VoidEventData>, JoinLobbyEventData> joinLobbyRequester = null;
+    private Requester<Response<VoidEventData>, StartGameEventData> startGameRequester = null;
+    private Requester<Response<VoidEventData>, RestartGameEventData> restartGameRequester = null;
+    private Requester<Response<VoidEventData>, ExitLobbyEventData> exitLobbyRequester = null;
 
     private EventReceiver<PlayerHasJoinLobbyEventData> playerHasJoinLobbyReceiver = null;
     private EventReceiver<GameHasStartedEventData> gameHasStartedReceiver = null;
