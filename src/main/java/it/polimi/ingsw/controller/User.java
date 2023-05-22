@@ -45,7 +45,11 @@ public class User implements Identifiable {
     }
 
     public boolean is(String username) {
-        return name.equals(username);
+        return name.equalsIgnoreCase(username);
+    }
+
+    public String getUsername() {
+        return this.name;
     }
 
     @Override

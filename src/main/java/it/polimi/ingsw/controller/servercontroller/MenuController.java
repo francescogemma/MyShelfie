@@ -261,6 +261,7 @@ public class MenuController {
      *     <li>username is already authenticated</li>
      *     <li>password is wrong for username</li>
      * </ul> SUCCESS otherwise
+     * username is set iff result is SUCCESS
      *
      * @throws NullPointerException iff
      * <ul>
@@ -271,30 +272,30 @@ public class MenuController {
      * 
      * @see MenuController#logout(EventTransmitter, String)
      */
-    public Response authenticated(EventTransmitter transmitter, String username, String password) {
+    public Pair<Response, String> authenticated(EventTransmitter transmitter, String username, String password) {
         Objects.requireNonNull(transmitter);
         Objects.requireNonNull(username);
         Objects.requireNonNull(password);
 
         if (username.isEmpty() || password.isEmpty()) {
-            return Response.failure("Password or username too short");
+            return Pair.of(Response.failure("Password or username too short"), null);
         }
 
         User user = this.getUser(username, password);
 
         if (user.isConnected())
-            return Response.failure("User login in other connection");
+            return Pair.of(Response.failure("User login in other connection"), null);
 
         if (!user.passwordMatches(password))
-            return Response.failure("Bad credentials");
+            return Pair.of(Response.failure("Bad credentials"), null);
 
         user.setConnected(true);
 
-        authenticated.add(Pair.of(username, transmitter));
+        authenticated.add(Pair.of(user.getUsername(), transmitter));
 
         Logger.writeMessage("%s authenticated correctly".formatted(username));
 
-        return Response.success("Ok");
+        return Pair.of(Response.success("Ok"), user.getUsername());
     }
 
     /**

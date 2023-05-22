@@ -220,16 +220,16 @@ public class VirtualView implements EventTransmitter {
 
     private Response login(LoginEventData event) {
         if (isAuthenticated()) return Response.alreadyLogIn;
-        Response response = MenuController.getInstance().authenticated(
+        Pair<Response, String> response = MenuController.getInstance().authenticated(
                 this,
                 event.getUsername(),
                 event.getPassword()
         );
 
-        if (response.isOk()) {
-            this.username = event.getUsername();
+        if (response.getKey().isOk()) {
+            this.username = response.getValue();
         }
-        return response;
+        return response.getKey();
     }
 
     private Response deselectTile (DeselectTileEventData eventData) {
