@@ -9,6 +9,7 @@ import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.view.popup.PopUp;
 import it.polimi.ingsw.view.popup.PopUpQueue;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -67,26 +68,33 @@ public class UserLoginMenuController extends Controller {
 
     @FXML
     private void login() {
-        Response response;
+        new Thread(new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                Response response;
 
-        try {
-            response = loginRequester.request(new LoginEventData(usernameTextField.getText(), passwordTextField.getText()));
-        } catch (DisconnectedException e) {
-            // TODO: print status bar (disconnected)
-            return;
-        }
-        // TODO: print status bar (response)
+                try {
+                    response = loginRequester.request(new LoginEventData(usernameTextField.getText(), passwordTextField.getText()));
+                } catch (DisconnectedException e) {
+                    showResponse(Response.failure("Disconnected!"));
+                    return null;
+                }
+                showResponse(response);
 
-        if(response.isOk()) {
-            getScene().getProperties().put("username", usernameTextField.getText());
-            switchLayout(AvailableGamesMenuController.NAME);
-        } else {
-            popUpQueue.add(
-                    response.message(),
-                    PopUp.hideAfter(2000),
-                    p -> {}
-            );
-        }
+                if(response.isOk()) {
+                    getScene().getProperties().put("username", usernameTextField.getText());
+                    switchLayout(AvailableGamesMenuController.NAME);
+                } else {
+                    popUpQueue.add(
+                            response.message(),
+                            PopUp.hideAfter(2000),
+                            p -> {}
+                    );
+                }
+
+                return null;
+            }
+        }).start();
     }
 
     @FXML
