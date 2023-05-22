@@ -355,6 +355,9 @@ public class GameController extends Controller {
 
                 count++;
             }
+
+            previousBookshelfButton.setDisable(true);
+            nextBookshelfButton.setDisable(true);
         });
     }
 

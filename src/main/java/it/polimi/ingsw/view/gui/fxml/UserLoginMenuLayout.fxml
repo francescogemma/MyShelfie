@@ -47,6 +47,13 @@
          <Button mnemonicParsing="false" text="EXIT" onAction="#exit"/>
          <Region HBox.hgrow="ALWAYS"/>
       </HBox>
+
+      <HBox fx:id="statusBarHBox" alignment="CENTER_RIGHT" visible="false">
+           <padding>
+               <Insets right="20"/>
+           </padding>
+           <Label fx:id="statusBarLabel" />
+      </HBox>
    </VBox>
 
    <Pane fx:id="userLoginBackgroundBlurPane" visible="false" styleClass="backgroundBlurPane"/>
