@@ -62,7 +62,7 @@ class VirtualViewTest {
     }
 
     private void authenticate(VirtualView virtualView, EventTransceiver transceiver, String username) throws DisconnectedException {
-        Requester<Response<VoidEventData>, LoginEventData> requester = Response.requester(transceiver, transceiver, new Object());
+        Requester<Response<UsernameEventData>, LoginEventData> requester = Response.requester(transceiver, transceiver, UsernameEventData.ID, new Object());
         requester.registerAllListeners();
         Assertions.assertTrue(requester.request(new LoginEventData(username, "ciao")).isOk());
 
