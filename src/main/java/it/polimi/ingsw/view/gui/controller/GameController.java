@@ -943,7 +943,7 @@ public class GameController extends Controller {
                         // additional points
                         int additionalPoints = player.getAdditionalPoints();
                         Label additionalPointsLabel = new Label(" + " + additionalPoints);
-                        additionalPointsLabel.setStyle("-fx-text-fill: #00FF00");
+                        additionalPointsLabel.setStyle("-fx-text-fill: palette-green");
                         additionalPointsLabel.setVisible(additionalPoints > 0);
                         additionalPointsLabel.setPadding(new Insets(0, 0, 0, 10));
                         additionalPointsLabel.setAlignment(Pos.CENTER_RIGHT);
