@@ -5,6 +5,7 @@ import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.VoidEventData;
 import it.polimi.ingsw.event.data.client.LoginEventData;
+import it.polimi.ingsw.event.data.client.UsernameEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.view.popup.PopUp;
@@ -32,7 +33,7 @@ public class UserLoginMenuController extends Controller {
     private NetworkEventTransceiver transceiver = null;
 
     // Utilities:
-    private Requester<Response<VoidEventData>, LoginEventData> loginRequester = null;
+    private Requester<Response<UsernameEventData>, LoginEventData> loginRequester = null;
 
     private PopUpQueue popUpQueue;
 
@@ -40,7 +41,7 @@ public class UserLoginMenuController extends Controller {
     private void initialize() {
         if(transceiver == null) {
             transceiver = (NetworkEventTransceiver) getScene().getProperties().get("transceiver");
-            loginRequester = Response.requester(transceiver, transceiver, new Object());
+            loginRequester = Response.requester(transceiver, transceiver, UsernameEventData.ID, new Object());
 
             PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
                 transceiver = null;
@@ -72,7 +73,7 @@ public class UserLoginMenuController extends Controller {
         new Thread(new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                Response response;
+                Response<UsernameEventData> response;
 
                 try {
                     response = loginRequester.request(new LoginEventData(usernameTextField.getText(), passwordTextField.getText()));
@@ -83,7 +84,7 @@ public class UserLoginMenuController extends Controller {
                 showResponse(response);
 
                 if(response.isOk()) {
-                    getScene().getProperties().put("username", usernameTextField.getText());
+                    getScene().getProperties().put("username", response.getWrappedData().getUsername());
                     switchLayout(AvailableGamesMenuController.NAME);
                 } else {
                     popUpQueue.add(

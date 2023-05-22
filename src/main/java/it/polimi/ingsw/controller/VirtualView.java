@@ -10,6 +10,7 @@ import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
+import it.polimi.ingsw.view.gui.controller.UserLoginMenuController;
 
 import java.util.Objects;
 
@@ -218,9 +219,10 @@ public class VirtualView implements EventTransmitter {
         return response;
     }
 
-    private Response login(LoginEventData event) {
-        if (isAuthenticated()) return Response.alreadyLogIn;
-        Pair<Response, String> response = MenuController.getInstance().authenticated(
+    private Response<UsernameEventData> login(LoginEventData event) {
+        if (isAuthenticated()) return new Response<>("Already login", ResponseStatus.FAILURE, new UsernameEventData(""));
+
+        Pair<Response<UsernameEventData>, String> response = MenuController.getInstance().authenticated(
                 this,
                 event.getUsername(),
                 event.getPassword()

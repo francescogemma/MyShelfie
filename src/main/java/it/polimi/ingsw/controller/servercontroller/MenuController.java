@@ -6,6 +6,7 @@ import it.polimi.ingsw.controller.User;
 import it.polimi.ingsw.controller.db.DBManager;
 import it.polimi.ingsw.controller.db.IdentifiableNotFoundException;
 import it.polimi.ingsw.event.data.EventData;
+import it.polimi.ingsw.event.data.client.UsernameEventData;
 import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
 import it.polimi.ingsw.event.data.game.GameHasBeenStoppedEventData;
 import it.polimi.ingsw.event.data.game.GameIsNoLongerAvailableEventData;
@@ -272,22 +273,37 @@ public class MenuController {
      * 
      * @see MenuController#logout(EventTransmitter, String)
      */
-    public Pair<Response, String> authenticated(EventTransmitter transmitter, String username, String password) {
+    public Pair<Response<UsernameEventData>, String> authenticated(EventTransmitter transmitter, String username, String password) {
         Objects.requireNonNull(transmitter);
         Objects.requireNonNull(username);
         Objects.requireNonNull(password);
 
         if (username.isEmpty() || password.isEmpty()) {
-            return Pair.of(Response.failure("Password or username too short"), null);
+            return Pair.of(
+                    new Response<>(
+                            "Password or username too short",
+                            ResponseStatus.FAILURE,
+                            new UsernameEventData("")),
+                    null);
         }
 
         User user = this.getUser(username, password);
 
         if (user.isConnected())
-            return Pair.of(Response.failure("User login in other connection"), null);
+            return Pair.of(
+                    new Response<>(
+                            "User login in other connection",
+                            ResponseStatus.FAILURE,
+                            new UsernameEventData("")),
+                    null);
 
         if (!user.passwordMatches(password))
-            return Pair.of(Response.failure("Bad credentials"), null);
+            return Pair.of(
+                    new Response<>(
+                            "Bad credentials",
+                            ResponseStatus.FAILURE,
+                            new UsernameEventData("")),
+                    null);
 
         user.setConnected(true);
 
@@ -295,7 +311,12 @@ public class MenuController {
 
         Logger.writeMessage("%s authenticated correctly".formatted(username));
 
-        return Pair.of(Response.success("Ok"), user.getUsername());
+        return Pair.of(
+                new Response<>(
+                        "OK!",
+                        ResponseStatus.SUCCESS,
+                        new UsernameEventData(user.getUsername())),
+                user.getUsername());
     }
 
     /**

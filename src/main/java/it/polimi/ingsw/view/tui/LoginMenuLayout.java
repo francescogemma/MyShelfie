@@ -2,10 +2,12 @@ package it.polimi.ingsw.view.tui;
 
 import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.controller.ResponseStatus;
+import it.polimi.ingsw.controller.User;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.VoidEventData;
 import it.polimi.ingsw.event.data.client.LoginEventData;
+import it.polimi.ingsw.event.data.client.UsernameEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.view.popup.PopUp;
@@ -46,9 +48,10 @@ public class LoginMenuLayout extends AppLayout {
 
     // Data:
     private NetworkEventTransceiver transceiver = null;
+    private String username;
 
     // Utilities:
-    private Requester<Response<VoidEventData>, LoginEventData> loginRequester = null;
+    private Requester<Response<UsernameEventData>, LoginEventData> loginRequester = null;
 
     private PopUpQueue popUpQueue;
 
@@ -57,13 +60,13 @@ public class LoginMenuLayout extends AppLayout {
 
         setData(new AppLayoutData(
             Map.of(
-                "username", usernameEntry::getValue,
+                "username", () -> username,
                 "password", passwordEntry::getValue
             )
         ));
 
         loginButton.onpress(() -> {
-            Response response;
+            Response<UsernameEventData> response;
             try {
                 response = loginRequester
                     .request(new LoginEventData(usernameEntry.getValue(), passwordEntry.getValue()));
@@ -76,6 +79,7 @@ public class LoginMenuLayout extends AppLayout {
             displayServerResponse(response);
 
             if (response.isOk()) {
+                username = response.getWrappedData().getUsername();
                 switchAppLayout(AvailableGamesMenuLayout.NAME);
             } else {
                 popUpQueue.add(response.message(), PopUp.hideAfter(2000), p -> {});
@@ -100,7 +104,7 @@ public class LoginMenuLayout extends AppLayout {
             transceiver = (NetworkEventTransceiver) appDataProvider.get(ConnectionMenuLayout.NAME,
                 "transceiver");
 
-            loginRequester = Response.requester(transceiver, transceiver, getLock());
+            loginRequester = Response.requester(transceiver, transceiver, UsernameEventData.ID, getLock());
 
             PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(data -> {
                 transceiver = null;
