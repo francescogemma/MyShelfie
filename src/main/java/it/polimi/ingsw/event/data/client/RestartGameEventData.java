@@ -9,6 +9,11 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
+/**
+ * This event asks the server to restart the game in which the user is in the lobby.
+ *
+ * @author Giacomo Groppi
+ * */
 public class RestartGameEventData implements EventData {
     public static final String ID = "RESTART_GAME";
 
