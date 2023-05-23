@@ -172,7 +172,7 @@ public class GameController {
 
                 return Response.success("Game has been stopped");
             } catch (IllegalFlowException e) {
-                return Response.success("Game is not stopped");
+                return Response.failure("Game is not stopped");
             }
         }
     }
