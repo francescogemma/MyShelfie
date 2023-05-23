@@ -406,7 +406,7 @@ public class GameController extends Controller {
     private Requester<Response<VoidEventData>, DeselectTileEventData> deselectTileRequester = null;
     private Requester<Response<VoidEventData>, InsertTileEventData> insertTileRequester = null;
     private Requester<Response<VoidEventData>, PauseGameEventData> pauseGameRequester = null;
-    private Requester<Response<VoidEventData>, PlayerExitGame> playerExitGameRequester = null;
+    private Requester<Response<VoidEventData>, PlayerExitGameEventData> playerExitGameRequester = null;
 
     private EventReceiver<InitialGameEventData> initialGameReceiver = null;
     private EventReceiver<PersonalGoalSetEventData> personalGoalSetReceiver = null;
@@ -811,7 +811,7 @@ public class GameController extends Controller {
 
         exitButton.setOnAction(event -> {
             try {
-                Response response = playerExitGameRequester.request(new PlayerExitGame());
+                Response response = playerExitGameRequester.request(new PlayerExitGameEventData());
 
                 if (!response.isOk()) {
                     showResponse(response);

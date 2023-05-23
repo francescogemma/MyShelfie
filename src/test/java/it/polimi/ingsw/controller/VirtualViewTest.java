@@ -1,25 +1,17 @@
 package it.polimi.ingsw.controller;
 
 import it.polimi.ingsw.controller.db.DBManagerTest;
-import it.polimi.ingsw.controller.servercontroller.MenuController;
 import it.polimi.ingsw.event.*;
 import it.polimi.ingsw.event.data.VoidEventData;
 import it.polimi.ingsw.event.data.client.*;
-import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.DisconnectedException;
-import it.polimi.ingsw.networking.TCP.TCPConnection;
 import it.polimi.ingsw.utils.Logger;
-import it.polimi.ingsw.utils.Pair;
 import jdk.jfr.Description;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
-import org.w3c.dom.events.Event;
-
-import java.util.Objects;
 
 @Execution(ExecutionMode.SAME_THREAD)
 class VirtualViewTest {
@@ -92,9 +84,9 @@ class VirtualViewTest {
     }
 
     private void exitGame(VirtualView view, EventTransceiver transceiver) throws DisconnectedException {
-        Requester<Response<VoidEventData>, PlayerExitGame> requester = Response.requester(transceiver, transceiver, new Object());
+        Requester<Response<VoidEventData>, PlayerExitGameEventData> requester = Response.requester(transceiver, transceiver, new Object());
         requester.registerAllListeners();
-        Assertions.assertTrue(requester.request(new PlayerExitGame()).isOk());
+        Assertions.assertTrue(requester.request(new PlayerExitGameEventData()).isOk());
     }
 
     private void startGame(VirtualView view, EventTransceiver transceiver) throws DisconnectedException {
