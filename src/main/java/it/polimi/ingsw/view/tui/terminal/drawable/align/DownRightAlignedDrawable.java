@@ -9,12 +9,37 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
 import java.util.Optional;
 
+/**
+ * Is an AlignedDrawable which aligns a given inner {@link Drawable} to the right-down side of the free space
+ * (if there is some).
+ *
+ * @see AlignedDrawable
+ */
 public class DownRightAlignedDrawable extends AlignedDrawable {
+    /**
+     * The inner Drawable which must be aligned to the right-down side of the free space.
+     */
     private final Drawable toAlignDownRight;
 
+    /**
+     * The line component of the {@link Coordinate} of the origin (upper-left corner) of the inner Drawable inside
+     * the free space.
+     */
     private int toAlignDownRightOriginLine;
+
+    /**
+     * The column component of the {@link Coordinate} of the origin (upper-left corner) of the inner Drawable inside
+     * the free space.
+     */
     private int toAlignDownRightOriginColumn;
 
+    /**
+     * Constructor of the class. Initializes the inner Drawable that is going to be aligned to the right-down side
+     * of the available space.
+     *
+     * @param toAlignDownRight is the inner Drawable that will be aligned to the right-down side of the available space
+     *                         (if there is some).
+     */
     public DownRightAlignedDrawable(Drawable toAlignDownRight) {
         this.toAlignDownRight = toAlignDownRight;
     }
