@@ -6,9 +6,25 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
 import java.util.Optional;
 
+/**
+ * Is an AlignedDrawable which aligns a given inner {@link Drawable} to the up-left side of the free space
+ * (if there is some).
+ *
+ * @see AlignedDrawable
+ */
 public class UpLeftAlignedDrawable extends AlignedDrawable {
+    /**
+     * The inner Drawable which must be aligned to the up-left side of the free space.
+     */
     private final Drawable toAlignUpLeft;
 
+    /**
+     * Constructor of the class. Initializes the inner Drawable that is going to be aligned to the up-left side
+     * of the available space.
+     *
+     * @param toAlignUpLeft is the inner Drawable that will be aligned to the up-left side of the available space
+     *                      (if there is some).
+     */
     public UpLeftAlignedDrawable(Drawable toAlignUpLeft) {
         this.toAlignUpLeft = toAlignUpLeft;
     }
