@@ -162,7 +162,7 @@ public class AvailableGamesMenuController extends Controller {
             }
         });
 
-        transceiver.broadcast(new PlayerHasJoinMenu());
+        transceiver.broadcast(new PlayerHasJoinMenuEventData());
     }
 
     @FXML

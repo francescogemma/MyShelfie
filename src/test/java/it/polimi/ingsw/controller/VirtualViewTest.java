@@ -58,7 +58,7 @@ class VirtualViewTest {
         requester.registerAllListeners();
         Assertions.assertTrue(requester.request(new LoginEventData(username, "ciao")).isOk());
 
-        transceiver.broadcast(new PlayerHasJoinMenu());
+        transceiver.broadcast(new PlayerHasJoinMenuEventData());
     }
 
     private void createNewGame(VirtualView view, EventTransceiver transceiver, String gameName) throws DisconnectedException {
