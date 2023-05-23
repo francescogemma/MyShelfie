@@ -1,13 +1,12 @@
 package it.polimi.ingsw.view.tui;
 
 import it.polimi.ingsw.controller.Response;
-import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
 import it.polimi.ingsw.event.data.VoidEventData;
 import it.polimi.ingsw.event.data.client.CreateNewGameEventData;
 import it.polimi.ingsw.event.data.client.LogoutEventData;
-import it.polimi.ingsw.event.data.client.PlayerHasJoinMenu;
+import it.polimi.ingsw.event.data.client.PlayerHasJoinMenuEventData;
 import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
 import it.polimi.ingsw.event.data.game.GameIsNoLongerAvailableEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
@@ -243,7 +242,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
         gameHasBeenCreatedReceiver.registerListener(gameHasBeenCreatedListener);
         gameIsNoLongerAvailableReceiver.registerListener(gameIsNoLongerAvailableListener);
 
-        transceiver.broadcast(new PlayerHasJoinMenu());
+        transceiver.broadcast(new PlayerHasJoinMenuEventData());
     }
 
     @Override

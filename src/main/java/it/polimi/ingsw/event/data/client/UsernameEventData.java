@@ -9,6 +9,18 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
+/**
+ * This event is used by the {@link it.polimi.ingsw.controller.Response} class to notify the
+ * client of the actual username of the user.
+ * If a user attempts to log in with a name that differs only in case from an existing user
+ * (since the server is not case-sensitive for usernames), it is necessary to notify the user
+ * interface of the actual username.
+ * For this reason, when performing the login, along with the {@link it.polimi.ingsw.controller.Response} object,
+ * the {@link UsernameEventData} is also passed as data.
+ *
+ * @author Giacomo Groppi
+ * @see it.polimi.ingsw.controller.servercontroller.MenuController#login(EventTransmitter, String, String)
+ * */
 public class UsernameEventData implements EventData {
     public static final String ID = "USERNAME";
     private final String username;
