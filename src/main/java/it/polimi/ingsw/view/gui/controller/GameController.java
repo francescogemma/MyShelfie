@@ -663,12 +663,14 @@ public class GameController extends Controller {
     public void waitForReconnections() {
         popUpQueue.add("Waiting for reconnection of other players",
             popUp ->{
-                if (scoreBoard.getDisplayablePlayers().stream().filter(DisplayablePlayer::isConnected)
-                    .count() < 2 && !gameHasBeenStopped) {
-                    waitingForReconnectionsPopUp = popUp;
-                } else {
-                    popUp.askToHide();
-                }
+                Platform.runLater(() -> {
+                    if (scoreBoard.getDisplayablePlayers().stream().filter(DisplayablePlayer::isConnected)
+                        .count() < 2 && !gameHasBeenStopped) {
+                        waitingForReconnectionsPopUp = popUp;
+                    } else {
+                        popUp.askToHide();
+                    }
+                });
             },
             popUp -> {});
     }
