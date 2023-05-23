@@ -6,10 +6,27 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
 import java.util.Optional;
 
+/**
+ * Is an AlignedDrawable which centers a given inner {@link Drawable} in the free space (if there is some).
+ *
+ * @see AlignedDrawable
+ */
 public class CenteredDrawable extends AlignedDrawable {
+    /**
+     * The inner Drawable which must be centered.
+     */
     private final Drawable toCenter;
+
+    /**
+     * The {@link Coordinate} of the origin (upper-left corner) of the inner Drawable inside the free space.
+     */
     private Coordinate toCenterOrigin;
 
+    /**
+     * Constructor of the class. Initializes the inner Drawable that is going to be centered in the available space.
+     *
+     * @param toCenter is the inner Drawable that will be centered if there is some available space.
+     */
     public CenteredDrawable(Drawable toCenter) {
         this.toCenter = toCenter;
     }
