@@ -11,7 +11,6 @@ import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
-import it.polimi.ingsw.view.gui.controller.UserLoginMenuController;
 
 import java.util.Objects;
 
@@ -40,7 +39,7 @@ public class VirtualView implements EventTransmitter {
         RestartGameEventData    .responder(transceiver, transceiver, this::restartGame);
         JoinLobbyEventData      .responder(transceiver, transceiver, this::joinLobby);
         CreateNewGameEventData  .responder(transceiver, transceiver, this::createNewGame);
-        PlayerExitGame          .responder(transceiver, transceiver, this::exitGame);
+        PlayerExitGameEventData.responder(transceiver, transceiver, this::exitGame);
         PauseGameEventData      .responder(transceiver, transceiver, this::pauseGame);
         LogoutEventData         .responder(transceiver, transceiver, this::logout);
         ExitLobbyEventData      .responder(transceiver, transceiver, this::exitLobby);
@@ -49,7 +48,7 @@ public class VirtualView implements EventTransmitter {
         PlayerDisconnectedInternalEventData.castEventReceiver(transceiver).registerListener(event -> disconnect());
 
         // user event
-        PlayerHasJoinMenu       .castEventReceiver(transceiver).registerListener(event -> this.playerHasJoinMenu());
+        PlayerHasJoinMenuEventData.castEventReceiver(transceiver).registerListener(event -> this.playerHasJoinMenu());
     }
 
     private Response<VoidEventData> joinLobby (JoinLobbyEventData event) {
@@ -141,7 +140,7 @@ public class VirtualView implements EventTransmitter {
         return response;
     }
 
-    private Response<VoidEventData> exitGame (PlayerExitGame exitGame) {
+    private Response<VoidEventData> exitGame (PlayerExitGameEventData exitGame) {
         Logger.writeMessage("Call for username %s".formatted(username));
 
         if (gameController == null) return Response.failure("You are not in a game");
@@ -223,7 +222,7 @@ public class VirtualView implements EventTransmitter {
     private Response<UsernameEventData> login(LoginEventData event) {
         if (isAuthenticated()) return new Response<>("Already login", ResponseStatus.FAILURE, new UsernameEventData(""));
 
-        Response<UsernameEventData> response = MenuController.getInstance().authenticated(
+        Response<UsernameEventData> response = MenuController.getInstance().login(
                 this,
                 event.getUsername(),
                 event.getPassword()

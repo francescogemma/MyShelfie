@@ -9,7 +9,6 @@ import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.VoidEventData;
 import it.polimi.ingsw.event.data.client.UsernameEventData;
 import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
-import it.polimi.ingsw.event.data.game.GameHasBeenStoppedEventData;
 import it.polimi.ingsw.event.data.game.GameIsNoLongerAvailableEventData;
 import it.polimi.ingsw.event.data.internal.GameHasBeenStoppedInternalEventData;
 import it.polimi.ingsw.event.data.internal.GameOverInternalEventData;
@@ -274,7 +273,7 @@ public class MenuController {
      * 
      * @see MenuController#logout(EventTransmitter, String)
      */
-    public Response<UsernameEventData> authenticated(EventTransmitter transmitter, String username, String password) {
+    public Response<UsernameEventData> login(EventTransmitter transmitter, String username, String password) {
         Objects.requireNonNull(transmitter);
         Objects.requireNonNull(username);
         Objects.requireNonNull(password);
