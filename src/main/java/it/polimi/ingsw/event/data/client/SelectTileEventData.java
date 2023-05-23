@@ -10,6 +10,15 @@ import it.polimi.ingsw.utils.Coordinate;
 
 import java.util.function.Function;
 
+/**
+ * Use this event to request the server to select the Tile at the specified coordinate.
+ *
+ * @param coordinate The coordinate where the Tile should be selected.
+ * @see Coordinate
+ * @see it.polimi.ingsw.model.game.Game#selectTile(String, Coordinate)
+ * @see it.polimi.ingsw.controller.servercontroller.GameController#selectTile(String, Coordinate) 
+ * @author Giacomo Groppi
+ * */
 public record SelectTileEventData(Coordinate coordinate) implements EventData {
     public static final String ID = "SELECT_TILE";
 
