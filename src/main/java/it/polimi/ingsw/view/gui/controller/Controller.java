@@ -82,9 +82,7 @@ public abstract class Controller {
             this.timerStatusBar.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    Platform.runLater(() -> {
-                        statusBarHBox.setVisible(false);
-                    });
+                    Platform.runLater(() -> statusBarHBox.setVisible(false));
                 }
             }, 2000);
         });
@@ -100,9 +98,7 @@ public abstract class Controller {
     }
 
     public void setProperty(String property, Object value) {
-        Platform.runLater(() -> {
-            getScene().getProperties().put(property, value);
-        });
+        Platform.runLater(() -> getScene().getProperties().put(property, value));
     }
 
 

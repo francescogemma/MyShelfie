@@ -22,6 +22,9 @@ import javafx.scene.layout.VBox;
 
 import java.util.function.UnaryOperator;
 
+/**
+ * Controller for the connection menu layout.
+ */
 public class ConnectionMenuController extends Controller {
     @FXML private TextField serverIPTextField;
     @FXML private TextField serverPortTextField;
@@ -36,8 +39,10 @@ public class ConnectionMenuController extends Controller {
 
     @FXML
     private void initialize() {
+        // set the server port text field to accept only decimal numbers
         setServerPortTextFieldToDecimalOnly();
 
+        // initialize the PopUpQueue
         popUpQueue = new PopUpQueue(
                 text -> Platform.runLater(() -> {
                     connectionPopUpLabel.setText(text);
@@ -51,6 +56,7 @@ public class ConnectionMenuController extends Controller {
                 new Object()
         );
 
+        // if we return to this layout because of a disconnection, show a disconnected pop up message
         if(!getPreviousLayoutName().equals(Controller.START_NAME)) {
             popUpQueue.add(
                     "You have been disconnected from the server",
@@ -60,6 +66,9 @@ public class ConnectionMenuController extends Controller {
         }
     }
 
+    /**
+     * Set the server port text field to accept only decimal numbers
+     */
     private void setServerPortTextFieldToDecimalOnly() {
         UnaryOperator<TextFormatter.Change> integerFilter = change -> {
             String input = change.getText();
@@ -72,6 +81,12 @@ public class ConnectionMenuController extends Controller {
         serverPortTextField.setTextFormatter(new TextFormatter<>(integerFilter));
     }
 
+    /**
+     * callback for the "Next" button.
+     * It checks if the IP address and the port are valid and then tries to connect to the server.
+     * If the connection is successful, it switches to the next layout.
+     * If the connection fails, it shows a pop up message.
+     */
     @FXML
     private void connect() {
         String ipAddress = serverIPTextField.getText();
@@ -81,12 +96,16 @@ public class ConnectionMenuController extends Controller {
                 "Trying to connect to the server...",
                 "CONNECTING",
                 popUp -> {
+                    // create a new task to connect to the server
                     Task<Void> connect = new Task<>() {
                         @Override
                         protected Void call() {
                             Connection connection = null;
 
                             try {
+                                /* retrieve the connection type from the scene properties
+                                 * and create the connection
+                                 */
                                 if (getScene().getProperties().get("connection").equals("TCP")) {
                                     connection = new TCPConnection(ipAddress, port);
                                 } else {
@@ -113,6 +132,7 @@ public class ConnectionMenuController extends Controller {
                             } finally {
                                 popUp.askToHide();
                                 if(connection != null) {
+                                    // if a connection has been created, set it as the transceiver and switch layout
                                     setProperty("transceiver", new NetworkEventTransceiver(connection, new Object()));
                                     switchLayout(UserLoginMenuController.NAME);
                                 }
@@ -127,6 +147,10 @@ public class ConnectionMenuController extends Controller {
         );
     }
 
+    /**
+     * callback for the "Exit" button.
+     * It closes the application.
+     */
     @FXML
     private void exit() {
         Platform.exit();
