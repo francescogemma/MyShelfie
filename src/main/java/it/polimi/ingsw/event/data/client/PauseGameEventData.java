@@ -9,12 +9,14 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
+/**
+ * This event is used to request the server to pause the game
+ *
+ * @see it.polimi.ingsw.controller.servercontroller.GameController#stopGame(String)
+ * @author Giacomo Groppi
+ * */
 public class PauseGameEventData implements EventData {
     public static final String ID = "PAUSE_GAME";
-
-    public PauseGameEventData() {
-
-    }
 
     public static CastEventReceiver<PauseGameEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
