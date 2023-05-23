@@ -234,9 +234,13 @@ public class Game extends GameView {
     private synchronized void setStopped () {
         forceStop();
 
-        if (timerEndGame != null)
+        if (this.timerEndGame != null)
             this.timerEndGame.cancel();
-        timerEndGame = null;
+        this.timerEndGame = null;
+
+        if (this.playTimer != null)
+            this.playTimer.cancel();
+        this.playTimer = null;
 
         Logger.writeMessage("game: %s is stopped".formatted(name));
         broadcast(new GameHasBeenStoppedEventData());
