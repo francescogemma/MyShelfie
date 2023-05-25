@@ -7,9 +7,7 @@ import it.polimi.ingsw.event.LocalEventTransceiver;
 import it.polimi.ingsw.event.data.EventData;
 import it.polimi.ingsw.event.data.client.ExitLobbyEventData;
 import it.polimi.ingsw.event.data.client.SelectTileEventData;
-import it.polimi.ingsw.event.data.game.BoardChangedEventData;
-import it.polimi.ingsw.event.data.game.BookshelfHasChangedEventData;
-import it.polimi.ingsw.event.data.game.PlayerHasExitLobbyEventData;
+import it.polimi.ingsw.event.data.game.*;
 import it.polimi.ingsw.model.game.Game;
 import it.polimi.ingsw.model.game.GameView;
 import it.polimi.ingsw.model.game.NoPlayerConnectedException;
@@ -291,7 +289,7 @@ class GameControllerTest {
         Assertions.assertTrue(gameController.exitGame(username4).isOk());
 
         Assertions.assertTrue(
-                gameController.getGameView().isStopped()
+                gameController.isStopped()
         );
     }
 
@@ -508,6 +506,118 @@ class GameControllerTest {
 
         Assertions.assertTrue(
                 gameController.restartGame(username1).isOk()
+        );
+    }
+
+    @Test
+    void disconnect_playerInLobby_correctOutput() {
+        List<String> events = new ArrayList<>();
+
+        eventTransceiver2.registerListener(event -> {
+            events.add(event.getId());
+        });
+
+        gameController.joinLobby(virtualView1, username1);
+        gameController.joinLobby(virtualView2, username2);
+        gameController.joinLobby(virtualView3, username3);
+        gameController.joinLobby(virtualView4, username4);
+
+        gameController.disconnect(username1);
+
+        Assertions.assertTrue(events.contains(PlayerHasExitLobbyEventData.ID));
+    }
+
+    @Test
+    void disconnect_playerInGame_correctOutput() {
+        List<String> events = new ArrayList<>();
+
+        eventTransceiver2.registerListener(event -> {
+            events.add(event.getId());
+        });
+
+        gameController.joinLobby(virtualView1, username1);
+        gameController.joinLobby(virtualView2, username2);
+        gameController.joinLobby(virtualView3, username3);
+        gameController.joinLobby(virtualView4, username4);
+
+        gameController.startGame(username1);
+
+        gameController.joinGame(username1);
+        gameController.joinGame(username2);
+        gameController.joinGame(username3);
+        gameController.joinGame(username4);
+
+        gameController.disconnect(username1);
+
+        Assertions.assertTrue(events.contains(PlayerHasDisconnectedEventData.ID));
+        Assertions.assertTrue(events.contains(CurrentPlayerChangedEventData.ID));
+    }
+
+    @Test
+    void disconnect_lastPlayerDisconnectGameShouldStop_correctOutput() {
+        gameController.joinLobby(virtualView1, username1);
+        gameController.joinLobby(virtualView2, username2);
+        gameController.joinLobby(virtualView3, username3);
+        gameController.joinLobby(virtualView4, username4);
+
+        gameController.startGame(username1);
+
+        gameController.joinGame(username1);
+        gameController.joinGame(username2);
+        gameController.joinGame(username3);
+        gameController.joinGame(username4);
+
+        gameController.disconnect(username1);
+        gameController.disconnect(username2);
+        gameController.disconnect(username3);
+        gameController.disconnect(username4);
+
+        GameView gameView = gameController.getGameView();
+
+        Assertions.assertTrue(gameView.isStopped());
+    }
+
+    @Test
+    void startGame_playerNotInLobby_correctOutput() {
+        gameController.joinLobby(virtualView1, username1);
+        gameController.joinLobby(virtualView2, username2);
+
+        Assertions.assertFalse(
+                gameController.startGame(username3).isOk()
+        );
+    }
+
+    @Test
+    void startGame_gameAlreadyStarted_correctOutput() {
+        gameController.joinLobby(virtualView1, username1);
+        gameController.joinLobby(virtualView2, username2);
+
+        gameController.startGame(username1);
+
+        Assertions.assertFalse(
+                gameController.startGame(username1).isOk()
+        );
+    }
+
+    @Test
+    void startGame_onlyOnePlayerInLobby_correctOutput() {
+        gameController.joinLobby(virtualView1, username1);
+
+        Assertions.assertFalse(
+                gameController.startGame(username1).isOk()
+        );
+    }
+
+    @Test
+    void isAvailableForJoin_playerDisconnected_correctOutput() {
+        gameController.joinLobby(virtualView1, username1);
+        gameController.joinLobby(virtualView2, username2);
+        gameController.joinLobby(virtualView3, username3);
+
+        gameController.disconnect(username2);
+
+        Assertions.assertTrue(
+                gameController.isAvailableForJoin(username2)
         );
     }
 }
