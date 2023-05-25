@@ -1,7 +1,6 @@
 package it.polimi.ingsw.controller.servercontroller;
 
 import it.polimi.ingsw.controller.Response;
-import it.polimi.ingsw.controller.ResponseStatus;
 import it.polimi.ingsw.controller.db.DBManager;
 import it.polimi.ingsw.event.EventTransceiver;
 import it.polimi.ingsw.event.LocalEventTransceiver;
@@ -637,21 +636,17 @@ public class GameController {
         return game.isStopped();
     }
 
-    /**
-     * @return true iff we have remove one element
-     * */
-    private boolean removeFromList (String username, ArrayList<Pair<EventTransmitter, String>> list) {
+    private void removeFromList (String username, ArrayList<Pair<EventTransmitter, String>> list) {
         Objects.requireNonNull(username);
         Objects.requireNonNull(list);
 
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getValue().equals(username)) {
                 list.remove(i);
-                return true;
+                return;
             }
         }
 
-        return false;
     }
 
     /**

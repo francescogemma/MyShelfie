@@ -169,7 +169,7 @@ public class MenuController {
      * @throws NullPointerException if gameController or username are null
      * @see GameController#exitGame(String)
      */
-    public synchronized Response exitGame(GameController gameController, String username) {
+    public synchronized Response<VoidEventData> exitGame(GameController gameController, String username) {
         Objects.requireNonNull(gameController);
         Objects.requireNonNull(username);
 
@@ -447,7 +447,7 @@ public class MenuController {
      *
      * @return SUCCESS iff there is no game with the same name
      */
-    public Response createNewGame(String gameName, String username) {
+    public Response<VoidEventData> createNewGame(String gameName, String username) {
         Objects.requireNonNull(gameName);
         Objects.requireNonNull(username);
 

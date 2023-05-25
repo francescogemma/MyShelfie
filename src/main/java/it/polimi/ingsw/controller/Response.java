@@ -41,32 +41,32 @@ public class Response <T extends EventData> extends EventDataWrapper<T> {
     /**
      * Default message for not authenticated user
      * */
-    protected static final Response<VoidEventData> notAuthenticated = Response.failure("Not autenticated");
+    protected static final String notAuthenticated = "Not autenticated";
 
     /**
      * Default message for client not in lobby
      */
-    protected static final Response<VoidEventData> notInLobby = Response.failure("Not in lobby");
+    protected static final String notInLobby = "Not in lobby";
 
     /**
      * Default message for client not in game
      * */
-    protected static final Response<VoidEventData> notInGame  = Response.failure("Not in game");
+    protected static final String notInGame  = "Not in game";
 
     /**
      * Default message for client not in game
      * */
-    protected static final Response<VoidEventData> alreadyInGame = Response.failure("Already in game");
+    protected static final String alreadyInGame = "Already in game";
 
     /**
      * Default message for client already in game
      * */
-    protected static final Response<VoidEventData> alreadyInLobby = Response.failure("Already in lobby");
+    protected static final String alreadyInLobby = "Already in lobby";
 
     /**
      * Default failure message for client already log in
      * */
-    protected static final Response<VoidEventData> alreadyLogIn = Response.failure("Already log in");
+    protected static final String alreadyLogIn = "Already log in";
 
     /**
      * Creates a new Response object with a success status.
