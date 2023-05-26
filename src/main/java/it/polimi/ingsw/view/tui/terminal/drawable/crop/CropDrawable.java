@@ -7,9 +7,24 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
 import java.util.Optional;
 
+/**
+ * A CropDrawable is a {@link FullyResizableDrawable} built starting from an {@link AlignedDrawable}, which is a {@link Drawable}
+ * with no maximum size, by taking only the up-left area in the original drawable if the desired size is less than
+ * the one reachable by the AlignedDrawable.
+ *
+ * @see FullyResizableDrawable
+ */
 public class CropDrawable extends FullyResizableDrawable {
-    private final Drawable toCrop;
+    /**
+     * Is the AlignedDrawable which will be cropped, becoming a {@link FullyResizableDrawable}.
+     */
+    private final AlignedDrawable toCrop;
 
+    /**
+     * Constructor of the class. Initializes the AlignedDrawable which will be cropped.
+     *
+     * @param toCrop is the AlignedDrawable which will be cropped.
+     */
     public CropDrawable(AlignedDrawable toCrop) {
         this.toCrop = toCrop;
     }
