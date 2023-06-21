@@ -17,11 +17,14 @@ The project consists of the development of a Java software version of the board 
 
 ## Implemented features
 
-* **Complete rules**
+This project comes up with an intuitive CLI interface and a GUI interface, you can choose which one to use once you launch the app.
+The implemented features are the following:
+
+* **Complete rules:**
     all the rules implemented.
-* **Multiple games**
+* **Multiple games:**
     allows the server to manage multiple games simultaneously.
-* **Flexibility to disconnections**
+* **Flexibility to disconnections:**
     disconnected players can reconnect and continue the game.
-* **Persintency**
+* **Persintency:**
     Games can be saved, so the user can stop a game and restart it.
