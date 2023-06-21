@@ -10,26 +10,73 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
 import java.util.Optional;
 
+/**
+ * It is a ValueDrawable which allows to display text on screen.
+ * TextBoxes support editing, so the user can type inside a TextBox to change its content.
+ * Editable TextBoxes have a cursor in a certain position; by typing users will add the specified character at the
+ * cursor position, they can also delete characters behind the cursor.
+ * They can also be used to display unchangeable text.
+ *
+ * @author Cristiano Migali
+ */
 public class TextBox extends ValueDrawable<String> {
+    /**
+     * It contains the text that is being displayed by the TextBox.
+     */
     private StringBuilder text;
 
+    /**
+     * It is the column component of the coordinate (which is 0 based conversely to {@link Coordinate}) of the
+     * edit cursor inside the TextBox.
+     */
     private int cursorColumn = 0;
+
+    /**
+     * It is the line component of the coordinate (which is 0 based conversely to {@link Coordinate}) of the
+     * edit cursors inside the TextBox.
+     */
     private int cursorLine = 0;
 
+    /**
+     * It is true iff the edit cursor is being shown on screen by making the corresponding symbol background white.
+     */
     private boolean showCursor = true;
 
+    /**
+     * It is true iff this TextBox can be on focus (usually it is equivalent to be an editable TextBox).
+     */
     private boolean focusable = true;
 
+    /**
+     * It is true iff the TextBox is on focus.
+     */
     private boolean onFocus = false;
 
+    /**
+     * If true displays the {@link PrimitiveSymbol#STAR} instead of actual characters inside the TextBox. It is
+     * useful for password fields.
+     */
     private boolean textHidden = false;
 
+    /**
+     * It is the color of the text that is being displayed inside the TextBox.
+     */
     private Color color = Color.WHITE;
 
+    /**
+     * It is true iff the TextBox supports multi line text.
+     */
     private boolean acceptsNewLinesAndSpaces = false;
 
+    /**
+     * It is true iff the text inside the TextBox must be displayed in bold.
+     */
     private boolean bold = false;
 
+    /**
+     * @param line is the line coordinate (0 based) of the desired line inside the text contained in the TextBox.
+     * @return the line of text contained in the TextBox at the specified line coordinate.
+     */
     private String getLineOfText(int line) {
         int start = 0;
 
@@ -51,6 +98,9 @@ public class TextBox extends ValueDrawable<String> {
         return text.substring(start, end);
     }
 
+    /**
+     * Adjusts the size of the TextBox Drawable to fit the contained text.
+     */
     private void calculateSize() {
         int lines = 1;
         int columns = 1;
@@ -70,6 +120,10 @@ public class TextBox extends ValueDrawable<String> {
         size = new DrawableSize(lines, columns);
     }
 
+    /**
+     * Constructor of the class.
+     * Initializes an empty TextBox.
+     */
     public TextBox() {
         text = new StringBuilder(" ");
         calculateSize();
@@ -284,6 +338,10 @@ public class TextBox extends ValueDrawable<String> {
         return getLineOfText(1).strip();
     }
 
+    /**
+     * @param text is the text that we want to set inside this TextBox.
+     * @return this TextBox which will contain the specified text.
+     */
     public TextBox text(String text) {
         this.text = new StringBuilder(text.replaceAll("\n", " \n") + " ");
 
@@ -292,6 +350,9 @@ public class TextBox extends ValueDrawable<String> {
         return this;
     }
 
+    /**
+     * @return this TextBox which now is hiding the edit cursor.
+     */
     public TextBox hideCursor() {
         showCursor = false;
         cursorLine = 0;
@@ -300,6 +361,9 @@ public class TextBox extends ValueDrawable<String> {
         return this;
     }
 
+    /**
+     * @return this TextBox which is now not focusable.
+     */
     public TextBox unfocusable() {
         focusable = false;
         onFocus = false;
@@ -307,24 +371,38 @@ public class TextBox extends ValueDrawable<String> {
         return this;
     }
 
+    /**
+     * @return this TextBox which now displays {@link PrimitiveSymbol#STAR} instead of the actual text characters.
+     * It is useful for password fields.
+     */
     public TextBox hideText() {
         textHidden = true;
 
         return this;
     }
 
+    /**
+     * @param color is the desired {@link Color} for the text inside this TextBox.
+     * @return this TextBox which now displays text with the specified color.
+     */
     public TextBox color(Color color) {
         this.color = color;
 
         return this;
     }
 
+    /**
+     * @return this TextBox which now accepts new lines and spaces that the user can type while editing.
+     */
     public TextBox acceptsNewLinesAndSpaces() {
         acceptsNewLinesAndSpaces = true;
 
         return this;
     }
 
+    /**
+     * @return this TextBox which now displays text in bold.
+     */
     public TextBox bold() {
         bold = true;
 
