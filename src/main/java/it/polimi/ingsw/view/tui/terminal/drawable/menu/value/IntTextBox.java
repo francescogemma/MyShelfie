@@ -7,7 +7,16 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
 import java.util.Optional;
 
+/**
+ * It is a {@link TextBox} which accepts only text representing an integer value; that is a TextBox which accepts only
+ * the characters "0", ..., "9".
+ *
+ * @author Cristiano Migali
+ */
 public class IntTextBox extends ValueDrawable<Integer> {
+    /**
+     * It is the TextBox which will contain the text representing an integer and display it on screen.
+     */
     private final TextBox textBox = new TextBox();
 
     @Override
@@ -55,6 +64,10 @@ public class IntTextBox extends ValueDrawable<Integer> {
         }
     }
 
+    /**
+     * @param integer is the integer value to which the text inside this IntTextBox will be set.
+     * @return this IntTextBox after having set the text to the specified integer value.
+     */
     public IntTextBox integer(int integer) {
         textBox.text(String.valueOf(integer));
 
