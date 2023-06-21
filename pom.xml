@@ -112,7 +112,7 @@
           <artifactId>javafx-maven-plugin</artifactId>
           <version>${javafx.maven.plugin.version}</version>
           <configuration>
-            <mainClass>HelloFX</mainClass>
+            <mainClass>it.polimi.ingsw.view.gui.GuiApplication</mainClass>
           </configuration>
         </plugin>
       </plugins>
