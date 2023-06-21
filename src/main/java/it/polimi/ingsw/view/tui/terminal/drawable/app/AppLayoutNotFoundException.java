@@ -2,6 +2,8 @@ package it.polimi.ingsw.view.tui.terminal.drawable.app;
 
 /**
  * Exception thrown there is no {@link AppLayout} in the {@link App} with the specified name.
+ *
+ * @author Cristiano Migali
  */
 public class AppLayoutNotFoundException extends RuntimeException {
     /**

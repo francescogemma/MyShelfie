@@ -7,23 +7,75 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
 import java.util.Optional;
 
+/**
+ * Adds to the contained {@link Drawable} a scrollbar, which allows to reduce its size on screen by seeing only a
+ * portion of it. The displayed portion is centered around the area on focus of the contained drawable.
+ *
+ * @author Cristiano Migali
+ */
 public class ScrollableDrawable extends Drawable {
+    /**
+     * Is the contained {@link Drawable} to which a scrollbar will be added.
+     */
     private final Drawable toMakeScrollable;
 
+    /**
+     * Is true iff the number of lines of the contained Drawable is greater than the desired (available) number,
+     * hence we need vertical scrolling to reduce its height.
+     */
     private boolean needsVerticalScrolling;
+
+    /**
+     * Is true iff the number of columns of the contained Drawable is greater than the desired (available) number,
+     * hence we need horizontal scrolling to reduce its width.
+     */
     private boolean needsHorizontalScrolling;
 
+    /**
+     * Is the number of lines of the visible portion of the contained drawable.
+     */
     private int visibleLines;
+
+    /**
+     * Is the number of columns of the visible portion of the contained drawable.
+     */
     private int visibleColumns;
 
+    /**
+     * Is the line component of the {@link Coordinate} of the last focused area inside the contained Drawable, or 1 if
+     * it has never been on focus.
+     */
     private int focusedLine;
+
+    /**
+     * Is the column component of the {@link Coordinate} of the last focused area inside the contained Drawable,
+     * or 1 if it has never been on focus.
+     */
     private int focusedColumn;
 
+    /**
+     * Is the line component of the upper left {@link Coordinate} of the area of the contained Drawable which will be
+     * displayed on screen, eventually surrounded by scroll bars.
+     */
     private int firstVisibleLine;
+
+    /**
+     * Is the column component of the upper left {@link Coordinate} of the area of the contained Drawable which will be
+     * displayed on screen, eventually surrounded by scroll bars.
+     */
     private int firstVisibleColumn;
 
+    /**
+     * Is the last focused coordinate of the contained drawable, or (1, 1) if the drawable has never been on focus.
+     */
     private Coordinate lastFocusedCoordinate = Coordinate.origin();
 
+    /**
+     * Constructor of the class.
+     * It initializes the Drawable to which the scroll bar will be added.
+     *
+     * @param toMakeScrollable is the Drawable to which the scroll bar will be added.
+     */
     public ScrollableDrawable(AlignedDrawable toMakeScrollable) {
         this.toMakeScrollable = toMakeScrollable;
     }
@@ -107,6 +159,17 @@ public class ScrollableDrawable extends Drawable {
         }
     }
 
+    /**
+     * Returns the symbol of the drawable at the specified coordinate accounting for the space eventually occupied by
+     * the horizontal scroll bar.
+     *
+     * @param coordinate is the {@link Coordinate} where we want to retrieve the {@link Symbol} from.
+     * @param startLine is the line component of the upper left {@link Coordinate} of the area in the ScrollableDrawable
+     *                  which is below the eventual horizontal scroll bar. That is 1 if there is no horizontal bar or
+     *                  4 (the horizontal bar has an height of 3) otherwise.
+     * @return the {@link Symbol} at the specified {@link Coordinate}, accounting for the space occupied by the
+     * horizontal scroll bar.
+     */
     private Symbol getSymbolAtAfterDrawingHorizontalBar(Coordinate coordinate, int startLine) {
         if (needsVerticalScrolling) {
             return WithBorderBoxDrawable.addBorder(new Coordinate(

@@ -2,6 +2,8 @@ package it.polimi.ingsw.view.tui.terminal.drawable.app;
 
 /**
  * Exception thrown when the data with the specified label has a different concrete type than expected.
+ *
+ * @author Cristiano Migali
  */
 public class WrongDataTypeAtLabelException extends RuntimeException {
     /**

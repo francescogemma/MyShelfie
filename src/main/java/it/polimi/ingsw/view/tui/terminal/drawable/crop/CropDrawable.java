@@ -13,6 +13,8 @@ import java.util.Optional;
  * the one reachable by the AlignedDrawable.
  *
  * @see FullyResizableDrawable
+ *
+ * @author Cristiano Migali
  */
 public class CropDrawable extends FullyResizableDrawable {
     /**
