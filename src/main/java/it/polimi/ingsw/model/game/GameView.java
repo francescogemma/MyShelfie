@@ -5,7 +5,6 @@ import it.polimi.ingsw.model.bag.Bag;
 import it.polimi.ingsw.model.board.Board;
 import it.polimi.ingsw.model.board.BoardView;
 import it.polimi.ingsw.model.goal.CommonGoal;
-import it.polimi.ingsw.utils.Logger;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -94,7 +93,7 @@ public class GameView implements Identifiable {
     protected int currentPlayerIndex;
 
     /*
-     * list of all player in the game
+     * list of all players in the game
      */
     protected final List<Player> players;
 

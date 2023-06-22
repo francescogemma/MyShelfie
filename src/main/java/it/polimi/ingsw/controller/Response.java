@@ -17,6 +17,10 @@ import java.util.function.Function;
  * It contains a textual message and a {@link ResponseStatus status}.
  * The object is thread-safe and immutable.
  *
+ * @param <T> is the subclass of {@link EventData} that is sent with {@link Response}
+ * via {@link EventDataWrapper}.
+ *
+ * @see EventDataWrapper
  * @see EventData
  * @see ResponseStatus
  * @author Cristiano Migali
@@ -24,7 +28,7 @@ import java.util.function.Function;
  * */
 public class Response <T extends EventData> extends EventDataWrapper<T> {
     /**
-     * Event id
+     * Wrapper id
      * */
     public static final String WRAPPER_ID = "RESPONSE";
 
@@ -41,7 +45,7 @@ public class Response <T extends EventData> extends EventDataWrapper<T> {
     /**
      * Default message for not authenticated user
      * */
-    protected static final String notAuthenticated = "Not autenticated";
+    protected static final String notAuthenticated = "Not authenticated";
 
     /**
      * Default message for client not in lobby
