@@ -51,3 +51,4 @@ docs/
 db/
 log_*
 testdb/*
+dependency-reduced-pom.xml
