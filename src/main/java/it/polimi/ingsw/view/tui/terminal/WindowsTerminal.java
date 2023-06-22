@@ -15,6 +15,8 @@ import java.util.Queue;
 
 /**
  * Implements basic functionalities to manage a terminal in Windows.
+ *
+ * @author Cristiano Migali
  */
 class WindowsTerminal extends Terminal {
     /**

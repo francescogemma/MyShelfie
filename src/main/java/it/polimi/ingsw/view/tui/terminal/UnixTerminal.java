@@ -16,6 +16,8 @@ import java.util.Scanner;
 
 /**
  * Implements basic functionalities to manage a terminal on POSIX compliant systems.
+ *
+ * @author Cristiano Migali
  */
 class UnixTerminal extends Terminal {
     /**
