@@ -18,7 +18,16 @@ import java.util.Scanner;
  * Implements basic functionalities to manage a terminal on POSIX compliant systems.
  */
 class UnixTerminal extends Terminal {
+    /**
+     * It is the instance of the UnixTerminal used to implement a singleton pattern.
+     */
     private static UnixTerminal INSTANCE = null;
+
+    /**
+     * This is the only way of retrieving a UnixTerminal instance. Indeed this class implements a singleton pattern.
+     *
+     * @return the instance of the UnixTerminal.
+     */
     public static UnixTerminal getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new UnixTerminal();
@@ -27,8 +36,14 @@ class UnixTerminal extends Terminal {
         return INSTANCE;
     }
 
+    /**
+     * It is the original termios struct configuration of the terminal emulator.
+     */
     private final CLibrary.termios orig_termios = CLibrary.craft_termios();
 
+    /**
+     * Constructor of the class.
+     */
     private UnixTerminal() {
 
     }
@@ -147,14 +162,19 @@ class UnixTerminal extends Terminal {
      */
     private static final String LIBC_NAME = "c";
 
-    /* Loading libc as illustrated in https://github.com/java-native-access/jna/blob/master/www/GettingStarted.md.
+    /**
+     *  Loading libc as illustrated in https://github.com/java-native-access/jna/blob/master/www/GettingStarted.md.
      * Note that we are using "libc" as the library name instead of just "c" as in the example,
      * on Unix systems they are equivalent.
      */
     public interface CLibrary extends Library {
+        /**
+         * Instance of libc which allows to invoke system calls through JNA.
+         */
         CLibrary INSTANCE = (CLibrary) Native.load(LIBC_NAME, CLibrary.class);
 
-        /* We retreived the value of TCSAFLUSH in libc using: grep -R TCSAFLUSH /usr/include.
+        /**
+         * We retreived the value of TCSAFLUSH in libc using: grep -R TCSAFLUSH /usr/include.
          * We got:
          * ...
          * /usr/include/x86_64-linux-gnu/bits/termios-tcflow.h:#define     TCSAFLUSH       2
@@ -162,7 +182,8 @@ class UnixTerminal extends Terminal {
          */
         int TCSAFLUSH = 2;
 
-        /* We retreived the value of STDIN_FILENO in libc using: grep -R STDIN_FILENO /usr/include.
+        /**
+         * We retreived the value of STDIN_FILENO in libc using: grep -R STDIN_FILENO /usr/include.
          * We got:
          * ...
          * /usr/include/unistd.h:#define   STDIN_FILENO    0       /* Standard input.  *//*
@@ -170,7 +191,8 @@ class UnixTerminal extends Terminal {
          */
         int STDIN_FILENO = 0;
 
-        /* We retreived the value of STDOUT_FILENO in libc using: grep -R STDOUT_FILENO /usr/include.
+        /**
+         * We retreived the value of STDOUT_FILENO in libc using: grep -R STDOUT_FILENO /usr/include.
          * We got:
          * ...
          * /usr/include/unistd.h:#define   STDOUT_FILENO   1       /* Standard output.  *//*
@@ -178,7 +200,8 @@ class UnixTerminal extends Terminal {
          */
         int STDOUT_FILENO = 1;
 
-        /* We retreived the value of NCCS in libc using: grep -R NCCS /usr/include.
+        /**
+         * We retreived the value of NCCS in libc using: grep -R NCCS /usr/include.
          * We got:
          * ...
          * /usr/include/x86_64-linux-gnu/bits/termios-struct.h:#define NCCS 32
@@ -186,7 +209,8 @@ class UnixTerminal extends Terminal {
          */
         int NCCS = Platform.isMac() ? 20 : 32;
 
-        /* We retreived the value of TIOCGWINSZ in libc using: grep -R TIOCGWINSZ /usr/include.
+        /**
+         * We retreived the value of TIOCGWINSZ in libc using: grep -R TIOCGWINSZ /usr/include.
          * We got:
          * ...
          * /usr/include/asm-generic/ioctls.h:#define TIOCGWINSZ    0x5413
@@ -194,15 +218,22 @@ class UnixTerminal extends Terminal {
          */
         int TIOCGWINSZ = Platform.isMac() ? 0x40087468 : 0x5413;
 
+        /**
+         * Represents a termios struct which can be cloned.
+         */
         interface termios {
             termios clone();
         }
 
+        /**
+         * @return a termios struct according if the program is running on Mac OS or Linux.
+         */
         static termios craft_termios() {
             return Platform.isMac() ? new macos_termios() : new linux_termios();
         }
 
-        /* Definining termios struct as explained in
+        /**
+         * Definining termios struct as explained in
          * https://github.com/java-native-access/jna/blob/master/www/StructuresAndUnions.md.
          * The original termios struct definition in https://man7.org/linux/man-pages/man3/termios.3.html contains:
          * tcflag_t c_iflag;      /* input modes *//*
@@ -276,6 +307,10 @@ class UnixTerminal extends Terminal {
             }
         }
 
+        /**
+         * Defining termios struct according to Max OS documentation. It is analogous to the Linux one but has slightly
+         * different field sizes.
+         */
         @FieldOrder({ "c_iflag", "c_oflag", "c_cflag", "c_lflag", "c_cc",
             "c_ispeed", "c_ospeed" })
         class macos_termios extends Structure implements termios {
@@ -309,16 +344,23 @@ class UnixTerminal extends Terminal {
             }
         }
 
-        // Defining cfmakeraw signature as in https://man7.org/linux/man-pages/man3/termios.3.html.
+        /**
+         * Defining cfmakeraw signature as in https://man7.org/linux/man-pages/man3/termios.3.html.
+         */
         void cfmakeraw(termios termios_p);
 
-        // Defining tcgetattr signature as in https://man7.org/linux/man-pages/man3/termios.3.html.
+        /**
+         * Defining tcgetattr signature as in https://man7.org/linux/man-pages/man3/termios.3.html.
+         */
         int tcgetattr(int fd, termios termios_p) throws LastErrorException;
 
-        // Defining tcsetattr signature as in https://man7.org/linux/man-pages/man3/termios.3.html.
+        /**
+         * Defining tcsetattr signature as in https://man7.org/linux/man-pages/man3/termios.3.html.
+         */
         int tcsetattr(int fd, int optional_actions, termios termios_p) throws LastErrorException;
 
-        /* Definining winsize struct as explained in
+        /**
+         * Definining winsize struct as explained in
          * https://github.com/java-native-access/jna/blob/master/www/StructuresAndUnions.md.
          * The original winsize struct definition in https://man7.org/linux/man-pages/man2/ioctl_tty.2.html is:
          * struct winsize {
@@ -347,7 +389,8 @@ class UnixTerminal extends Terminal {
             }
         }
 
-        /* Defining ioctl signature as in https://man7.org/linux/man-pages/man2/ioctl_tty.2.html.
+        /**
+         * Defining ioctl signature as in https://man7.org/linux/man-pages/man2/ioctl_tty.2.html.
          * The original signature has variadic arguments, we instead only declare a winsize parameter since
          * it's the only that we are going to use.
          */

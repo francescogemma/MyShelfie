@@ -17,7 +17,16 @@ import java.util.Queue;
  * Implements basic functionalities to manage a terminal in Windows.
  */
 class WindowsTerminal extends Terminal {
+    /**
+     * It is the instance of the WindowsTerminal used to implement a singleton pattern.
+     */
     private static WindowsTerminal INSTANCE = null;
+
+    /**
+     * This is the only way of retrieving a WindowsTerminal instance. Indeed this class implements a singleton pattern.
+     *
+     * @return the instance of the WindowsTerminal.
+     */
     public static WindowsTerminal getInstance() throws TerminalException {
         if (INSTANCE == null) {
             INSTANCE = new WindowsTerminal();
@@ -26,10 +35,27 @@ class WindowsTerminal extends Terminal {
         return INSTANCE;
     }
 
+    /**
+     * It is the original input mode of the terminal emulator.
+     */
     private int originalInputMode;
+
+    /**
+     * JNA pointer to the input handle of the Windows terminal emulator.
+     */
     private final Pointer stdInputHandle;
+
+    /**
+     * JNA pointer to the output handle of the Windows terminal emulator.
+     */
     private final Pointer stdOutputHandle;
 
+    /**
+     * Constructor of the class.
+     *
+     * @throws TerminalException if the terminal emulator doesn't allow to retrieve pointers to its input or output
+     * handles.
+     */
     private WindowsTerminal() throws TerminalException {
         try {
             stdInputHandle = Kernel32.INSTANCE.GetStdHandle(Kernel32.STD_INPUT_HANDLE);
@@ -118,44 +144,55 @@ class WindowsTerminal extends Terminal {
      */
     private static final String KERNEL32_NAME = "kernel32";
 
-    // Loading Kernel32 as illustrated in https://github.com/java-native-access/jna/blob/master/www/GettingStarted.md.
+    /**
+     * Loading Kernel32 as illustrated in https://github.com/java-native-access/jna/blob/master/www/GettingStarted.md.
+     */
     public interface Kernel32 extends StdCallLibrary {
+        /**
+         * Instance of Kernel32 which allows to invoke system calls through JNA.
+         */
         Kernel32 INSTANCE = (Kernel32) Native.load(KERNEL32_NAME, Kernel32.class);
 
-        /* We retrieved the value of STD_INPUT_HANDLE at the following link:
+        /**
+         * We retrieved the value of STD_INPUT_HANDLE at the following link:
          * https://learn.microsoft.com/it-it/windows/console/getstdhandle.
          */
         int STD_INPUT_HANDLE = -10;
 
-        /* We retrieved the value of STD_OUTPUT_HANDLE at the following link:
+        /**
+         * We retrieved the value of STD_OUTPUT_HANDLE at the following link:
          * https://learn.microsoft.com/it-it/windows/console/getstdhandle.
          */
         int STD_OUTPUT_HANDLE = -11;
 
-        /* We retrieved the value of ENABLE_ECHO_INPUT at the following link:
+        /**
+         * We retrieved the value of ENABLE_ECHO_INPUT at the following link:
          * https://learn.microsoft.com/it-it/windows/console/setconsolemode?source=recommendations.
          */
         int ENABLE_ECHO_INPUT = 0x0004;
 
-        /* We retrieved the value of ENABLE_LINE_INPUT at the following link:
+        /**
+         * We retrieved the value of ENABLE_LINE_INPUT at the following link:
          * https://learn.microsoft.com/it-it/windows/console/setconsolemode?source=recommendations.
          */
         int ENABLE_LINE_INPUT = 0x0002;
 
-        /* We retrieved the value of ENABLE_PROCESSED_INPUT at the following link:
+        /**
+         * We retrieved the value of ENABLE_PROCESSED_INPUT at the following link:
          * https://learn.microsoft.com/it-it/windows/console/setconsolemode?source=recommendations.
          */
         int ENABLE_PROCESSED_INPUT = 0x0001;
 
-        /* Defining GetStdHandle signature as in https://learn.microsoft.com/it-it/windows/console/getstdhandle.
-         *
+        /**
+         * Defining GetStdHandle signature as in https://learn.microsoft.com/it-it/windows/console/getstdhandle.
          * By the mappings to primitive types explained in
          * https://github.com/java-native-access/jna/blob/master/www/Mappings.md:
          * DWORD -> int
          */
         Pointer GetStdHandle(int nStdHandle) throws LastErrorException;
 
-        /* Defining GetConsoleMode signature as in https://learn.microsoft.com/it-it/windows/console/getconsolemode.
+        /**
+         * Defining GetConsoleMode signature as in https://learn.microsoft.com/it-it/windows/console/getconsolemode.
          *
          * We retrieved the primitive type aliased by HANDLE and LPDWORD in
          * https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types.
@@ -168,7 +205,8 @@ class WindowsTerminal extends Terminal {
          */
         boolean GetConsoleMode(Pointer hConsoleHandle, IntByReference lpMode) throws LastErrorException;
 
-        /* Defining SetConsoleMode signature as in https://learn.microsoft.com/it-it/windows/console/setconsolemode.
+        /**
+         * Defining SetConsoleMode signature as in https://learn.microsoft.com/it-it/windows/console/setconsolemode.
          *
          * We retrieved the primitive type aliased by HANDLE in
          * https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types.
@@ -181,7 +219,8 @@ class WindowsTerminal extends Terminal {
          */
         boolean SetConsoleMode(Pointer hConsoleHandle, int dwMode) throws LastErrorException;
 
-        /* Defining COORD struct as explained in
+        /**
+         * Defining COORD struct as explained in
          * https://github.com/java-native-access/jna/blob/master/www/StructuresAndUnions.md.
          * The original COORD struct definition in https://learn.microsoft.com/en-us/windows/console/coord-str is:
          * typedef struct _COORD {
@@ -202,7 +241,8 @@ class WindowsTerminal extends Terminal {
             public short Y;
         }
 
-        /* Defining SMALL_RECT struct as explained in
+        /**
+         * Defining SMALL_RECT struct as explained in
          * https://github.com/java-native-access/jna/blob/master/www/StructuresAndUnions.md.
          * The original SMALL_RECT struct definition in https://learn.microsoft.com/en-us/windows/console/small-rect-str
          * is:
@@ -228,7 +268,8 @@ class WindowsTerminal extends Terminal {
             public short Bottom;
         }
 
-        /* Defining CONSOLE_SCREEN_BUFFER_INFO struct as explained in
+        /**
+         * Defining CONSOLE_SCREEN_BUFFER_INFO struct as explained in
          * https://github.com/java-native-access/jna/blob/master/www/StructuresAndUnions.md.
          * The original CONSOLE_SCREEN_BUFFER_INFO struct definition in
          * https://learn.microsoft.com/en-us/windows/console/console-screen-buffer-info-str is:
@@ -260,20 +301,25 @@ class WindowsTerminal extends Terminal {
             public COORD drMaximumWindowSize;
         }
 
-        /* Defining GetConsoleScreenBufferInfo as in
+        /**
+         * Defining GetConsoleScreenBufferInfo as in
          * https://learn.microsoft.com/it-it/windows/console/getconsolescreenbufferinfo.
          */
         boolean GetConsoleScreenBufferInfo(Pointer hConsoleOutput,
                                            CONSOLE_SCREEN_BUFFER_INFO lpConsoleScreenBufferInfo) throws LastErrorException;
 
 
-        // https://learn.microsoft.com/en-us/windows/console/focus-event-record-str
+        /**
+         * Defining FOCUS_EVENT_RECORD struct as explained in https://learn.microsoft.com/en-us/windows/console/focus-event-record-str .
+         */
         @FieldOrder({ "bSetFocus" })
         class FOCUS_EVENT_RECORD extends Structure {
             public boolean bSetFocus;
         }
 
-        // https://learn.microsoft.com/en-us/windows/console/key-event-record-str
+        /**
+         * Defining KEY_EVENT_RECORD struct as explained in https://learn.microsoft.com/en-us/windows/console/key-event-record-str .
+         */
         @FieldOrder({ "bKeyDown", "wRepeatCount", "wVirtualKeyCode", "wVirtualScanCode", "uChar", "dwControlKeyState" })
         class KEY_EVENT_RECORD extends Structure {
             public boolean bKeyDown;
@@ -287,13 +333,17 @@ class WindowsTerminal extends Terminal {
             public int dwControlKeyState;
         }
 
-        // https://learn.microsoft.com/en-us/windows/console/menu-event-record-str
+        /**
+         * Defining MENU_EVENT_RECORD struct as explained in https://learn.microsoft.com/en-us/windows/console/menu-event-record-str .
+         */
         @FieldOrder({ "dwCommandId" })
         class MENU_EVENT_RECORD extends Structure {
             public int dwCommandId;
         }
 
-        // https://learn.microsoft.com/en-us/windows/console/mouse-event-record-str
+        /**
+         * Defining MOUSE_EVENT_RECORD struct as explained in https://learn.microsoft.com/en-us/windows/console/mouse-event-record-str .
+         */
         @FieldOrder({ "dwMousePosition", "dwButtonState", "dwControlKeyState", "dwEventFlags" })
         class MOUSE_EVENT_RECORD extends Structure {
             public COORD dwMousePosition;
@@ -302,20 +352,44 @@ class WindowsTerminal extends Terminal {
             public int dwEventFlags;
         }
 
-        // https://learn.microsoft.com/en-us/windows/console/window-buffer-size-record-str
+        /**
+         * Defining WINDOW_BUFFER_SIZE_RECORD struct as explained in https://learn.microsoft.com/en-us/windows/console/window-buffer-size-record-str .
+         */
         @FieldOrder({ "dwSize" })
         class WINDOW_BUFFER_SIZE_RECORD extends Structure {
             public COORD dwSize;
         }
 
         // https://learn.microsoft.com/en-us/windows/console/input-record-str
+
+        /**
+         * Event type code for the focus event of the terminal window.
+         */
         short FOCUS_EVENT = 0x0010;
+
+        /**
+         * Event type code for the key event of the terminal window.
+         */
         short KEY_EVENT = 0x0001;
+
+        /**
+         * Event type code for the menu event of the terminal window.
+         */
         short MENU_EVENT = 0x0008;
+
+        /**
+         * Event type code for the mouse event of the terminal window.
+         */
         short MOUSE_EVENT = 0x0002;
+
+        /**
+         * Event type code for the window buffer size event of the terminal window.
+         */
         short WINDOW_BUFFER_SIZE_EVENT = 0x0004;
 
-        // https://learn.microsoft.com/en-us/windows/console/input-record-str
+        /**
+         * Defining EVENT_RECORD_UNION struct as explained in https://learn.microsoft.com/en-us/windows/console/input-record-str.
+         */
         @FieldOrder({ "KeyEvent", "MouseEvent", "WindowBufferSizeEvent", "MenuEvent", "FocusEvent" })
         class EVENT_RECORD_UNION extends Union {
             public KEY_EVENT_RECORD KeyEvent;
@@ -325,8 +399,10 @@ class WindowsTerminal extends Terminal {
             public FOCUS_EVENT_RECORD FocusEvent;
         }
 
-        // https://learn.microsoft.com/en-us/windows/console/input-record-str
-        // https://stackoverflow.com/questions/56043874/how-to-map-a-union-in-a-jna-structure
+        /**
+         * Defining the INPUT_RECORD struct as explained in https://learn.microsoft.com/en-us/windows/console/input-record-str,
+         * according to https://stackoverflow.com/questions/56043874/how-to-map-a-union-in-a-jna-structure .
+         */
         @FieldOrder({ "EventType", "Event" })
         class INPUT_RECORD extends Structure {
             public short EventType;
@@ -348,17 +424,42 @@ class WindowsTerminal extends Terminal {
             }
         }
 
-        // https://learn.microsoft.com/en-us/windows/console/readconsoleinput
+        /**
+         * Defining ReadConsoleInputA method as explained in https://learn.microsoft.com/en-us/windows/console/readconsoleinput.
+         */
         boolean ReadConsoleInputA(Pointer hConsoleInput, INPUT_RECORD lpBuffer, int nLength,
                                  IntByReference lpNumberOfEventsRead) throws LastErrorException;
 
         // https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+
+        /**
+         * Virtual key code for keyboard left arrow.
+         */
         short VK_LEFT = 0x25;
+
+        /**
+         * Virtual key code for keyboard up arrow.
+         */
         short VK_UP = 0x26;
+
+        /**
+         * Virtual key code for the keyboard right arrow.
+         */
         short VK_RIGHT = 0x27;
+
+        /**
+         * Virtual key code for the keyboard down arrow.
+         */
         short VK_DOWN = 0x28;
     }
 
+    /**
+     * Queue of integers used to simulate the input ANSI control sequence for keyboard
+     * arrows that is provided on Unix terminals. In particular when the Windows terminal detects an arrow key press it
+     * returns (from the {@link WindowsTerminal#read()} method) the escape character and adds to this queue the
+     * integer codes for the remaining characters of the
+     * ANSI control sequence corresponding to the arrow in input.
+     */
     private final Queue<Integer> readQueue = new ArrayDeque<>();
 
     @Override
