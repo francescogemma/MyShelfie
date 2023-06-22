@@ -14,8 +14,8 @@ package it.polimi.ingsw.view.tui.terminal.drawable.symbol;
  */
 public interface Symbol {
     /**
-     * @return a string which can be printed to the terminal to display the represented Symbol, with all its
-     * formatting (background color, foreground color, bold effect, ...).
+     * @return a string (an ANSI escape sequence) which can be printed to the terminal to display the represented Symbol,
+     * with all its formatting (background color, foreground color, bold effect, ...).
      */
     String asString();
 

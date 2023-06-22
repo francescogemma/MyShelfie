@@ -13,16 +13,54 @@ import java.util.List;
  * @author Cristiano Migali
  */
 public enum Color {
+    /**
+     * It represents the black color.
+     */
     BLACK(List.of(30), List.of(40)),
+
+    /**
+     * It represents the default ANSI red color.
+     */
     RED(List.of(31), List.of(41)),
+
+    /**
+     * It represents the default ANSI green color.
+     */
     GREEN(List.of(32), List.of(42)),
+
+    /**
+     * It represents the default ANSI yellow color.
+     */
     YELLOW(List.of(33), List.of(43)),
+
+    /**
+     * It represents the default ANSI blue color.
+     */
     BLUE(List.of(34), List.of(44)),
+
+    /**
+     * It represents the default ANSI magenta color.
+     */
     MAGENTA(List.of(35), List.of(45)),
+
+    /**
+     * It represents the default ANSI cyan color.
+     */
     CYAN(List.of(36), List.of(46)),
+
+    /**
+     * It represents the white color.
+     */
     WHITE(List.of(37), List.of(47)),
+
+    /**
+     * It represents the color with ANSI is 236, which corresponds to a shade of grey.
+     */
     GREY(236);
 
+    /**
+     * It is the default color for the border boxes of focused areas on the terminal.
+     */
     public static final Color FOCUS = RED;
 
     /**
