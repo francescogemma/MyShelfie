@@ -8,12 +8,38 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
 import java.util.Optional;
 
+/**
+ * Represents a Drawable composed by two layers: background and foreground. Each layer is a Drawable which can be
+ * displayed on the terminal. This Drawable allows to display only the background or the foreground and the background
+ * together.
+ * In particular, if the foreground at a certain {@link Coordinate} displays {@link PrimitiveSymbol#EMPTY}, it is
+ * possible to see through, that is we see the background {@link Symbol} at the same {@link Coordinate}.
+ *
+ * @author Cristiano Migali
+ */
 public class TwoLayersDrawable extends Drawable {
+    /**
+     * It is the background layer Drawable.
+     */
     private final Drawable background;
+
+    /**
+     * It is the foreground layer Drawable.
+     */
     private final Drawable foreground;
 
+    /**
+     * It is true iff we should also show the foreground.
+     */
     private boolean foregroundToShow = false;
 
+    /**
+     * Constructor of the class.
+     * Initializes the background and foreground layer.
+     *
+     * @param background is the Drawable associated with the background layer.
+     * @param foreground is the Drawable associated with the foreground layer.
+     */
     public TwoLayersDrawable(Drawable background, Drawable foreground) {
         this.background = background;
         this.foreground = foreground;
@@ -83,6 +109,9 @@ public class TwoLayersDrawable extends Drawable {
         return background.getFocusedCoordinate();
     }
 
+    /**
+     * @return this TwoLayersDrawable which is now displaying also the foreground layer.
+     */
     public TwoLayersDrawable showForeground() {
         if (foregroundToShow) {
             return this;
@@ -98,6 +127,9 @@ public class TwoLayersDrawable extends Drawable {
         return this;
     }
 
+    /**
+     * @return this TwoLayersDrawable which isn't displaying the foreground layer anymore.
+     */
     public TwoLayersDrawable hideForeground() {
         if (!foregroundToShow) {
             return this;
