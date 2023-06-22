@@ -96,7 +96,7 @@ public class AvailableGamesMenuLayout extends AppLayout {
             joinLobbyButton.center().crop().weight(0);
 
         /**
-         * Constructor of the class. It initializes the layout of game entry.
+         * Constructor of the class. It initializes the layout of the available games menu.
          */
         private AvailableGameDrawable() {
             setLayout(new FullyResizableOrientedLayout(Orientation.HORIZONTAL,

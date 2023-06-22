@@ -23,18 +23,45 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.PrimitiveSymbol;
 
 import java.util.Map;
 
+/**
+ * {@link AppLayout} which allows user to enter the server IP and port and connect to it.
+ *
+ * @author Cristiano Migali
+ */
 public class ConnectionMenuLayout extends AppLayout {
+    /**
+     * Unique name of the connection menu layout.
+     */
     public static final String NAME = "CONNECTION_MENU";
 
     // Layout:
+
+    /**
+     * {@link ValueMenuEntry} which allows users to enter the server IP.
+     */
     private final ValueMenuEntry<String> ipAddressEntry = new ValueMenuEntry<>("Server IP",
         new TextBox().text("10.0.0.4"));
+
+    /**
+     * {@link ValueMenuEntry} which allows users to enter the server port.
+     */
     private final ValueMenuEntry<Integer> portEntry = new ValueMenuEntry<>("Server port",
         new IntTextBox().integer(8080));
 
+    /**
+     * {@link Button} which allows the user to try to connect to the server.
+     */
     private final Button nextButton = new Button("Next");
+
+    /**
+     * {@link Button} which allows the user to exit from the game.
+     */
     private final Button exitButton = new Button("Exit");
 
+    /**
+     * It is the layout of the menu. It stacks vertically the IP entry, the port entry and both the buttons, which
+     * are stacked horizontally.
+     */
     private final Drawable background = new OrientedLayout(Orientation.VERTICAL,
             ipAddressEntry.center().weight(1),
             portEntry.center().weight(1),
@@ -46,14 +73,30 @@ public class ConnectionMenuLayout extends AppLayout {
             ).weight(1)
         ).center().scrollable();
 
+    /**
+     * {@link PopUpDrawable} used to notify the user if the connection to the server has failed.
+     */
     private final PopUpDrawable popUpDrawable = new PopUpDrawable(background);
 
     // Data:
+
+    /**
+     * {@link NetworkEventTransceiver} which allows to receive events from the server.
+     */
     private NetworkEventTransceiver transceiver;
 
     // Utilities:
+
+    /**
+     * {@link PopUpQueue} used to manage the pop-ups needed to notify the users if the connection to the server has
+     * failed or if they have been disconnected.
+     */
     private PopUpQueue popUpQueue;
 
+    /**
+     * Constructor of the class.
+     * It initializes the layout of the connection menu.
+     */
     public ConnectionMenuLayout() {
         setLayout(popUpDrawable.alignUpLeft().crop());
 
