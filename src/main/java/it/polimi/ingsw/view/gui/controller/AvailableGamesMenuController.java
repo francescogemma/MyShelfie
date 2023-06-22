@@ -24,24 +24,80 @@ import javafx.util.Callback;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * This menu is part of the game's graphical use interface. It shows a list of available games, and offers the option to
+ * add a new one. All available games are displayed using a ListView object. If no games are available, the interface
+ * lets the user know this occurrence through an HBox, containing a simple text message.
+ */
 public class AvailableGamesMenuController extends Controller {
+    /**
+     * A simple label displaying the user's name.
+     */
     @FXML private Label loggedUsername;
+
+    /**
+     * This button is bound to the createNewGame method. As such, it is used to create a new instance of a game.
+     */
     @FXML private Button createNewGameButton;
+
+    /**
+     * Used to enter the name of a game. This name will be used as the new game's name, as soon as the user presses the
+     * button to confirm a new game creation.
+     */
     @FXML private TextField gameNameTextField;
+
+    /**
+     * An interface-recurring button to go back to the previous menu. In this case, the interface would switch back to
+     * the user login menu.
+     */
     @FXML private Button backToLoginButton;
+
+    /**
+     * This is an HBox that contains an explanatory text which lets the user know that the current game list is empty.
+     * It will only be visible under appropriate conditions.
+     */
     @FXML private HBox noAvailableGamesHBox;
+
+    /**
+     * When the list of available games is not empty, this ListView will provide an array of interface elements which will
+     * list all available game instances.
+     */
     @FXML private ListView<GameHasBeenCreatedEventData.AvailableGame> availableGamesListView;
 
+    /**
+     * Utility class attribute that stores this menu's name. This attribute is often used by other layouts, to switch to
+     * the next menu without needing to rewrite and consequentially expose its name.
+     */
     public static final String NAME = "AvailableGamesMenu";
 
     // Data:
+    /**
+     * The current active transceiver is stored here. This object is initialized in the "initialize" method within this
+     * class.
+     */
     private NetworkEventTransceiver transceiver = null;
 
     // Utilities:
+    /**
+     * Gets the response to the request to create a new game. This response will then be shown on screen on an appropriate
+     * HBox called "statusBarHBox", as a text label.
+     */
     private Requester<Response<VoidEventData>, CreateNewGameEventData> responseCreateNewGameEventDataRequester;
+
+    /**
+     * Gets the response to the request to log out. This response will then be shown on screen on an appropriate Hbox called
+     * "statusBarHBox", as a text label.
+     */
     private Requester<Response<VoidEventData>, LogoutEventData> responseLogoutEventDataRequester;
 
+    /**
+     * EventReceiver that filters for events relative to game creation.
+     */
     private CastEventReceiver<GameHasBeenCreatedEventData> gameHasBeenCreatedEventDataCastEventReceiver;
+
+    /**
+     * EventReceiver that filters for events relative game unavailability.
+     */
     private CastEventReceiver<GameIsNoLongerAvailableEventData> gameIsNoLongerAvailableEventDataCastEventReceiver;
 
     // Listeners:
