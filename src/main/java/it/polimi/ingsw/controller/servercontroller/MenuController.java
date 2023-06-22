@@ -73,6 +73,9 @@ public class MenuController {
                 });
     }
 
+    /**
+     * This method constructs a new instance of the {@link MenuController} class.
+     * */
     private MenuController() {
         users = new HashSet<>();
     }
@@ -148,7 +151,7 @@ public class MenuController {
      * 
      * @see GameController#exitLobby(String) 
      */
-    public synchronized Response exitLobby(GameController gameController, String username) {
+    public synchronized Response<VoidEventData> exitLobby(GameController gameController, String username) {
         Objects.requireNonNull(username);
 
         if (gameController == null) return Response.failure("User not in lobby");
@@ -209,6 +212,10 @@ public class MenuController {
         return response;
     }
 
+    /**
+     * @return The game controller
+     * @see GameController
+     * */
     private synchronized Optional<GameController> getGameController(String gameName) {
         for (GameController controller: gameControllerList) {
             if (controller.gameName().equalsIgnoreCase(gameName))
@@ -331,6 +338,12 @@ public class MenuController {
         return Response.success("You are now logout");
     }
 
+    /**
+     * This method sets the connection status of the user "username" to the specified value.
+     * @param username The username of the user to set the connection status for
+     * @param connected The connection status to set for the user "username"
+     * @see User
+     * */
     private synchronized void setConnectUser(String username, boolean connected) {
         for (User user : users) {
             if (user.is(username)) {
@@ -339,8 +352,24 @@ public class MenuController {
         }
     }
 
-    private Response<VoidEventData> removeFromLobbyIfNecessary(GameController gameController, String username,
-                                                Function<GameController, Response<VoidEventData>> executor)
+    /**
+     * This method is used to remove a user from the lobby.
+     * If the lobby was full and the game was not visible to the users in the menu,
+     * it notifies them that the lobby is available again.
+     *
+     * @param username  The username of the player who wants to exit the lobby.
+     * @param gameController The lobby from which the user wants to exit.
+     * @param executor The function that executes the exit from the game.
+     *
+     * @return A response object with the status of the operation.
+     *
+     * @see Response<VoidEventData>
+     * */
+    private Response<VoidEventData> removeFromLobbyIfNecessary(
+                    GameController gameController,
+                    String username,
+                    Function<GameController, Response<VoidEventData>> executor
+            )
     {
         Objects.requireNonNull(gameController);
         Objects.requireNonNull(username);
@@ -395,6 +424,16 @@ public class MenuController {
         }
     }
 
+    /**
+     * This listener is used to synchronize with the state of the games.
+     * In case a game is stopped, it is necessary to notify all users within
+     * the menu, who can directly enter that game,
+     * of the change in state from "game that needs to be entered directly"
+     * to "game that needs to be entered through the lobby as it is stopped".
+     *
+     * @see EventListener
+     * @see it.polimi.ingsw.event.data.game.GameHasBeenStoppedEventData
+     * */
     private final EventListener<GameHasBeenStoppedInternalEventData> listenerGameStop = eventData -> {
         synchronized (this) {
             authenticated.stream()
@@ -413,14 +452,32 @@ public class MenuController {
         }
     };
 
+    /**
+     * This {@link EventListener} is executed when a {@link GameController} notifies that the game has ended.
+     * This method notifies the users in the menu who could enter the game without going through the lobby
+     * that the game is no longer available as it has ended.
+     * */
     private final EventListener<GameOverInternalEventData> listenerGameOver = eventData -> {
         synchronized (this) {
             gameControllerList.remove(eventData.getGameController());
             eventData.getGameController().getInternalTransceiver().unregisterAllListeners();
+
             forEachAuthenticated(new GameIsNoLongerAvailableEventData(eventData.getGameController().gameName()));
         }
     };
 
+    /**
+     * This method registers the {@link EventListener} of the {@link GameController}
+     * to the private {@link EventTransmitter} of the {@link MenuController}.
+     *
+     * @param gameController il game controller su cui ci si vuole sincronizzare per gli eventi interni
+     * @throws NullPointerException iff gameController is null
+     *
+     * @see MenuController#listenerGameStop
+     * @see MenuController#listenerGameOver
+     * @see GameHasBeenStoppedInternalEventData
+     * @see GameOverInternalEventData
+     * */
     private void syncToGameController(GameController gameController) {
         Objects.requireNonNull(gameController);
 
