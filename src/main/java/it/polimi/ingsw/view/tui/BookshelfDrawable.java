@@ -8,11 +8,34 @@ import it.polimi.ingsw.view.tui.terminal.drawable.Orientation;
 import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayout;
 import it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayoutElement;
 
+/**
+ * It is a Drawable which allows to display a game bookshelf.
+ * It is realized through a set of 5 {@link BookshelfColumnDrawable} stacked horizontally.
+ * It allows to switch the focused column through keyboard arrows.
+ * Furthermore the bookshelf can be masked with a provided {@link BookshelfMaskSet}, every {@link BookshelfMask} in the
+ * set will be associated with a positive number (starting from 1) which will be displayed on the foreground of the
+ * corresponding tiles; tiles which aren't in any {@link BookshelfMask} will be blurred. The precondition is that
+ * there is no intersection among any of the {@link BookshelfMask}s in the {@link BookshelfMaskSet}.
+ *
+ * @author Cristiano Migali
+ */
 public class BookshelfDrawable extends FixedLayoutDrawable<OrientedLayout> {
+    /**
+     * It is true iff the BookshelfDrawable is focusable, that is it allows to focus a specific column and
+     * trigger its "on press" callback.
+     */
     private boolean focusable = false;
 
+    /**
+     * The underlying {@link OrientedLayout} used to stack the {@link BookshelfColumnDrawable} together.
+     */
     private final OrientedLayout layout;
 
+    /**
+     * Constructor of the class.
+     * It initializes the underlying {@link OrientedLayout} which allows to stack the {@link BookshelfColumnDrawable}
+     * together.
+     */
     public BookshelfDrawable() {
         OrientedLayoutElement[] columns = new OrientedLayoutElement[Bookshelf.COLUMNS];
 
@@ -52,6 +75,13 @@ public class BookshelfDrawable extends FixedLayoutDrawable<OrientedLayout> {
         return super.focus(desiredCoordinate);
     }
 
+    /**
+     * Allows to set if this BookshelfDrawable is focusable or not.
+     * If the BookshelfDrawable is focusable it allows to focus single columns and trigger their "on press" callback.
+     *
+     * @param focusable should be true iff you want to make this BookshelfDrawable focusable.
+     * @return this BookshelfDrawable after it has set focusable or not focusable.
+     */
     public BookshelfDrawable focusable(boolean focusable) {
         this.focusable = focusable;
 
@@ -62,6 +92,10 @@ public class BookshelfDrawable extends FixedLayoutDrawable<OrientedLayout> {
         return this;
     }
 
+    /**
+     * @param column is the column index of the desired {@link BookshelfColumnDrawable}.
+     * @return the {@link BookshelfColumnDrawable} in this BookshelfDrawable at the specified column index.
+     */
     public BookshelfColumnDrawable getColumn(int column) {
         if (!Bookshelf.isColumnInsideTheBookshelf(column)) {
             throw new IllegalArgumentException("Trying to get column: " + column +
@@ -72,6 +106,13 @@ public class BookshelfDrawable extends FixedLayoutDrawable<OrientedLayout> {
                 .getDrawable());
     }
 
+    /**
+     * Populates this BookshelfDrawable according to the data in the provided {@link BookshelfView}.
+     *
+     * @param bookshelf is the {@link BookshelfView} which describes how to populate this BookshelfDrawable.
+     * @return this BookshelfDrawable after it has been populated according to the data in the provided
+     * {@link BookshelfView}.
+     */
     public BookshelfDrawable populate(BookshelfView bookshelf) {
         for (int column = 0; column < BookshelfView.COLUMNS; column++) {
             BookshelfColumnDrawable columnDrawable = getColumn(column);
@@ -86,6 +127,18 @@ public class BookshelfDrawable extends FixedLayoutDrawable<OrientedLayout> {
         return this;
     }
 
+    /**
+     * Masks this BookshelfDrawable according to the data in the provided {@link BookshelfMaskSet}.
+     * A precondition of this method is that there aren't two {@link BookshelfMask} with non-null intersection.
+     * Every {@link BookshelfMask} in the {@link BookshelfMaskSet} will be associated with a positive integer
+     * (starting from 1), this integer will be displayed on the foreground of all the tiles in this BookshelfDrawable
+     * which are in the {@link BookshelfMask}.
+     * If a tile isn't in any {@link BookshelfMask} it will be blurred.
+     * This method is useful to display goal completion.
+     *
+     * @param bookshelfMaskSet is the {@link BookshelfMaskSet} which describes how to mask this BookshelfDrawable.
+     * @return this BookshelfDrawable after it has been masked according to the data in the provided {@link BookshelfMaskSet}.
+     */
     public BookshelfDrawable mask(BookshelfMaskSet bookshelfMaskSet) {
         if (bookshelfMaskSet.getBookshelfMasks().isEmpty()) {
             throw new IllegalArgumentException("You can't mask a bookshelf with an empty bookshelf mask set");
