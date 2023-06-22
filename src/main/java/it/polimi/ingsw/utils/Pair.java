@@ -1,32 +1,74 @@
 package it.polimi.ingsw.utils;
 
-import java.util.List;
 import java.util.Objects;
 
-public class Pair<T, F> {
-    private T key;
-    private F value;
-    public Pair(T key, F value) {
+/**
+ * A generic class representing a pair of values.
+ * @param <K> The type of the key.
+ * @param <T> The type of the value.
+ *
+ * @author Giacomo Groppi
+ */
+public class Pair<K, T> {
+    private K key;
+    private T value;
+
+    /**
+     * Constructs a new Pair with the given key and value.
+     *
+     * @param key   The key of the pair.
+     * @param value The value of the pair.
+     */
+    public Pair(K key, T value) {
         this.key = key;
         this.value = value;
     }
 
-    public T getKey() {
+    /**
+     * Returns the key of the pair.
+     *
+     * @return The key of the pair.
+     */
+    public K getKey() {
         return key;
     }
 
-    public F getValue() {
+    /**
+     * Returns the value of the pair.
+     *
+     * @return The value of the pair.
+     */
+    public T getValue() {
         return value;
     }
 
-    public void setKey(T row) {
-        this.key = row;
+    /**
+     * Sets the key of the pair.
+     *
+     * @param key The key to set.
+     */
+    public void setKey(K key) {
+        this.key = key;
     }
 
-    public void setValue(F f) {
-        this.value = f;
+    /**
+     * Sets the value of the pair.
+     *
+     * @param value The value to set.
+     */
+    public void setValue(T value) {
+        this.value = value;
     }
 
+    /**
+     * Creates a new Pair with the given key and value.
+     *
+     * @param <T>   The type of the key.
+     * @param <F>   The type of the value.
+     * @param key   The key of the pair.
+     * @param value The value of the pair.
+     * @return A new Pair with the specified key and value.
+     */
     public static <T, F> Pair<T, F> of(T key, F value) {
         return new Pair<>(key, value);
     }
