@@ -4,9 +4,23 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
 import java.util.Optional;
 
+/**
+ * It is a {@link FullyResizableDrawable} which fills all the available space with a given {@link Symbol}.
+ *
+ * @author Cristiano Migali
+ */
 public class Fill extends FullyResizableDrawable {
+    /**
+     * It is the symbol used to fill all the available space.
+     */
     private final Symbol symbol;
 
+    /**
+     * Constructor of the class.
+     * It initializes the symbol used to fill all the available space.
+     *
+     * @param symbol is the {@link Symbol} which is used to fill all the available space assigned to the Drawable.
+     */
     public Fill(Symbol symbol) {
         this.symbol = symbol;
     }
