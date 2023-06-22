@@ -10,8 +10,6 @@ import java.util.*;
  * @author Giacomo Groppi
  * */
 public class Board extends BoardView {
-    // TODO: JavaDoc for some private fields is missing (we must add it :( [Laboratorio 2 - Javadoc-1.pdf, slide number 9])
-
     /**
      * The number of rows in the board.
      * */
@@ -80,7 +78,24 @@ public class Board extends BoardView {
     }
 
     /**
+     * The function selects the Tile for extraction, it handles both the case where a Tile without
+     * a free side is selected, and if a Tile is selected that cannot be extracted together with
+     * the Tiles previously selected.
      *
+     * @return The {@link Tile Tile} selected.
+     *
+     * @throws IllegalExtractionException
+     *  <ul>
+     *      <li> There are no selection coordinate </li>
+     *      <li> Coordinate can't be selected </li>
+     *  </ul>
+     *
+     * @throws IllegalArgumentException iff coordinate is outside the border
+     *
+     * @param row The x coordinate of the {@link Tile Tile} to select.
+     * @param col The y coordinate of the {@link Tile Tile} to select.
+     *
+     * @see #getSelectableCoordinate()
      * */
     public Tile selectTile (int row, int col) throws IllegalExtractionException, FullSelectionException {
         return this.selectTile(new Coordinate(row, col));
@@ -102,6 +117,11 @@ public class Board extends BoardView {
         return res;
     }
 
+    /**
+     * Returns a list of all available positions where a tile can be placed.
+     *
+     * @return A list of all available positions where a tile can be placed.
+     */
     private List<Coordinate> getAvailablePositionInsert(int numPlayer) {
         List<Coordinate> res = new ArrayList<>();
 
@@ -143,17 +163,27 @@ public class Board extends BoardView {
         );
     }
 
-    private void insert(Tile tile, Coordinate c) {
-        this.tiles[c.getRow()][c.getCol()] = tile;
+    /**
+     * This method inserts a {@link Tile} at the specified {@link Coordinate}.
+     * @param coordinate The position where the tile should be inserted.
+     * @param tile The tile to be inserted.
+     */
+    private void insert(Tile tile, Coordinate coordinate) {
+        this.tiles[coordinate.getRow()][coordinate.getCol()] = tile;
         this.occupied ++;
     }
 
-    private Tile remove (Coordinate c) {
-        assert !isEmpty(c);
+    /**
+     * This method removes the {@link Tile} at the specified {@link Coordinate}.
+     * @param coordinate The {@link Coordinate} of the tile to be removed.
+     * @return The tile at the specified {@link Coordinate}
+     */
+    private Tile remove (Coordinate coordinate) {
+        assert !isEmpty(coordinate);
 
-        Tile t = this.tileAt(c);
+        Tile t = this.tileAt(coordinate);
         this.occupied --;
-        this.tiles[c.getRow()][c.getCol()] = null;
+        this.tiles[coordinate.getRow()][coordinate.getCol()] = null;
         return t;
     }
 
