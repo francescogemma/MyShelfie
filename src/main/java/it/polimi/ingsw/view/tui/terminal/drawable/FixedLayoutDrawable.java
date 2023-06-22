@@ -4,9 +4,28 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
 import java.util.Optional;
 
+/**
+ * Represents a Drawable which is obtained by combining other kinds of Drawable in a specified layout
+ * (for example with an {@link it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayout}).
+ *
+ * @param <T> is the type of underlying Drawable at the root of the layout.
+ *
+ * @author Cristiano Migali
+ */
 public abstract class FixedLayoutDrawable<T extends Drawable> extends Drawable {
+    /**
+     * It is the Drawable of the layout.
+     */
     private T layout;
 
+    /**
+     * Allows to specify the layout for this FixedLayoutDrawable.
+     * The layout can be set only once.
+     *
+     * @param layout is the layout of this FixedLayoutDrawable.
+     *
+     * @throws IllegalStateException if you try to set a layout more the once.
+     */
     protected void setLayout(T layout) {
         if (this.layout != null) {
             throw new IllegalStateException("You can set the layout of a fixed layout drawable only once");
@@ -15,6 +34,9 @@ public abstract class FixedLayoutDrawable<T extends Drawable> extends Drawable {
         this.layout = layout;
     }
 
+    /**
+     * @return the underlying layout of this FixedLayoutDrawable.
+     */
     public T getLayout() {
         return layout;
     }
