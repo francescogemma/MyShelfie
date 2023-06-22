@@ -77,6 +77,9 @@ public class BoardView {
      */
     protected final Tile[][] tiles = new Tile[BOARD_ROWS][COLUMN_BOARDS];
 
+    /**
+     * Construct a new instance of {@link BoardView}
+     */
     BoardView () {
 
     }
@@ -141,32 +144,38 @@ public class BoardView {
         return this.tileAt(c) == null;
     }
 
-    protected int numberOfFreeSides(Coordinate c) {
-        if (this.isOutOfBoard(c))
-            throw new IllegalArgumentException("row or col out of bound: row: " + c.getRow() + " col: " + c.getCol());
+    /**
+     * This method returns the number of free sides of a given position.
+     *
+     * @param coordinate The {@link Coordinate} to check
+     * @return The number of free sides of the tile at the specified coordinate.
+     */
+    protected int numberOfFreeSides(Coordinate coordinate) {
+        if (this.isOutOfBoard(coordinate))
+            throw new IllegalArgumentException("row or col out of bound: row: " + coordinate.getRow() + " col: " + coordinate.getCol());
 
         int free = 0;
-        final boolean onBorder = this.hasEdgeOnBorder(c);
+        final boolean onBorder = this.hasEdgeOnBorder(coordinate);
         if (onBorder)
             free++;
 
-        if (c.getCol() + 1 < Board.COLUMN_BOARDS &&
-                isEmpty(c.right())) {
+        if (coordinate.getCol() + 1 < Board.COLUMN_BOARDS &&
+                isEmpty(coordinate.right())) {
             free++;
         }
 
-        if (c.getRow() + 1 < Board.BOARD_ROWS &&
-                isEmpty(c.down())) {
+        if (coordinate.getRow() + 1 < Board.BOARD_ROWS &&
+                isEmpty(coordinate.down())) {
             free++;
         }
 
-        if (c.getRow() != 0 &&
-                isEmpty(c.top())) {
+        if (coordinate.getRow() != 0 &&
+                isEmpty(coordinate.top())) {
             free ++;
         }
 
-        if (c.getCol() != 0 &&
-                isEmpty(c.left())) {
+        if (coordinate.getCol() != 0 &&
+                isEmpty(coordinate.left())) {
             free++;
         }
 
@@ -181,10 +190,8 @@ public class BoardView {
                 c.getRow() == 0 || c.getCol() == 0;
     }
 
-    /* TODO: Also cells selected after the first must have at least free side (at the beginning of the round),
-     * that is they must have an adjacent cell which is empty.
-     * The code now allows to select tiles that haven't any free side at the beginning of the round but get some
-     * because of previous selections.
+    /**
+     * @return A list of all possible selectable positions within the board.
      */
     public List<Coordinate> getSelectableCoordinate() {
         List<Coordinate> res = new ArrayList<>();
@@ -219,12 +226,23 @@ public class BoardView {
         return res;
     }
 
+    /**
+     * @param coordinate The {@link Coordinate coordinate} of the position to check
+     * @return True iff it's possible to extract the file in position "coordinate"
+     */
     protected boolean canExtractForNumberOfFreeSides (Coordinate coordinate) {
         return this.numberOfFreeSides(coordinate) > 0;
     }
 
-    protected boolean isOutOfBoard (Coordinate c) {
-        return c.getRow() < 0 || c.getCol() < 0 || c.getRow() >= Board.BOARD_ROWS || c.getCol() >= Board.COLUMN_BOARDS;
+    /**
+     * @return True iff "coordinate" it's out of the board
+     * @param coordinate The position to check
+     */
+    protected boolean isOutOfBoard (Coordinate coordinate) {
+        return  coordinate.getRow() < 0 ||
+                coordinate.getCol() < 0 ||
+                coordinate.getRow() >= Board.BOARD_ROWS ||
+                coordinate.getCol() >= Board.COLUMN_BOARDS;
     }
 
     /**
@@ -293,21 +311,5 @@ public class BoardView {
      * */
     public BoardView createView() {
         return new BoardView(this);
-    }
-
-    @Override
-    public String toString () {
-        StringBuilder stringBuilder = new StringBuilder().append("\n");
-        for (Tile[] tile : this.tiles) {
-            for (Tile value : tile) {
-                if (value == null) {
-                    stringBuilder.append("[ ]");
-                } else {
-                    stringBuilder.append(value.getColor().color("[#]"));
-                }
-            }
-            stringBuilder.append("\n");
-        }
-        return stringBuilder.toString();
     }
 }

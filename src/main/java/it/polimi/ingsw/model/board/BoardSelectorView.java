@@ -13,14 +13,16 @@ import static java.lang.Math.abs;
 class BoardSelectorView {
     protected List<Coordinate> selected;
 
-    public BoardSelectorView(List<Coordinate> selected) {
-        this.selected = selected;
-    }
-
+    /**
+     * Constructor of {@link BoardSelectorView}.
+     * */
     public BoardSelectorView() {
         this.selected = new ArrayList<>();
     }
 
+    /**
+     * @return A list of coordinates in the order of selection of the selected coordinates up to this point.
+     * */
     public List<Coordinate> getSelected () {
         return new ArrayList<>(selected);
     }
@@ -32,8 +34,12 @@ class BoardSelectorView {
         return this.selected.size();
     }
 
-    /*
-     * we assume the extraction is legal from now
+    /**
+     * The method requires that the extraction is legal and that {@link BoardSelectorView#selected} is equal to 2.
+     *
+     * @return If the extraction is vertical, the method returns the distance between the rows of the two selected
+     *  coordinates. If the extraction is horizontal, it returns the horizontal distance between the two selected
+     *  coordinates.
      * */
     protected int distanceFromTwoSelectedTile () {
         assert selected.size() == 2;

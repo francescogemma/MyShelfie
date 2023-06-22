@@ -19,8 +19,12 @@ class BoardSelector extends BoardSelectorView {
         selected = new ArrayList<>();
     }
 
+    /**
+     * Constructs a new {@link BoardSelector} object that is equal to the given {@link BoardSelector} parameter.
+     * @param other The {@link BoardSelector} object to be copied.
+     * */
     BoardSelector(BoardSelector other) {
-        selected = other.selected.stream().toList();
+        selected = new ArrayList<>(other.selected);
     }
 
     /**
@@ -120,14 +124,14 @@ class BoardSelector extends BoardSelectorView {
      * The function checks that wrong positions are not selected, but it does not check whether the cell can actually be selected, i.e., whether it has a free side.
      * @throws IllegalExtractionException if the position of the Tile is along the diagonal
      * @throws IllegalArgumentException if we are trying to extract more than 3 tiles
-     * @throws IllegalArgumentException if [r, c] is already in the list
+     * @throws IllegalArgumentException if coordinate is already in the list
      */
-    public void select (Coordinate c) throws IllegalExtractionException, FullSelectionException {
+    public void select (Coordinate coordinate) throws IllegalExtractionException, FullSelectionException {
         if (selectionSize() > 2) {
             throw new FullSelectionException();
         }
 
-        if (contains(c)) {
+        if (contains(coordinate)) {
             throw new IllegalExtractionException("The specified coordinate already exists");
         }
 
@@ -135,12 +139,12 @@ class BoardSelector extends BoardSelectorView {
                 getAvailableSelection()
                         .stream()
                         .flatMap(Collection::stream)
-                        .noneMatch(p -> p.equals(c)))
+                        .noneMatch(p -> p.equals(coordinate)))
         {
             throw new IllegalExtractionException();
         }
 
-        this.selected.add(c);
+        this.selected.add(coordinate);
     }
 
     /**

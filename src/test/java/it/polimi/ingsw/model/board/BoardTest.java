@@ -603,4 +603,42 @@ class BoardTest {
         fillBoard(board, 4);
         Assertions.assertNotEquals(board, board.createView());
     }
+
+    @RepeatedTest(numberOfRun)
+    void forgetSelection__correctOutput() throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 3);
+
+        Coordinate s = board.getSelectableCoordinate().get(0);
+
+        board.selectTile(s);
+        board.forgetSelection();
+
+        Assertions.assertEquals(0, board.getSelectedTiles().size());
+    }
+
+    @Test
+    void canDraw__correctOutput() throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 4);
+
+        Assertions.assertFalse(board.canDraw());
+
+        board.selectTile(board.getSelectableCoordinate().get(0));
+        Assertions.assertTrue(board.canDraw());
+    }
+
+    @Test
+    void canDraw_horizontal_correctOutput() throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 4);
+
+        board.selectTile(0, 3);
+        board.selectTile(0, 4);
+
+        board.draw();
+
+        board.selectTile(1, 3);
+        board.selectTile(1, 4);
+        board.selectTile(1, 5);
+
+        Assertions.assertTrue(board.canDraw());
+    }
 }
