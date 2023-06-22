@@ -403,7 +403,7 @@ public enum PrimitiveSymbol implements Symbol {
     NINE("9"),
 
     /**
-     * It represents the "<" character.
+     * It represents the "{@literal <}" character.
      */
     LESS_THAN("<"),
 
