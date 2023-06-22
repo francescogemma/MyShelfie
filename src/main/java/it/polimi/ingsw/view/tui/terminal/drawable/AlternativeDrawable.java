@@ -4,12 +4,34 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
 import java.util.Optional;
 
+/**
+ * Represents a Drawable which allows to display alternatively two child Drawables.
+ *
+ * @author Cristiano Migali
+ */
 public class AlternativeDrawable extends Drawable {
+    /**
+     * Is the array of 2 Drawables which can be displayed alternatively.
+     */
     private final Drawable[] drawables = new Drawable[2];
+
+    /**
+     * It is the index of current displayed Drawable in drawables array. Since the drawables are 2, it can be 0 or 1.
+     */
     private int currentDrawableIndex = 0;
 
+    /**
+     * It is true iff the AlternativeDrawable is on focus.
+     */
     private boolean onFocus = false;
 
+    /**
+     * Constructor of the class.
+     * Initializes the two Drawables to be shown alternatively.
+     *
+     * @param firstDrawable is the first Drawable which is shown by default.
+     * @param secondDrawable is the second Drawable which is hidden by default.
+     */
     public AlternativeDrawable(Drawable firstDrawable, Drawable secondDrawable) {
         drawables[0] = firstDrawable;
         drawables[1] = secondDrawable;
@@ -66,6 +88,10 @@ public class AlternativeDrawable extends Drawable {
         return drawables[currentDrawableIndex].getFocusedCoordinate();
     }
 
+    /**
+     * @return this AlternativeDrawable which has now switched the child Drawable that is being displayed, that is,
+     * if the current displayed Drawable was the first one, now it is displaying the second and vice-versa.
+     */
     public AlternativeDrawable toggle() {
         if (onFocus) {
             onFocus = drawables[1 - currentDrawableIndex].focus(drawables[currentDrawableIndex]
@@ -79,6 +105,9 @@ public class AlternativeDrawable extends Drawable {
         return this;
     }
 
+    /*
+     * @return this AlternativeDrawable which is now displaying the first Drawable set in the constructor.
+     */
     public AlternativeDrawable first() {
         if (currentDrawableIndex == 1) {
             return toggle();
@@ -87,6 +116,9 @@ public class AlternativeDrawable extends Drawable {
         return this;
     }
 
+    /**
+     * @return this AlternativeDrawable which is now displaying the second Drawable set in the constructor.
+     */
     public AlternativeDrawable second() {
         if (currentDrawableIndex == 0) {
             return toggle();
