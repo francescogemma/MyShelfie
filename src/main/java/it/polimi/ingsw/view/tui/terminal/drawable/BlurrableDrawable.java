@@ -4,10 +4,29 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
 import java.util.Optional;
 
+/**
+ * Represents a Drawable which can blur a child Drawable.
+ * That is, all its {@link Symbol}s can be formatted with a foreground grey shade, simulating a blur effect.
+ *
+ * @author Cristiano Migali
+ */
 public class BlurrableDrawable extends Drawable {
+    /**
+     * It is true iff the BlurrableDrawable is being blurred.
+     */
     private boolean blurred = false;
+
+    /**
+     * It is the underlying child Drawable which can be blurred.
+     */
     private final Drawable toBlur;
 
+    /**
+     * Constructor of the class.
+     * Initializes the underlying Drawable which can be blurred.
+     *
+     * @param toBlur is the underlying Drawable which can be blurred.
+     */
     public BlurrableDrawable(Drawable toBlur) {
         this.toBlur = toBlur;
     }
@@ -63,6 +82,11 @@ public class BlurrableDrawable extends Drawable {
         return toBlur.getFocusedCoordinate();
     }
 
+    /**
+     * Allows to specify if the underlying Drawable must be blurred or not.
+     *
+     * @param blurred must be true iff we want to blur the underlying Drawable.
+     */
     public void blur(boolean blurred) {
         if (blurred) {
             toBlur.unfocus();
