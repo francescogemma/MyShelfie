@@ -6,11 +6,31 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 
 import java.util.Optional;
 
+/**
+ * It is a Drawable obtained by adding a border box to another Drawable.
+ * The border box is built through {@link PrimitiveSymbol#VERTICAL_BOX_BORDER}, {@link PrimitiveSymbol#HORIZONTAL_BOX_BORDER},
+ * {@link PrimitiveSymbol#LOWER_RIGHT_BOX_BORDER}, {@link PrimitiveSymbol#LOWER_LEFT_BOX_BORDER},
+ * {@link PrimitiveSymbol#UPPER_RIGHT_BOX_BORDER} and {@link PrimitiveSymbol#UPPER_LEFT_BOX_BORDER} symbols.
+ * When the surrounded Drawable is on focus, the border box turns red.
+ *
+ * @author Cristiano Migali
+ */
 public class WithBorderBoxDrawable extends Drawable {
+    /**
+     * It is the Drawable to which the border box will be added.
+     */
     private final Drawable toAddBorderBox;
 
+    /**
+     * It is true iff the WithBorderBoxDrawable is on focus.
+     */
     private boolean onFocus;
 
+    /**
+     * Constructor of the class.
+     *
+     * @param toAddBorderBox is the Drawable to which the border box will be added.
+     */
     public WithBorderBoxDrawable(Drawable toAddBorderBox) {
         this.toAddBorderBox = toAddBorderBox;
     }
@@ -30,6 +50,16 @@ public class WithBorderBoxDrawable extends Drawable {
         onFocus = toAddBorderBox.getFocusedCoordinate().isPresent();
     }
 
+    /**
+     * Allows to add border boxes with the specified {@link DrawableSize} to a Drawable.
+     *
+     * @param coordinate is the {@link Coordinate} where we want to retrieve the corresponding border box symbol.
+     * @param size is the {@link DrawableSize} of the border box that has to be added to the Drawable (it is not
+     *             the size of the Drawable, it comprehends also the border).
+     * @return an Optional which is empty if the {@link Coordinate} isn't on the border of the rectangle identified
+     * by the given {@link DrawableSize}, otherwise it contains the {@link PrimitiveSymbol}
+     * of the border box at the specified {@link Coordinate}.
+     */
     public static Optional<PrimitiveSymbol> addBorder(Coordinate coordinate, DrawableSize size) {
         if (!size.isInside(coordinate)) {
             return Optional.empty();
