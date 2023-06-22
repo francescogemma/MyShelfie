@@ -193,6 +193,11 @@ public class Game extends GameView {
         throw new IllegalArgumentException("Player not in this game");
     }
 
+    /**
+     * This function is called to declare the victory of the only online player.
+     * The points will be calculated based on {@link PersonalGoal} and {@link AdjacencyGoal},
+     * and the sole winner will be the only online player, regardless of the number of points.
+     */
     private synchronized void awardTimeWinner() {
         assert isWaitingForReconnections();
         assert numberOfPlayerOnline() == 1;
@@ -209,6 +214,13 @@ public class Game extends GameView {
         );
     }
 
+    /**
+     * This function sets the game to "waiting for reconnection" state, starts a timer to determine,
+     * if the game is not removed from that state, the automatic victory of the only connected player.
+     * It is required that the number of online players is equal to 1.
+     *
+     * @see Game#TIME_WAITING_FOR_RECONNECTIONS_BEFORE_WIN
+     */
     private synchronized void setWaitingForReconnections() {
         assert players.stream().filter(Player::isConnected).toList().size() == 1;
         isWaitingForReconnections = true;
@@ -223,6 +235,9 @@ public class Game extends GameView {
         }, TIME_WAITING_FOR_RECONNECTIONS_BEFORE_WIN);
     }
 
+    /**
+     * This method removes the "waiting for reconnection" state from the game.
+     */
     private synchronized void removeFromWaitingForReconnections() {
         if (timerEndGame != null) {
             timerEndGame.cancel();
@@ -231,6 +246,11 @@ public class Game extends GameView {
         isWaitingForReconnections = false;
     }
 
+    /**
+     * This method sets the game as stopped and notifies the clients that the game has
+     * been paused using the {@link GameHasBeenStoppedEventData} event.
+     * The method disables timers if they are waiting to finish.
+     */
     private synchronized void setStopped () {
         forceStop();
 
@@ -339,6 +359,10 @@ public class Game extends GameView {
         throw new PlayerNotInGameException(username, name);
     }
 
+    /**
+     * This method allows changing the current player if the current player has not connected to the game within
+     * {@link Game#TIME_FIRST_PLAYER_CONNECT}.
+     */
     private synchronized void timerEndForTurn () {
         if (!isStopped() && (players.get(currentPlayerIndex).isDisconnected())) {
                 broadcast(new PlayerHasDisconnectedEventData(players.get(currentPlayerIndex).getUsername(), getCurrentOwner().get()));
@@ -371,42 +395,42 @@ public class Game extends GameView {
         requireStatus(EnumSet.of(RequiredState.NOT_STOP));
 
         for (Player player : players) {
-            if (player.is(username)) {
-                if (player.isConnected()) {
-                    throw new PlayerAlreadyInGameException(username);
-                }
+            if (!player.is(username))
+                continue;
 
-                player.setConnectionState(true);
-                this.transceiver.broadcast(new PlayerHasJoinGameEventData(player.getUsername(), getCurrentOwner().get()));
-
-                if (numberOfPlayerOnline() == 1) {
-                    setWaitingForReconnections();
-                } else if (isWaitingForReconnections()) {
-                    assert numberOfPlayerOnline() == 2;
-                    assert playTimer == null;
-
-                    removeFromWaitingForReconnections();
-
-                    if (players.get(currentPlayerIndex).isDisconnected() && playersToWait.isEmpty()) {
-                        this.playTimer = new Timer();
-                        this.playTimer.schedule(new TimerTask() {
-                            @Override
-                            public void run() {
-                                timerEndForTurn();
-                            }
-                        }, TIME_FIRST_PLAYER_CONNECT);
-                    }
-                } else {
-                    if (playTimer != null) {
-                        this.playTimer.cancel();
-                        this.playTimer = null;
-                    }
-
-                    playersToWait = new ArrayList<>();
-                }
-
-                return;
+            if (player.isConnected()) {
+                throw new PlayerAlreadyInGameException(username);
             }
+
+            player.setConnectionState(true);
+            this.transceiver.broadcast(new PlayerHasJoinGameEventData(player.getUsername(), getCurrentOwner().get()));
+
+            if (numberOfPlayerOnline() == 1) {
+                setWaitingForReconnections();
+            } else if (isWaitingForReconnections()) {
+                assert numberOfPlayerOnline() == 2;
+                assert playTimer == null;
+
+                removeFromWaitingForReconnections();
+
+                if (players.get(currentPlayerIndex).isDisconnected() && playersToWait.isEmpty()) {
+                    this.playTimer = new Timer();
+                    this.playTimer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            timerEndForTurn();
+                        }}, TIME_FIRST_PLAYER_CONNECT);
+                }
+            } else {
+                if (playTimer != null) {
+                    this.playTimer.cancel();
+                    this.playTimer = null;
+                }
+
+                playersToWait = new ArrayList<>();
+            }
+
+            return;
         }
         throw new PlayerNotInGameException(username, name);
     }
@@ -459,6 +483,10 @@ public class Game extends GameView {
         this.transceiver.broadcast(new PlayerHasDeselectTile(coordinate));
     }
 
+    /**
+     * This method is used to fill the board if necessary. If the board changes,
+     * a {@link BoardChangedEventData} event will be sent.
+     */
     private synchronized void refillBoardIfNecessary () {
         if (!this.board.needsRefill())
             return;
@@ -482,10 +510,19 @@ public class Game extends GameView {
         }
     }
 
+    /**
+     * This method is used to perform a broadcast on the {@link Game#transceiver} of the game using the
+     * provided event data as a parameter.
+     * @param eventData The event for which the broadcast needs to be performed
+     * @see Game#transceiver
+     */
     private synchronized void broadcast(EventData eventData) {
         this.transceiver.broadcast(eventData);
     }
 
+    /**
+     * @return True iff the current player is the last player connected
+     */
     private synchronized boolean isLastPlayerSelected() {
         Player lastConnected = null;
 
@@ -499,6 +536,14 @@ public class Game extends GameView {
         return players.get(currentPlayerIndex).equals(lastConnected);
     }
 
+    /**
+     * This method calculates the points for each player i-th with the i-th goal.
+     * It is required that the goals list passed as a parameter has the same size as the players list.
+     *
+     * @return A list of the same size as the players list, where each position i contains the
+     * number of points obtained by the i-th player for completing the i-th goal, and the
+     * corresponding {@link BookshelfMaskSet} for that goal.
+     */
     private List<Pair<Integer, BookshelfMaskSet>> calculatePoints(List<Goal> goals) {
         List<Pair<Integer, BookshelfMaskSet>> res = new ArrayList<>();
         assert goals.size() == players.size();
@@ -515,6 +560,12 @@ public class Game extends GameView {
         return res;
     }
 
+    /**
+     * The method calculates and sets the next player after the current one.
+     * If the current player is the last one who needs to play because there is a player who has finished filling
+     * the {@link Bookshelf} and was the last one to join the game, the points are calculated, and the end of the
+     * game is notified.
+     */
     private synchronized void calculateNextPlayer() {
         assert this.players.size() >= 2 && this.players.size() <= 4;
         assert this.isStarted();
