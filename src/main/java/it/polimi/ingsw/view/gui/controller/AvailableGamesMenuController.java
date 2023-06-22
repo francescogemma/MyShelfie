@@ -96,11 +96,14 @@ public class AvailableGamesMenuController extends Controller {
     private CastEventReceiver<GameHasBeenCreatedEventData> gameHasBeenCreatedEventDataCastEventReceiver;
 
     /**
-     * EventReceiver that filters for events relative game unavailability.
+     * EventReceiver that filters for events relative to game unavailability.
      */
     private CastEventReceiver<GameIsNoLongerAvailableEventData> gameIsNoLongerAvailableEventDataCastEventReceiver;
 
     // Listeners:
+    /**
+     * Gets new game names that have been created and adds them to the graphical list of available games.
+     */
     private final EventListener<GameHasBeenCreatedEventData> gameHasBeenCreatedListener = data -> {
         Platform.runLater(() -> {
             availableGamesListView.getItems().addAll(data.getNames());
@@ -108,6 +111,10 @@ public class AvailableGamesMenuController extends Controller {
         });
     };
 
+    /**
+     * As soon as game is not available anymore, this EventListener looks through all elements of the graphical list of
+     * available games to get a match of the latest removed game, and removes it.
+     */
     private final EventListener<GameIsNoLongerAvailableEventData> gameIsNoLongerAvailableListener = data -> {
         Platform.runLater(() -> {
             List<GameHasBeenCreatedEventData.AvailableGame> list = availableGamesListView.getItems();
@@ -122,6 +129,10 @@ public class AvailableGamesMenuController extends Controller {
         });
     };
 
+    /**
+     * Utility function to switch from a view of a graphical list of available games to a view of a simple HBox with some
+     * explanatory text on it. The latter configuration only happens when no games are available.
+     */
     private void manageNoAvailableGames() {
         if (availableGamesListView.getItems().isEmpty()) {
             availableGamesListView.setVisible(false);
@@ -132,6 +143,12 @@ public class AvailableGamesMenuController extends Controller {
         }
     }
 
+    /**
+     * This method sets up this controller's menu by initializing the main transceiver, all requesters and receivers.
+     * The ListView consisting in the array of available games is accessed and modified through a method that sets its
+     * cell factory. The behaviour of the ListView is set as to reflect its main functionality:
+     * Cells are configured to contain the game's name, and a button to either join the game lobby or the game itself.
+     */
     @FXML
     private void initialize() {
         loggedUsername.setText((String) getScene().getProperties().get("username"));
@@ -221,6 +238,10 @@ public class AvailableGamesMenuController extends Controller {
         transceiver.broadcast(new PlayerHasJoinMenuEventData());
     }
 
+    /**
+     * If the user requests to go back to the previous menu, this method is needed to log them out of the game, since
+     * the previous menu's functionality is user authentication.
+     */
     @FXML
     private void backToLogin() {
         new Thread(new Task<>() {
@@ -243,12 +264,19 @@ public class AvailableGamesMenuController extends Controller {
         }).start();
     }
 
+    /**
+     * This method is called if the user requests to close the window in any way, and ends the process.
+     */
     @FXML
     private void exit() {
         Platform.exit();
         System.exit(0);
     }
 
+    /**
+     * Gets the string contained in the text field, that corresponds to the name of a new game. The requester responsible for this
+     * particular action is used, and its response is shown on the screen.
+     */
     @FXML
     private void createNewGame() {
         new Thread(new Task<>() {
