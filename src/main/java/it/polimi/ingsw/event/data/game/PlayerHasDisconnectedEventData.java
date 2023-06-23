@@ -10,6 +10,12 @@ import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 
+/**
+ * Event sent to the client when someone has disconnected from the game.
+ * @param username The username of the player that has disconnected.
+ * @param newOwner The username of the new owner of the game.
+ * @author Giacomo Groppi
+ */
 public record PlayerHasDisconnectedEventData(String username, String newOwner) implements EventData {
     public static final String ID = "PLAYER_HAS_DISCONNECTED";
 
