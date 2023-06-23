@@ -9,10 +9,18 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
+/**
+ * This event is broadcasted when the connection falls between the server and a client.
+ * @author Giacomo Groppi
+ */
 public class PlayerDisconnectedInternalEventData implements EventData {
     public static final String ID = "PLAYER_DISCONNECTED_INTERNAL";
 
+    /**
+     * Constructs a {@link PlayerDisconnectedInternalEventData}.
+     */
     public PlayerDisconnectedInternalEventData() {
+
     }
 
     public static CastEventReceiver<PlayerDisconnectedInternalEventData> castEventReceiver(EventReceiver<EventData> receiver) {
