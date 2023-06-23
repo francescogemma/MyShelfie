@@ -18,10 +18,26 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * {@link AppLayout} which allows the user to choose between TUI or GUI interface type and
+ * TCP or RMI connection type.
+ *
+ * @author Cristiano Migali
+ */
 public class InitialMenuLayout extends AppLayout {
+    /**
+     * Unique name of the initial menu layout required to allow other AppLayouts to tell
+     * the {@link App} to switch to this layout.
+     *
+     * @see AppLayout
+     */
     public static final String NAME = "INITIAL_MENU";
 
     // Layout:
+
+    /**
+     * It is the {@link TextBox} displayed on startup as a splash screen.
+     */
     private final TextBox splashTextBox = new TextBox().text(
 """
  ┌─┐  ┌─┐            ____   ┌─┐            ┌─┐   __   _          
@@ -33,14 +49,32 @@ public class InitialMenuLayout extends AppLayout {
 """
     ).unfocusable().color(Color.YELLOW).bold();
 
+    /**
+     * {@link ValueMenuEntry} which allows the user to choose among TUI and GUI interface.
+     */
     private final ValueMenuEntry<String> interfaceEntry = new ValueMenuEntry<>("Interface type",
         new Options("TUI", "GUI"));
+
+    /**
+     * {@link ValueMenuEntry} which allows the user to choose among TCP and RMI connection type.
+     */
     private final ValueMenuEntry<String> connectionEntry = new ValueMenuEntry<>("Connection type",
         new Options("TCP", "RMI"));
 
+    /**
+     * {@link Button} which allows the user to confirm its choice and switch to the {@link ConnectionMenuLayout}.
+     */
     private final Button nextButton = new Button("Next");
+
+    /**
+     * {@link Button} which allows the user to quit from the game.
+     */
     private final Button exitButton = new Button("Exit");
 
+    /**
+     * {@link AlternativeDrawable} used to switch between the splash screen realized through {@link InitialMenuLayout#splashTextBox}
+     * and the actual menu.
+     */
     private final AlternativeDrawable alternativeDrawable = new AlternativeDrawable(
             splashTextBox.center(),
             new OrientedLayout(Orientation.VERTICAL,
@@ -55,8 +89,16 @@ public class InitialMenuLayout extends AppLayout {
             ).center().scrollable());
 
     // Data:
+
+    /**
+     * It is true iff the player has pressed the exit button.
+     */
     private boolean wantsToExit = false;
 
+    /**
+     * Constructor of the class.
+     * It initializes the layout in which all the elements are arranged and sets the {@link Button}s callbacks.
+     */
     public InitialMenuLayout() {
         setLayout(alternativeDrawable.alignUpLeft().crop());
 
