@@ -24,13 +24,18 @@ public abstract class CommonGoalEvaluator implements Evaluator {
         }
         return pointStack.remove(pointStack.size() - 1);
     }
-
-    // TODO: (for Cristiano) complete JavaDoc
+    /**
+     * @return a list with the points that the evaluator assigns to the ith player that completes the goal.
+     */
     public List<Integer> getPointStack() {
         return new ArrayList<>(pointStack);
     }
 
-    // TODO: (for Cristiano) refactor the point stack setting mechanism
+    /**
+     * Sets the point stack for this CommonGoalEvaluator.
+     *
+     * @param pointStack is the list of points that this evaluator assigns to the ith player that completes the goal.
+     */
     public void setPointStack(List<Integer> pointStack) {
         this.pointStack = new ArrayList<>(pointStack);
     }

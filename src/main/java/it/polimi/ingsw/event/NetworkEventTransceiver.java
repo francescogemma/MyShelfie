@@ -99,8 +99,6 @@ public class NetworkEventTransceiver implements EventTransceiver {
                     /* Event handling is done inside the lock because of an optimization:
                      * every TUI's component listener needs to synchronize on the drawing lock,
                      * we take the lock one time and then handle the events.
-                     *
-                     * TODO: Maybe we can do handling without the lock and add the synchronize to every listener
                      */
                     for (EventListener<EventData> listener : listenersCopy) {
                         listener.handle(eventData);
@@ -147,7 +145,6 @@ public class NetworkEventTransceiver implements EventTransceiver {
         }
     }
 
-    // TODO: Perform broadcast in a separated queue (and thread)
     @Override
     public void broadcast(EventData data) {
         try {

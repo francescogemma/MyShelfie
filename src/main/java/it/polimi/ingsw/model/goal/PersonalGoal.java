@@ -187,7 +187,10 @@ public class PersonalGoal extends IndexedGoal {
         };
     }
 
-    // TODO: Add JavaDoc
+    /**
+     * @return the map which associates the {@link Shelf shelves} in the {@link it.polimi.ingsw.model.bookshelf.Bookshelf}
+     * with the required {@link TileColor} needed in order to complete the personal goal.
+     */
     public Map<Shelf, TileColor> getTilesColorMask() {
         return ((PersonalGoalEvaluator) evaluator).getTilesColorMask();
     }

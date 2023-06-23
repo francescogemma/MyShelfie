@@ -149,9 +149,6 @@ public class DBManagerTest {
         Assertions.assertFalse(DBManager.getUsersDBManager().getIdentifiableFilePath("delete_me")
             .toFile().exists());
     }
-
-    // TODO: Add tests for GamesDBManager
-
     public static class MenuControllerTest {
 
         @BeforeEach
