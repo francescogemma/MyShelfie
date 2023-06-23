@@ -190,7 +190,7 @@ public class LobbyLayout extends AppLayout {
      * {@link EventListener} invoked when the server notifies that another player has joined the lobby.
      */
     private final EventListener<PlayerHasJoinLobbyEventData> playerHasJoinLobbyListener = data -> {
-        playersInLobbyNames.add(data.getUsername());
+        playersInLobbyNames.add(data.username());
 
         populate();
     };

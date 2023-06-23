@@ -8,7 +8,6 @@ import it.polimi.ingsw.event.data.client.ExitLobbyEventData;
 import it.polimi.ingsw.event.data.client.JoinLobbyEventData;
 import it.polimi.ingsw.event.data.client.RestartGameEventData;
 import it.polimi.ingsw.event.data.client.StartGameEventData;
-import it.polimi.ingsw.event.data.game.GameHasBeenCreatedEventData;
 import it.polimi.ingsw.event.data.game.GameHasStartedEventData;
 import it.polimi.ingsw.event.data.game.PlayerHasExitLobbyEventData;
 import it.polimi.ingsw.event.data.game.PlayerHasJoinLobbyEventData;
@@ -17,10 +16,8 @@ import it.polimi.ingsw.event.receiver.EventListener;
 import it.polimi.ingsw.event.receiver.EventReceiver;
 import it.polimi.ingsw.networking.DisconnectedException;
 import javafx.application.Platform;
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -31,7 +28,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.util.Callback;
 
 import java.util.Optional;
@@ -62,7 +58,7 @@ public class GameLobbyMenuController extends Controller {
     // Listeners:
     private final EventListener<PlayerHasJoinLobbyEventData> playerHasJoinLobbyListener = data -> {
         Platform.runLater(() -> {
-            players.add(data.getUsername());
+            players.add(data.username());
         });
     };
 
