@@ -11,8 +11,13 @@ import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 
+/**
+ * Event sent to notify the players that the current player has deselected a tile from the
+ * {@link it.polimi.ingsw.model.board.Board}.
+ * @param coordinate The coordinate of the tile that has been deselected.
+ * @author Giacomo Groppi
+ */
 public record PlayerHasDeselectTile(Coordinate coordinate) implements EventData {
-
     public static final String ID = "PLAYER_HAS_DESELECT_TILE";
 
     public static CastEventReceiver<PlayerHasDeselectTile> castEventReceiver(EventReceiver<EventData> receiver) {
