@@ -9,9 +9,16 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
+/**
+ * Event sent when the game has been stopped.
+ * @author Giacomo Groppi
+ */
 public class GameHasBeenStoppedEventData implements EventData {
     public static final String ID = "GAME_HAS_BEEN_STOPPED";
 
+    /**
+     * Default constructor.
+     */
     public GameHasBeenStoppedEventData() {
 
     }

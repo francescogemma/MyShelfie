@@ -1,11 +1,8 @@
 package it.polimi.ingsw.view.tui;
 
 import it.polimi.ingsw.controller.Response;
-import it.polimi.ingsw.controller.ResponseStatus;
-import it.polimi.ingsw.controller.User;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
-import it.polimi.ingsw.event.data.VoidEventData;
 import it.polimi.ingsw.event.data.client.LoginEventData;
 import it.polimi.ingsw.event.data.client.UsernameEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
@@ -135,7 +132,7 @@ public class LoginMenuLayout extends AppLayout {
             displayServerResponse(response);
 
             if (response.isOk()) {
-                username = response.getWrappedData().getUsername();
+                username = response.getWrappedData().username();
                 switchAppLayout(AvailableGamesMenuLayout.NAME);
             } else {
                 popUpQueue.add(response.message(), PopUp.hideAfter(2000), p -> {});

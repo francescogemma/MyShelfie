@@ -3,7 +3,6 @@ package it.polimi.ingsw.view.gui.controller;
 import it.polimi.ingsw.controller.Response;
 import it.polimi.ingsw.event.NetworkEventTransceiver;
 import it.polimi.ingsw.event.Requester;
-import it.polimi.ingsw.event.data.VoidEventData;
 import it.polimi.ingsw.event.data.client.LoginEventData;
 import it.polimi.ingsw.event.data.client.UsernameEventData;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
@@ -84,7 +83,7 @@ public class UserLoginMenuController extends Controller {
                 showResponse(response);
 
                 if(response.isOk()) {
-                    getScene().getProperties().put("username", response.getWrappedData().getUsername());
+                    getScene().getProperties().put("username", response.getWrappedData().username());
                     switchLayout(AvailableGamesMenuController.NAME);
                 } else {
                     popUpQueue.add(
