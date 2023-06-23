@@ -10,6 +10,12 @@ import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 
+/**
+ * Event sent when a player has joined the game from a disconnected state.
+ * @param username The username of the player that has joined the game.
+ * @param owner The new owner of the game.
+ * @author Giacomo Groppi
+ */
 public record PlayerHasJoinGameEventData(String username, String owner) implements EventData {
     public static final String ID = "PLAYER_HAS_JOIN_GAME";
 
