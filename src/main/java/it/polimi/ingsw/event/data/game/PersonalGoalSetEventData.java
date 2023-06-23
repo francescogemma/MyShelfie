@@ -10,6 +10,11 @@ import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 
+/**
+ * Event sent to the player to notify the player's personal goal
+ * @param personalGoal The personal goal.
+ * @author Giacomo Groppi
+ */
 public record PersonalGoalSetEventData(int personalGoal) implements EventData {
     public static final String ID = "PERSONAL_GOAL";
 
