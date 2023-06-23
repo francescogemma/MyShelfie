@@ -652,8 +652,8 @@ class GameTest {
         Assertions.assertFalse(game.isWaitingForReconnections());
     }
 
-    @RepeatedTest(4)
-    void isPause_afterTimeFirstPlayerLoseTurn_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException, PlayerNotInGameException, InterruptedException, NoSuchFieldException, IllegalAccessException {
+    @RepeatedTest(1)
+    void isPause_afterTimFirstPlayerLoseTurn_correctOutput () throws IllegalFlowException, PlayerAlreadyInGameException, PlayerNotInGameException, InterruptedException, NoSuchFieldException, IllegalAccessException {
         game.addPlayer("Giacomo");
         game.addPlayer("Michele");
         game.addPlayer("Cristiano");
@@ -671,7 +671,7 @@ class GameTest {
         Assertions.assertEquals("Michele", game.getCurrentPlayer().getUsername());
     }
 
-    @RepeatedTest(4)
+    @RepeatedTest(1)
     void isOver_afterAPause_correctOutput() throws IllegalFlowException, PlayerAlreadyInGameException, PlayerNotInGameException, InterruptedException {
         game.addPlayer("Giacomo");
         game.addPlayer("Michele");

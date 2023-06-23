@@ -66,11 +66,6 @@ public class Game extends GameView {
     private final List<PersonalGoal> personalGoals;
 
     /**
-     * List of players who want to participate in the game after it has been resumed.
-     */
-    private transient List<String> playersToWait;
-
-    /**
      * Creates a new game with the given name.
      * @param name the name of the game
      * @throws IllegalArgumentException iff the name is empty
@@ -82,7 +77,6 @@ public class Game extends GameView {
         this.personalGoalIndexes = new ArrayList<>(Arrays.asList( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ));
         this.personalGoals = new ArrayList<>();
         Collections.shuffle(this.personalGoalIndexes);
-        this.playersToWait = new ArrayList<>();
     }
 
     /**
@@ -330,10 +324,9 @@ public class Game extends GameView {
         if (!this.creator.equals(username))
             throw new IllegalFlowException("You can't restart this game");
 
-        this.playersToWait = new ArrayList<>(usernameToWait);
 
         for (int i = 0; i < players.size(); i++) {
-            if (this.playersToWait.contains(players.get(currentPlayerIndex).getUsername())) {
+            if (usernameToWait.contains(players.get(currentPlayerIndex).getUsername())) {
                 break;
             } else {
                 currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
@@ -365,9 +358,12 @@ public class Game extends GameView {
      */
     private synchronized void timerEndForTurn () {
         if (!isStopped() && (players.get(currentPlayerIndex).isDisconnected())) {
-                broadcast(new PlayerHasDisconnectedEventData(players.get(currentPlayerIndex).getUsername(), getCurrentOwner().get()));
-                calculateNextPlayer();
+            broadcast(new PlayerHasDisconnectedEventData(
+                    players.get(currentPlayerIndex).getUsername(),
+                    getCurrentOwner().get()
+            ));
 
+            calculateNextPlayer();
         }
     }
 
@@ -413,7 +409,7 @@ public class Game extends GameView {
 
                 removeFromWaitingForReconnections();
 
-                if (players.get(currentPlayerIndex).isDisconnected() && playersToWait.isEmpty()) {
+                if (players.get(currentPlayerIndex).isDisconnected()) {
                     this.playTimer = new Timer();
                     this.playTimer.schedule(new TimerTask() {
                         @Override
@@ -426,8 +422,6 @@ public class Game extends GameView {
                     this.playTimer.cancel();
                     this.playTimer = null;
                 }
-
-                playersToWait = new ArrayList<>();
             }
 
             return;
