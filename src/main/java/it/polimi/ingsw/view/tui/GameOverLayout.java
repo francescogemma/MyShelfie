@@ -15,15 +15,46 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.PrimitiveSymbol;
 
 import java.util.Map;
 
+/**
+ * {@link AppLayout} to display the final score board after the game has ended.
+ *
+ * @author Cristiano Migali
+ */
 public class GameOverLayout extends AppLayout {
+    /**
+     * Unique name of the game over layout required to allow other AppLayouts to tell
+     * the {@link it.polimi.ingsw.view.tui.terminal.drawable.app.App} to switch to this layout.
+     *
+     * @see AppLayout
+     */
     public static final String NAME = "GAME_OVER";
 
     // Layout:
+
+    /**
+     * It is a drawable which allows to display a player in the final score board.
+     * Every player has a position text-box, a name text-box and a points text-box.
+     */
     private static class GameOverDisplayablePlayerDrawable extends FixedLayoutDrawable<Drawable> {
+        /**
+         * It is the {@link TextBox} which displays the position of the player in the scoreboard.
+         */
         private final TextBox positionTextBox = new TextBox().unfocusable();
+
+        /**
+         * It is the {@link TextBox} which displays the name of the player.
+         */
         private final TextBox playerNameTextBox = new TextBox().hideCursor();
+
+        /**
+         * It is the {@link TextBox} which displays the points that the player has scored.
+         */
         private final TextBox playerPointsTextBox = new TextBox().hideCursor();
 
+        /**
+         * Constructor of the class.
+         * It initializes the layout in which all the text-boxes are arranged.
+         */
         private GameOverDisplayablePlayerDrawable() {
             setLayout(new OrientedLayout(Orientation.HORIZONTAL,
                 positionTextBox.center().weight(1),
@@ -34,6 +65,11 @@ public class GameOverLayout extends AppLayout {
         }
     }
 
+    /**
+     * {@link RecyclerDrawable} used to display the score board. It is populated only once.
+     * The advantage of using a RecyclerDrawable is that it is capable of handling a different number
+     * of players in the scoreboard from game to game.
+     */
     private final RecyclerDrawable<GameOverDisplayablePlayerDrawable,
         DisplayablePlayer> scoreBoardRecyclerDrawable =
         new RecyclerDrawable<>(Orientation.VERTICAL,
@@ -46,12 +82,29 @@ public class GameOverLayout extends AppLayout {
                 gameOverDisplayablePlayerDrawable.playerPointsTextBox.text("Points: " + displayablePlayer.getPoints());
             }));
 
+    /**
+     * {@link Button} which allows the user to get back to {@link AvailableGamesMenuLayout}.
+     */
     private final Button backToAvailableGamesButton = new Button("Back to available games");
+
+    /**
+     * {@link Button} which allows the user to quit the game.
+     */
     private final Button exitButton = new Button("Exit");
 
     // Data:
+
+    /**
+     * {@link NetworkEventTransceiver} which allows to detect if the connection to the server has been
+     * interrupted.
+     */
     private NetworkEventTransceiver transceiver = null;
 
+    /**
+     * Constructor of the class.
+     * It initializes the layout in which all elements are arranged and sets all the  {@link Button}s'
+     * callbacks.
+     */
     public GameOverLayout() {
         setLayout(new OrientedLayout(Orientation.VERTICAL,
             new TextBox().text("Scoreboard").unfocusable().center().weight(1),

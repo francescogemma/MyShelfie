@@ -996,8 +996,8 @@ public class GameLayout extends AppLayout {
 
     /**
      * Constructor of the class.
-     * It initializes the layout in which all the elements are arranged and sets the required {@link EventReceiver}s,
-     * {@link EventListener}s and {@link Requester}s.
+     * It initializes the layout in which all the elements are arranged and sets the required {@link Button}s
+     * callbacks.
      */
     public GameLayout() {
         setLayout(new OrientedLayout(Orientation.HORIZONTAL,
