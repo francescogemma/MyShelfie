@@ -14,9 +14,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * Event sent when the game has started.
+ * @author Giacomo Groppi
+ */
 public class GameHasStartedEventData implements EventData {
     public static final String ID = "GAME_HAS_STARTED";
 
+    /**
+     * Default constructor.
+     */
     public GameHasStartedEventData() {
     }
 
