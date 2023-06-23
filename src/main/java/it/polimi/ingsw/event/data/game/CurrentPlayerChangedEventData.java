@@ -10,14 +10,30 @@ import it.polimi.ingsw.model.game.Player;
 
 import java.util.function.Function;
 
+/**
+ * This event indicates that the current player has changed.
+ * @author Giacomo Groppi
+ * */
 public class CurrentPlayerChangedEventData implements EventData {
+    /**
+     * The username of the new current player.
+     * */
     private final String username;
+
     public static final String ID = "CURRENT_PLAYER_CHANGED";
 
+    /**
+     * Constructor of the event.
+     * @param player The new current {@link Player}.
+     * */
     public CurrentPlayerChangedEventData(Player player) {
         this.username = player.getUsername();
     }
 
+    /**
+     * Getter for the username of the new current player.
+     * @return The username of the new current player.
+     * */
     public String getUsername() {
         return this.username;
     }
