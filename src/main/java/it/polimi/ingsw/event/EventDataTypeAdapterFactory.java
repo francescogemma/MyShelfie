@@ -64,7 +64,6 @@ public class EventDataTypeAdapterFactory implements TypeAdapterFactory {
             Map.entry(FirstFullBookshelfEventData.ID, FirstFullBookshelfEventData.class),
             Map.entry(LogoutEventData.ID, LogoutEventData.class),
             Map.entry(GameHasBeenPauseEventData.ID, GameHasBeenPauseEventData.class),
-            Map.entry(GameHasResumeEventData.ID, GameHasResumeEventData.class),
             Map.entry(ExitLobbyEventData.ID, ExitLobbyEventData.class),
             Map.entry(PlayerHasExitLobbyEventData.ID, PlayerHasExitLobbyEventData.class),
             Map.entry(PlayerHasJoinLobbyEventData.ID, PlayerHasJoinLobbyEventData.class),
