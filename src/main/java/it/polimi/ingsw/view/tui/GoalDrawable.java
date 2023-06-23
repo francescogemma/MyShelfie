@@ -13,9 +13,27 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.Symbol;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * It is a {@link Drawable} which allows to display a personal or common goal on a terminal screen.
+ * In particular the goal is displayed as a bookshelf where every tile occupies exactly one terminal cell,
+ * the bookshelf is surrounded by a border box. It provides control on the color of every tile in such a bookshelf.
+ * Representing a personal goal is straightforward, we just need to color the bookshelf tiles accordingly.
+ * For common goals a set of {@link it.polimi.ingsw.model.bookshelf.BookshelfMask}s which would satisfy the goal
+ * is represented instead.
+ *
+ * @author Cristiano Migali
+ */
 public class GoalDrawable extends Drawable {
+    /**
+     * Map which associates every {@link Shelf} of the represented bookshelf with the corresponding {@link TileColor}
+     * with which it should be colored.
+     */
     private Map<Shelf, TileColor> tilesColorMask = Map.of();
 
+    /**
+     * Constructor of the class.
+     * It initializes the size of the Drawable.
+     */
     public GoalDrawable() {
         size = new DrawableSize(Bookshelf.ROWS + 3, Bookshelf.COLUMNS + 3);
     }
@@ -85,6 +103,13 @@ public class GoalDrawable extends Drawable {
         return Optional.empty();
     }
 
+    /**
+     * Allows to populate the GoalDrawable display specifying the color of each tile in the bookshelf.
+     *
+     * @param tilesColorMask is a map which indicates the correspondence between every {@link Shelf} in the bookshelf
+     *                       display and its color.
+     * @return this GoalDrawable after the color of each one of the shelves in its bookshelf have been set.
+     */
     public GoalDrawable populate(Map<Shelf, TileColor> tilesColorMask) {
         this.tilesColorMask = tilesColorMask;
 
