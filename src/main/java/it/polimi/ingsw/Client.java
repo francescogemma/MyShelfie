@@ -7,7 +7,15 @@ import it.polimi.ingsw.view.tui.terminal.Terminal;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.App;
 import it.polimi.ingsw.view.tui.terminal.drawable.app.AppLayoutData;
 
+/**
+ * Client application entry point.
+ */
 public class Client {
+    /**
+     * Main of the client application.
+     * It starts the terminal application to allow the user to choose the interface type and the
+     * connection type; then starts another terminal application or the GUI one according to the user choice.
+     */
     public static void main(String[] args) {
         Terminal terminal = Terminal.getInstance();
 
