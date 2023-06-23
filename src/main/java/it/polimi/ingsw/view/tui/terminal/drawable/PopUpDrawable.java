@@ -6,11 +6,35 @@ import it.polimi.ingsw.view.tui.terminal.drawable.twolayers.TwoLayersDrawable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * It is a {@link Drawable} which allows to display a pop-up on top of a background Drawable which is blurred.
+ * The pop-up is displayed as a text-box surrounded by a border box.
+ *
+ * @author Cristiano Migali
+ */
 public class PopUpDrawable extends FixedLayoutDrawable<TwoLayersDrawable> {
+    /**
+     * {@link BlurrableDrawable} which correspond to the background on top of which the pop-up will be displayed.
+     */
     private final BlurrableDrawable blurrableBackground;
+
+    /**
+     * It is a {@link TwoLayersDrawable} on whose background layer there is the {@link PopUpDrawable#blurrableBackground},
+     * on the foreground there is the pop-up instead.
+     */
     private final TwoLayersDrawable twoLayers;
+
+    /**
+     * It is the {@link TextBox} used to display the pop-up message.
+     */
     private final TextBox popUpTextBox = new TextBox().unfocusable();
 
+    /**
+     * Constructor of the class.
+     * It initializes the layout of the Drawable.
+     *
+     * @param background is the background Drawable on top of which we want to display the pop-up.
+     */
     public PopUpDrawable(Drawable background) {
         blurrableBackground = background.blurrable();
 
@@ -26,6 +50,11 @@ public class PopUpDrawable extends FixedLayoutDrawable<TwoLayersDrawable> {
         setLayout(twoLayers);
     }
 
+    /**
+     * Displays a pop-up with the given text message on the foreground layer and blurs the background.
+     *
+     * @param text is the text message of the pop-up that will be displayed.
+     */
     public void displayPopUp(String text) {
         blurrableBackground.blur(true);
 
@@ -59,6 +88,9 @@ public class PopUpDrawable extends FixedLayoutDrawable<TwoLayersDrawable> {
         twoLayers.showForeground();
     }
 
+    /**
+     * Hides the pop-up which is currently being displayed on the foreground and unblurs the background.
+     */
     public void hidePopUp() {
         blurrableBackground.blur(false);
         twoLayers.hideForeground();
