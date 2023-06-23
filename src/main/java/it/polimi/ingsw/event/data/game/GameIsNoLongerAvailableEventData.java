@@ -10,6 +10,11 @@ import it.polimi.ingsw.utils.Logger;
 
 import java.util.function.Function;
 
+/**
+ * Event sent when the game is no longer available.
+ * @param gameName The name of the game that is no longer available.
+ * @author Giacomo Groppi
+ */
 public record GameIsNoLongerAvailableEventData(String gameName) implements EventData {
     public static final String ID = "GAME_IS_NO_LONGER_AVAILABLE";
 
