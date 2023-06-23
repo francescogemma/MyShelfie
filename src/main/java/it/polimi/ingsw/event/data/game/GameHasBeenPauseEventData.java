@@ -10,12 +10,15 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 import java.util.function.Function;
 
 /**
- * evento lanciato se la partita è stata messa in pausa perchè si è rimasti da soli in
- * lobby
- * */
+ * This event is sent when the game has been paused.
+ * @author Giacomo Groppi
+ */
 public class GameHasBeenPauseEventData implements EventData {
     public static final String ID = "GAME_HAS_BEEN_PAUSE";
 
+    /**
+     * Default constructor.
+     * */
     public GameHasBeenPauseEventData() {
 
     }
