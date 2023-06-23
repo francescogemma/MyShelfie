@@ -10,15 +10,31 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
+/**
+ * Event used to notify the game is over.
+ * This event is used internally by the server.
+ * @author Giacomo Groppi
+ */
 public class GameOverInternalEventData implements EventData {
     public static final String ID = "GAME_OVER_INTERNAL";
 
+    /**
+     * The game controller of the game that is over.
+     */
     private final GameController gameController;
 
+    /**
+     * Constructs a {@link GameOverInternalEventData}.
+     * @param controller The game controller of the game that is over.
+     */
     public GameOverInternalEventData(GameController controller) {
         this.gameController = controller;
     }
 
+    /**
+     * Returns the game controller of the game that is over.
+     * @return The game controller of the game that is over.
+     */
     public GameController getGameController() {
         return this.gameController;
     }
