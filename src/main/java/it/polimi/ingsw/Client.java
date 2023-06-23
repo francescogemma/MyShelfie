@@ -27,5 +27,7 @@ public class Client {
                 AvailableGamesMenuLayout::new, LobbyLayout::new, GameLayout::new,
                 GameOverLayout::new));
         }
+
+        System.exit(0);
     }
 }
