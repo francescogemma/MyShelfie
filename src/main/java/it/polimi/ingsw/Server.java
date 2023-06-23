@@ -10,7 +10,19 @@ import it.polimi.ingsw.utils.Logger;
 
 import java.rmi.RemoteException;
 
+/**
+ * Server application entry point.
+ */
 public class Server {
+    /**
+     * Main of the server application.
+     * It initializes the {@link MenuController}.
+     * It starts the {@link ConnectionAcceptor} which waits for incoming TCP or RMI connections from users.
+     * For every incoming connection initializes a corresponding {@link VirtualView} and sets its {@link MenuController}.
+     *
+     * @param args allow to optionally specify the hostname of the server used to set "java.rmi.server.hostname" property.
+     *             It is sufficient to enter an IP or hostname as the only argument.
+     */
     public static void main(String[] args) {
         MenuController menuController = MenuController.getInstance();
         ConnectionAcceptor connectionAcceptor;
