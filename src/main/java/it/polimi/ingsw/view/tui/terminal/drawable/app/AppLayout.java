@@ -13,6 +13,8 @@ import java.util.TimerTask;
  * While the {@link it.polimi.ingsw.view.tui.terminal.Terminal} is running an {@link App} there is one and only one
  * displayed AppLayout. An AppLayout is built through a hierarchy of other drawables, composed one into the other, but
  * it is always the root element of this hierarchy.
+ * Every AppLayout must have a public constant string which uniquely identifies it, it allows the AppLayouts to tell
+ * the {@link App} which is the next AppLayout to be shown.
  *
  * @see it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayout
  */

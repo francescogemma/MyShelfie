@@ -30,7 +30,10 @@ import java.util.Map;
  */
 public class ConnectionMenuLayout extends AppLayout {
     /**
-     * Unique name of the connection menu layout.
+     * Unique name of the connection menu layout required to allow other AppLayouts to tell
+     * the {@link it.polimi.ingsw.view.tui.terminal.drawable.app.App} to switch to this layout.
+     *
+     * @see AppLayout
      */
     public static final String NAME = "CONNECTION_MENU";
 

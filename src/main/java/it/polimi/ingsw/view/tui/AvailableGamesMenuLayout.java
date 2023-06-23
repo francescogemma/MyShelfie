@@ -37,7 +37,10 @@ import java.util.Map;
  */
 public class AvailableGamesMenuLayout extends AppLayout {
     /**
-     * Unique name of the available games menu layout.
+     * Unique name of the available games menu layout required to allow other AppLayouts to tell
+     * the {@link it.polimi.ingsw.view.tui.terminal.drawable.app.App} to switch to this layout.
+     *
+     * @see AppLayout
      */
     public static final String NAME = "AVAILABLE_GAMES_MENU";
 
