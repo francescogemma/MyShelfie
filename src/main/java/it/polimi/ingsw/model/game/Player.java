@@ -83,8 +83,9 @@ public class Player {
 
     /**
      * Create a new instance of PlayerView equals to other
+     * @param other the Player to copy
      * */
-    protected Player(Player other) {
+    public Player(Player other) {
         this.username = other.username;
         this.bookshelf = new Bookshelf(other.bookshelf);
 
