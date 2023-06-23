@@ -10,16 +10,31 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
+/**
+ * Event used for notifying that the game has been stopped.
+ * This event is used internally by the server.
+ * @author Giacomo Groppi
+ */
 public class GameHasBeenStoppedInternalEventData implements EventData {
     public static final String ID = "GAME_STOP_INTERNAL";
 
+    /**
+     * The game controller of the game that has been stopped.
+     * */
     private final GameController gameController;
 
+    /**
+     * Constructs a {@link GameHasBeenStoppedInternalEventData}.
+     * @param controller The game controller of the game that has been stopped.
+     * */
     public GameHasBeenStoppedInternalEventData(GameController controller) {
         this.gameController = controller;
     }
 
-
+    /**
+     * Returns the game controller of the game that has been stopped.
+     * @return The game controller of the game that has been stopped.
+     * */
     public GameController getGameController() {
         return this.gameController;
     }
