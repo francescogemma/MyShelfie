@@ -9,7 +9,6 @@ import it.polimi.ingsw.event.data.client.LoginEventData;
 import it.polimi.ingsw.event.data.client.*;
 import it.polimi.ingsw.event.data.internal.PlayerDisconnectedInternalEventData;
 import it.polimi.ingsw.event.transmitter.EventTransmitter;
-import it.polimi.ingsw.model.game.IllegalFlowException;
 import it.polimi.ingsw.utils.Coordinate;
 import it.polimi.ingsw.utils.Logger;
 import it.polimi.ingsw.utils.Pair;
@@ -406,7 +405,7 @@ public class VirtualView implements EventTransmitter {
         );
 
         if (response.isOk()) {
-            this.username = response.getWrappedData().getUsername();
+            this.username = response.getWrappedData().username();
         }
         return response;
     }

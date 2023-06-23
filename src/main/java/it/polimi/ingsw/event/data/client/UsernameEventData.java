@@ -18,34 +18,26 @@ import java.util.function.Function;
  * For this reason, when performing the login, along with the {@link it.polimi.ingsw.controller.Response} object,
  * the {@link UsernameEventData} is also passed as data.
  *
+ * @param username The real username of the user
  * @author Giacomo Groppi
  * @see it.polimi.ingsw.controller.servercontroller.MenuController#login(EventTransmitter, String, String)
- * */
-public class UsernameEventData implements EventData {
+ */
+public record UsernameEventData(String username) implements EventData {
     public static final String ID = "USERNAME";
-    private final String username;
-
-    public UsernameEventData(String username) {
-        this.username = username;
-    }
-
-    public String getUsername() {
-        return this.username;
-    }
 
     public static CastEventReceiver<UsernameEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }
 
     public static <T extends EventData> Requester<UsernameEventData, T> requester(EventTransmitter transmitter,
-                                                                                EventReceiver<EventData> receiver,
-                                                                                Object responsesLock) {
+                                                                                  EventReceiver<EventData> receiver,
+                                                                                  Object responsesLock) {
         return new Requester<>(ID, transmitter, receiver, responsesLock);
     }
 
     public static <T extends EventData> Responder<UsernameEventData, T> responder(EventTransmitter transmitter,
-                                                                                EventReceiver<EventData> receiver,
-                                                                                Function<UsernameEventData, T> response) {
+                                                                                  EventReceiver<EventData> receiver,
+                                                                                  Function<UsernameEventData, T> response) {
         return new Responder<>(ID, transmitter, receiver, response);
     }
 
