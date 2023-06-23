@@ -23,16 +23,48 @@ import it.polimi.ingsw.view.tui.terminal.drawable.symbol.PrimitiveSymbol;
 
 import java.util.Map;
 
+/**
+ * {@link AppLayout} which allows the user to enter its username and password and perform a login.
+ *
+ * @author Cristiano Migali
+ */
 public class LoginMenuLayout extends AppLayout {
+    /**
+     * Unique name of the login menu layout required to allow other AppLayouts to tell
+     * the {@link it.polimi.ingsw.view.tui.terminal.drawable.app.App} to switch to this layout.
+     *
+     * @see AppLayout
+     */
     public static final String NAME = "LOGIN_MENU";
 
     // Layout:
+
+    /**
+     * {@link ValueMenuEntry} which allows the user to enter its username in a {@link TextBox}.
+     */
     private final ValueMenuEntry<String> usernameEntry = new ValueMenuEntry<>("Username",
         new TextBox());
+
+    /**
+     * {@link ValueMenuEntry} which allows the user to enter its password in a {@link TextBox}.
+     */
     private final ValueMenuEntry<String> passwordEntry = new ValueMenuEntry<>("Password",
         new TextBox().hideText());
+
+    /**
+     * It is the {@link Button} which allows the user to perform the login synchronous request to the
+     * server.
+     */
     private final Button loginButton = new Button("Login");
+
+    /**
+     * It is the {@link Button} which allows the user to quit from the game.
+     */
     private final Button exitButton = new Button("Exit");
+
+    /**
+     * Background layout in which all the menu entries and buttons are arranged.
+     */
     private final Drawable background = new OrientedLayout(Orientation.VERTICAL,
             usernameEntry.center().weight(1),
             passwordEntry.center().weight(1),
@@ -44,17 +76,41 @@ public class LoginMenuLayout extends AppLayout {
             ).weight(1)
         ).center().scrollable();
 
+    /**
+     * {@link PopUpDrawable} displayed on top of the background layout to inform the user
+     * that the login has failed.
+     */
     private final PopUpDrawable popUpDrawable = new PopUpDrawable(background);
 
     // Data:
+
+    /**
+     * {@link NetworkEventTransceiver} which allows to receive events from the server.
+     */
     private NetworkEventTransceiver transceiver = null;
+
+    /**
+     * It is the username entered by the user.
+     */
     private String username;
 
     // Utilities:
+
+    /**
+     * {@link Requester} which allows the user to perform a synchronous login request to the server.
+     */
     private Requester<Response<UsernameEventData>, LoginEventData> loginRequester = null;
 
+    /**
+     * {@link PopUpQueue} used to manage the pop-ups that inform the user if a login has failed.
+     */
     private PopUpQueue popUpQueue;
 
+    /**
+     * Constructor of the class.
+     * It initializes the layout in which all the elements are arranged and sets the required
+     * {@link Button}s callbacks.
+     */
     public LoginMenuLayout() {
         setLayout(popUpDrawable.alignUpLeft().crop());
 
