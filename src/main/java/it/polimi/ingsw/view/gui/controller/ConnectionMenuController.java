@@ -23,16 +23,49 @@ import javafx.scene.layout.VBox;
 import java.util.function.UnaryOperator;
 
 /**
- * Controller for the connection menu layout.
+ * This is a controller corresponding to the connection menu.
+ * This menu is part of the game's graphical use interface. If features two text fields, allowing the user to set a server IP
+ * address and port to connect to.
  */
 public class ConnectionMenuController extends Controller {
+    /**
+     * Used to contain a string (provided by the user) corresponding to the host server's IP address.
+     */
     @FXML private TextField serverIPTextField;
+
+    /**
+     * Used to contain a string (provided by th user) corresponding to the host server's port address.
+     */
     @FXML private TextField serverPortTextField;
+
+    /**
+     * Used to submit the current information contained in the text fields, and request a new connection.
+     */
     @FXML private Button connectionMenuNextButton;
+
+    /**
+     * An invisible pane, rendered visible as soon as the main menu objects need to go out of focus, to leave
+     * space to an overlay message.
+     */
     @FXML private Pane connectionBackgroundBlurPane;
+
+    /**
+     * This vertical box represents an area of space used to contain a label.
+     * This label will contain a message to the user, and, upon activation, will put the other interface elements out of
+     * focus.
+     */
     @FXML private VBox connectionPopUpMessageBackground;
+
+    /**
+     * Informational label, containing a message to the user. It is contained within an invisible object by default, and
+     * will not be visible.
+     */
     @FXML private Label connectionPopUpLabel;
 
+    /**
+     * Utility class attribute that stores this menu's name. This attribute is often used by other layouts, to switch to
+     * the next menu without needing to rewrite and consequentially expose its name.
+     */
     public static final String NAME = "ConnectionMenu";
 
     private PopUpQueue popUpQueue;
