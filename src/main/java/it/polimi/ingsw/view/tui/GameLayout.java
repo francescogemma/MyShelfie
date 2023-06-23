@@ -554,7 +554,7 @@ public class GameLayout extends AppLayout {
 
     // Utilities:
     /**
-     * {@link Requester} which allows to perform a synchronous request to join the game.
+     * {@link Requester} which allows the user to perform a synchronous request to join the game.
      * This request is performed on layout setup and ensures that the server doesn't broadcast any update relevant
      * to the game layout before it has set the corresponding receivers.
      */
