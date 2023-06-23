@@ -9,6 +9,11 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
+/**
+ * Event sent when a player has joined the lobby.
+ * @param username The username of the player that has join the lobby.
+ * @author Giacomo Groppi
+ * */
 public record PlayerHasJoinLobbyEventData(String username) implements EventData {
     public static final String ID = "PLAYER_HAS_JOIN_LOBBY";
 
