@@ -9,6 +9,11 @@ import it.polimi.ingsw.event.transmitter.EventTransmitter;
 
 import java.util.function.Function;
 
+/**
+ * This event indicates "username" has completed his bookshelf.
+ * @param username The username of the player that completed his bookshelf.
+ * @author Giacomo Groppi
+ * */
 public record FirstFullBookshelfEventData(String username) implements EventData {
     public static final String ID = "FIRST_FULL_BOOKSHELF";
 
