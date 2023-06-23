@@ -12,6 +12,11 @@ import it.polimi.ingsw.utils.Logger;
 import java.util.Objects;
 import java.util.function.Function;
 
+/**
+ * Event sent to the client when the player has is ready to receive the initial game data.
+ * @param gameView The game view of the game that the player is joining.
+ * @author Giacomo Groppi
+ */
 public record InitialGameEventData(GameView gameView) implements EventData {
     public static final String ID = "INITIAL_GAME";
 
