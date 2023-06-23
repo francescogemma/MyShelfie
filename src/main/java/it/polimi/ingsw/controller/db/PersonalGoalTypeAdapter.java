@@ -7,6 +7,12 @@ import it.polimi.ingsw.model.goal.PersonalGoal;
 
 import java.io.IOException;
 
+/**
+ * {@link TypeAdapter} used to serialize personal goals to JSON in an efficient way.
+ * In particular, every personal goal is serialized as an integer which uniquely identifies it.
+ *
+ * @author Cristiano Migali
+ */
 public class PersonalGoalTypeAdapter extends TypeAdapter<PersonalGoal> {
     @Override
     public void write(JsonWriter jsonWriter, PersonalGoal personalGoal) throws IOException {

@@ -10,9 +10,25 @@ import it.polimi.ingsw.model.tile.TileVersion;
 
 import java.io.IOException;
 
+/**
+ * {@link TypeAdapter} used to serialize tiles to JSON preserving the singleton pattern.
+ * In particular, every tile is serialized to a JSON with a color field and a version field.
+ * During the deserialization the tile instance corresponding to the deserialized color and version is retrieved
+ * through {@link Tile#getInstance(TileColor, TileVersion)} ensuring that there is only one {@link Tile} instance with
+ * a certain color and version couple.
+ *
+ * @author Cristiano Migali1
+ */
 public class TileTypeAdapter extends TypeAdapter<Tile> {
-    private final static String COLOR_FIELD_NAME = "color";
-    private final static String VERSION_FIELD_NAME = "version";
+    /**
+     * It is the name of the color field in the tile JSON.
+     */
+    private static final String COLOR_FIELD_NAME = "color";
+
+    /**
+     * It is the name of the version field in the tile JSON.
+     */
+    private static final String VERSION_FIELD_NAME = "version";
 
     @Override
     public void write(JsonWriter jsonWriter, Tile tile) throws IOException {
