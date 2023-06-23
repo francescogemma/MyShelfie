@@ -9,6 +9,9 @@ import it.polimi.ingsw.model.filter.NumDifferentColorFilter;
  * @author Cristiano Migali
  */
 public class AdjacencyGoal extends Goal {
+    /**
+     * Constructor of the class.
+     */
     public AdjacencyGoal() {
         super(new AdjacencyFetcher(),
             new NumDifferentColorFilter(1, 1),

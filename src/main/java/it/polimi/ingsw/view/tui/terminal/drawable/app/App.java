@@ -20,6 +20,8 @@ import java.util.function.Supplier;
  *
  * An App can be started through {@link it.polimi.ingsw.view.tui.terminal.Terminal#start(App)}.
  * Note that you can't start the same App instance more than once.
+ *
+ * @author Cristiano Migali
  */
 public class App {
     /**

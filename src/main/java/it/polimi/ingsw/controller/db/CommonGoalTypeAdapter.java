@@ -10,6 +10,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * {@link TypeAdapter} used to serialize common goals to JSON in an efficient way.
+ * In particular, every common goal is serialized as an integer which indicates the type of the common
+ * goal and a list which corresponds to its current points stack.
+ *
+ * @author Cristiano Migali
+ */
 public class CommonGoalTypeAdapter extends TypeAdapter<CommonGoal> {
     @Override
     public void write(JsonWriter jsonWriter, CommonGoal commonGoal) throws IOException {

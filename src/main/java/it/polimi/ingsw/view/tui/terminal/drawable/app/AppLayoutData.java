@@ -9,6 +9,8 @@ import java.util.function.Supplier;
  * object, a string, an integer, ...) in order to retrieve it.
  * Instead of directly setting data in correspondence to certain labels, a supplier is provided which can be invoked
  * to retrieve (or recalculate) the desired data; in this way we ensure that data is updated.
+ *
+ * @author Cristiano Migali
  */
 public class AppLayoutData {
     /**

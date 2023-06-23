@@ -57,11 +57,7 @@ public class MenuController {
 
         List<Game> allGame;
 
-        try {
-            allGame = DBManager.getGamesDBManager().loadAllInFolder();
-        } catch (IdentifiableNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        allGame = DBManager.getGamesDBManager().loadAllInFolder();
 
         allGame.stream()
                 .filter(g -> !g.isOver())

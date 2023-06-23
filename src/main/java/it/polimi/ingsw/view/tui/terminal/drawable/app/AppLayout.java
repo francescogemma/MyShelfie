@@ -17,6 +17,8 @@ import java.util.TimerTask;
  * the {@link App} which is the next AppLayout to be shown.
  *
  * @see it.polimi.ingsw.view.tui.terminal.drawable.orientedlayout.OrientedLayout
+ *
+ * @author Cristiano Migali
  */
 public abstract class AppLayout extends FixedLayoutDrawable<FullyResizableDrawable> {
     /**

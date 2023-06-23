@@ -6,6 +6,8 @@ import java.util.Map;
  * Allows data exchange between all the {@link AppLayout} instances of an {@link App}.
  * It does so by containing the {@link AppLayoutData} provided by every {@link AppLayout} in the {@link App};
  * access to some data in some layout is reachable (by other layouts) by specifying the layout name and the data label.
+ *
+ * @author Cristiano Migali
  */
 public class AppDataProvider {
     /**

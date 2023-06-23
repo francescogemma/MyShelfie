@@ -12,6 +12,8 @@ import it.polimi.ingsw.view.tui.terminal.drawable.crop.ScrollableDrawable;
  * AlignedDrawable's implementations differs from the way in which they place (align) the inner Drawable inside
  * the available space when there is more of it than required (for example the inner Drawable could be centered in
  * the free space), this is where the name comes from.
+ *
+ * @author Cristiano Migali
  */
 public abstract class AlignedDrawable extends Drawable {
     /**
