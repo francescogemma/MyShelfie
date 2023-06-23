@@ -68,8 +68,15 @@ public class ConnectionMenuController extends Controller {
      */
     public static final String NAME = "ConnectionMenu";
 
+    /**
+     * Used to handle multiple popup requests. In this particular case, all popups are relative to connection state
+     * messages.
+     */
     private PopUpQueue popUpQueue;
 
+    /**
+     * Sets the menu up so that it only accepts valid inputs, and initializes all relevant layout elements.
+     */
     @FXML
     private void initialize() {
         // set the server port text field to accept only decimal numbers
@@ -100,7 +107,7 @@ public class ConnectionMenuController extends Controller {
     }
 
     /**
-     * Set the server port text field to accept only decimal numbers
+     * Sets the server port text field to only accept decimal numbers.
      */
     private void setServerPortTextFieldToDecimalOnly() {
         UnaryOperator<TextFormatter.Change> integerFilter = change -> {
@@ -115,10 +122,10 @@ public class ConnectionMenuController extends Controller {
     }
 
     /**
-     * callback for the "Next" button.
+     * Callback for the "Next" button.
      * It checks if the IP address and the port are valid and then tries to connect to the server.
      * If the connection is successful, it switches to the next layout.
-     * If the connection fails, it shows a pop up message.
+     * If the connection fails, it shows a popup message.
      */
     @FXML
     private void connect() {
@@ -181,8 +188,7 @@ public class ConnectionMenuController extends Controller {
     }
 
     /**
-     * callback for the "Exit" button.
-     * It closes the application.
+     * This method is called if the user requests to close the window in any way, and ends the process.
      */
     @FXML
     private void exit() {
