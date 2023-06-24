@@ -45,20 +45,57 @@ import it.polimi.ingsw.view.displayable.DisplayableScoreBoard;
 import javafx.util.Callback;
 import javafx.util.Duration;
 
+/**
+ * This is a controller corresponding to the actual main game.
+ * This menu is part of the game's graphical use interface. It's comprised of a game board, all shelves, and additional
+ * user information, such as the leaderboard and all player names, as well as information about the current game objectives.
+ */
 public class GameController extends Controller {
+    /**
+     * Utility class attribute that stores this menu's name. This attribute is often used by other layouts, to switch to
+     * the next menu without needing to rewrite and consequentially expose its name.
+     */
     public static final String NAME = "Game";
 
     // Layout:
     // Left panel:
+
+    /**
+     * Container for an image representing a brief explanation of the requirements for the first common goal.
+     */
     @FXML private ImageView firstCommonGoalImageView;
+
+    /**
+     * Appendix to the first common goal image container, describes the points assigned to that common goal.
+     */
     @FXML private ImageView firstScoringToken;
+
+    /**
+     * Container for an image representing a brief explanation of the requirements for the second common goal.
+     */
     @FXML private ImageView secondCommonGoalImageView;
+
+    /**
+     * Appendix to the second common goal image container, describes the points assigned to that common goal.
+     */
     @FXML private ImageView secondScoringToken;
+
+    /**
+     * Container for an image representing a brief explanation of the requirements for the player's personal goal.
+     */
     @FXML private ImageView personalGoalImageView;
 
+    /**
+     * A label containing a message to the user. This is a pop-up that gets displayed on screen for a brief time
+     * interval. It's a quick utility notification platform.
+     */
     @FXML private Label gamePopUpLabel;
-    @FXML private VBox gamePopUpMessageBackground;
 
+    /**
+     * A background that gets applied immediately behind the popup label, as a way to make the background elements not
+     * interactive for a brief time frame.
+     */
+    @FXML private VBox gamePopUpMessageBackground;
     private static final double COMMON_GOAL_WIDTH = 1385.0;
     private static final double COMMON_GOAL_HEIGHT = 913.0;
     private static final double COMMON_GOAL_ASPECT_RATIO = COMMON_GOAL_WIDTH / COMMON_GOAL_HEIGHT;
