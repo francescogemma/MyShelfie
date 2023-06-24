@@ -641,4 +641,24 @@ class BoardTest {
 
         Assertions.assertTrue(board.canDraw());
     }
+
+    @Test
+    void getSelectedCoordinates__correctOutput() throws IllegalExtractionException, FullSelectionException {
+        fillBoard(board, 2);
+
+        board.selectTile(1, 3);
+        board.selectTile(1, 4);
+
+        board.draw();
+
+        board.selectTile(2, 2);
+        board.selectTile(2, 3);
+        board.selectTile(2, 4);
+
+        Assertions.assertEquals(3, board.getSelectedCoordinates().size());
+
+        Assertions.assertEquals(new Coordinate(2, 2), board.getSelectedCoordinates().get(0));
+        Assertions.assertEquals(new Coordinate(2, 3), board.getSelectedCoordinates().get(1));
+        Assertions.assertEquals(new Coordinate(2, 4), board.getSelectedCoordinates().get(2));
+    }
 }

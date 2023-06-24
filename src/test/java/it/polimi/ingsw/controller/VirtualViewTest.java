@@ -122,7 +122,8 @@ class VirtualViewTest {
     }
 
     @RepeatedTest(numberOfRepetition)
-    void test() throws DisconnectedException, InterruptedException {
+    @Description("Test concurrncy with 4 players")
+    void joinLobby_fourThreadSendMessages_correctOutput() throws DisconnectedException, InterruptedException {
         Thread thread1, thread2, thread3, thread4;
 
         authenticate(virtualView1, transceiver1, username1);
@@ -194,7 +195,8 @@ class VirtualViewTest {
     }
 
     @RepeatedTest(numberOfRepetition)
-    void test2() throws DisconnectedException, InterruptedException {
+    @Description("Test concurrecy of joinLobby and exitLobby with 1 games available")
+    void joinLobby_threePlayersOneInMenu_correctOutput() throws DisconnectedException, InterruptedException {
         Thread thread1, thread2, thread3;
 
         authenticate(virtualView1, transceiver1, username1);
@@ -269,8 +271,8 @@ class VirtualViewTest {
     }
 
     @RepeatedTest(numberOfRepetition)
-    @Description("With 2 game in list")
-    void test3() throws DisconnectedException, InterruptedException {
+    @Description("Test concurrecy of joinLobby and exitLobby with 2 games available")
+    void joinLobby_threePlayersOneInMenu2gamesAvailable_correctOutput() throws DisconnectedException, InterruptedException {
         Thread thread1, thread2, thread3;
 
         authenticate(virtualView1, transceiver1, username1);

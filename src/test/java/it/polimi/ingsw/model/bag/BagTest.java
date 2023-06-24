@@ -23,13 +23,13 @@ class BagTest {
 
     @RepeatedTest(numberOfRun)
     @Description("The function checks the initial size of the Bag")
-    void checkSize() {
+    void getRemaining__correctOutput() {
         Assertions.assertEquals(22 * 6, bag.getRemaining());
     }
 
     @RepeatedTest(numberOfRun)
     @Description("The function tests that the getRandomTile function removes the object from the board.")
-    void testGetRandomTile () {
+    void getRemaining_afterDropOneTile_correctOutput () {
         for (int i = 0; i < 22 * 6; i++) {
             final int oSize = bag.getRemaining();
             bag.getRandomTile();
@@ -39,7 +39,7 @@ class BagTest {
 
     @RepeatedTest(numberOfRun)
     @Description("Tests that an exception is thrown when attempting to remove a Tile but the bag is empty.")
-    void testExtractionEmpty() {
+    void getRandomTile_emptyBag_shouldThrowIllegalStateException() {
         for (int i = 0; i < 22 * 6; i++) {
             bag.getRandomTile();
         }
@@ -59,7 +59,7 @@ class BagTest {
 
     @RepeatedTest(numberOfRun)
     @Description("Test restore")
-    void testRestore () {
+    void forgetLastExtraction_askToForgetExtractionTwice_shouldThrowRuntimeException () {
         removeRandom();
         final int s = bag.getRemaining();
         bag.forgetLastExtraction();
@@ -71,32 +71,25 @@ class BagTest {
     }
 
     @RepeatedTest(numberOfRun)
-    @Description("Testing clone")
-    void testingClone() {
+    @Description("Testing copy constructor")
+    void CopyConstructor_checkCopyConstructorDontShareData_correctOutput() {
         removeRandom();
         Bag newBag = new Bag(this.bag);
         assertEquals(newBag, this.bag);
+
+        newBag.getRandomTile();
+        assertNotEquals(newBag, this.bag);
     }
 
     @RepeatedTest(numberOfRun)
     @Description("Testing clone with restore")
-    void testingCloneAndRestore() {
+    void forgetLastExtraction_restorePreviousState_correctOutput() {
         removeRandom();
         Bag newBag = new Bag(this.bag);
         assertEquals(newBag, this.bag);
         newBag.getRandomTile();
         newBag.forgetLastExtraction();
         assertEquals(newBag, this.bag);
-    }
-
-    @RepeatedTest(numberOfRun)
-    @Description("Testing clone and equals")
-    void testingCloneAndEquals() {
-        removeRandom();
-        Bag newBag = new Bag(this.bag);
-        assertEquals(newBag, this.bag);
-        newBag.getRandomTile();
-        assertNotEquals(newBag, this.bag);
     }
 
     @AfterEach

@@ -226,21 +226,6 @@ public class Board extends BoardView {
     }
 
     @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder("---------------\n");
-        for (int i = 0; i < this.tiles.length; i++) {
-            for (int k = 0; k < this.tiles[i].length; k++) {
-                if (isEmpty(new Coordinate(i, k)))
-                    result.append("[ ]");
-                else
-                    result.append("[").append(this.tiles[i][k].getColor().color("#")).append("]");
-            }
-            result.append("\n");
-        }
-        return result.toString();
-    }
-
-    @Override
     public boolean equals(Object other) {
         if (other == this)
             return true;
