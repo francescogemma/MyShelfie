@@ -182,6 +182,10 @@ public class GameController extends Controller {
         });
     }
 
+    /**
+     * For each token image view, this method gets the correct integer value to assign to it,
+     * and changes the image accordingly.
+     */
     private void populateCommonGoalsPointsTextBoxes() {
         setTokenImage((commonGoals[0].getPointStack().isEmpty()) ? 0 :
             commonGoals[0].getPointStack().get(commonGoals[0].getPointStack().size() - 1), firstScoringToken);
@@ -189,6 +193,10 @@ public class GameController extends Controller {
             commonGoals[1].getPointStack().get(commonGoals[1].getPointStack().size() - 1), secondScoringToken);
     }
 
+    /**
+     * Utility method to set all common goal explanation images, and initialize a tooltip object as an aid to users when
+     * looking for additional information about that specific goal.
+     */
     private void populateGoalsPanel() {
         Platform.runLater(() -> {
             firstCommonGoalImageView.setImage(ImageProvider.getInstance().getCommonGoal(commonGoals[0].getIndex()));
@@ -207,6 +215,10 @@ public class GameController extends Controller {
         populateCommonGoalsPointsTextBoxes();
     }
 
+    /**
+     * Upon goal completion (or game-end state), use this method to display the provided goal, and update the scoreboard.
+     * @param displayableGoal will provide the information required by the scoreboard in order to display the completed goal.
+     */
     private void displayGoal(DisplayableGoal displayableGoal) {
         isDisplayingCommonGoal = true;
 
