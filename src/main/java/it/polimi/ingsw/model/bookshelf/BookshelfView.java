@@ -4,6 +4,11 @@ import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.model.tile.TileColor;
 import it.polimi.ingsw.model.tile.TileVersion;
 
+/**
+ * It is an immutable view on a {@link Bookshelf} which exposes only its getter methods.
+ *
+ * @author Giacomo Groppi
+ */
 public class BookshelfView {
     /**
      * The number of rows in the bookshelf grid.
@@ -28,6 +33,10 @@ public class BookshelfView {
      */
     protected final Tile[][] content = new Tile[ROWS][COLUMNS];
 
+    /**
+     * Constructor of the class.
+     * It initializes a BookshelfView which is completely empty.
+     */
     public BookshelfView() {
         for (int row = 0; row < ROWS; row++) {
             for (int column = 0; column < COLUMNS; column++) {
@@ -36,6 +45,11 @@ public class BookshelfView {
         }
     }
 
+    /**
+     * Copy constructor of the class.
+     *
+     * @param other is the other BookshelfView that has to be copied.
+     */
     public BookshelfView(BookshelfView other) {
         for (int r = 0; r < content.length; r ++) {
             for (int c = 0; c < content[r].length; c ++) {
@@ -76,6 +90,9 @@ public class BookshelfView {
         return content[shelf.getRow()][shelf.getColumn()];
     }
 
+    /**
+     * @return a copy of this {@link BookshelfView}.
+     */
     public BookshelfView createView () {
         return new BookshelfView(this);
     }
