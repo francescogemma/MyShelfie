@@ -11,12 +11,39 @@ import it.polimi.ingsw.model.bookshelf.Bookshelf;
  * @author Giacomo Groppi, Cristiano Migali
  */
 public enum TileColor {
+    /**
+     * It is the green color.
+     */
     GREEN("green", "\033[30;42m"),
+
+    /**
+     * It is the white color.
+     */
     WHITE("white", "\033[30;47m"),
+
+    /**
+     * It is the yellow color.
+     */
     YELLOW("yellow", "\033[30;43m"),
+
+    /**
+     * It is the blue color.
+     */
     BLUE("blue", "\033[30;44m"),
+
+    /**
+     * It is the cyan color.
+     */
     CYAN("cyan", "\033[30;46m"),
+
+    /**
+     * It is the magenta color.
+     */
     MAGENTA("magenta", "\033[30;45m"),
+
+    /**
+     * It represents a cell where there is no tile.
+     */
     EMPTY("empty", "");
 
     /**
@@ -54,6 +81,12 @@ public enum TileColor {
         return this.name;
     }
 
+    /**
+     * Converts an index to a TileColor.
+     *
+     * @param index is the index which we want to convert to the corresponding TileColor.
+     * @return the TileColor corresponding to the index.
+     */
     public static TileColor indexToTileColor(int index) {
         if (index == 0) {
             return TileColor.EMPTY;
@@ -78,6 +111,12 @@ public enum TileColor {
         return tileColor;
     }
 
+    /**
+     * Converts a TileColor to an index.
+     *
+     * @param tileColor is the TileColor which we want to convert to the corresponding index.
+     * @return index corresponding to the TileColor.
+     */
     public static int tileColorToIndex(TileColor tileColor) {
         if (tileColor == TileColor.EMPTY) {
             return 0;
