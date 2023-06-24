@@ -96,14 +96,52 @@ public class GameController extends Controller {
      * interactive for a brief time frame.
      */
     @FXML private VBox gamePopUpMessageBackground;
+
+    /**
+     * The actual image width of a common goal explanation image.
+     */
     private static final double COMMON_GOAL_WIDTH = 1385.0;
+
+    /**
+     * The actual image height of a common goal explanation image.
+     */
     private static final double COMMON_GOAL_HEIGHT = 913.0;
+
+    /**
+     * The aspect ratio of the common goal explanation image's resolution.
+     */
     private static final double COMMON_GOAL_ASPECT_RATIO = COMMON_GOAL_WIDTH / COMMON_GOAL_HEIGHT;
+
+    /**
+     * A factor to which the actual image size should be multiplied by in order to resize the common goal image to
+     * the intended in-game image size.
+     */
     private static final double TOKEN_COMMON_GOAL_RESIZE_FACTOR = 315.805 / COMMON_GOAL_WIDTH;
+
+    /**
+     * An arbitrary, decorative angular offset to apply to common goal tokens.
+     */
     private static final double TOKEN_COMMON_GOAL_ANGLE = -7.6426;
+
+    /**
+     * This value will be multiplied by the in-game image space width for the common goal image, in order to gather an
+     * offset to apply to the token. This acts as a percentage to use to position the token horizontally, relative to the
+     * common goal image.
+     */
     private static final double TOKEN_COMMON_GOAL_UP_MARGIN_FACTOR = 39.5 / COMMON_GOAL_WIDTH;
+
+    /**
+     * This value will be multiplied by the in-game image space width for the common goal image, in order to gather an
+     * offset to apply to the token. This acts as a percentage to use to position the token vertically, relative to the
+     * common goal image.
+     */
     private static final double TOKEN_COMMON_GOAL_RIGHT_MARGIN_FACTOR = 326.5 / COMMON_GOAL_WIDTH;
 
+    /**
+     * Helper function to resize a given goal score token, using this class' token constants, describing its relative position
+     * and size to the common goal images.
+     * @param scoringToken is the ImageView object corresponding to the token that needs to be resized.
+     */
     private void resizeCommonGoalToken(ImageView scoringToken) {
         double realWidth = Math.min(firstCommonGoalImageView.getFitWidth(), firstCommonGoalImageView.getFitHeight() * COMMON_GOAL_ASPECT_RATIO);
 
@@ -114,6 +152,10 @@ public class GameController extends Controller {
         scoringToken.setRotate(TOKEN_COMMON_GOAL_ANGLE);
     }
 
+    /**
+     * This method adds listeners to all common goal image views. These listeners will be used to automatically resize the
+     * relative goal tokens in the event of an image view resize.
+     */
     private void setCommonGoalImageViewsListeners() {
         firstCommonGoalImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> resizeCommonGoalToken(firstScoringToken));
         firstCommonGoalImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> resizeCommonGoalToken(firstScoringToken));
@@ -122,6 +164,11 @@ public class GameController extends Controller {
         secondCommonGoalImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> resizeCommonGoalToken(secondScoringToken));
     }
 
+    /**
+     * Method to automatically set a token's score image, given an integer value for that score.
+     * @param points is a numerical value representing the score to assign to a token.
+     * @param tokenImageView is the ImageView container for the token's image.
+     */
     private void setTokenImage(int points, ImageView tokenImageView) {
         Platform.runLater(() -> {
             if(points == 0) {
