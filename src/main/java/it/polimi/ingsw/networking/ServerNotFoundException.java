@@ -21,11 +21,16 @@ public class ServerNotFoundException extends ConnectionException {
 
     /**
      * Constructs a new exception with the specified detail message.
+     *
+     * @param s the detail message
      */
     public ServerNotFoundException(String s) { super(s); }
 
     /**
      * Constructs a new exception with the specified detail message and cause.
+     *
+     * @param s the detail message
+     * @param cause the cause
      */
     public ServerNotFoundException(String s, Throwable cause) { super(s, cause); }
 }

@@ -36,6 +36,8 @@ public interface Evaluator {
     /**
      * Returns a {@link BookshelfMaskSet set of masks} that consists in the reason for giving the player the current amount of points.
      *
+     * @return a set of masks that gives the player the points
+     *
      * @author Francesco Gemma
      * @author Michele Miotti
      */

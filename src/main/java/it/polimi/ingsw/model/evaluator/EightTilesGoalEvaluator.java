@@ -21,7 +21,14 @@ import it.polimi.ingsw.model.goal.EightTilesGoal;
  * @author Francesco Gemma
  */
 public class EightTilesGoalEvaluator extends CommonGoalEvaluator implements Evaluator {
+    /**
+     * Indicates whether the goal has been satisfied.
+     */
     private boolean satisfied;
+
+    /**
+     * Contains the masks that satisfy the goal.
+     */
     private BookshelfMaskSet pointMasks;
 
     /**

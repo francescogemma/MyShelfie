@@ -24,6 +24,7 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
 
     /**
      * Class constructor.
+     *
      * @param targetAmount is the needed quantity of {@link BookshelfMask BookshelfMasks} to
      *                     grant a player a non-zero amount of points.
      */

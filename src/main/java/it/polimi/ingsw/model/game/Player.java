@@ -61,6 +61,10 @@ public class Player {
         }
     }
 
+    /**
+     * This method returns the bookshelf of the player.
+     * @return the bookshelf of the player.
+     */
     public Bookshelf getBookshelf () {
         return this.bookshelf;
     }

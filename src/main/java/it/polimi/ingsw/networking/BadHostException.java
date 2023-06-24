@@ -15,11 +15,16 @@ public class BadHostException extends ServerNotFoundException {
 
     /**
      * Constructs a new exception with the specified detail message.
+     *
+     * @param s the detail message
      */
     public BadHostException(String s) { super(s); }
 
     /**
      * Constructs a new exception with the specified detail message and cause.
+     *
+     * @param s the detail message
+     * @param cause the cause
      */
     public BadHostException(String s, Throwable cause) { super(s, cause); }
 }

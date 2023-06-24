@@ -13,7 +13,17 @@ import javafx.stage.Stage;
 
 import java.util.Objects;
 
+/**
+ * GUI application entry point.
+ * It extends {@link Application} and overrides the {@link Application#start(Stage)} method
+ * to make JavaFX work.
+ *
+ * @author Francesco Gemma
+ */
 public class GuiApplication extends Application {
+    /**
+     * Main that starts the GUI application.
+     */
     public static void main(String[] args) {
         launch(args);
     }

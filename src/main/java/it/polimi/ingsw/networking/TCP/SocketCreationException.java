@@ -12,7 +12,23 @@ import it.polimi.ingsw.networking.ConnectionException;
  * @see java.net.Socket Socket
  */
 public class SocketCreationException extends ConnectionException {
+    /**
+     * Creates a new exception.
+     */
     public SocketCreationException() { super(); }
+
+    /**
+     * Creates a new exception with the specified detail message.
+     *
+     * @param s the detail message
+     */
     public SocketCreationException(String s) { super(s); }
+
+    /**
+     * Creates a new exception with the specified detail message and cause.
+     *
+     * @param s the detail message
+     * @param cause the cause
+     */
     public SocketCreationException(String s, Throwable cause) { super(s, cause); }
 }

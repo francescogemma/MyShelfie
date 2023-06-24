@@ -12,11 +12,16 @@ public class ConnectionException extends Exception {
 
     /**
      * Constructs a new exception with the specified detail message.
+     *
+     * @param s the detail message
      */
     public ConnectionException(String s) { super(s); }
 
     /**
      * Constructs a new exception with the specified detail message and cause.
+     *
+     * @param s the detail message
+     * @param cause the cause
      */
     public ConnectionException(String s, Throwable cause) { super(s, cause); }
 }

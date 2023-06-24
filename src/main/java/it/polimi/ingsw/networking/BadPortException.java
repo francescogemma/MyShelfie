@@ -16,11 +16,16 @@ public class BadPortException extends ServerNotFoundException {
 
     /**
      * Constructs a new exception with the specified detail message.
+     *
+     * @param s the detail message
      */
     public BadPortException(String s) { super(s); }
 
     /**
      * Constructs a new exception with the specified detail message and cause.
+     *
+     * @param s the detail message
+     * @param cause the cause
      */
     public BadPortException(String s, Throwable cause) { super(s, cause); }
 }
