@@ -19,6 +19,9 @@ import static java.util.Map.entry;
  * @author Cristiano Migali
  */
 public class FourGroupsFourTilesGoal extends CommonGoal {
+    /**
+     * Constructor of the class.
+     */
     public FourGroupsFourTilesGoal() {
         super(  new AdjacencyFetcher(),
                 new NumDifferentColorFilter(1, 1),

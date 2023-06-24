@@ -19,6 +19,9 @@ import static java.util.Map.entry;
  * @author Cristiano Migali
  */
 public class SixGroupsTwoTilesGoal extends CommonGoal {
+    /**
+     * Constructor of the class.
+     */
     public SixGroupsTwoTilesGoal() {
         super(  new AdjacencyFetcher(),
                 new NumDifferentColorFilter(1, 1),

@@ -16,6 +16,9 @@ import static java.util.Map.entry;
  * @author Giacomo Groppi
  * */
 public class RowFiveAllDifferentColor extends CommonGoal{
+    /**
+     * Constructor of the class.
+     */
     protected RowFiveAllDifferentColor() {
         super(
                 new ShapeFetcher(Shape.getRow(5)),

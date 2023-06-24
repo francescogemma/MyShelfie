@@ -34,7 +34,9 @@ public abstract class Goal {
      */
     protected final Evaluator evaluator;
 
-    // Set of masks used to store all the masks that satisfy the last goal computed.
+    /**
+     * Set of masks used to store all the masks that satisfy the last goal computed.
+     */
     private BookshelfMaskSet pointMasks;
 
     /**
