@@ -55,7 +55,8 @@ public class LoginEventData implements EventData {
     }
 
     /**
-     * Unique identifier for {@link LoginEventData}.
+     * Unique identifier for the EventData, added for serialization purposes accordingly to {@link EventData}
+     * interface contract.
      */
     public static final String ID = "LOGIN";
 
@@ -65,24 +66,28 @@ public class LoginEventData implements EventData {
     }
 
     /**
-     * @param receiver is the receiver that will receive the login data that we want to listen for.
+     * {@link CastEventReceiver} factory method for the EventData, added accordingly to {@link EventData}
+     * interface contract.
      *
-     * @return a receiver which listens only for login events and provides the data already caster.
-     *
-     * @see CastEventReceiver
+     * @param receiver is the {@link EventReceiver} which will receive instances of this EventData.
+     * @return a {@link CastEventReceiver} which filters the events received by receiver and provides those
+     * of this EventData type to an {@link it.polimi.ingsw.event.receiver.EventListener} after a cast.
      */
     public static CastEventReceiver<LoginEventData> castEventReceiver(EventReceiver<EventData> receiver) {
         return new CastEventReceiver<>(ID, receiver);
     }
 
     /**
-     * @param transmitter is the transmitter that will send the synchronous request encapsulating the login data.
-     * @param receiver is the receiver that will receive the synchronous response to the login request.
-     * @param responsesLock is the lock on which the {@link Requester} will invoke {@link Object#wait()} while
-     *                      waiting for the response. Furthermore the lock will be used for synchronization with
-     *                      the thread listening for incoming responses.
-     * @return a requester capable of performing login requests.
-     * @param <T> the type of the response we except to receive.
+     * {@link Requester} factory method that performs requests which receive responses of this EventData, added
+     * accordingly to {@link EventData} interface contract.
+     *
+     * @param transmitter is the {@link EventTransmitter} on which the request is sent.
+     * @param receiver is the {@link EventReceiver} which receives the response to the request.
+     * @param responsesLock is the lock Object on which the {@link Requester} synchronizes to wait for the
+     *                      response.
+     * @return a {@link Requester} which is capable of performing requests which receive responses of this
+     * EventData.
+     * @param <T> is the type of the request EventData.
      */
     public static <T extends EventData> Requester<LoginEventData, T> requester(EventTransmitter transmitter,
                                                              EventReceiver<EventData> receiver,
@@ -91,11 +96,14 @@ public class LoginEventData implements EventData {
     }
 
     /**
-     * @param transmitter is the transmitter that will send the synchronous response to the incoming login request.
-     * @param receiver is the receiver that will receive the login request we will answer for.
-     * @param response is the function which will craft the appropriate response to the received login requests.
-     * @return a responder capable of answering incoming login requests.
-     * @param <T> the type of the response we will send as an answer to the incoming login request.
+     * {@link Responder} factory method which allows to respond to requests of this EventData, added accordingly
+     * to {@link EventData} interface contract.
+     *
+     * @param transmitter is the {@link EventTransmitter} on which the response is sent.
+     * @param receiver is the {@link EventReceiver} which receives the request.
+     * @param response is the function which allows to compute the appropriate response to the received request.
+     * @return a {@link Responder} which is capable of answering requests of this EventData.
+     * @param <T> is the type of the response EventData.
      */
     public static <T extends EventData> Responder<LoginEventData, T> responder(EventTransmitter transmitter,
                                                                                EventReceiver<EventData> receiver,

@@ -5,6 +5,10 @@ package it.polimi.ingsw.event.data;
  * @author Giacomo Groppi
  */
 public class VoidEventData implements EventData {
+    /**
+     * Unique identifier for the EventData, added for serialization purposes accordingly to {@link EventData}
+     * interface contract.
+     */
     public final static String ID = "VOID";
 
     @Override
