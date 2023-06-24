@@ -68,6 +68,8 @@ public class Game extends GameView {
     /**
      * Creates a new game with the given name.
      * @param name the name of the game
+     * @param username is the username of the {@link Player} who is creating the game.
+     *
      * @throws IllegalArgumentException iff the name is empty
      * @throws NullPointerException iff name is null
      */
@@ -127,6 +129,8 @@ public class Game extends GameView {
     /**
      * Use this method to add a player to the game
      *
+     * @param username is the username of the {@link Player} that you want to add to the game.
+     *
      * @return The added player
      * @throws IllegalFlowException
      * <ul>
@@ -164,6 +168,8 @@ public class Game extends GameView {
 
     /**
      * The function removes the player with username "username" from the game.
+     *
+     * @param username is the username of the {@link Player} that you want to remove from the game.
      *
      * @throws IllegalFlowException iff game is already started.
      * @throws NullPointerException iff username is null.
@@ -267,6 +273,8 @@ public class Game extends GameView {
      * If the number of remaining players is 1, the game is put in waitingForReconnection.
      * If the number of remaining players is > 1 and the disconnected player was the current player, they lose their turn.
      *
+     * @param username is the username of the {@link Player} that you want to disconnect.
+     *
      * @throws NullPointerException iff username is null
      * @throws IllegalFlowException iff player is already disconnected
      * */
@@ -302,6 +310,9 @@ public class Game extends GameView {
     /**
      * This method allows to remove the stop state from a game.
      * The method notifies all players that the game has restarted with the {@link GameHasStartedEventData} event.
+     *
+     * @param username is the username of the {@link Player} which is trying to restart the game.
+     * @param usernameToWait is the list of usernames whose connection has to be waited when restarting the game.
      *
      * @throws NullPointerException iff username is null
      * @throws IllegalFlowException iff
@@ -339,6 +350,8 @@ public class Game extends GameView {
 
     /**
      * This method returns the connection status of the player "username".
+     *
+     * @param username is the username of the {@link Player} for which we want to check the connection state.
      *
      * @return True iff the player "username" is connected
      * @throws PlayerNotInGameException iff "username" is not in this game.
@@ -459,6 +472,10 @@ public class Game extends GameView {
 
     /**
      * Use this method to remove the last selected tile from the tile selection
+     *
+     * @param username is the username of the {@link Player} which wants to deselect their last selected tile.
+     * @param coordinate is the {@link Coordinate} of the tile in the {@link Board} that the player wants to deselect.
+     *
      * @throws IllegalFlowException
      * <ul>
      *  <li> Game is not started </li>
@@ -533,6 +550,9 @@ public class Game extends GameView {
     /**
      * This method calculates the points for each player i-th with the i-th goal.
      * It is required that the goals list passed as a parameter has the same size as the players list.
+     *
+     * @param goals is the list of {@link Goal goals} that have to be checked to calculate the points that every player has
+     *              scored.
      *
      * @return A list of the same size as the players list, where each position i contains the
      * number of points obtained by the i-th player for completing the i-th goal, and the
@@ -616,6 +636,10 @@ public class Game extends GameView {
 
     /**
      * This method is used for insert a selection of tile in che bookshelf
+     *
+     * @param username is the username of the {@link Player} that wants to insert the selected tiles in their {@link Bookshelf}.
+     * @param col is the index of the column in the player's bookshelf where they want to insert the selected tiles.
+     *
      * @throws IllegalFlowException
      *  <ul>
      *      <li> Game is stopped or waitingForReconnections </li>
@@ -688,6 +712,9 @@ public class Game extends GameView {
 
     /**
      * This method returns personal goal of player username
+     *
+     * @param username is the username of the {@link Player} for which we want to retrieve the {@link PersonalGoal}.
+     *
      * @return Index the player's personal goal
      * @throws IllegalArgumentException iff username is not in this game.
      * */
@@ -705,6 +732,10 @@ public class Game extends GameView {
 
     /**
      * This method selects a Tile from the board
+     *
+     * @param username is the username of the {@link Player} who wants to select a tile on the {@link Board}.
+     * @param coordinate is the {@link Coordinate} of the tile in the board that the player wants to select.
+     *
      * @throws IllegalFlowException iff
      * <ul>
      *     <li> game is not started </li>

@@ -15,6 +15,10 @@ import static java.lang.Math.*;
  * @author Giacomo Groppi
  */
 class BoardSelector extends BoardSelectorView {
+    /**
+     * Constructor of the class.
+     * Initializes an empty selection.
+     */
     BoardSelector () {
         selected = new ArrayList<>();
     }
@@ -109,6 +113,13 @@ class BoardSelector extends BoardSelectorView {
         return res;
     }
 
+    /**
+     * Draws the selected coordinates from the board.
+     *
+     * @return the list of selected coordinates.
+     * @throws IllegalExtractionException if the selected coordinates can't be extracted from the board according
+     * to game rules.
+     */
     public List<Coordinate> draw () throws IllegalExtractionException {
         if (selectionSize() == 0)
             throw new IllegalExtractionException("Tiles selected is empty");
@@ -122,9 +133,14 @@ class BoardSelector extends BoardSelectorView {
 
     /**
      * The function checks that wrong positions are not selected, but it does not check whether the cell can actually be selected, i.e., whether it has a free side.
+     *
+     * @param coordinate is the {@link Coordinate} of the tile that we want to select.
+     *
      * @throws IllegalExtractionException if the position of the Tile is along the diagonal
      * @throws IllegalArgumentException if we are trying to extract more than 3 tiles
      * @throws IllegalArgumentException if coordinate is already in the list
+     *
+     * @throws  FullSelectionException if we have already selected three tiles.
      */
     public void select (Coordinate coordinate) throws IllegalExtractionException, FullSelectionException {
         if (selectionSize() > 2) {
@@ -156,13 +172,18 @@ class BoardSelector extends BoardSelectorView {
         return new ArrayList<>(this.selected);
     }
 
+    /**
+     * @return the {@link Coordinate} of the last selected tile.
+     */
     public Coordinate lastSelected() {
         if (this.selected.isEmpty())
             throw new IllegalArgumentException("List is empty");
         return this.selected.get(selected.size() - 1);
     }
 
-    // TODO: javadoc
+    /**
+     * Removes the last selected coordinate from the selection list.
+     */
     public void forgetLastSelected() {
         this.selected.remove(selected.size() - 1);
     }

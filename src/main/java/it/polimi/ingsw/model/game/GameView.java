@@ -22,77 +22,77 @@ import java.util.Optional;
  * @author Giacomo Groppi
  * */
 public class GameView implements Identifiable {
-    /*
+    /**
      * The index of the first player in the list of players.
      */
     protected static final int FIRST_PLAYER_INDEX = 0;
 
-    /*
+    /**
      * Time after which, if the game is still waiting for reconnection, it is terminated, assigning the connected player as the winner.
      */
     protected static final int TIME_WAITING_FOR_RECONNECTIONS_BEFORE_WIN = 60 * 1000;
 
-    /*
+    /**
      * Time after which, if the first player is not connected, he lost his turn
      */
     protected static final int TIME_FIRST_PLAYER_CONNECT = 10 * 1000;
 
-    /*
+    /**
      * The name of the game.
      */
     protected final String name;
 
-    /*
+    /**
      * The optional winner of the game.
      */
     protected final List<Player> winners;
 
-    /*
+    /**
      * The common goals of the game.
      */
     protected final CommonGoal[] commonGoals;
 
-    /*
+    /**
      * The bag of tiles in the game.
      */
     protected final Bag bag;
 
-    /*
+    /**
      * The board of the game.
      */
     protected final Board board;
 
-    /*
+    /**
      * Whether the game has started.
      */
     protected boolean isStarted;
 
-    /*
+    /**
      * name of the creator of the game
      */
     protected String creator;
 
-    /*
+    /**
      * true if game is stopped
      */
     protected boolean isStopped;
 
     /**
-     *
-     * */
+     * It is true iff the game is in pause since there is only one connected player.
+     */
     protected boolean isWaitingForReconnections;
 
-    /*
+    /**
      * Index of the first player who completed the bookshelf
      */
     protected int firstPlayerCompleteBookshelf = -1;
 
-    /*
+    /**
      * The index of the current player in the list of players.
      */
     protected int currentPlayerIndex;
 
-    /*
+    /**
      * list of all players in the game
      */
     protected final List<Player> players;
@@ -191,6 +191,11 @@ public class GameView implements Identifiable {
         return numberOfPlayerOnline() != players.size();
     }
 
+    /**
+     * @param currentPlayerIndex is the index of the player that is playing the current turn.
+     * @return the index of the next player connected with the respect to the one that is playing the current turn.
+     * @throws NoPlayerConnectedException if there is no connected player.
+     */
     protected synchronized int getNextPlayerOnline (int currentPlayerIndex) throws NoPlayerConnectedException {
         for (int i = 1; i < this.players.size(); i++) {
             final int index = (currentPlayerIndex + i) % this.players.size();
@@ -210,6 +215,9 @@ public class GameView implements Identifiable {
 
     /**
      * This method is call to understand if one player can start or resume one game
+     *
+     * @param username is the username of the {@link Player} for which we want to check if they can resume the game or not.
+     *
      * @throws NullPointerException iff username is null
      * @throws IllegalStateException
      * <ul>
@@ -228,6 +236,10 @@ public class GameView implements Identifiable {
         return username.equals(creator);
     }
 
+    /**
+     * @param username is the name of a player in the game.
+     * @return the index of the player with the given username in the original lobby ordering.
+     */
     protected synchronized int getIndex (String username) {
         for (int i = 0; i < players.size(); i++) {
             if (players.get(i).is(username))
@@ -237,6 +249,10 @@ public class GameView implements Identifiable {
         throw  new IllegalArgumentException("Player not in this game");
     }
 
+    /**
+     * @param username is the username of the player that we want to retrieve.
+     * @return the {@link Player} in the Game with the given username.
+     */
     protected synchronized Player getPlayer (String username) {
         final int index = getIndex(username);
         return players.get(index);
@@ -255,6 +271,8 @@ public class GameView implements Identifiable {
     }
 
     /**
+     * @param username is the username of the {@link Player} for which we want to check if they can stop the game or not.
+     *
      * @return true iff username can stop this game.
      */
     public synchronized boolean canStopGame (String username) {
@@ -291,6 +309,10 @@ public class GameView implements Identifiable {
         return players.get(currentPlayerIndex);
     }
 
+    /**
+     * @param username is the username of the player for which we want to check if they can join the game or not.
+     * @return true iff the {@link Player} with the given username could join the Game.
+     */
     public synchronized boolean isAvailableForJoin(String username) {
         if (isStarted()) {
             return players.stream().anyMatch(p -> p.is(username));
@@ -305,17 +327,57 @@ public class GameView implements Identifiable {
         return players.stream().anyMatch(p -> p.getBookshelf().isFull());
     }
 
+    /**
+     * State of the game required to perform a certain action.
+     */
     protected enum RequiredState {
+        /**
+         * The game has been started.
+         */
         STARTED,
+
+        /**
+         * The game has been created but never started.
+         */
         NOT_STARTED,
+
+        /**
+         * The game has been stopped and not resumed.
+         */
         STOP,
+
+        /**
+         * The game isn't stopped.
+         */
         NOT_STOP,
+
+        /**
+         * There is only one connected player.
+         */
         WAITING_FOR_RECONNECTION,
+
+        /**
+         * There are zero or more than one connected players or the game has not been started.
+         */
         NOT_WAITING_FOR_RECONNECTION,
+
+        /**
+         * The game is over.
+         */
         OVER,
+
+        /**
+         * The game is not over.
+         */
         NOT_OVER
     }
 
+    /**
+     * Checks if the Game satisfies the set of all the required states.
+     *
+     * @param set is a set of state in which the Game should be.
+     * @throws IllegalFlowException if the Game isn't in at least one of the provided states.
+     */
     protected void requireStatus (EnumSet<RequiredState> set) throws IllegalFlowException {
         if (!isStarted() && set.contains(RequiredState.STARTED)) throw new IllegalFlowException("Game is not started");
         if ( isStarted() && set.contains(RequiredState.NOT_STARTED)) throw new IllegalFlowException("Game is already started");
@@ -329,6 +391,8 @@ public class GameView implements Identifiable {
 
     /**
      * @return whether the game is over or not.
+     *
+     * @throws IllegalFlowException if the game is not over.
      */
     public synchronized List<Player> getWinners() throws IllegalFlowException {
         requireStatus(EnumSet.of(RequiredState.OVER));
@@ -355,6 +419,9 @@ public class GameView implements Identifiable {
         return new GameView(this);
     }
 
+    /**
+     * @return the owner of the game, that is the player that has created the game.
+     */
     public synchronized String getOwner () {
         return this.creator;
     }
@@ -389,7 +456,7 @@ public class GameView implements Identifiable {
     /**
      * Returns a new immutable list of player views.
      * @return a new list of immutable player view instances
-     * */
+     */
     public synchronized List<Player> getPlayers () {
         return new ArrayList<>(players);
     }

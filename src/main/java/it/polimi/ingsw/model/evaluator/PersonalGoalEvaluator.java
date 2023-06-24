@@ -42,6 +42,11 @@ public class PersonalGoalEvaluator implements Evaluator {
      * Points that should be given the player so far.
      */
     private int points;
+
+    /**
+     * It is a set of a single {@link BookshelfMask} with the shelves that we have filled accordingly to the
+     * {@link it.polimi.ingsw.model.goal.PersonalGoal}.
+     */
     private BookshelfMaskSet pointMasks;
 
     /**

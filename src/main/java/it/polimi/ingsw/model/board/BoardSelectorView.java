@@ -11,6 +11,9 @@ import static java.lang.Math.abs;
  * @author Giacomo Groppi
  * */
 class BoardSelectorView {
+    /**
+     * It is the list of selected {@link Coordinate coordinates}.
+     */
     protected List<Coordinate> selected;
 
     /**
@@ -65,6 +68,8 @@ class BoardSelectorView {
 
     /**
      * Use this method to understand if the current selection can be drawn
+     *
+     * @return true iff the selected tiles can be drawn from the board.
      * */
     public boolean canDraw () {
         if (selectionSize() == 0)

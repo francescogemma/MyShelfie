@@ -108,6 +108,10 @@ public class Bag {
      * @author Giacomo Groppi
      * */
     private final int[] remainingTiles = new int[Tile.NUM_OF_DIFFERENT_NON_EMPTY_TILES];
+
+    /**
+     * Index of the last extracted tile from the bag.
+     */
     private int lastExtraction;
 
     /**
@@ -132,6 +136,9 @@ public class Bag {
 
     /**
      * Constructs a new object equal to the past one
+     *
+     * @param bag is the other {@link Bag} which we will copy.
+     *
      * @author Giacomo Groppi
      * */
     public Bag (final Bag bag) {
@@ -174,6 +181,8 @@ public class Bag {
      * @param index index of extraction
      * @throws IllegalArgumentException If there is no Tile left at index i
      * @author Giacomo Groppi
+     *
+     * @return the {@link Tile} in the bag at the provided index.
      */
     private Tile removeAndReturn(int index) {
         if (this.remainingTiles[index] < 1) {

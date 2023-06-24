@@ -62,6 +62,8 @@ public class Board extends BoardView {
      * @param coordinate The {@link Coordinate Coordinate} of the {@link Tile Tile} to select.
      *
      * @see #getSelectableCoordinate()
+     *
+     * @throws FullSelectionException if we have already selected three tiles.
     * */
     public Tile selectTile(Coordinate coordinate) throws IllegalExtractionException, FullSelectionException {
         if (isOutOfBoard(coordinate))
@@ -96,6 +98,8 @@ public class Board extends BoardView {
      * @param col The y coordinate of the {@link Tile Tile} to select.
      *
      * @see #getSelectableCoordinate()
+     *
+     * @throws FullSelectionException if we have already selected three tiles.
      * */
     public Tile selectTile (int row, int col) throws IllegalExtractionException, FullSelectionException {
         return this.selectTile(new Coordinate(row, col));
@@ -104,6 +108,9 @@ public class Board extends BoardView {
     /**
      * The function removes the tiles from the board and return a List of selected {@link Tile tiles}.
      * @return The list of all selected {@link Tile tiles}.
+     *
+     * @throws IllegalExtractionException if the selected tiles can't be drawn from the board without violating
+     * the game rules.
      */
     public List<Tile> draw() throws IllegalExtractionException {
         List<Tile> res = new ArrayList<>();
@@ -119,6 +126,8 @@ public class Board extends BoardView {
 
     /**
      * Returns a list of all available positions where a tile can be placed.
+     *
+     * @param numPlayer is the number of players in the game.
      *
      * @return A list of all available positions where a tile can be placed.
      */
@@ -150,6 +159,9 @@ public class Board extends BoardView {
      * board.
      * The function places the {@link Tile tile} in a legal position, therefore it is guaranteed that the
      * {@link Tile tile} inserted will have at least one occupied side, if such position exists.
+     *
+     * @param tile is the {@link Tile} which will be randomly placed on the board.
+     * @param numPlayer is the number of players in the game.
     */
     public void fillRandomly(final Tile tile, final int numPlayer) {
         if (this.isFull(numPlayer))

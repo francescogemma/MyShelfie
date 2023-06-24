@@ -58,6 +58,10 @@ public class BoardView {
             {0, 4}, {1, 5}, {4, 8}, {5, 7}, {8, 4}
         }));
 
+    /**
+     * @param coordinate is the {@link Coordinate} in the Board for which we want to check if it can be filled or not.
+     * @return true iff the coordinate can't be filled with a tile no matter the number of players.
+     */
     public static boolean isAlwaysEmpty(Coordinate coordinate) {
         return !TWO_PLAYER_POSITIONS.contains(coordinate) && !THREE_PLAYER_POSITIONS.contains(coordinate) && !FOUR_PLAYER_POSITIONS.contains(coordinate);
     }
@@ -107,6 +111,8 @@ public class BoardView {
     }
 
     /**
+     * @param c is the {@link Coordinate} where we want to retrieve the tile.
+     *
      * @return the Tile in position [row, col]
      */
     public Tile tileAt(Coordinate c) {
@@ -183,6 +189,8 @@ public class BoardView {
     }
 
     /**
+     * @param c is the {@link Coordinate} for which we want to check if it is on the edge of the board.
+     *
      * @return return true if tiles[row][col] is on border
      * */
     protected boolean hasEdgeOnBorder(Coordinate c) {
