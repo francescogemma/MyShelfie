@@ -14,7 +14,18 @@ package it.polimi.ingsw.networking;
  * @see ConnectionException
  */
 public class ServerNotFoundException extends ConnectionException {
+    /**
+     * Constructs a new exception.
+     */
     public ServerNotFoundException() { super(); }
+
+    /**
+     * Constructs a new exception with the specified detail message.
+     */
     public ServerNotFoundException(String s) { super(s); }
+
+    /**
+     * Constructs a new exception with the specified detail message and cause.
+     */
     public ServerNotFoundException(String s, Throwable cause) { super(s, cause); }
 }

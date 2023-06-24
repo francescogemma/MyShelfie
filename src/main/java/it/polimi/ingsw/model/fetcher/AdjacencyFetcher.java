@@ -39,13 +39,19 @@ public class AdjacencyFetcher implements Fetcher {
         NOT_THE_SAME_COLOR
     }
 
-    // stack used to implement the DFS
+    /**
+     * Stack used to implement the DFS.
+     */
     private final Deque<Shelf> stack;
 
-    // matrix of the statuses of the shelves
+    /**
+     * Matrix of the statuses of the shelves.
+     */
     private final ShelfStatus[][] statuses;
 
-    // boolean used to know if we are visiting the first shelf of the group
+    /**
+     * Boolean used to know if we are visiting the first shelf of the group.
+     */
     private boolean firstShelfOfTheGroup;
 
 

@@ -6,7 +6,18 @@ package it.polimi.ingsw.networking;
  * initiate its connection, but only if an already present connection ceases to exist.
  */
 public class DisconnectedException extends Exception {
+    /**
+     * Constructs a new exception.
+     */
     public DisconnectedException() { super(); }
+
+    /**
+     * Constructs a new exception with the specified detail message.
+     */
     public DisconnectedException(String s) { super(s); }
+
+    /**
+     * Constructs a new exception with the specified detail message and cause.
+     */
     public DisconnectedException(String s, Throwable cause) { super(s, cause); }
 }

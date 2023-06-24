@@ -9,7 +9,18 @@ package it.polimi.ingsw.networking;
  * @see ServerNotFoundException
  */
 public class BadPortException extends ServerNotFoundException {
+    /**
+     * Constructs a new exception.
+     */
     public BadPortException() { super(); }
+
+    /**
+     * Constructs a new exception with the specified detail message.
+     */
     public BadPortException(String s) { super(s); }
+
+    /**
+     * Constructs a new exception with the specified detail message and cause.
+     */
     public BadPortException(String s, Throwable cause) { super(s, cause); }
 }

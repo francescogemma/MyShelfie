@@ -9,22 +9,22 @@ import it.polimi.ingsw.model.bookshelf.Bookshelf;
  * @author Giacomo Groppi
  */
 public class Player {
-    /*
+    /**
      * username of the player
      */
     private final String username;
 
-    /*
+    /**
      * bookshelf of the player
      */
     private final Bookshelf bookshelf;
 
-    /*
+    /**
      * points earned so far
      */
     private int points;
 
-    /*
+    /**
      * true iff player is connected
      */
     private boolean isConnected;
