@@ -240,6 +240,10 @@ public class GameController extends Controller {
         populateBookshelfPanelWithMask(displayableGoal.getMaskSet());
     }
 
+    /**
+     * Helper method to call after displaying a goal with displayGoal. All players' points will be summed up, and
+     * the scoreboard will be refreshed.
+     */
     private void resetLayoutAfterDisplayingGoal() {
         isDisplayingCommonGoal = false;
 
@@ -256,18 +260,70 @@ public class GameController extends Controller {
     }
 
     // Board (center panel):
+
+    /**
+     * A simple label providing information to the user about the current playing player.
+     */
     @FXML private Label turnLabel;
+
+    /**
+     * The main game board's background.
+     */
     @FXML private Pane boardBackground;
+
+    /**
+     * Used to align game tiles to the board, in order to make them match correctly with the game bord image.
+     */
     @FXML private GridPane boardGridPane;
+
+    /**
+     * An ImageView containing an image representing a graphical view of the game board. Tiles will be added on top of
+     * this image.
+     */
     @FXML private ImageView gameBoardImageView;
+
+    /**
+     * A button to momentarily pause the game.
+     */
     @FXML private Button stopGameButton;
+
+    /**
+     * A button to quit the game. This might not end the game, as other users might want to continue playing.
+     */
     @FXML private Button exitButton;
+
+    /**
+     * Pixel image size for the whole board image, taking the external margin into account.
+     */
     private static final double FULL_BOARD_IMAGE_SIZE = 2965.0;
+
+    /**
+     * Image size for a cropped version of the board image, consisting in the grid itself, with no margins.
+     * This is used to position the tiles more accurately.
+     */
     private static final double BOARD_SIZE = 2661.0;
+
+    /**
+     * A factor used to resize the full board image to a smaller version, that can fit into the game window.
+     */
     private static final double BOARD_RESIZE_FACTOR = BOARD_SIZE / FULL_BOARD_IMAGE_SIZE;
+
+    /**
+     * After positioning the board image on screen, it needs to be translated and offset in order to account to the
+     * image's margins. This factor indicates the amount to offset this image by, relative to the full image's size.
+     */
     private static final double BOARD_RIGHT_MARGIN_FACTOR = 13.0 / FULL_BOARD_IMAGE_SIZE;
+
+    /**
+     * For each tile on the board, a button is initialized and put in this button matrix. These will act as interactive
+     * objects for the user, with the purpose to select and deselect tiles.
+     */
     private Button[][] boardButtons = new Button[Board.BOARD_ROWS][Board.COLUMN_BOARDS];
 
+    /**
+     * This class' board relative constants are applied to the board image, background and grid pane in order to align it
+     * and fit it accordingly into the window.
+     */
     private void resizeBoard() {
         double realWidth = Math.min(gameBoardImageView.getFitWidth(), gameBoardImageView.getFitHeight());
         double realHeight = Math.min(gameBoardImageView.getFitHeight(), gameBoardImageView.getFitWidth());
