@@ -18,11 +18,35 @@ import java.util.TimerTask;
  * @author Francesco Gemma
  */
 public class TCPConnection implements Connection {
+    /**
+     * {@link Socket Socket} used for communication.
+     */
     private final Socket socket;
+
+    /**
+     * {@link DataOutputStream DataOutputStream} used to write strings to the socket.
+     */
     private final DataOutputStream  out;
+
+    /**
+     * {@link DataInputStream DataInputStream} used to read strings from the socket.
+     */
     private final DataInputStream in;
+
+    /**
+     * Boolean value that indicates if the connection is broken.
+     */
     private boolean disconnected;
+
+    /**
+     * {@link Object Object} used as a lock.
+     */
     private final Object lock = new Object();
+
+    /**
+     * {@link Deque Deque} of {@link String Strings} that contains all the messages
+     * received from the other side of the connection.
+     */
     private final Deque<String> receivedMessages;
 
     /**
@@ -183,9 +207,7 @@ public class TCPConnection implements Connection {
                     if(disconnected) {
                         try {
                             socket.close();
-                        } catch(IOException e) {
-                            // TODO: handle exception when closing socket
-                        }
+                        } catch(IOException ignored) {}
                         return;
                     }
                 }
