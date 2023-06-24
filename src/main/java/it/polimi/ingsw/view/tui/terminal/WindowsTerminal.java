@@ -190,6 +190,12 @@ class WindowsTerminal extends Terminal {
          * By the mappings to primitive types explained in
          * https://github.com/java-native-access/jna/blob/master/www/Mappings.md:
          * DWORD -> int
+         *
+         * @param nStdHandle The standard device. This parameter can be one of the following values.
+         *
+         * @throws LastErrorException if an unexpected errors occurs.
+         *
+         * @return a handle to the specified standard device.
          */
         Pointer GetStdHandle(int nStdHandle) throws LastErrorException;
 
@@ -204,6 +210,13 @@ class WindowsTerminal extends Terminal {
          * https://java-native-access.github.io/jna/4.2.1/com/sun/jna/Pointer.html.
          * Since lpMode is an int* argument, we are using IntByReference as explained in
          * https://github.com/java-native-access/jna/blob/master/www/ByRefArguments.md.
+         *
+         * @param hConsoleHandle  A handle to the console input buffer or the console screen buffer. The handle must have the GENERIC_READ access right. For more information, see Console Buffer Security and Access Rights.
+         * @param lpMode  A pointer to a variable that receives the current mode of the specified buffer.
+         *
+         * @return true iff the function succeeds.
+         *
+         * @throws LastErrorException if an unexpected errors occurs.
          */
         boolean GetConsoleMode(Pointer hConsoleHandle, IntByReference lpMode) throws LastErrorException;
 
@@ -218,6 +231,13 @@ class WindowsTerminal extends Terminal {
          * By the mappings to primitive types explained in
          * https://github.com/java-native-access/jna/blob/master/www/Mappings.md:
          * DWORD -> int
+         *
+         * @param hConsoleHandle  A handle to the console input buffer or a console screen buffer. The handle must have the GENERIC_READ access right. For more information, see Console Buffer Security and Access Rights.
+         * @param dwMode  The input or output mode to be set.
+         *
+         * @return true iff the consol mode has been set succesfully.
+         *
+         * @throws LastErrorException if an unexpected error occurs.
          */
         boolean SetConsoleMode(Pointer hConsoleHandle, int dwMode) throws LastErrorException;
 
@@ -239,7 +259,14 @@ class WindowsTerminal extends Terminal {
          */
         @FieldOrder({ "X", "Y" })
         class COORD extends Structure {
+            /**
+             *  The horizontal coordinate or column value. The units depend on the function call.
+             */
             public short X;
+
+            /**
+             *  The vertical coordinate or row value. The units depend on the function call.
+             */
             public short Y;
         }
 
@@ -264,9 +291,24 @@ class WindowsTerminal extends Terminal {
          */
         @FieldOrder({ "Left", "Top", "Right", "Bottom" })
         class SMALL_RECT extends Structure {
+            /**
+             *  The x-coordinate of the upper left corner of the rectangle.
+             */
             public short Left;
+
+            /**
+             *  The y-coordinate of the upper left corner of the rectangle.
+             */
             public short Top;
+
+            /**
+             *  The x-coordinate of the lower right corner of the rectangle.
+             */
             public short Right;
+
+            /**
+             *  The y-coordinate of the lower right corner of the rectangle.
+             */
             public short Bottom;
         }
 
@@ -296,16 +338,42 @@ class WindowsTerminal extends Terminal {
          */
         @FieldOrder({ "dwSize", "dwCursorPosition", "wAttributes", "srWindow", "drMaximumWindowSize" })
         class CONSOLE_SCREEN_BUFFER_INFO extends Structure {
+            /**
+             * A COORD structure that contains the size of the console screen buffer, in character columns and rows.
+             */
             public COORD dwSize;
+
+            /**
+             *  A COORD structure that contains the column and row coordinates of the cursor in the console screen buffer.
+             */
             public COORD dwCursorPosition;
+
+            /**
+             *  The attributes of the characters written to a screen buffer by the WriteFile and WriteConsole functions, or echoed to a screen buffer by the ReadFile and ReadConsole functions. For more information, see Character Attributes.
+             */
             public short wAttributes;
+
+            /**
+             *  A SMALL_RECT structure that contains the console screen buffer coordinates of the upper-left and lower-right corners of the display window.
+             */
             public SMALL_RECT srWindow;
+
+            /**
+             *  A COORD structure that contains the maximum size of the console window, in character columns and rows, given the current screen buffer size and font and the screen size.
+             */
             public COORD drMaximumWindowSize;
         }
 
         /**
          * Defining GetConsoleScreenBufferInfo as in
          * https://learn.microsoft.com/it-it/windows/console/getconsolescreenbufferinfo.
+         *
+         * @param hConsoleOutput  A handle to the console screen buffer. The handle must have the GENERIC_READ access right. For more information, see Console Buffer Security and Access Rights.
+         * @param lpConsoleScreenBufferInfo  A pointer to a CONSOLE_SCREEN_BUFFER_INFO structure that receives the console screen buffer information.
+         *
+         * @return true iff the retrieval has been successful.
+         *
+         * @throws LastErrorException if an unexpected error has occurred.
          */
         boolean GetConsoleScreenBufferInfo(Pointer hConsoleOutput,
                                            CONSOLE_SCREEN_BUFFER_INFO lpConsoleScreenBufferInfo) throws LastErrorException;
@@ -316,6 +384,9 @@ class WindowsTerminal extends Terminal {
          */
         @FieldOrder({ "bSetFocus" })
         class FOCUS_EVENT_RECORD extends Structure {
+            /**
+             * It is true iff the focus has been set.
+             */
             public boolean bSetFocus;
         }
 
@@ -324,14 +395,36 @@ class WindowsTerminal extends Terminal {
          */
         @FieldOrder({ "bKeyDown", "wRepeatCount", "wVirtualKeyCode", "wVirtualScanCode", "uChar", "dwControlKeyState" })
         class KEY_EVENT_RECORD extends Structure {
+            /**
+             *  If the key is pressed, this member is TRUE. Otherwise, this member is FALSE (the key is released).
+             */
             public boolean bKeyDown;
+
+            /**
+             *  The repeat count, which indicates that a key is being held down. For example, when a key is held down, you might get five events with this member equal to 1, one event with this member equal to 5, or multiple events with this member greater than or equal to 1.
+             */
             public short wRepeatCount;
+
+            /**
+             *  A virtual-key code that identifies the given key in a device-independent manner.
+             */
             public short wVirtualKeyCode;
+
+            /**
+             *  The virtual scan code of the given key that represents the device-dependent value generated by the keyboard hardware.
+             */
             public short wVirtualScanCode;
 
             // In the actual struct there is a union, I'm taking the max here
+            /**
+             *  A union of the following members: UnicodeChar and AsciiChar.
+             */
             public short uChar;
 
+
+            /**
+             *  The state of the control keys. This member can be one or more of the following values.
+             */
             public int dwControlKeyState;
         }
 
@@ -340,6 +433,9 @@ class WindowsTerminal extends Terminal {
          */
         @FieldOrder({ "dwCommandId" })
         class MENU_EVENT_RECORD extends Structure {
+            /**
+             * It is the id of the received menu command.
+             */
             public int dwCommandId;
         }
 
@@ -348,9 +444,24 @@ class WindowsTerminal extends Terminal {
          */
         @FieldOrder({ "dwMousePosition", "dwButtonState", "dwControlKeyState", "dwEventFlags" })
         class MOUSE_EVENT_RECORD extends Structure {
+            /**
+             *  A COORD structure that contains the location of the cursor, in terms of the console screen buffer's character-cell coordinates.
+             */
             public COORD dwMousePosition;
+
+            /**
+             *  The status of the mouse buttons. The least significant bit corresponds to the leftmost mouse button. The next least significant bit corresponds to the rightmost mouse button. The next bit indicates the next-to-leftmost mouse button. The bits then correspond left to right to the mouse buttons. A bit is 1 if the button was pressed.
+             */
             public int dwButtonState;
+
+            /**
+             *  The state of the control keys. This member can be one or more of the following values.
+             */
             public int dwControlKeyState;
+
+            /**
+             *  The type of mouse event. If this value is zero, it indicates a mouse button being pressed or released. Otherwise, this member is one of the following values.
+             */
             public int dwEventFlags;
         }
 
@@ -359,6 +470,9 @@ class WindowsTerminal extends Terminal {
          */
         @FieldOrder({ "dwSize" })
         class WINDOW_BUFFER_SIZE_RECORD extends Structure {
+            /**
+             *  A COORD structure that contains the size of the console screen buffer, in character cell columns and rows.
+             */
             public COORD dwSize;
         }
 
@@ -394,10 +508,29 @@ class WindowsTerminal extends Terminal {
          */
         @FieldOrder({ "KeyEvent", "MouseEvent", "WindowBufferSizeEvent", "MenuEvent", "FocusEvent" })
         class EVENT_RECORD_UNION extends Union {
+            /**
+             * The Event member contains a FOCUS_EVENT_RECORD structure. These events are used internally and should be ignored.
+             */
             public KEY_EVENT_RECORD KeyEvent;
+
+            /**
+             * The Event member contains a KEY_EVENT_RECORD structure with information about a keyboard event.
+             */
             public MOUSE_EVENT_RECORD MouseEvent;
+
+            /**
+             * The Event member contains a MENU_EVENT_RECORD structure. These events are used internally and should be ignored.
+             */
             public WINDOW_BUFFER_SIZE_RECORD WindowBufferSizeEvent;
+
+            /**
+             * The Event member contains a MOUSE_EVENT_RECORD structure with information about a mouse movement or button press event.
+             */
             public MENU_EVENT_RECORD MenuEvent;
+
+            /**
+             * The Event member contains a WINDOW_BUFFER_SIZE_RECORD structure with information about the new size of the console screen buffer.
+             */
             public FOCUS_EVENT_RECORD FocusEvent;
         }
 
@@ -407,7 +540,14 @@ class WindowsTerminal extends Terminal {
          */
         @FieldOrder({ "EventType", "Event" })
         class INPUT_RECORD extends Structure {
+            /**
+             *  A handle to the type of input event and the event record stored in the Event member.
+             */
             public short EventType;
+
+            /**
+             *  The event information. The format of this member depends on the event type specified by the EventType member.
+             */
             public EVENT_RECORD_UNION Event;
 
             @Override
@@ -428,6 +568,15 @@ class WindowsTerminal extends Terminal {
 
         /**
          * Defining ReadConsoleInputA method as explained in https://learn.microsoft.com/en-us/windows/console/readconsoleinput.
+         *
+         * @param hConsoleInput  A handle to the console input buffer. The handle must have the GENERIC_READ access right. For more information, see Console Buffer Security and Access Rights.
+         * @param lpBuffer  A pointer to an array of INPUT_RECORD structures that receives the input buffer data.
+         * @param nLength  The size of the array pointed to by the lpBuffer parameter, in array elements.
+         * @param lpNumberOfEventsRead  A pointer to a variable that receives the number of input records read.
+         *
+         * @return true iff the function succeeds.
+         *
+         * @throws LastErrorException if an unexpected error occurs.
          */
         boolean ReadConsoleInputA(Pointer hConsoleInput, INPUT_RECORD lpBuffer, int nLength,
                                  IntByReference lpNumberOfEventsRead) throws LastErrorException;
