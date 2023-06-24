@@ -11,12 +11,14 @@ public interface Connection {
     /**
      * Send the provided string to the target assigned by the acceptor.
      * @param string will be sent to the target provided by the acceptor.
+     * @throws DisconnectedException if the connection is broken.
      */
     void send(String string) throws DisconnectedException;
 
     /**
      * This method will return the string that has been received from another connection.
      * @return a string that has been received from another connection.
+     * @throws DisconnectedException if the connection is broken.
      */
     String receive() throws DisconnectedException;
 
