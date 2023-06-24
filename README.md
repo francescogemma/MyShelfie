@@ -51,6 +51,6 @@ You can run the server version of the application by following these instruction
 2. Go to the directory containing the JAR file of the server (`my-shelfie-server.jar`)
 3. execute the server JAR using the command:
     ```
-    java -jar my-shelfie-client.jar [hostname]
+    java -jar my-shelfie-server.jar [hostname]
     ```
     where `[hostname]` indicates the server's hostname, it's an optional argument for setting the `java.rmi.server.hostname` property
