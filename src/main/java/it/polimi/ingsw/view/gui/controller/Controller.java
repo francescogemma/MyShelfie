@@ -17,12 +17,43 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public abstract class Controller {
+    /**
+     * Dummy string to assign the name of the previous layout. All actual implementations will use more appropriate names
+     * to identify the previous layout.
+     */
     protected static final String START_NAME = "Start";
+
+    /**
+     * The name of the previous layout, relative to the current one.
+     * This attribute is usually needed to code the "back" button, to navigate the interface backwards.
+     */
     private String previousLayoutName = START_NAME;
+
+    /**
+     * Simple flag to determine what layout is currently active, or being rendered to the user in general. This is useful
+     * since all controllers technically exist simultaneously. We need to determine which one is the acive one.
+     */
     private boolean isCurrentLayout = true;
+
+    /**
+     * Use this attribute to set a new JavaFX scene.
+     */
     private static Scene scene;
+
+    /**
+     * Used to monitor the status bar's visibility state. The status bar stays visible for a short time frame, controlled by
+     * this particular timer.
+     */
     private Timer timerStatusBar;
+
+    /**
+     * Every Controller must have a status bar. This is an HBox containing it.
+     */
     @FXML private HBox statusBarHBox;
+
+    /**
+     * This is a label contained within the status bar's HBox.
+     */
     @FXML private Label statusBarLabel;
 
     private static final Map<String, Controller> controllers = Map.of(
