@@ -224,6 +224,9 @@ class UnixTerminal extends Terminal {
          * Represents a termios struct which can be cloned.
          */
         interface termios {
+            /**
+             * @return a copy of this termios struct.
+             */
             termios clone();
         }
 
@@ -277,15 +280,49 @@ class UnixTerminal extends Terminal {
         @FieldOrder({ "c_iflag", "c_oflag", "c_cflag", "c_lflag", "c_line", "c_cc",
                 "c_ispeed", "c_ospeed" })
         class linux_termios extends Structure implements termios {
+            /**
+             * Input modes.
+             */
             public int c_iflag;
+
+            /**
+             * Output modes.
+             */
             public int c_oflag;
+
+            /**
+             * Control modes.
+             */
             public int c_cflag;
+
+            /**
+             * Local modes.
+             */
             public int c_lflag;
+
+            /**
+             * Special characters.
+             */
             public byte c_line;
+
+            /**
+             * Special characters.
+             */
             public byte[] c_cc;
+
+            /**
+             * Input speed.
+             */
             public int c_ispeed;
+
+            /**
+             * Output speed.
+             */
             public int c_ospeed;
 
+            /**
+             * Constructor of the class.
+             */
             public linux_termios() {
                 c_cc = new byte[NCCS];
             }
@@ -316,14 +353,44 @@ class UnixTerminal extends Terminal {
         @FieldOrder({ "c_iflag", "c_oflag", "c_cflag", "c_lflag", "c_cc",
             "c_ispeed", "c_ospeed" })
         class macos_termios extends Structure implements termios {
+            /**
+             * Input flags.
+             */
             public long c_iflag;
+
+            /**
+             * Output flags.
+             */
             public long c_oflag;
+
+            /**
+             * Control flags.
+             */
             public long c_cflag;
+
+            /**
+             * Local flags.
+             */
             public long c_lflag;
+
+            /**
+             * Control chars.
+             */
             public byte[] c_cc;
+
+            /**
+             * Input speed.
+             */
             public long c_ispeed;
+
+            /**
+             * Output speed.
+             */
             public long c_ospeed;
 
+            /**
+             * Constructor of the class.
+             */
             public macos_termios() {
                 c_cc = new byte[NCCS];
             }
@@ -348,16 +415,33 @@ class UnixTerminal extends Terminal {
 
         /**
          * Defining cfmakeraw signature as in https://man7.org/linux/man-pages/man3/termios.3.html.
+         *
+         * @param termios_p is a pointer to a termios structure.
          */
         void cfmakeraw(termios termios_p);
 
         /**
          * Defining tcgetattr signature as in https://man7.org/linux/man-pages/man3/termios.3.html.
+         *
+         * @param fd is a file descriptor to the terminal.
+         * @param termios_p is a pointer to a termios structure.
+         *
+         * @return 0 iff there hasn't been any error.
+         *
+         * @throws LastErrorException if an unexpected error occurs.
          */
         int tcgetattr(int fd, termios termios_p) throws LastErrorException;
 
         /**
          * Defining tcsetattr signature as in https://man7.org/linux/man-pages/man3/termios.3.html.
+         *
+         * @param fd is a file descriptor to the terminal.
+         * @param optional_actions allows to specify optional actions.
+         * @param termios_p is a pointer to a termios structure.
+         *
+         * @return 0 iff there hasn't been any error.
+         *
+         * @throws LastErrorException if an unexpected error occurs.
          */
         int tcsetattr(int fd, int optional_actions, termios termios_p) throws LastErrorException;
 
@@ -378,11 +462,29 @@ class UnixTerminal extends Terminal {
          */
         @FieldOrder({ "ws_row", "ws_col", "ws_xpixel", "ws_ypixel" })
         class winsize extends Structure {
+            /**
+             * It is the number of rows of the terminal window.
+             */
             public short ws_row;
+
+            /**
+             * It is the number of columns of the terminal window.
+             */
             public short ws_col;
+
+            /**
+             * It is the number of pixel of the terminal window, in the x direction.
+             */
             public short ws_xpixel;
+
+            /**
+             * It is the number of pixel of the terminal window, in the y direction.
+             */
             public short ws_ypixel;
 
+            /**
+             * Constructor of the class.
+             */
             public winsize () {
                 ws_row = 0;
                 ws_col = 0;
@@ -395,6 +497,14 @@ class UnixTerminal extends Terminal {
          * Defining ioctl signature as in https://man7.org/linux/man-pages/man2/ioctl_tty.2.html.
          * The original signature has variadic arguments, we instead only declare a winsize parameter since
          * it's the only that we are going to use.
+         *
+         * @param fd is a file descriptor.
+         * @param cmd is the command which specifies what the system call should do.
+         * @param ws allows to retrieve the size of the terminal.
+         *
+         * @return 0 iff there hasn't been any error.
+         *
+         * @throws LastErrorException if an unexpected error occurs.
          */
         int ioctl(int fd, int cmd, winsize ws) throws LastErrorException;
     }
