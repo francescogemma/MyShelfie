@@ -462,13 +462,16 @@ public enum PrimitiveSymbol implements Symbol {
      */
     EMPTY(" ");
 
+    /**
+     * It is the character represented by this primitive symbol.
+     */
     private final String symbol;
 
     /**
      * Constructor of the class.
      * Initializes the character corresponding to the primitive symbol.
      *
-     * @param symbol
+     * @param symbol is the character represented by this PrimitiveSymbol
      */
     PrimitiveSymbol(String symbol) {
         this.symbol = symbol;

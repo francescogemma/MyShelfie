@@ -390,6 +390,9 @@ public class Shape {
         ))
     );
 
+    /**
+     * It is a 2 x 2 square.
+     */
     public static final Shape SQUARE = new Shape(List.of(
         Offset.getInstance(0, 0), Offset.getInstance(0, 1),
         Offset.getInstance(1, 0), Offset.getInstance(1, 1)

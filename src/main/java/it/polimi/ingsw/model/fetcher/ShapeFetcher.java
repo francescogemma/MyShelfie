@@ -41,6 +41,11 @@ public class ShapeFetcher implements Fetcher {
      */
     private final Shelf lastOrigin;
 
+    /**
+     * Constructor of the class.
+     *
+     * @param shape is the {@link Shape} which will be extracted from the {@link Bookshelf}.
+     */
     public ShapeFetcher(Shape shape) {
         this.offsets = shape.getOffsets();
 

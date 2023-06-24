@@ -20,7 +20,14 @@ import java.util.Random;
  * @author Francesco Gemma
  */
 public abstract class CommonGoal extends IndexedGoal {
+    /**
+     * Describes how to complete this common goal.
+     */
     private final String description;
+
+    /**
+     * It represents an example of tile configuration in a bookshelf which would satisfy the goal.
+     */
     private final Map<Shelf, TileColor> display;
 
     /**
@@ -41,6 +48,9 @@ public abstract class CommonGoal extends IndexedGoal {
 
     /**
      * This method returns an array containing two random common goals (not repeated).
+     *
+     * @param playersAmount is the number of players in the game.
+     *
      * @return an array containing two random common goals
      */
     public static CommonGoal[] getTwoRandomCommonGoals(int playersAmount) {
@@ -104,18 +114,33 @@ public abstract class CommonGoal extends IndexedGoal {
         return commonGoal;
     }
 
+    /**
+     * @return a list of points which indicates the additional score that the ith player obtains by completing this goal.
+     */
     public List<Integer> getPointStack() {
         return ((CommonGoalEvaluator) evaluator).getPointStack();
     }
 
+    /**
+     * Sets the list of points which indicates the additional score that the ith player obtains by completing this goal.
+     *
+     * @param pointStack is the list of points which indicates the additional score that the ith player obtains
+     *                   by completing this goal.
+     */
     public void setPointStack(List<Integer> pointStack) {
         ((CommonGoalEvaluator) evaluator).setPointStack(pointStack);
     }
 
+    /**
+     * @return the description on how to complete this goal.
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * @return an example of tiles configuration in a bookshelf which would satisfy the requirements of this goal.
+     */
     public Map<Shelf, TileColor> getDisplay() {
         return display;
     }

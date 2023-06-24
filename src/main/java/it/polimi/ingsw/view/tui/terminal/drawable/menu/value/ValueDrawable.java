@@ -14,5 +14,8 @@ import it.polimi.ingsw.view.tui.terminal.drawable.Drawable;
  * @author Cristiano Migali
  */
 public abstract class ValueDrawable<T> extends Drawable {
+    /**
+     * @return the value that the user has entered in this drawable.
+     */
     public abstract T getValue();
 }

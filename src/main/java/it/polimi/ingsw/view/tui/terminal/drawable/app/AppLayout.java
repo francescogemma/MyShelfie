@@ -181,6 +181,9 @@ public abstract class AppLayout extends FixedLayoutDrawable<FullyResizableDrawab
         this.data = data;
     }
 
+    /**
+     * {@link AppDataProvider} by which this layout can exchange data with the others.
+     */
     protected AppDataProvider appDataProvider;
 
     /**

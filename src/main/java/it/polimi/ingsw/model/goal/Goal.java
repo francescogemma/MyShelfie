@@ -17,8 +17,21 @@ import it.polimi.ingsw.model.filter.Filter;
  * @author Francesco Gemma
  */
 public abstract class Goal {
+    /**
+     * It is the {@link Fetcher} which allows to extract the {@link BookshelfMask}s from the {@link Bookshelf} in
+     * order to check goal satisfaction.
+     */
     private final Fetcher fetcher;
+
+    /**
+     * It is the {@link Filter} which allows to select only certain {@link BookshelfMask}s among the extracted ones,
+     * according to a coloring criteria relevant for goal satisfaction.
+     */
     private final Filter filter;
+
+    /**
+     * Computes the number of scored points according to the {@link BookshelfMask}s extracted and filtered.
+     */
     protected final Evaluator evaluator;
 
     // Set of masks used to store all the masks that satisfy the last goal computed.

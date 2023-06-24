@@ -47,6 +47,9 @@ public class Bookshelf extends BookshelfView {
 
     /**
      * Constructs a new object equal to the past one
+     *
+     * @param other is the other {@link Bookshelf} that has to be copied.
+     *
      * @author Giacomo Groppi
      * */
     public Bookshelf(Bookshelf other) {

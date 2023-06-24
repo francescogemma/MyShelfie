@@ -105,7 +105,7 @@ public class AlternativeDrawable extends Drawable {
         return this;
     }
 
-    /*
+    /**
      * @return this AlternativeDrawable which is now displaying the first Drawable set in the constructor.
      */
     public AlternativeDrawable first() {
