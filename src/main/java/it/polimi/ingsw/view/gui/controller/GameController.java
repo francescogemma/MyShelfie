@@ -344,11 +344,18 @@ public class GameController extends Controller {
         turnLabel.setTranslateY(-realWidth * 1.12 / 2 - turnLabel.getHeight() / 2 - 5);
     }
 
+    /**
+     * This method adds listeners to the game board's image view. These listeners will be used to automatically resize
+     * it in the event of an image view resize.
+     */
     private void setBoardImageViewListener() {
         gameBoardImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> resizeBoard());
         gameBoardImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> resizeBoard());
     }
 
+    /**
+     * Helper function to update the current playing user's indicative text label.
+     */
     private void populateTurnTextBox() {
         Platform.runLater(() -> {
             turnLabel.setText(
@@ -361,6 +368,10 @@ public class GameController extends Controller {
         });
     }
 
+    /**
+     * Fill up the board, iterate through all rows and columns. The button matrix gets assigned the image
+     * of the correct tile at that position.
+     */
     private void populateBoard() {
         Platform.runLater(() -> {
             for (int row = 0; row < Board.BOARD_ROWS; row++) {
