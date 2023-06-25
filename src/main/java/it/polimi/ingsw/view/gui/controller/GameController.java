@@ -419,29 +419,127 @@ public class GameController extends Controller {
 
     // Right panel:
     // Score board:
+
+    /**
+     * A list view of players, that encompasses all features of a simple scoreboard. All players are ranked relatively to
+     * the amount of points they've accumulated, and their connection state is also taken account of, through specific coloring.
+     */
     @FXML private ListView<DisplayablePlayer> scoreBoardListView;
 
     // Bookshelves:
+    /**
+     * A label that specifies the current bookshelf's player's name. This way, the user can distinguish through bookshelves
+     * in the interface, since their underlying graphic image is identical.
+     */
     @FXML private Label selectedBookshelfLabel;
+
+    /**
+     * Similarly to the game board, a grid pane is needed to properly align the tiles' graphics to the bookshelf image.
+     */
     @FXML private GridPane bookshelfGridPane;
+
+    /**
+     * An image container designated to storing the graphical image that represents the bookshelf. On top of it, a grid
+     * pane containing buttons will be set as overlay to display an interactive bookshelf.
+     */
     @FXML private ImageView bookshelfImageView;
+
+    /**
+     * This grid pane is used to let the user select a column in which to slide a new tile. It consists of an array of
+     * columns, and exactly one row.
+     */
     @FXML private GridPane bookshelfColumnSelectorGridPane;
+
+    /**
+     * A simple button to iterate through all users' bookshelves. This particular button shows the next bookshelf in the
+     * list.
+     */
     @FXML private Button nextBookshelfButton;
+
+    /**
+     * A simple button to iterate through all users' bookshelves. This particular button shows the previous bookshelf in
+     * the list.
+     */
     @FXML private Button previousBookshelfButton;
+
+    /**
+     * This button is used by the player to select the first column, when a tile set insertion is needed.
+     */
     @FXML private Button bookshelfColumn1Button;
+
+    /**
+     * This button is used by the player to select the second column, when a tile set insertion is needed.
+     */
     @FXML private Button bookshelfColumn2Button;
+
+    /**
+     * This button is used by the player to select the third column, when a tile set insertion is needed.
+     */
     @FXML private Button bookshelfColumn3Button;
+
+    /**
+     * This button is used by the player to select the fourth column, when a tile set insertion is needed.
+     */
     @FXML private Button bookshelfColumn4Button;
+
+    /**
+     * This button is used by the player to select the fifth column, when a tile set insertion is needed.
+     */
     @FXML private Button bookshelfColumn5Button;
+
+    /**
+     * Full pixel width of the image representing the bookshelf.
+     */
     private static final double FULL_BOOKSHELF_IMAGE_WIDTH = 1414.0;
+
+    /**
+     * Full pixel height of the image representing the bookshelf.
+     */
     private static final double FULL_BOOKSHELF_IMAGE_HEIGHT = 1411.0;
+
+    /**
+     * Pixel width of the image representing the bookshelf, ignoring the external margin.
+     */
     private static final double BOOKSHELF_WIDTH = 1074.0;
+
+    /**
+     * Pixel height of the image representing the bookshelf, ignoring the external margin.
+     */
     private static final double BOOKSHELF_HEIGHT = 1144.0;
+
+    /**
+     * The bookshelf's image's aspect ratio.
+     */
     private static final double BOOKSHELF_ASPECT_RATIO = FULL_BOOKSHELF_IMAGE_WIDTH / FULL_BOOKSHELF_IMAGE_HEIGHT;
+
+    /**
+     * A factor used to map the current image's width to a smaller one, that counts the image's additional margin around
+     * the bookshelf.
+     */
     private static final double BOOKSHELF_WIDTH_RESIZE_FACTOR = BOOKSHELF_WIDTH / FULL_BOOKSHELF_IMAGE_WIDTH;
+
+    /**
+     * A factor used to map the current image's height to a smaller one, that counts the image's additional margin around
+     * the bookshelf.
+     */
     private static final double BOOKSHELF_HEIGHT_RESIZE_FACTOR = BOOKSHELF_HEIGHT / FULL_BOOKSHELF_IMAGE_HEIGHT;
+
+    /**
+     * A coefficient to multiply the actual fit height of the image view by to extract a value that will be used to translate
+     * the image, so that the margin gets offset relatively to the game area.
+     */
     private static final double BOOKSHELF_UP_MARGIN_FACTOR = 38.5 / FULL_BOOKSHELF_IMAGE_HEIGHT;
+
+    /**
+     * A matrix of buttons, consisting of interactive objects for the user, one for each tile that can be contained within
+     * a bookshelf.
+     */
     private final Button[][] bookshelfButtons = new Button[BookshelfView.ROWS][BookshelfView.COLUMNS];
+
+    /**
+     * A list of buttons, consisting of interactive objects for the user, one for each column that can be used as an
+     * insert area for a tile set.
+     */
     private final Button[] bookshelfColumnsButton = new Button[BookshelfView.COLUMNS];
 
     private void resizeBookshelf() {
