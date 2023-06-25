@@ -31,7 +31,7 @@ public class ColumnDifferentGoal extends CommonGoal {
      * </ul>
      *
      * @see CommonGoal#CommonGoal(Fetcher, Filter, CommonGoalEvaluator, String, Map)
-     * */
+     */
     public ColumnDifferentGoal() {
         super(
                 new ShapeFetcher(Shape.getColumn(6)),

@@ -18,6 +18,14 @@ import static java.util.Map.entry;
 public class RowFiveAllDifferentColor extends CommonGoal{
     /**
      * Constructor of the class.
+     * It takes:
+     * <ul>
+     *     <li> a {@link ShapeFetcher} to fetch all the rows; </li>
+     *     <li> a {@link NumDifferentColorFilter} to filter out rows of tiles with all different colors; </li>
+     *     <li> an {@link AtLeastEvaluator} with targetAmount equal to 2 consenting at least 2 rows; </li>
+     *     <li> a {@link String} representing the description on the goal; </li>
+     *     <li> a {@link Map} representing an example of the goal to display. </li>
+     * </ul>
      */
     protected RowFiveAllDifferentColor() {
         super(

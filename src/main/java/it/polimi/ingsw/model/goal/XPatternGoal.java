@@ -21,9 +21,17 @@ import static java.util.Map.entry;
 public class XPatternGoal extends CommonGoal{
     /**
      * Constructor of the class.
+     * It takes:
+     * <ul>
+     *     <li> a {@link ShapeFetcher} to fetch all the X patterns; </li>
+     *     <li> a {@link NumDifferentColorFilter} to filter out X patterns of tiles with the same color; </li>
+     *     <li> an {@link AtLeastEvaluator} with targetAmount equal to 1 consenting at least 1 X pattern; </li>
+     *     <li> a {@link String} representing the description on the goal; </li>
+     *     <li> a {@link Map} representing an example of the goal to display. </li>
+     * </ul>
      *
      * @see CommonGoal#CommonGoal(Fetcher, Filter, CommonGoalEvaluator, String, Map)
-     * */
+     */
     public XPatternGoal() {
         super(new ShapeFetcher(Shape.X),
             new NumDifferentColorFilter(1, 1),

@@ -50,9 +50,18 @@ public class StairGoal extends CommonGoal{
 
     /**
      * Constructor of the class.
+     * It takes:
+     * <ul>
+     *     <li> a {@link UnionFetcher} to fetch all stairs in a bookshelf; </li>
+     *     <li> a {@link NumDifferentColorFilter} that consent all colors; </li>
+     *     <li> an {@link AtLeastEvaluator} with targetAmount equal to 1 (consenting 1 stair)
+     *     and checking if the shape is a valid one </li>
+     *     <li> a {@link String} representing the description on the goal; </li>
+     *     <li> a {@link Map} representing an example of the goal to display. </li>
+     * </ul>
      *
      * @see CommonGoal#CommonGoal(Fetcher, Filter, CommonGoalEvaluator, String, Map)
-     * */
+     */
     public StairGoal() {
         super(new UnionFetcher(List.of(
                     new ShapeFetcher(Shape.STAIR),

@@ -36,33 +36,33 @@ public class Logger {
         }
     }
 
-    /*
+    /**
      * file writer.
      * null if writeFile is false
      */
     private PrintWriter writer;
 
-    /*
+    /**
      * all the incoming log messages
      */
     private final List<String> message;
 
-    /*
+    /**
      * true if you want to print on-screen all log message
      */
     private boolean shouldPrint = true;
 
-    /*
+    /**
      * true if you want to write log output to a file
      */
     private boolean writeFile = true;
 
-    /*
+    /**
      * true if you want to append the caller name to the log message
      */
     private boolean printCaller = true;
 
-    /*
+    /**
      * name of the log file.
      */
     private final String nameLog =
@@ -73,7 +73,7 @@ public class Logger {
             .replace("\\.", "_")
             .replace(":", "_");
 
-    /*
+    /**
      * folder for log output
      */
     private static String logPosition;

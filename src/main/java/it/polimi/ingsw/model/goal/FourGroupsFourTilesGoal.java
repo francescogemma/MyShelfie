@@ -21,6 +21,15 @@ import static java.util.Map.entry;
 public class FourGroupsFourTilesGoal extends CommonGoal {
     /**
      * Constructor of the class.
+     * It takes:
+     * <ul>
+     *     <li> a {@link AdjacencyFetcher} to fetch all groups of adjacent tiles; </li>
+     *     <li> a {@link NumDifferentColorFilter} to filter out groups of tiles with the same color; </li>
+     *     <li> an {@link AtLeastEvaluator} with targetAmount equal to 4 consenting at least 4 groups of tiles
+     *     with at least 4 tiles of the same color; </li>
+     *     <li> a {@link String} representing the description on the goal; </li>
+     *     <li> a {@link Map} representing an example of the goal to display. </li>
+     * </ul>
      */
     public FourGroupsFourTilesGoal() {
         super(  new AdjacencyFetcher(),

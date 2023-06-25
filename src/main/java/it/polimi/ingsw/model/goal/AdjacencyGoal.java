@@ -11,6 +11,12 @@ import it.polimi.ingsw.model.filter.NumDifferentColorFilter;
 public class AdjacencyGoal extends Goal {
     /**
      * Constructor of the class.
+     * It takes:
+     * <ul>
+     *     <li> a {@link AdjacencyFetcher} to fetch all groups of adjacent tiles; </li>
+     *     <li> a {@link NumDifferentColorFilter} to filter out groups of tiles with the same color; </li>
+     *     <li> an {@link AdjacencyEvaluator} to evaluate the goal. </li>
+     * </ul>
      */
     public AdjacencyGoal() {
         super(new AdjacencyFetcher(),
