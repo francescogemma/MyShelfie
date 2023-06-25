@@ -30,6 +30,9 @@ import static java.util.Map.entry;
  * @author Giacomo Groppi
  * */
 public class StairGoal extends CommonGoal{
+    /**
+     * This predicate checks if a staircase is a valid one.
+     */
     private static final Predicate<BookshelfMask> check = (BookshelfMask bookshelfMask) -> {
         List<Shelf> shelves = bookshelfMask.getShelves();
         for (Shelf s: shelves) {

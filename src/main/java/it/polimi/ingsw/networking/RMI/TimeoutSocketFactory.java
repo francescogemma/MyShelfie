@@ -6,6 +6,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.server.RMISocketFactory;
 
+/**
+ * This class is a custom socket factory for RMI connections.
+ * It is used to set a timeout on the socket connection.
+ */
 public class TimeoutSocketFactory extends RMISocketFactory {
     @Override
     public Socket createSocket(String host, int port) throws IOException {
