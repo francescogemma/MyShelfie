@@ -1,5 +1,8 @@
 package it.polimi.ingsw.view.gui;
 
+/**
+ * Exception thrown when a fxml loader fails to load a resource.
+ */
 public class LoaderException extends RuntimeException {
     /**
      * Creates a new exception.

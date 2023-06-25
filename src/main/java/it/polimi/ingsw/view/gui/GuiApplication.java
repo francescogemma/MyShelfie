@@ -23,6 +23,10 @@ import java.util.Objects;
 public class GuiApplication extends Application {
     /**
      * Main that starts the GUI application.
+     *
+     * @param args optional arguments for the GUI application,
+     *             here an argument, passed by the {@link it.polimi.ingsw.Client},
+     *             is a String that represents the connection type.
      */
     public static void main(String[] args) {
         launch(args);
@@ -49,7 +53,11 @@ public class GuiApplication extends Application {
         primaryStage.setMinHeight(400);
         primaryStage.setMinWidth(600);
 
-        // Save connection type
+        /*
+         * Save connection type.
+         * The connection type is passed as an argument to the GUI application.
+         * Save it in the scene properties to make it available to all the controllers.
+         */
         String connectionType = getParameters().getRaw().get(0);
         primaryStage.getScene().getProperties().put("connection", connectionType);
 

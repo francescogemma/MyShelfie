@@ -10,7 +10,14 @@ import java.util.Objects;
  * @author Giacomo Groppi
  */
 public class Pair<K, T> {
+    /**
+     * The key of the Pair.
+     */
     private K key;
+
+    /**
+     * The value of the Pair.
+     */
     private T value;
 
     /**

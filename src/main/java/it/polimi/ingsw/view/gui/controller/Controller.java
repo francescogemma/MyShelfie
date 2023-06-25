@@ -16,6 +16,13 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Abstract class that handles the basic functionalities of a controller.
+ * It is extended by all the controllers.
+ * <p>
+ * It handles switching between scenes, status bar
+ * and properties to be saved in the scene.
+ */
 public abstract class Controller {
     /**
      * Dummy string to assign the name of the previous layout. All actual implementations will use more appropriate names

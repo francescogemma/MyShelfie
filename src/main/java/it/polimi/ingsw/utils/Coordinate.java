@@ -10,13 +10,14 @@ import java.util.Collection;
  * @author Giacomo Groppi
  * */
 public class Coordinate {
-    /*
+    /**
      * The column value of the coordinate.
      */
     private final int col;
-    /*
+
+    /**
      * The row value of the coordinate.
-     * */
+     */
     private final int row;
 
     /**

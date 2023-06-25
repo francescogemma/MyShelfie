@@ -28,8 +28,8 @@ public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluato
      * for this evaluator to consider its target met, and give the player
      * their non-zero amount of points.
      */
-
     private BookshelfMaskSet biggestSet;
+
     private final int targetSetSize;
 
     /**
