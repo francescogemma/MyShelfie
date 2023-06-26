@@ -5,10 +5,7 @@ import it.polimi.ingsw.networking.*;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 /**
  * {@link Connection Connection} class that represents one side of an RMI pair of connections.
@@ -67,7 +64,6 @@ public class RMIConnection implements Connection {
         disconnected = false;
 
         try {
-            System.setProperty("sun.rmi.transport.tcp.responseTimeout", "5000");
             Registry registry = LocateRegistry.getRegistry(address, port);
             RemoteServer remoteServer = (RemoteServer) registry.lookup("SERVER");
 
@@ -128,8 +124,67 @@ public class RMIConnection implements Connection {
         }, 0, 2500);
     }
 
-    private final Object readLock = new Object();
+    private static final long TIMEOUT = 5000;
+
+    private final Object readWithTimeoutLock = new Object();
     private String read;
+
+    private Optional<String> readWithTimeout() {
+        read = null;
+
+        new Thread(() -> {
+            try {
+                String remoteRead = pollQueue.poll();
+
+                synchronized (readWithTimeoutLock) {
+                    read = remoteRead;
+                    readWithTimeoutLock.notifyAll();
+                }
+            } catch (RemoteException remoteException) {
+
+            }
+        }).start();
+
+        synchronized (readWithTimeoutLock) {
+            try {
+                readWithTimeoutLock.wait(TIMEOUT);
+            } catch (InterruptedException e) {
+
+            }
+
+            return Optional.ofNullable(read);
+        }
+    }
+
+    private final Object sendWithTimeoutLock = new Object();
+    private boolean sent;
+
+    private boolean sendWithTimeout(String toSend) {
+        sent = false;
+
+        new Thread(() -> {
+            try {
+                addQueue.add(toSend);
+
+                synchronized (sendWithTimeoutLock) {
+                    sent = true;
+                    sendWithTimeoutLock.notifyAll();
+                }
+            } catch (RemoteException remoteException) {
+
+            }
+        }).start();
+
+        synchronized (sendWithTimeoutLock) {
+            try {
+                sendWithTimeoutLock.wait(TIMEOUT);
+            } catch (InterruptedException e) {
+
+            }
+
+            return sent;
+        }
+    }
 
     /**
      * Should only be called once.
@@ -145,38 +200,16 @@ public class RMIConnection implements Connection {
                     }
                 }
 
-                read = null;
+                Optional<String> read = readWithTimeout();
 
-                new Thread(() -> {
-                        try {
-                            String remoteRead = pollQueue.poll();
-
-                            synchronized (readLock) {
-                                read = remoteRead;
-                                readLock.notifyAll();
-                            }
-                        } catch (RemoteException remoteException) {
-
-                        }
-                }).start();
-
-
-                synchronized (readLock) {
-                    try {
-                        readLock.wait(5000);
-                    } catch (InterruptedException e) {
-
-                    }
-                }
-
-                if (read == null) {
+                if (read.isEmpty()) {
                     disconnect();
                     return;
                 }
 
-                if (!read.equals("heartbeat")) {
+                if (!read.get().equals("heartbeat")) {
                     synchronized(lock) {
-                        pendingMessages.add(read);
+                        pendingMessages.add(read.get());
                         lock.notifyAll();
                     }
                 }
@@ -192,11 +225,9 @@ public class RMIConnection implements Connection {
                 throw new DisconnectedException();
             }
 
-            try {
-                addQueue.add(string);
-            } catch (RemoteException remoteException) {
+            if (!sendWithTimeout(string)) {
                 disconnect();
-                throw new DisconnectedException(remoteException.getMessage());
+                throw new DisconnectedException("Send required more than " + TIMEOUT + " milliseconds");
             }
         }
     }
