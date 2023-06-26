@@ -264,6 +264,10 @@ public class MenuController {
      * and will receive all events for the games that are created and also for the games
      * that are no longer available.
      *
+     * @param transmitter The {@link EventTransmitter eventTransmitter} of the user with username "username".
+     * @param username The username of the user who wants to login.
+     * @param password The password of the user who wants to login.
+     *
      * @return FAILURE iff
      * <ul>
      *     <li>username or password is empty</li>
@@ -321,6 +325,7 @@ public class MenuController {
     /**
      * This method is used to log out the user with the given username.
      *
+     * @param eventTransmitter The {@link EventTransmitter} of "username"
      * @param username the username of the user who wants to log out.
      * @throws NullPointerException if the eventTransmitter is null.
      * @return always returns SUCCESS.

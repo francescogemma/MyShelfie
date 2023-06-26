@@ -134,10 +134,11 @@ public class GameController {
     }
 
     /**
-     * This method returns the index of the {@link PersonalGoal personalGoal} of the player "username".
+     * This method returns the index of the {@link PersonalGoal personalGoal} of the player "username"
      *
-     * @return The index of the {@link PersonalGoal personalGoal} of the player "username".
-     * @throws NullPointerException iff "username" is null.
+     * @param username The username of the user for whom you want to become aware of the personal goal
+     * @return The index of the {@link PersonalGoal personalGoal} of the player "username"
+     * @throws NullPointerException iff "username" is null
      *
      * @see PersonalGoal
      * @see it.polimi.ingsw.model.goal.Goal
@@ -272,7 +273,7 @@ public class GameController {
             return Response.failure("You are in the lobby");
         }
 
-        removeFromList(username, this.clientsInGame);
+        removeFromList(username, clientsInGame);
 
         try {
             game.disconnectPlayer(username);
@@ -595,6 +596,7 @@ public class GameController {
      * It requires that the game is not started and that there are at least 2 players in the lobby
      * All the players in the lobby are added to the game and the lobby is cleared
      *
+     * @param username The username of the player who wants to start the game.
      * @return FAILURE iff
      * <ul>
      *     <li> Username is not in lobby </li>
@@ -643,6 +645,11 @@ public class GameController {
         return game.isStopped();
     }
 
+    /**
+     * Removes the user with the username "username" from the list passed as a parameter.
+     * @param username The username to be removed
+     * @param list The list from which the user with the username "username" needs to be removed.
+     */
     private void removeFromList (String username, ArrayList<Pair<EventTransmitter, String>> list) {
         Objects.requireNonNull(username);
         Objects.requireNonNull(list);

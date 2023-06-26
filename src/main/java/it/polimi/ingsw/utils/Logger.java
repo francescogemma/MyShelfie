@@ -17,17 +17,38 @@ import java.util.List;
  * This feature can be useful for debugging and troubleshooting purposes.
  *
  * @author Giacomo Groppi
- * */
+ */
 public class Logger {
+    /**
+     * Enum represents different severity types of messages.
+     */
     public enum Type {
+        /**
+         * Represents a critical message.
+         */
         CRITICAL("Critical"),
+
+        /**
+         * Represents a warning message.
+         */
         WARNING("Warning"),
+
+        /**
+         * Represents a general message.
+         */
         MESSAGE("Message");
 
+        /**
+         * The severity level of the message
+         */
         private final String data;
 
-        Type(String m) {
-            this.data = m;
+        /**
+         * Private constructor for the enum.
+         * @param type Type of severity
+         */
+        private Type(String type) {
+            this.data = type;
         }
 
         @Override
@@ -78,10 +99,16 @@ public class Logger {
      */
     private static String logPosition;
 
+    /**
+     * @return The position of the log file.
+     */
     private String getLogPosition () {
         return logPosition + "/log_" + nameLog + ".txt";
     }
 
+    /**
+     * Private constructor for the logger for implementing the singleton pattern.
+     */
     private Logger() {
         message = new ArrayList<>();
     }
@@ -108,10 +135,17 @@ public class Logger {
         }
     }
 
+    /**
+     * @param position The position of the file to be removed.
+     * @return True iff the file has been successfully removed
+     */
     private boolean removeFile (String position) {
         return new File(position).delete();
     }
 
+    /**
+     * Instance of the logger for implementing the singleton pattern.
+     */
     private static final Logger INSTANCE;
 
     /**
@@ -179,6 +213,17 @@ public class Logger {
         Logger.write(Type.CRITICAL, message, true);
     }
 
+    /**
+     * Prints the log message based on the logger configuration.
+     * The function is expected to be called from a function that is between
+     * {@link Logger#write(Type, String, boolean)} and the caller who wants to print a text string,
+     * because the function to print the name of the calling function observes the {@link Thread#getStackTrace()}
+     * and needs to know how many functions are between it and the caller.
+     *
+     * @param type Message type.
+     * @param message Message to print.
+     * @param printCaller If true, prints the name of the calling function.
+     */
     private static void write (Type type, String message, boolean printCaller) {
         String appendMessage;
 
