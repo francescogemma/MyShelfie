@@ -171,7 +171,16 @@ public class NetworkEventTransceiver implements EventTransceiver {
         }
     }
 
+    /**
+     * It is a queue used to implement a producer/consumer pattern for outgoing events.
+     * {@link NetworkEventTransceiver#broadcast(EventData)} is the producer; the consumer thread sens
+     * the events over the connection.
+     */
     private final Queue<EventData> sendQueue = new ArrayDeque<>();
+
+    /**
+     * It is true iff the consumer thread which sends events over the connection has to remain alive.
+     */
     private boolean hasToSend = true;
 
     @Override

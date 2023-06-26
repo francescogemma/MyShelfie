@@ -124,11 +124,27 @@ public class RMIConnection implements Connection {
         }, 0, 2500);
     }
 
+    /**
+     * Timeout in milliseconds of send and read operations over RMI.
+     */
     private static final long TIMEOUT = 5000;
 
+    /**
+     * Lock used to synchronize with the thread that executes RMI remote read operation.
+     */
     private final Object readWithTimeoutLock = new Object();
+
+    /**
+     * It is the result of RMI remote read. It is null if the read operation took longer than {@link RMIConnection#TIMEOUT}.
+     */
     private String read;
 
+    /**
+     * Performs a remote operation over RMI to read a string.
+     *
+     * @return an Optional with the read string if the remote operation took less than the timeout, an empty
+     * optional otherwise.
+     */
     private Optional<String> readWithTimeout() {
         read = null;
 
@@ -156,9 +172,23 @@ public class RMIConnection implements Connection {
         }
     }
 
+    /**
+     * Lock object used to synchronize with the thread that executes RMI remote write operation.
+     */
     private final Object sendWithTimeoutLock = new Object();
+
+    /**
+     * It is true iff the last remote write operation over RMI took less than the timeout.
+     */
     private boolean sent;
 
+    /**
+     * Sends the given string over RMI with a timeout.
+     *
+     * @param toSend is the string which will be sent.
+     * @return true iff the remote write operation over RMI took less than the timeout, which means that the
+     * read has been successful.
+     */
     private boolean sendWithTimeout(String toSend) {
         sent = false;
 
