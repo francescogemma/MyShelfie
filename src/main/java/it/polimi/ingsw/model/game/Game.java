@@ -66,6 +66,11 @@ public class Game extends GameView {
     private final List<PersonalGoal> personalGoals;
 
     /**
+     * It's true iff the game has just been started or restarted
+    */
+    private boolean hasRestarted = false;
+
+    /**
      * Creates a new game with the given name.
      * @param name the name of the game
      * @param username is the username of the {@link Player} who is creating the game.
@@ -300,6 +305,10 @@ public class Game extends GameView {
             setStopped();
         } else if (numberOfPlayerOnline() == 1) {
             setWaitingForReconnections();
+            if (this.players.get(currentPlayerIndex).equals(player)) {
+                calculateNextPlayer();
+                this.transceiver.broadcast(new CurrentPlayerChangedEventData(players.get(currentPlayerIndex)));
+            }
         } else if (isStarted() && (this.players.get(currentPlayerIndex).equals(player))) {
             calculateNextPlayer();
 
@@ -344,6 +353,7 @@ public class Game extends GameView {
             }
         }
 
+        hasRestarted = true;
         isStopped = false;
         broadcast(new GameHasStartedEventData());
     }
@@ -422,7 +432,7 @@ public class Game extends GameView {
 
                 removeFromWaitingForReconnections();
 
-                if (players.get(currentPlayerIndex).isDisconnected()) {
+                if (players.get(currentPlayerIndex).isDisconnected() && hasRestarted) {
                     this.playTimer = new Timer();
                     this.playTimer.schedule(new TimerTask() {
                         @Override
@@ -430,6 +440,8 @@ public class Game extends GameView {
                             timerEndForTurn();
                         }}, TIME_FIRST_PLAYER_CONNECT);
                 }
+
+                hasRestarted = false;
             } else {
                 if (playTimer != null) {
                     this.playTimer.cancel();
@@ -460,6 +472,7 @@ public class Game extends GameView {
         Logger.writeMessage("Number of player online:"  + numberOfPlayerOnline());
 
         this.isStarted = true;
+        this.hasRestarted = true;
 
         this.currentPlayerIndex = FIRST_PLAYER_INDEX;
 
