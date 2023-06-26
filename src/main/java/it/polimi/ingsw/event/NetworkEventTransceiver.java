@@ -15,10 +15,8 @@ import it.polimi.ingsw.model.tile.Tile;
 import it.polimi.ingsw.networking.Connection;
 import it.polimi.ingsw.networking.DisconnectedException;
 import it.polimi.ingsw.utils.Logger;
-import jdk.jfr.Event;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Is an {@link EventTransceiver} which allows broadcast and reception of events through a network. It relies on a
@@ -106,6 +104,34 @@ public class NetworkEventTransceiver implements EventTransceiver {
                 }
             }
         }).start();
+
+        new Thread(() -> {
+            EventData toSend;
+
+            while (true) {
+                synchronized (sendQueue) {
+                    while (sendQueue.isEmpty()) {
+                        if (!hasToSend) {
+                            return;
+                        }
+
+                        try {
+                            sendQueue.wait();
+                        } catch (InterruptedException e) {
+
+                        }
+                    }
+
+                    toSend = sendQueue.poll();
+                }
+
+                try {
+                    connection.send(gson.toJson(toSend, EventData.class));
+                } catch (DisconnectedException e) {
+                    return;
+                }
+            }
+        }).start();
     }
 
     /**
@@ -145,12 +171,14 @@ public class NetworkEventTransceiver implements EventTransceiver {
         }
     }
 
+    private final Queue<EventData> sendQueue = new ArrayDeque<>();
+    private boolean hasToSend = true;
+
     @Override
     public void broadcast(EventData data) {
-        try {
-            connection.send(gson.toJson(data, EventData.class));
-        } catch (DisconnectedException ignored) {
-
+        synchronized (sendQueue) {
+            sendQueue.add(data);
+            sendQueue.notifyAll();
         }
     }
 
@@ -162,5 +190,10 @@ public class NetworkEventTransceiver implements EventTransceiver {
      */
     public void disconnect() {
         connection.disconnect();
+
+        synchronized (sendQueue) {
+            hasToSend = false;
+            sendQueue.notifyAll();
+        }
     }
 }
