@@ -32,6 +32,12 @@ public class Server {
         try {
             if (args.length > 0) {
                 ConnectionAcceptor.initialize(args[0]);
+            } else {
+                System.out.println("You must specify the server's hostname, " +
+                        "which corresponds to the IP or domain of the server on the network interface " +
+                        "through which it communicates with the clients");
+                System.exit(1);
+                return;
             }
             connectionAcceptor = new ConnectionAcceptor(8080, 8081);
         } catch (RemoteException | ConnectionException e) {
