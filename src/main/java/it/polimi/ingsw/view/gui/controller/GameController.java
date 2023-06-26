@@ -830,6 +830,11 @@ public class GameController extends Controller {
     private PopUpQueue popUpQueue;
 
     // Listeners:
+
+    /**
+     * When the player is ready to receive new game data, the received event is unpacked.
+     * All goals and information about the board are retrieved and displayed.
+     */
     private final EventListener<InitialGameEventData> initialGameListener = data -> {
         commonGoals = data.gameView().getCommonGoals();
 
@@ -881,12 +886,19 @@ public class GameController extends Controller {
         });
     };
 
+    /**
+     * When the personal goal is received (as an index) it's transformed into an actual personal goal object and
+     * assigned to this class' relative attribute.
+     */
     private final EventListener<PersonalGoalSetEventData> personalGoalSetListener = data -> {
         personalGoal = PersonalGoal.fromIndex(data.personalGoal());
 
         populateGoalsPanel();
     };
 
+    /**
+     * When a new player enters the game, its name is rendered on screen.
+     */
     private final EventListener<PlayerHasJoinGameEventData> playerHasJoinGameListener = data -> {
         scoreBoard.setConnectionState(data.username(), true);
 
@@ -903,12 +915,18 @@ public class GameController extends Controller {
         }
     };
 
+    /**
+     * Listener that updates the board upon new board data retrieval.
+     */
     private final EventListener<BoardChangedEventData> boardChangedListener = data -> {
         board = data.board();
 
         populateBoard();
     };
 
+    /**
+     * Changes the bookshelf displayed on screen, once the user requests to change the current visible bookshelf.
+     */
     private final EventListener<BookshelfHasChangedEventData> bookshelfHasChangedListener = data -> {
         bookshelves.set(scoreBoard.getDisplayablePlayer(data.username()).getOriginalIndex(), data.bookshelf());
 
@@ -917,6 +935,10 @@ public class GameController extends Controller {
         }
     };
 
+    /**
+     * When the player changes, a message is sent to the user, and the current active player's name is updated on screen.
+     * This is equivalent a turn change, so the board is also updated.
+     */
     private final EventListener<CurrentPlayerChangedEventData> currentPlayerChangedListener = data -> {
         scoreBoard.setPlayingPlayerOriginalIndex(data.getUsername());
 
@@ -929,6 +951,9 @@ public class GameController extends Controller {
         }
     };
 
+    /**
+     * After common goal completion, the user is notified through a popup.
+     */
     private final EventListener<CommonGoalCompletedEventData> commonGoalCompletedListener = data -> {
         DisplayableGoal displayableGoal = new DisplayableGoal(data.getPlayer().getUsername(),
             DisplayableGoal.GoalType.COMMON, data.getCommonGoalCompleted() == commonGoals[0].getIndex(),
@@ -957,6 +982,9 @@ public class GameController extends Controller {
         );
     };
 
+    /**
+     * A message is sent to the user through a popup when any player completely fills their bookshelf with tiles.
+     */
     private final EventListener<FirstFullBookshelfEventData> firstFullBookshelfListener = data -> {
         popUpQueue.add(data.username() + " is the first who filled the bookshelf!",
             popUp -> {
@@ -982,6 +1010,11 @@ public class GameController extends Controller {
             });
     };
 
+    /**
+     * When a game over event is received, all players' points are tallied up one by one, in order. After a series of
+     * popups detailing each player's score components, the layout is changed to the scoreboard menu, to give one final
+     * summary of the game's statistics.
+     */
     private final EventListener<GameOverEventData> gameOverListener = data -> {
         for (DisplayablePlayer displayablePlayer : scoreBoard.getDisplayablePlayers()) {
             scoreBoard.setIsWinner(displayablePlayer.getName(),
@@ -1045,6 +1078,9 @@ public class GameController extends Controller {
         }
     };
 
+    /**
+     * If a player disconnects, a message is rendered on screen, and the scoreboard is updated.
+     */
     private final EventListener<PlayerHasDisconnectedEventData> playerHasDisconnectedListener = data -> {
         popUpQueue.add(data.username() + " has disconnected", data.username().toUpperCase() +
                 "_HAS_DISCONNECTED",
@@ -1062,10 +1098,19 @@ public class GameController extends Controller {
         });
     };
 
+    /**
+     * This listener waits for a reconnection after the game has been paused.
+     */
     private final EventListener<GameHasBeenPauseEventData> gameHasBeenPauseListener = data -> waitForReconnections();
 
+    /**
+     * Callback to the stopGame method if an GameHasBeenStoppedEvent is received.
+     */
     private final EventListener<GameHasBeenStoppedEventData> gameHasBeenStoppedListener = data -> stopGame();
 
+    /**
+     * Adds a message to the popUpQueue informing the user that the process is waiting for other players to reconnect.
+     */
     public void waitForReconnections() {
         popUpQueue.add("Waiting for reconnection of other players",
             popUp ->{
@@ -1081,6 +1126,10 @@ public class GameController extends Controller {
             popUp -> {});
     }
 
+    /**
+     * After game stop request, all buttons and interactive objects are turned off, and, after a brief pop up,
+     * the game menu is switched to the list of other available games.
+     */
     public void stopGame() {
         gameHasBeenStopped = true;
 
@@ -1112,8 +1161,16 @@ public class GameController extends Controller {
         return NAME;
     }
 
+    /**
+     * A JavaFX object used to define the game's background.
+     */
     @FXML private Pane gameBackgroundBlurPane;
 
+    /**
+     * Initializes the game's interface. The transceiver, all requesters, receivers are booted up. The game board and
+     * all bookshelves are initialized and filled accordingly. The scoreboard's list view is assigned a new cell factory
+     * to provide more accurate styling and dynamic information.
+     */
     @FXML
     private void initialize() {
         setBoardImageViewListener();
