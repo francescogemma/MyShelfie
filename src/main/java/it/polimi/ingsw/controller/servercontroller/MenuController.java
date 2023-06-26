@@ -90,6 +90,8 @@ public class MenuController {
      *
      * @param username the username of the user to return
      * @param password the password of the user.
+     *
+     * @return a user with the given username.
      */
     private User getUser (String username, String password) {
         User user;
@@ -209,6 +211,8 @@ public class MenuController {
     }
 
     /**
+     * @param gameName is the name of the game for which we want to retrieve the controller.
+     *
      * @return The game controller
      * @see GameController
      * */

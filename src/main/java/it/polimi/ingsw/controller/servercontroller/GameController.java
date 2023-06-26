@@ -86,7 +86,9 @@ public class GameController {
 
     /**
      * Constructs a new {@code GameController} object for the {@link Game game}.
-     * 
+     *
+     * @param game is the {@link Game} managed by this controller.
+     *
      * @throws NullPointerException iff game is null
      *
      * @see Game
@@ -187,6 +189,11 @@ public class GameController {
         return this;
     }
 
+    /**
+     * Broadcasts the given EventData to all the clients in the game lobby.
+     *
+     * @param event is the EventData which will be dispatched to all the clients in the lobby.
+     */
     private void forEachInLobby(EventData event) {
         assert event != null;
         this.clientsInLobby.forEach(p -> p.getKey().broadcast(event));
