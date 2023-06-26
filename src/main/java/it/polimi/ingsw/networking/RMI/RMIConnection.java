@@ -128,6 +128,9 @@ public class RMIConnection implements Connection {
         }, 0, 2500);
     }
 
+    private final Object readLock = new Object();
+    private String read;
+
     /**
      * Should only be called once.
      * This method creates a thread that checks the remote queue for "heartbeat" messages.
@@ -142,12 +145,33 @@ public class RMIConnection implements Connection {
                     }
                 }
 
-                String read;
-                try {
-                    read = pollQueue.poll();
-                } catch (RemoteException remoteException) {
-                    disconnect();
-                    return;
+                read = null;
+
+                new Thread(() -> {
+                        try {
+                            String remoteRead = pollQueue.poll();
+
+                            synchronized (readLock) {
+                                read = remoteRead;
+                                readLock.notifyAll();
+                            }
+                        } catch (RemoteException remoteException) {
+
+                        }
+                }).start();
+
+
+                synchronized (readLock) {
+                    try {
+                        readLock.wait(5000);
+                    } catch (InterruptedException e) {
+
+                    }
+
+                    if (read == null) {
+                        disconnect();
+                        return;
+                    }
                 }
 
                 if (!read.equals("heartbeat")) {
