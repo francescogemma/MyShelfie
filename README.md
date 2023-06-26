@@ -53,4 +53,4 @@ You can run the server version of the application by following these instruction
     ```
     java -jar my-shelfie-server.jar [hostname]
     ```
-    where `[hostname]` indicates the server's hostname, it's an optional argument for setting the `java.rmi.server.hostname` property
+    where `[hostname]` is a mandatory argument for setting the `java.rmi.server.hostname` property, which corresponds to the IP or domain of the server on the network interface through which it communicates with the clients
