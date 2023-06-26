@@ -222,7 +222,6 @@ public class GameController extends Controller {
     private void displayGoal(DisplayableGoal displayableGoal) {
         isDisplayingCommonGoal = true;
 
-        // TODO: Blur every player except for the one who has completed the goal
         scoreBoard.addAdditionalPoints(displayableGoal.getPlayerName(), displayableGoal.getPoints());
 
         Platform.runLater(() -> {
@@ -248,7 +247,6 @@ public class GameController extends Controller {
         isDisplayingCommonGoal = false;
 
         for (DisplayablePlayer displayablePlayer : scoreBoard.getDisplayablePlayers()) {
-            // TODO: Unblur every player
             scoreBoard.sumPoints(displayablePlayer.getName());
         }
 
@@ -623,7 +621,6 @@ public class GameController extends Controller {
                 }
             }
 
-            // TODO: Display the different masks which led to goal completion
             int count = 0;
             for (BookshelfMask mask : maskSet.getBookshelfMasks()) {
                 for (Shelf shelf : mask.getShelves()) {

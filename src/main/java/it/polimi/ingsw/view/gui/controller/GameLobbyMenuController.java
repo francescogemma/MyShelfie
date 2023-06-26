@@ -149,7 +149,6 @@ public class GameLobbyMenuController extends Controller {
     private final EventListener<PlayerHasExitLobbyEventData> playerHasExitLobbyListener = data -> {
         Platform.runLater(() -> {
             players.remove(data.username());
-            System.out.println(players); // TODO: remove this
         });
     };
 
