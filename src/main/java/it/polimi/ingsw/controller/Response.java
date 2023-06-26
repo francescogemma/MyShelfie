@@ -99,6 +99,8 @@ public class Response <T extends EventData> extends EventDataWrapper<T> {
      *
      * @param message The message to be set as the response.
      * @param status The status that the message should have.
+     * @param data is the wrapped EventData.
+     *
      * @author Cristiano Migali
      * */
     public Response(String message, ResponseStatus status, T data) {
@@ -139,6 +141,18 @@ public class Response <T extends EventData> extends EventDataWrapper<T> {
         return status == ResponseStatus.SUCCESS;
     }
 
+    /**
+     * {@link Requester} factory method that performs requests which receive responses of this EventData, added
+     * accordingly to {@link EventData} interface contract.
+     *
+     * @param transmitter is the {@link EventTransmitter} on which the request is sent.
+     * @param receiver is the {@link EventReceiver} which receives the response to the request.
+     * @param responsesLock is the lock Object on which the {@link Requester} synchronizes to wait for the
+     *                      response.
+     * @return a {@link Requester} which is capable of performing requests which receive responses of this
+     * EventData.
+     * @param <T> is the type of the request EventData.
+     */
     public static <T extends EventData> Requester<Response<VoidEventData>, T> requester(EventTransmitter transmitter,
                                                                          EventReceiver<EventData> receiver,
                                                                          Object responsesLock) {
@@ -148,6 +162,20 @@ public class Response <T extends EventData> extends EventDataWrapper<T> {
                 responsesLock);
     }
 
+    /**
+     * {@link Requester} factory method that performs requests which receive responses of this EventData, added
+     * accordingly to {@link EventData} interface contract.
+     *
+     * @param transmitter is the {@link EventTransmitter} on which the request is sent.
+     * @param receiver is the {@link EventReceiver} which receives the response to the request.
+     * @param wrappedEventId is the identifier of the wrapped EventData.
+     * @param responsesLock is the lock Object on which the {@link Requester} synchronizes to wait for the
+     *                      response.
+     * @return a {@link Requester} which is capable of performing requests which receive responses of this
+     * EventData.
+     * @param <T> is the type of the request EventData.
+     * @param <Z> is the type of the wrapped EventData.
+     */
     public static <T extends EventData, Z extends EventData> Requester<Response<Z>, T>
             requester(EventTransmitter transmitter,
                       EventReceiver<EventData> receiver,
