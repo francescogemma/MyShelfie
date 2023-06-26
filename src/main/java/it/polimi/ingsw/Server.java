@@ -27,6 +27,8 @@ public class Server {
         MenuController menuController = MenuController.getInstance();
         ConnectionAcceptor connectionAcceptor;
 
+        Logger.setShouldPrint(false);
+
         try {
             if (args.length > 0) {
                 ConnectionAcceptor.initialize(args[0]);
