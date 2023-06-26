@@ -30,6 +30,9 @@ public class CompatibleEvaluator extends CommonGoalEvaluator implements Evaluato
      */
     private BookshelfMaskSet biggestSet;
 
+    /**
+     * Set cardinality to be reached in order to complete the goal.
+     */
     private final int targetSetSize;
 
     /**

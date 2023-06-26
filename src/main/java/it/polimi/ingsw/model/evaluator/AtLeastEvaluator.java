@@ -27,6 +27,7 @@ public class AtLeastEvaluator extends CommonGoalEvaluator implements Evaluator {
      *
      * @param targetAmount is the needed quantity of {@link BookshelfMask BookshelfMasks} to
      *                     grant a player a non-zero amount of points.
+     * @param toCount predicates which a {@link BookshelfMask} must satisfy in order to be counted.
      */
     public AtLeastEvaluator(int targetAmount, Predicate<BookshelfMask> toCount) {
         // call simple constructor
