@@ -1123,6 +1123,12 @@ public class GameLayout extends AppLayout {
         }
 
         isDisplayingGoal = false;
+
+        blurrableFirstCommonGoalDrawable.blur(false);
+        blurrableSecondCommonGoalDrawable.blur(false);
+        blurrablePersonalGoalDrawable.blur(false);
+        blurrableAdjacencyGoalDrawable.blur(false);
+
         waitingForReconnectionsPopUp = null;
 
         exitButton.focusable(false);
