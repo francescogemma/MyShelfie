@@ -167,11 +167,11 @@ public class RMIConnection implements Connection {
                     } catch (InterruptedException e) {
 
                     }
+                }
 
-                    if (read == null) {
-                        disconnect();
-                        return;
-                    }
+                if (read == null) {
+                    disconnect();
+                    return;
                 }
 
                 if (!read.equals("heartbeat")) {
