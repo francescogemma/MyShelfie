@@ -283,7 +283,7 @@ public class GameController extends Controller {
     @FXML private ImageView gameBoardImageView;
 
     /**
-     * A button to momentarily pause the game.
+     * A button to momentarily stop the game.
      */
     @FXML private Button stopGameButton;
 
@@ -542,6 +542,9 @@ public class GameController extends Controller {
      */
     private final Button[] bookshelfColumnsButton = new Button[BookshelfView.COLUMNS];
 
+    /**
+     * Apply all bookshelf transforms, stored as constants within this class.
+     */
     private void resizeBookshelf() {
         double realWidth = Math.min(bookshelfImageView.getFitWidth(), bookshelfImageView.getFitHeight() * BOOKSHELF_ASPECT_RATIO);
         double realHeight = Math.min(bookshelfImageView.getFitHeight(), bookshelfImageView.getFitWidth() / BOOKSHELF_ASPECT_RATIO);
@@ -562,11 +565,19 @@ public class GameController extends Controller {
         bookshelfColumnSelectorGridPane.setHgap(bookshelfColumnSelectorGridPane.getWidth() * (61.0 / BOOKSHELF_WIDTH));
     }
 
+    /**
+     * Add listeners to the bookshelf's images view's fit size, and bind the resizeBookshelf method to them. The bookshelf
+     * will be automatically updated upon window size variation.
+     */
     private void setBookshelfImageViewListener() {
         bookshelfImageView.fitWidthProperty().addListener((observable, oldValue, newValue) -> resizeBookshelf());
         bookshelfImageView.fitHeightProperty().addListener((observable, oldValue, newValue) -> resizeBookshelf());
     }
 
+    /**
+     * For each button present in front of the bookshelf image view, their visibility and image are updated in order to reflect
+     * their tile.
+     */
     private void populateBookshelfPanel() {
         Platform.runLater(() -> {
             previousBookshelfButton.setDisable(selectedBookshelfIndex == 0);
@@ -600,6 +611,10 @@ public class GameController extends Controller {
         });
     }
 
+    /**
+     * Highlights all tiles that are part of the provided maskSet, by lowering the opacity of all other tiles.
+     * @param maskSet is the set of bookshelf masks that will be highlighted.
+     */
     private void populateBookshelfPanelWithMask(BookshelfMaskSet maskSet) {
         Platform.runLater(() -> {
             for (int row = 0; row < BookshelfView.ROWS; row++) {
@@ -623,6 +638,11 @@ public class GameController extends Controller {
         });
     }
 
+    /**
+     * Utility method to generate a tile button object, since the following operations are common to all buttons.
+     * @param isMouseTransparent will determine if the generated button will be interactive or not.
+     * @return an invisible button.
+     */
     private Button craftTileButton(boolean isMouseTransparent) {
         Button tileButton = new Button();
 
@@ -647,41 +667,166 @@ public class GameController extends Controller {
     }
 
     // Data:
+    /**
+     * The current active transceiver is stored here. This object is initialized in the "initialize" method within this
+     * class.
+     */
     private NetworkEventTransceiver transceiver = null;
+
+    /**
+     * The user's personal goal (all other users may have different variations of this object).
+     */
     private PersonalGoal personalGoal;
+
+    /**
+     * A list of common goals. This is not a list containing all common goals. It's limited to the ones relative to the
+     * user, so it should only contain two elements.
+     */
     private CommonGoal[] commonGoals;
+
+    /**
+     * The scoreboard object, containing relevant scoreboard information.
+     */
     private DisplayableScoreBoard scoreBoard;
+
+    /**
+     * The name of the current game.
+     */
     private String gameName;
+
+    /**
+     * The bookshelf's player index. This number is used as an index to iterate through all bookshelves in the game's
+     * interface.
+     */
     private int selectedBookshelfIndex;
+
+    /**
+     * Used to notify the user that the program is trying to reconnect to the game.
+     */
     private PopUp waitingForReconnectionsPopUp;
+
+    /**
+     * A list of bookshelves, one for each playing player. In the interface, the user will be able to iterate through
+     * these bookshelves, to see their tiles.
+     */
     private List<BookshelfView> bookshelves;
+
+    /**
+     * The game's board.
+     */
     private BoardView board;
 
+    /**
+     * Flag used to determine if a common goal is being displayed. This is needed to prevent other events from happening
+     * as the users need time to read one information at a time.
+     */
     private boolean isDisplayingCommonGoal;
 
+    /**
+     * Flag used to determine if the game is currently stopped.
+     */
     private boolean gameHasBeenStopped;
 
     // Utilities:
+
+    /**
+     * Requests to join the game.
+     */
     private Requester<Response<VoidEventData>, JoinGameEventData> joinGameRequester = null;
+
+    /**
+     * Requests to select a tile on the game board.
+     */
     private Requester<Response<VoidEventData>, SelectTileEventData> selectTileRequester = null;
+
+    /**
+     * Requests to deselect a tile on the game board. During selection, a player can select and deselect tiles, as long
+     * as the final configuration, before being inserted into their bookshelf, is valid.
+     */
     private Requester<Response<VoidEventData>, DeselectTileEventData> deselectTileRequester = null;
+
+    /**
+     * Requests to insert a tile into the bookshelf.
+     */
     private Requester<Response<VoidEventData>, InsertTileEventData> insertTileRequester = null;
+
+    /**
+     * Requests to pause the game.
+     */
     private Requester<Response<VoidEventData>, PauseGameEventData> pauseGameRequester = null;
+
+    /**
+     * Requests to exit the game. Exiting the game doesn't necessarily end it, as other players can continue playing.
+     */
     private Requester<Response<VoidEventData>, PlayerExitGameEventData> playerExitGameRequester = null;
 
+    /**
+     * Receives an event when the player is ready to receive the initial game data.
+     */
     private EventReceiver<InitialGameEventData> initialGameReceiver = null;
+
+    /**
+     * Receives personal goals. Different players may receive different personal goals.
+     */
     private EventReceiver<PersonalGoalSetEventData> personalGoalSetReceiver = null;
+
+    /**
+     * Receives an event if a player joins the game.
+     */
     private EventReceiver<PlayerHasJoinGameEventData> playerHasJoinGameReceiver = null;
+
+    /**
+     * Upon board edit, this receiver receives an event. This is needed to update the board on the client's
+     * interface.
+     */
     private EventReceiver<BoardChangedEventData> boardChangedReceiver = null;
+
+    /**
+     * Upon a bookshelf edit, this receiver receives an event. This is needed to update the bookshelf on
+     * the client's interface.
+     */
     private EventReceiver<BookshelfHasChangedEventData> bookshelfHasChangedReceiver = null;
+
+    /**
+     * At each turn, the playing player is different. The player that can interact with the game board is called "current
+     * player".
+     * This receiver receives an event upon current player change.
+     */
     private EventReceiver<CurrentPlayerChangedEventData> currentPlayerChangedReceiver = null;
+
+    /**
+     * Receives an event if a common goal is completed.
+     */
     private EventReceiver<CommonGoalCompletedEventData> commonGoalCompletedReceiver = null;
+
+    /**
+     * Receives an event as soon as any bookshelf if completely full of tiles.
+     */
     private EventReceiver<FirstFullBookshelfEventData> firstFullBookshelfReceiver = null;
+
+    /**
+     * When the game ends, this receiver receives an event.
+     */
     private EventReceiver<GameOverEventData> gameOverReceiver = null;
+
+    /**
+     * If a player disconnects from the game, this receiver is notified.
+     */
     private EventReceiver<PlayerHasDisconnectedEventData> playerHasDisconnectedReceiver = null;
+
+    /**
+     * If the game has been paused, this receiver is notified.
+     */
     private EventReceiver<GameHasBeenPauseEventData> gameHasBeenPauseReceiver = null;
+
+    /**
+     * If the game has been stopped, this receiver is notified.
+     */
     private EventReceiver<GameHasBeenStoppedEventData> gameHasBeenStoppedReceiver = null;
 
+    /**
+     * Used to handle multiple popup requests.
+     */
     private PopUpQueue popUpQueue;
 
     // Listeners:
