@@ -31,13 +31,17 @@ The implemented features are the following:
 
 ## How to run
 
+> Make sure to use Java 17 Runtime if you are on a Windows machine.
+> This program makes use of Unicode characters which won't render properly on the terminal if you use a newer version due to a change in the supported Unicode standard which doesn't match the one used by Windows
+
 ### Client
 
 You can run the client version of the application by following these instructions:
 
-1. Open the terminal, any terminal of any OS should work (Windows, Linux, MacOS)
-2. Go to the directory containing the JAR file of the client (`my-shelfie-client.jar`)
-3. execute the client JAR using the command:
+1. <a href="https://github.com/francescogemma/ing-sw-2023-gemma-groppi-migali-miotti/raw/main/deliverables/final/jar/my-shelfie-client.jar"> Download the client JAR </a>
+2. Open the terminal, any terminal of any OS should work (Windows, Linux, MacOS)
+3. Go to the directory containing the JAR file of the client (`my-shelfie-client.jar`)
+4. execute the client JAR using the command:
     ```
     java -jar my-shelfie-client.jar
     ```
@@ -47,9 +51,10 @@ You can run the client version of the application by following these instruction
 
 You can run the server version of the application by following these instructions:
 
-1. Open the terminal, any terminal of any OS should work (Windows, Linux, MacOS)
-2. Go to the directory containing the JAR file of the server (`my-shelfie-server.jar`)
-3. execute the server JAR using the command:
+1. <a href="https://github.com/francescogemma/ing-sw-2023-gemma-groppi-migali-miotti/raw/main/deliverables/final/jar/my-shelfie-server.jar"> Download the server JAR </a>
+2. Open the terminal, any terminal of any OS should work (Windows, Linux, MacOS)
+3. Go to the directory containing the JAR file of the server (`my-shelfie-server.jar`)
+4. execute the server JAR using the command:
     ```
     java -jar my-shelfie-server.jar [hostname]
     ```
