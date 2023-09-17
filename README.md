@@ -4,6 +4,8 @@
 
 **Prefessor**: San Pietro Pierluigi
 
+**Grade**: 30/30 cum laude
+
 ## Team members
 
 * [Cristiano Migali](https://github.com/m1gwings)
